@@ -2172,6 +2172,49 @@ body.hide-cursor textarea{
             </div>
         </section>
 
+        <section class="page" id="page-historico-posto">
+            <h1 class="page-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Histórico do Posto
+                <span class="process-badge" id="historicoPostoBadge"></span>
+            </h1>
+
+            <div class="card">
+                <div class="card-head">
+                    <h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2>
+                    <button class="btn btn-sm btn-secondary" onclick="exportPostoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button>
+                </div>
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="renderHistoricoPostoAtual()" data-vk>
+                    </div>
+                    <div class="filter-bar">
+                        <span class="filter-chip active" data-filter="all" onclick="setHistoricoPostoFilter('all',this)">Todos</span>
+                        <span class="filter-chip" data-filter="1º Turno" onclick="setHistoricoPostoFilter('1º Turno',this)">1º Turno</span>
+                        <span class="filter-chip" data-filter="2º Turno" onclick="setHistoricoPostoFilter('2º Turno',this)">2º Turno</span>
+                        <span class="filter-chip" data-filter="3º Turno" onclick="setHistoricoPostoFilter('3º Turno',this)">3º Turno</span>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>PEP</th>
+                                <th>Diagrama/Ordem</th>
+                                <th>Placa</th>
+                                <th>Turno</th>
+                                <th>Tempo no Posto</th>
+                                <th>Data/Hora Conclusão</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historicoPostoTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <section class="page" id="page-config">
             <h1 class="page-title">
                 <i class="fa-solid fa-gear"></i>
@@ -2544,7 +2587,7 @@ body.hide-cursor textarea{
 </div>
 
 <script>
-const STORAGE_KEY = 'weg_fluxo_produtivo_v21';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v22';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2582,6 +2625,7 @@ let currentUser = null;
 let currentPosto = null;
 let postoFilter = 'all';
 let postoConcluidosFilter = 'all';
+let historicoPostoFilter = 'all';
 let admFilter = 'all';
 let histFilter = 'all';
 let histPostoFilter = 'all';
@@ -2984,7 +3028,7 @@ function buildMenu(){
         const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
         html = `
             <a data-page="posto" class="active" data-tooltip="${currentPosto}"><i class="fa-solid ${iconMap[currentPosto]}"></i></a>
-            <a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a>
+            <a data-page="historico-posto" data-tooltip="Histórico do ${currentPosto}"><i class="fa-solid fa-clock-rotate-left"></i></a>
             <a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>
         `;
     }
@@ -3015,6 +3059,7 @@ function navigate(page){
     if(page === 'admin') renderAdminTable();
     if(page === 'posto') renderPosto();
     if(page === 'historico'){ renderHistorico(); renderHistoricoPostos(); }
+    if(page === 'historico-posto') renderHistoricoPostoAtual();
     if(page === 'config') loadConfigUI();
 }
 
@@ -3057,12 +3102,16 @@ function atualizarHeaderTitle(page){
         'admin': 'Administração',
         'posto': currentPosto ? 'Posto - ' + currentPosto : 'Posto de Trabalho',
         'historico': 'Histórico',
+        'historico-posto': currentPosto ? 'Histórico - ' + currentPosto : 'Histórico do Posto',
         'config': 'Configurações'
     };
     
     titleEl.textContent = titles[page] || 'WEG';
     
     if(page === 'posto' && currentPosto){
+        badgeEl.textContent = currentPosto;
+        badgeEl.style.display = 'inline-block';
+    }else if(page === 'historico-posto' && currentPosto){
         badgeEl.textContent = currentPosto;
         badgeEl.style.display = 'inline-block';
     }else{
@@ -3502,6 +3551,13 @@ function setPostoConcluidosFilter(f,el){
     renderPostoConcluidos();
 }
 
+function setHistoricoPostoFilter(f,el){
+    historicoPostoFilter = f;
+    document.querySelectorAll('#page-historico-posto .filter-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    renderHistoricoPostoAtual();
+}
+
 function renderPostoTable(){
     const tbody = document.getElementById('postoTableBody');
     const search = (document.getElementById('postoSearch').value || '').toLowerCase();
@@ -3638,6 +3694,47 @@ function renderPostoConcluidos(){
 
     if(data.length === 0){
         tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>Nenhum projeto foi concluído neste posto ainda.</p></div></td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = data.map(p=>{
+        const tempoStr = p.tempoReal ? formatarTempo(p.tempoReal) : '-';
+        const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+        const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
+        return `
+            <tr>
+                <td style="text-align:center;">${p.pep||'-'}</td>
+                <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
+                <td style="text-align:center;">${p.placa||'-'}</td>
+                <td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td>
+                <td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
+                <td style="text-align:center;">${dataConclusao}</td>
+                <td style="text-align:center;">${obs}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderHistoricoPostoAtual(){
+    const tbody = document.getElementById('historicoPostoTableBody');
+    const search = (document.getElementById('historicoPostoSearch').value || '').toLowerCase();
+
+    document.getElementById('historicoPostoNome').textContent = currentPosto;
+    document.getElementById('historicoPostoBadge').textContent = currentPosto;
+
+    let data = state.historicoPostos.filter(p => p.processo === currentPosto);
+    
+    if(historicoPostoFilter !== 'all') data = data.filter(p => p.turno === historicoPostoFilter);
+    if(search) data = data.filter(p =>
+        (p.pep||'').toLowerCase().includes(search) ||
+        p.diagrama.toLowerCase().includes(search) ||
+        (p.placa||'').toLowerCase().includes(search)
+    );
+
+    data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
+
+    if(data.length === 0){
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>Nenhum projeto foi concluído no ${currentPosto} ainda.</p></div></td></tr>`;
         return;
     }
 
