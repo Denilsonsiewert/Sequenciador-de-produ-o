@@ -1086,13 +1086,13 @@ body.hide-cursor textarea{
     left:50%;
     transform:translateX(-50%);
     background:var(--card);
-    border:2px solid var(--border);
-    border-radius:16px;
-    padding:14px;
-    box-shadow:0 8px 32px rgba(0,0,0,.25);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 12px 40px rgba(0,0,0,.15);
     z-index:7000;
     display:none;
-    max-width:420px;
+    max-width:380px;
     width:95%;
 }
 
@@ -1100,36 +1100,39 @@ body.hide-cursor textarea{
 
 .vk-header{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    margin-bottom:10px;
-    padding:0 4px;
+    gap:8px;
+    margin-bottom:16px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+}
+
+.vk-header i{
+    color:var(--weg-blue);
+    font-size:16px;
 }
 
 .vk-header span{
-    font-size:12px;
-    color:var(--text-light);
+    font-size:14px;
+    color:var(--text);
     font-weight:600;
-    display:flex;
-    align-items:center;
-    gap:6px;
 }
 
 .vk-row{
     display:flex;
-    gap:8px;
-    margin-bottom:8px;
+    gap:10px;
+    margin-bottom:10px;
     justify-content:center;
 }
 
 .vk-key{
-    background:var(--card);
-    border:2px solid var(--border);
+    background:var(--bg);
+    border:1px solid var(--border);
     border-radius:12px;
-    min-width:60px;
-    height:56px;
-    font-size:18px;
-    font-weight:700;
+    min-width:70px;
+    height:58px;
+    font-size:20px;
+    font-weight:600;
     color:var(--text);
     cursor:pointer !important;
     transition:all .15s ease;
@@ -1138,29 +1141,29 @@ body.hide-cursor textarea{
     justify-content:center;
     padding:0;
     user-select:none;
-    box-shadow:0 2px 0 rgba(0,0,0,.1);
     flex:1;
-    max-width:80px;
+    max-width:85px;
+    box-shadow:0 2px 4px rgba(0,0,0,.05);
 }
 
 .vk-key:hover{
     background:var(--weg-light);
     border-color:var(--weg-blue);
     transform:translateY(-2px);
-    box-shadow:0 4px 0 rgba(0,0,0,.1);
+    box-shadow:0 4px 8px rgba(0,0,0,.1);
 }
 
 .vk-key:active{
     background:var(--weg-blue);
     color:white;
-    transform:translateY(2px);
-    box-shadow:0 0 0 rgba(0,0,0,.1);
+    transform:translateY(0);
+    box-shadow:0 1px 2px rgba(0,0,0,.05);
 }
 
 .vk-key.wide{
-    min-width:80px;
-    font-size:14px;
-    max-width:100px;
+    min-width:90px;
+    font-size:16px;
+    max-width:110px;
 }
 
 .vk-key.action{
@@ -1192,6 +1195,16 @@ body.hide-cursor textarea{
 .vk-key.action.success:hover{
     background:#008a40;
     border-color:#008a40;
+}
+
+.vk-key.action.clear{
+    background:var(--info);
+    border-color:var(--info);
+}
+
+.vk-key.action.clear:hover{
+    background:#1976D2;
+    border-color:#1976D2;
 }
 
 .vk-toggle{
@@ -1493,14 +1506,14 @@ body.hide-cursor textarea{
     .user-info{display:none;}
     .role-grid{grid-template-columns:1fr;}
     .virtual-keyboard{
-        max-width:360px;
+        max-width:340px;
         bottom:10px;
-        padding:10px;
+        padding:15px;
     }
     .vk-key{
-        min-width:50px;
-        height:50px;
-        font-size:16px;
+        min-width:60px;
+        height:52px;
+        font-size:18px;
     }
     .modal-overlay{
         padding:15px;
@@ -1560,8 +1573,8 @@ body.hide-cursor textarea{
     .header{padding:0 15px;}
     .header-title{font-size:16px;}
     .header-logo{font-size:22px;}
-    .vk-key{min-width:45px;height:48px;font-size:16px;}
-    .vk-key.wide{min-width:60px;font-size:13px;}
+    .vk-key{min-width:50px;height:48px;font-size:16px;}
+    .vk-key.wide{min-width:70px;font-size:14px;}
     .icon-action-lg{
         min-width:50px;
         min-height:46px;
@@ -1570,10 +1583,10 @@ body.hide-cursor textarea{
     }
     .action-main{min-width:140px;gap:6px;}
     .virtual-keyboard{
-        max-width:320px;
-        padding:8px;
+        max-width:300px;
+        padding:12px;
     }
-    .vk-row{gap:5px;margin-bottom:5px;}
+    .vk-row{gap:8px;margin-bottom:8px;}
     .icon-action{
         width:44px;
         height:44px;
@@ -2302,7 +2315,30 @@ body.hide-cursor textarea{
             </div>
         </div>
 
-        <div class="form-group" style="margin-bottom:15px;">
+        <div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;">
+            <div class="alert alert-info" style="margin-bottom:10px;">
+                <i class="fa-solid fa-info-circle"></i>
+                <div>Informe o turno e a observação sobre o projeto.</div>
+            </div>
+            <div class="form-group">
+                <label>Turno de conclusão <span class="req">*</span></label>
+                <select id="concluirTurnoPintura">
+                    <option value="1º Turno">1º Turno</option>
+                    <option value="2º Turno">2º Turno</option>
+                    <option value="3º Turno">3º Turno</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Observação <span class="req">*</span></label>
+                <select id="concluirObservacaoPintura">
+                    <option value="">Selecione...</option>
+                    <option value="Peças em reprocesso/repintura">Peças em reprocesso/repintura</option>
+                    <option value="Gancherias/volumes pendentes">Gancherias/volumes pendentes</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;">
             <label>Turno de conclusão</label>
             <select id="concluirTurno">
                 <option value="1º Turno">1º Turno</option>
@@ -2321,7 +2357,8 @@ body.hide-cursor textarea{
 
 <div class="virtual-keyboard" id="virtualKeyboard">
     <div class="vk-header">
-        <span><i class="fa-solid fa-keyboard"></i> Teclado Numérico</span>
+        <i class="fa-solid fa-keyboard"></i>
+        <span>Teclado Numérico</span>
     </div>
     <div class="vk-row">
         <button class="vk-key" data-key="7">7</button>
@@ -2330,15 +2367,12 @@ body.hide-cursor textarea{
         <button class="vk-key action danger" data-action="backspace" title="Apagar">
             <i class="fa-solid fa-delete-left"></i>
         </button>
-        <button class="vk-key action danger" data-action="close" title="Fechar teclado">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
     </div>
     <div class="vk-row">
         <button class="vk-key" data-key="4">4</button>
         <button class="vk-key" data-key="5">5</button>
         <button class="vk-key" data-key="6">6</button>
-        <button class="vk-key action" data-action="clear" title="Limpar">
+        <button class="vk-key action clear" data-action="clear" title="Limpar">
             <i class="fa-solid fa-eraser"></i>
         </button>
     </div>
@@ -2346,9 +2380,12 @@ body.hide-cursor textarea{
         <button class="vk-key" data-key="1">1</button>
         <button class="vk-key" data-key="2">2</button>
         <button class="vk-key" data-key="3">3</button>
+        <button class="vk-key action danger" data-action="close" title="Fechar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
     <div class="vk-row">
-        <button class="vk-key" data-key="0" style="flex:2;max-width:168px;">0</button>
+        <button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button>
         <button class="vk-key" data-key=".">.</button>
         <button class="vk-key" data-key="-">-</button>
     </div>
@@ -2701,9 +2738,9 @@ function avaliarForcaSenha(){
     if(/\d/.test(senha)) score++;
     if(/[^A-Za-z0-9]/.test(senha)) score++;
 
-    if(score <= 2){ el.textContent = ' Senha fraca'; el.className = 'password-strength strength-weak'; }
+    if(score <= 2){ el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
     else if(score <= 3){ el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
-    else{ el.textContent = ' Senha forte'; el.className = 'password-strength strength-strong'; }
+    else{ el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 
 function togglePwdVisibility(inputId,btn){
@@ -2895,7 +2932,6 @@ function renderDashboard(){
     document.getElementById('dash-pint').textContent = state.projetos.filter(p=>p.processo==='Pintura').length;
     document.getElementById('dash-conf').textContent = state.projetos.filter(p=>p.processo==='Conferência').length;
     
-    // Atualizar estatísticas do dashboard
     atualizarEstatisticasDashboard();
     
     renderCharts();
@@ -2904,10 +2940,8 @@ function renderDashboard(){
 function atualizarEstatisticasDashboard(){
     const historico = state.historico;
     
-    // Total concluídos
     document.getElementById('totalConcluidos').textContent = historico.length;
     
-    // Projetos por turno
     const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
     historico.forEach(p => {
         if(turnos[p.turno] !== undefined) turnos[p.turno]++;
@@ -2916,7 +2950,6 @@ function atualizarEstatisticasDashboard(){
     document.getElementById('turno2-concluidos').textContent = turnos['2º Turno'];
     document.getElementById('turno3-concluidos').textContent = turnos['3º Turno'];
     
-    // Eficiência por turno (projetos concluídos / total de projetos naquele turno)
     const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
     state.projetos.forEach(p => { if(turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
     historico.forEach(p => { if(turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
@@ -2927,7 +2960,6 @@ function atualizarEstatisticasDashboard(){
         document.getElementById(`turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
     });
     
-    // Tempo médio geral
     const tempos = historico.filter(p => p.tempoReal).map(p => p.tempoReal);
     if(tempos.length > 0){
         const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
@@ -2938,7 +2970,6 @@ function atualizarEstatisticasDashboard(){
         document.getElementById('tempoMedioGeral').textContent = '00:00';
     }
     
-    // Projeto mais rápido
     if(tempos.length > 0){
         const maisRapido = Math.min(...tempos);
         const projetoRapido = historico.find(p => p.tempoReal === maisRapido);
@@ -2951,7 +2982,6 @@ function atualizarEstatisticasDashboard(){
         document.getElementById('projetoMaisRapidoTempo').textContent = '00:00 min';
     }
     
-    // Último projeto concluído
     if(historico.length > 0){
         const ultimo = historico[0];
         document.getElementById('ultimoProjeto').textContent = ultimo.diagrama;
@@ -3104,13 +3134,48 @@ function renderAdminTable(){
         const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':p.status==='Concluído'?'concluido':'parcial';
         const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
         
-        let volumesInfo = p.volumes || '-';
+        let volumesDisplay = '';
         if(p.volumesTotal && p.volumesTotal > 0){
             if(p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal){
-                volumesInfo += ` <span class="volumes-info parcial">(${p.volumesProcessados}/${p.volumesTotal} - Parcial)</span>`;
+                const restantes = p.volumesTotal - p.volumesProcessados;
+                const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
+                volumesDisplay = `
+                    <div class="volumes-container">
+                        <div class="volumes-main">
+                            <span class="volumes-processed">${p.volumesProcessados}</span>
+                            <span class="volumes-divider">/</span>
+                            <span class="volumes-total">${p.volumesTotal}</span>
+                        </div>
+                        <div class="volumes-progress-bar">
+                            <div class="volumes-progress-fill" style="width: ${porcentagem}%"></div>
+                        </div>
+                        <div class="volumes-remaining">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                            <span>${restantes} restante${restantes !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                `;
             }else if(p.volumesProcessados >= p.volumesTotal){
-                volumesInfo += ` <span class="volumes-info">(${p.volumesProcessados}/${p.volumesTotal} - Completo)</span>`;
+                volumesDisplay = `
+                    <div class="volumes-container">
+                        <div class="volumes-main complete">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <span>${p.volumesTotal}/${p.volumesTotal}</span>
+                        </div>
+                        <div class="volumes-progress-bar">
+                            <div class="volumes-progress-fill complete" style="width: 100%"></div>
+                        </div>
+                    </div>
+                `;
+            }else{
+                volumesDisplay = `
+                    <div class="volumes-container">
+                        <span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span>
+                    </div>
+                `;
             }
+        }else{
+            volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`;
         }
         
         return `
@@ -3119,7 +3184,7 @@ function renderAdminTable(){
                 <td><strong>${p.diagrama}</strong></td>
                 <td>${p.placa||'-'}</td>
                 <td>${p.processo}</td>
-                <td>${volumesInfo}</td>
+                <td>${volumesDisplay}</td>
                 <td><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
                 <td><span class="status ${statusClass}">${p.status}</span></td>
                 <td>
@@ -3382,11 +3447,15 @@ function solicitarConclusao(id){
     if(!p) return;
     projetoParaConcluir = id;
     document.getElementById('concluirCodigo').textContent = p.diagrama;
-    document.getElementById('concluirTurno').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
     
-    const sectionVolumes = document.getElementById('concluirVolumesSection');
+    // Esconder todas as seções primeiro
+    document.getElementById('concluirVolumesSection').style.display = 'none';
+    document.getElementById('concluirPinturaSection').style.display = 'none';
+    document.getElementById('concluirTurnoNormal').style.display = 'block';
+    
     if(p.processo === 'Nanocerâmico'){
-        sectionVolumes.style.display = 'block';
+        document.getElementById('concluirVolumesSection').style.display = 'block';
+        document.getElementById('concluirTurnoNormal').style.display = 'none';
         const total = p.volumesTotal || 0;
         const jaProcessados = p.volumesProcessados || 0;
         const faltam = total - jaProcessados;
@@ -3399,15 +3468,23 @@ function solicitarConclusao(id){
         document.getElementById('concluirVolumesRestantes').textContent = faltam;
         document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
         document.getElementById('concluirVolumesProcessados').oninput = atualizarVolumesRestantes;
-    }else{ 
-        sectionVolumes.style.display = 'none'; 
+    }else if(p.processo === 'Pintura'){
+        document.getElementById('concluirPinturaSection').style.display = 'block';
+        document.getElementById('concluirTurnoNormal').style.display = 'none';
+        document.getElementById('concluirTurnoPintura').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
+        document.getElementById('concluirObservacaoPintura').value = '';
+    }else{
+        document.getElementById('concluirTurno').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
     }
     
     openModal('modalConcluir');
     setTimeout(()=>{
-        if(sectionVolumes.style.display === 'block'){
+        if(p.processo === 'Nanocerâmico'){
             document.getElementById('concluirVolumesProcessados').focus();
             scrollParaElemento(document.getElementById('concluirVolumesProcessados'));
+        }else if(p.processo === 'Pintura'){
+            document.getElementById('concluirObservacaoPintura').focus();
+            scrollParaElemento(document.getElementById('concluirObservacaoPintura'));
         }
     },100);
 }
@@ -3427,9 +3504,9 @@ function confirmarConclusao(){
     if(!projetoParaConcluir) return;
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
-    const turno = document.getElementById('concluirTurno').value;
     
     if(p.processo === 'Nanocerâmico'){
+        const turno = document.getElementById('concluirTurno').value;
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
         if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
         
@@ -3449,7 +3526,19 @@ function confirmarConclusao(){
             renderAdminTable();
             showToast('info','Conclusão parcial',`${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados} volumes.`);
         }
+    }else if(p.processo === 'Pintura'){
+        const turno = document.getElementById('concluirTurnoPintura').value;
+        const observacao = document.getElementById('concluirObservacaoPintura').value;
+        
+        if(!observacao){
+            showToast('warning','Atenção','Selecione uma observação');
+            return;
+        }
+        
+        p.observacaoPintura = observacao;
+        concluirProjetoDireto(projetoParaConcluir, turno);
     }else{
+        const turno = document.getElementById('concluirTurno').value;
         concluirProjetoDireto(projetoParaConcluir, turno);
     }
     closeModal('modalConcluir');
@@ -3510,10 +3599,11 @@ function renderHistorico(){
         const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
         const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
         const tempoStr = p.tempoReal ? formatarTempo(p.tempoReal) : '-';
+        const obsPintura = p.observacaoPintura ? `<br><small style="color:var(--text-light);">${p.observacaoPintura}</small>` : '';
         return `
             <tr>
                 <td>${p.pep||'-'}</td>
-                <td><strong>${p.diagrama}</strong></td>
+                <td><strong>${p.diagrama}</strong>${obsPintura}</td>
                 <td>${p.processo}</td>
                 <td><span class="turno-badge">${p.turno||'-'}</span></td>
                 <td><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
