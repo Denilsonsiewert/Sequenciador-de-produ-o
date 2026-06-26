@@ -695,64 +695,36 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
-/* ===== EXIBIÇÃO DE VOLUMES MELHORADA ===== */
+/* Centralizar container de volumes */
 .volumes-container{
     display:flex;
     flex-direction:column;
     gap:4px;
-    align-items:flex-start;
+    align-items:center; /* Alterado de flex-start para center */
 }
 
+/* Centralizar barra de progresso */
+.volumes-progress-bar{
+    width:100%;
+    max-width:120px; /* Largura máxima para melhor visualização */
+    height:6px;
+    background:var(--border);
+    border-radius:3px;
+    overflow:hidden;
+    margin:2px auto; /* Centralizado com margin auto */
+}
+
+/* Centralizar informações principais de volumes */
 .volumes-main{
     display:flex;
     align-items:center;
     gap:6px;
     font-weight:700;
     font-size:14px;
+    justify-content:center; /* Centralizado */
 }
 
-.volumes-processed{
-    color:var(--weg-blue);
-    font-size:16px;
-}
-
-.volumes-divider{
-    color:var(--text-light);
-    font-weight:400;
-}
-
-.volumes-total{
-    color:var(--text);
-}
-
-.volumes-main.complete{
-    color:var(--success);
-}
-
-.volumes-main.complete i{
-    font-size:16px;
-}
-
-.volumes-progress-bar{
-    width:100%;
-    height:6px;
-    background:var(--border);
-    border-radius:3px;
-    overflow:hidden;
-    margin-top:2px;
-}
-
-.volumes-progress-fill{
-    height:100%;
-    background:linear-gradient(90deg, var(--warning), var(--weg-blue));
-    border-radius:3px;
-    transition:width 0.3s ease;
-}
-
-.volumes-progress-fill.complete{
-    background:var(--success);
-}
-
+/* Centralizar volumes restantes */
 .volumes-remaining{
     display:flex;
     align-items:center;
@@ -763,32 +735,55 @@ body.hide-cursor textarea{
     background:rgba(255,176,0,0.1);
     padding:2px 8px;
     border-radius:12px;
+    justify-content:center; /* Centralizado */
 }
 
-.volumes-remaining i{
-    font-size:10px;
+/* Centralizar cabeçalho AÇÕES */
+.table thead th:last-child{
+    text-align:center; /* Centraliza o texto AÇÕES */
 }
 
-.volumes-total-only{
+/* Centralizar células da coluna de ações */
+.table tbody td:last-child{
+    text-align:center; /* Centraliza o conteúdo */
+}
+
+/* Centralizar container de ações principais */
+.action-main{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:center; /* Alterado de flex-start para center */
+    min-width:180px;
+    margin:0 auto; /* Centralizado */
+}
+
+/* Ajustar botões de ação para melhor centralização */
+.icon-action-lg{
+    background:var(--bg);
+    border:2px solid var(--border);
+    cursor:pointer;
+    padding:12px 16px;
+    border-radius:10px;
     color:var(--text);
-    font-weight:600;
-    font-size:13px;
+    transition:var(--transition);
+    font-size:20px;
+    min-width:60px;
+    min-height:52px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 2px 4px rgba(0,0,0,.08);
+    flex:0 0 auto; /* Remove flex-grow para não esticar */
 }
 
-.volumes-simple{
-    color:var(--text-light);
-    font-size:13px;
-}
-
-.volumes-info{
-    font-size:11px;
-    color:var(--text-light);
-    margin-top:2px;
-}
-
-.volumes-info.parcial{
-    color:var(--warning);
-    font-weight:600;
+/* Ações da tabela admin - centralizar */
+.row-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:nowrap;
+    align-items:center;
+    justify-content:center; /* Alterado para center */
 }
 
 /* ===== TEMPO EM TEMPO REAL ===== */
