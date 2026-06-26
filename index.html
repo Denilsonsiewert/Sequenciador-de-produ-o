@@ -2019,14 +2019,20 @@ body.hide-cursor textarea{
                 <div>Informe quantos volumes foram processados neste turno.</div>
             </div>
             <div class="form-group">
-                <label>Total de volumes do projeto: <strong id="concluirTotalVolumes">0</strong></label>
+                <label>Total de volumes do projeto: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong></label>
             </div>
-            <div class="form-group" style="margin-top:10px;">
-                <label>Volumes processados agora <span class="req">*</span></label>
+            <div class="form-group" style="margin-top:8px;">
+                <label>Já processados anteriormente: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong></label>
+            </div>
+            <div class="form-group" style="margin-top:8px;">
+                <label>Faltam processar: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></label>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Processar agora (neste turno) <span class="req">*</span></label>
                 <input type="number" id="concluirVolumesProcessados" min="1" required placeholder="Ex: 5" onfocus="scrollParaElemento(this)">
             </div>
             <div class="form-group" style="margin-top:10px;">
-                <label>Volumes restantes: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></label>
+                <label>Restará para próximo turno: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></label>
             </div>
         </div>
 
@@ -3030,10 +3036,17 @@ function solicitarConclusao(id){
     const sectionVolumes = document.getElementById('concluirVolumesSection');
     if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
         sectionVolumes.style.display = 'block';
-        document.getElementById('concluirTotalVolumes').textContent = p.volumesTotal || 0;
+        const total = p.volumesTotal || 0;
+        const jaProcessados = p.volumesProcessados || 0;
+        const faltam = total - jaProcessados;
+        
+        document.getElementById('concluirTotalVolumes').textContent = total;
+        document.getElementById('concluirJaProcessados').textContent = jaProcessados;
+        document.getElementById('concluirFaltam').textContent = faltam;
         document.getElementById('concluirVolumesProcessados').value = '';
-        document.getElementById('concluirVolumesProcessados').max = p.volumesTotal || 999;
-        atualizarVolumesRestantes();
+        document.getElementById('concluirVolumesProcessados').max = faltam;
+        document.getElementById('concluirVolumesRestantes').textContent = faltam;
+        document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
         document.getElementById('concluirVolumesProcessados').oninput = atualizarVolumesRestantes;
     }else{ sectionVolumes.style.display = 'none'; }
     
@@ -3049,9 +3062,11 @@ function solicitarConclusao(id){
 function atualizarVolumesRestantes(){
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
-    const processados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
+    const processadosAgora = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
     const total = p.volumesTotal || 0;
-    const restantes = total - processados;
+    const jaProcessados = p.volumesProcessados || 0;
+    // CORREÇÃO: Calcula os restantes considerando o que já foi processado anteriormente
+    const restantes = total - jaProcessados - processadosAgora;
     document.getElementById('concluirVolumesRestantes').textContent = restantes;
     document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
 }
@@ -3065,6 +3080,14 @@ function confirmarConclusao(){
     if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
         if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
+        
+        // CORREÇÃO: Valida se o valor informado não ultrapassa o que falta
+        const faltam = (p.volumesTotal || 0) - (p.volumesProcessados || 0);
+        if(volumesProcessados > faltam){
+            showToast('error','Erro',`Você informou ${volumesProcessados}, mas faltam apenas ${faltam} volumes.`);
+            return;
+        }
+        
         p.volumesProcessados += volumesProcessados;
         if(p.volumesProcessados >= p.volumesTotal){
             concluirProjetoDireto(projetoParaConcluir, turno);
