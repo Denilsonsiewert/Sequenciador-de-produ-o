@@ -8,9 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
-        /* ============================================
-           VARIÁVEIS CSS E CONFIGURAÇÕES GLOBAIS
-           ============================================ */
         :root {
             --weg-blue: #005BAC;
             --weg-dark: #003D79;
@@ -33,9 +30,6 @@
             --transition: all .25s ease;
         }
 
-        /* ============================================
-           RESET E ESTILOS BASE
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -60,11 +54,6 @@
             cursor: none !important;
         }
 
-        /* ============================================
-           CORREÇÃO DE ÁREA DE CLIQUE - HITBOX
-           ============================================ */
-        
-        /* Garantir que todos os elementos interativos tenham área de clique correta */
         button, a, .btn, .icon-action, .icon-action-lg, .role-btn, 
         .menu a, .filter-chip, .historico-tab, .dashboard-tab,
         .posto-tab, .password-toggle, .modal-close, .vk-key {
@@ -77,7 +66,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Centralização perfeita de ícones */
         button i, a i, .btn i, .icon-action i, .icon-action-lg i,
         .role-btn i, .menu a i, .filter-chip i, .historico-tab i,
         .dashboard-tab i, .posto-tab i, .password-toggle i,
@@ -87,12 +75,9 @@
             justify-content: center;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Evita que o ícone intercepte o clique */
+            pointer-events: none;
         }
 
-        /* ============================================
-           SCROLLBAR PERSONALIZADA
-           ============================================ */
         ::-webkit-scrollbar { width: 30px; height: 30px; }
         ::-webkit-scrollbar-track {
             background: var(--bg);
@@ -112,9 +97,6 @@
             scrollbar-color: var(--weg-blue) var(--bg);
         }
 
-        /* ============================================
-           TELA DE LOGIN
-           ============================================ */
         .login-screen {
             position: fixed;
             inset: 0;
@@ -198,9 +180,6 @@
             font-size: 11px;
         }
 
-        /* ============================================
-           HEADER
-           ============================================ */
         .header {
             background: linear-gradient(90deg, var(--weg-blue), var(--weg-dark));
             color: white;
@@ -322,9 +301,6 @@
         .btn-logout:active { transform: scale(.95); }
         .btn-logout i { pointer-events: none; }
 
-        /* ============================================
-           LAYOUT PRINCIPAL
-           ============================================ */
         .layout {
             display: flex;
             min-height: calc(100vh - var(--header-height));
@@ -431,9 +407,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============================================
-           TÍTULOS E BADGES
-           ============================================ */
         .page-title {
             font-size: 24px;
             color: var(--text);
@@ -455,9 +428,6 @@
             font-weight: 600;
         }
 
-        /* ============================================
-           KPIs E CARDS
-           ============================================ */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -562,9 +532,6 @@
 
         .card h2 i { color: var(--weg-blue); }
 
-        /* ============================================
-           BOTÕES
-           ============================================ */
         .btn {
             background: var(--weg-blue);
             color: white;
@@ -610,9 +577,6 @@
         .btn-warning:hover { background: #e09e00; }
         .btn-lg { padding: 14px 28px; font-size: 16px; font-weight: 600; }
 
-        /* ============================================
-           FORMULÁRIOS
-           ============================================ */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -664,9 +628,6 @@
             flex-wrap: wrap;
         }
 
-        /* ============================================
-           TABELAS
-           ============================================ */
         .table-wrapper {
             overflow-x: auto;
             border-radius: 8px;
@@ -735,9 +696,6 @@
             text-align: center;
         }
 
-        /* ============================================
-           STATUS E BADGES
-           ============================================ */
         .status {
             padding: 4px 10px;
             border-radius: 20px;
@@ -776,9 +734,6 @@
         .posto-pintura { background: #FFF3E0; color: #E65100; }
         .posto-conferencia { background: #E8F5E9; color: #2E7D32; }
 
-        /* ============================================
-           VOLUMES E PROGRESSO
-           ============================================ */
         .volumes-container {
             display: flex;
             flex-direction: column;
@@ -841,9 +796,6 @@
         .volumes-total-only { color: var(--text); font-weight: 600; font-size: 13px; text-align: center; }
         .volumes-simple { color: var(--text-light); font-size: 13px; text-align: center; }
 
-        /* ============================================
-           TEMPO E ANIMAÇÕES
-           ============================================ */
         .tempo-real {
             background: var(--weg-light);
             color: var(--weg-blue);
@@ -867,9 +819,6 @@
             50% { opacity: .7; }
         }
 
-        /* ============================================
-           AÇÕES E ÍCONES - CORREÇÃO DE HITBOX
-           ============================================ */
         .action-main {
             display: flex;
             gap: 8px;
@@ -965,9 +914,6 @@
         .icon-action.delete:hover { background: rgba(211,47,47,.1); color: var(--danger); }
         .icon-action.success:hover { background: rgba(0,166,81,.1); color: var(--success); }
 
-        /* ============================================
-           MODAIS
-           ============================================ */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1051,9 +997,6 @@
         .modal-logout .modal-actions { display: flex; gap: 12px; justify-content: center; }
         .modal-logout .btn { min-width: 140px; justify-content: center; }
 
-        /* ============================================
-           LEITOR DE ETIQUETA
-           ============================================ */
         .leitor-box {
             border: 2px dashed var(--weg-blue);
             border-radius: var(--radius);
@@ -1067,9 +1010,6 @@
         .leitor-box p { color: var(--text); font-size: 14px; font-weight: 600; }
         .leitor-box small { color: var(--text-light); font-size: 12px; }
 
-        /* ============================================
-           TECLADO VIRTUAL
-           ============================================ */
         .virtual-keyboard {
             position: fixed;
             bottom: 20px;
@@ -1160,9 +1100,6 @@
         .vk-key.action.clear { background: var(--info); border-color: var(--info); }
         .vk-key.action.clear:hover { background: #1976D2; border-color: #1976D2; }
 
-        /* ============================================
-           TOASTS E NOTIFICAÇÕES
-           ============================================ */
         .toast-container {
             position: fixed;
             top: 100px;
@@ -1202,9 +1139,6 @@
         .toast-title { font-weight: 600; font-size: 13px; }
         .toast-message { font-size: 12px; color: var(--text-light); margin-top: 2px; }
 
-        /* ============================================
-           FILTROS
-           ============================================ */
         .filter-bar {
             display: flex;
             gap: 10px;
@@ -1233,9 +1167,6 @@
             border-color: var(--weg-blue);
         }
 
-        /* ============================================
-           ESTADOS VAZIOS
-           ============================================ */
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -1254,9 +1185,6 @@
             color: var(--text);
         }
 
-        /* ============================================
-           SENHA E FORÇA
-           ============================================ */
         .password-wrapper { position: relative; }
         .password-wrapper input { width: 100%; padding-right: 40px; }
 
@@ -1288,9 +1216,6 @@
         .strength-medium { color: var(--warning); }
         .strength-strong { color: var(--success); }
 
-        /* ============================================
-           ALERTAS
-           ============================================ */
         .alert {
             padding: 12px 15px;
             border-radius: 8px;
@@ -1319,9 +1244,6 @@
             border-left: 4px solid var(--warning);
         }
 
-        /* ============================================
-           GRÁFICOS E ESTATÍSTICAS
-           ============================================ */
         .charts-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -1428,9 +1350,6 @@
             margin-top: 5px;
         }
 
-        /* ============================================
-           ABAS DO DASHBOARD E HISTÓRICO
-           ============================================ */
         .dashboard-tabs,
         .historico-tabs {
             display: flex;
@@ -1472,9 +1391,6 @@
             pointer-events: none;
         }
 
-        /* ============================================
-           RESPONSIVIDADE
-           ============================================ */
         @media(max-width:1000px){
             .charts-grid { grid-template-columns: 1fr; }
             .sidebar {
@@ -1548,19 +1464,16 @@
 </head>
 
 <body>
-    <!-- O HTML permanece igual ao anterior -->
-    <!-- (mantido por brevidade - todas as seções, modais, etc.) -->
-
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
             <h1>WEG</h1>
             <p>Centro de Fluxo Produtivo<br>Selecione seu perfil para continuar</p>
             <div class="role-grid">
-                <div class="role-btn" onclick="App.login('admin')"><i class="fa-solid fa-user-shield"></i><strong>Administrador</strong><small>Coordenação / Cadastros</small></div>
-                <div class="role-btn" onclick="App.login('nano')"><i class="fa-solid fa-flask"></i><strong>Nanocerâmico</strong><small>Operador do posto</small></div>
-                <div class="role-btn" onclick="App.login('pintura')"><i class="fa-solid fa-paint-roller"></i><strong>Pintura</strong><small>Operador do posto</small></div>
-                <div class="role-btn" onclick="App.login('conferencia')"><i class="fa-solid fa-clipboard-check"></i><strong>Conferência</strong><small>Operador do posto</small></div>
+                <div class="role-btn" onclick="Auth.login('admin')"><i class="fa-solid fa-user-shield"></i><strong>Administrador</strong><small>Coordenação / Cadastros</small></div>
+                <div class="role-btn" onclick="Auth.login('nano')"><i class="fa-solid fa-flask"></i><strong>Nanocerâmico</strong><small>Operador do posto</small></div>
+                <div class="role-btn" onclick="Auth.login('pintura')"><i class="fa-solid fa-paint-roller"></i><strong>Pintura</strong><small>Operador do posto</small></div>
+                <div class="role-btn" onclick="Auth.login('conferencia')"><i class="fa-solid fa-clipboard-check"></i><strong>Conferência</strong><small>Operador do posto</small></div>
             </div>
         </div>
     </div>
@@ -1592,7 +1505,6 @@
                 <nav class="menu" id="mainMenu"></nav>
             </aside>
             <main class="content">
-                <!-- Todas as seções de página mantidas -->
                 <section class="page" id="page-dashboard">
                     <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
                     <div class="dashboard-tabs">
@@ -1892,7 +1804,6 @@
         </div>
     </div>
 
-    <!-- Modais -->
     <div class="modal-overlay" id="modalLogout">
         <div class="modal modal-logout">
             <div class="modal-body">
@@ -2025,9 +1936,6 @@
     </div>
 
     <script>
-        /* ============================================
-           CONFIGURAÇÕES E CONSTANTES
-           ============================================ */
         const CONFIG = {
             STORAGE_KEY: 'weg_fluxo_produtivo_v24',
             SENHA_PADRAO: 'weg2024',
@@ -2036,9 +1944,6 @@
             FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null }
         };
 
-        /* ============================================
-           ESTADO DA APLICAÇÃO
-           ============================================ */
         const State = {
             data: {
                 projetos: [],
@@ -2066,14 +1971,10 @@
             timerInterval: null
         };
 
-        /* ============================================
-           UTILITÁRIOS
-           ============================================ */
         const Utils = {
             genId() {
                 return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
             },
-
             formatarTempo(ms) {
                 if (!ms || ms < 0) return '00:00:00';
                 const segundos = Math.floor(ms / 1000);
@@ -2085,11 +1986,9 @@
                 if (dias > 0) return `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
                 return `${pad(horas)}:${pad(minutos)}:${pad(segs)}`;
             },
-
             dateStamp() {
                 return new Date().toISOString().slice(0,10);
             },
-
             detectarTurnoAutomatico() {
                 const agora = new Date();
                 const tempoAtual = agora.getHours() * 60 + agora.getMinutes();
@@ -2097,12 +1996,10 @@
                 if (tempoAtual >= 858 && tempoAtual < 1404) return '2º Turno';
                 return '3º Turno';
             },
-
             ehFimDeSemana() {
                 const diaSemana = new Date().getDay();
                 return diaSemana === 0 || diaSemana === 6;
             },
-
             ordenarPorPrioridade(data) {
                 return data.sort((a,b) => {
                     const prioA = CONFIG.PRIORIDADE_ORDEM[a.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[a.prioridade] : 9;
@@ -2113,14 +2010,10 @@
             }
         };
 
-        /* ============================================
-           PERSISTÊNCIA
-           ============================================ */
         const Storage = {
             salvar() {
                 localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(State.data));
             },
-
             carregar() {
                 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
                 if (raw) {
@@ -2137,7 +2030,6 @@
                         this.migrarTurnosAntigos();
                     } catch(e) {}
                 }
-
                 if (State.data.projetos.length === 0 && State.data.historico.length === 0) {
                     const agora = Date.now();
                     State.data.projetos = [
@@ -2151,7 +2043,6 @@
                     this.salvar();
                 }
             },
-
             migrarTurnosAntigos() {
                 let mudou = false;
                 for (const posto in State.data.turnosPorPosto) {
@@ -2171,9 +2062,6 @@
             }
         };
 
-        /* ============================================
-           INTERFACE (UI)
-           ============================================ */
         const UI = {
             aplicarEstadoCursor() {
                 if (State.data.config.dispositivo === 'computador') {
@@ -2182,7 +2070,6 @@
                     document.body.classList.remove('hide-cursor');
                 }
             },
-
             scrollParaElemento(elemento) {
                 setTimeout(() => {
                     if (State.vkActive && State.data.config.dispositivo === 'computador') {
@@ -2192,19 +2079,15 @@
                     }
                 }, 300);
             },
-
             openModal(id) {
                 document.getElementById(id).classList.add('active');
             },
-
             closeModal(id) {
                 document.getElementById(id).classList.remove('active');
             },
-
             toggleSidebarMobile() {
                 document.getElementById('sidebar').classList.toggle('open');
             },
-
             togglePwdVisibility(inputId, btn) {
                 const input = document.getElementById(inputId);
                 const icon = btn.querySelector('i');
@@ -2216,7 +2099,6 @@
                     icon.className = 'fa-solid fa-eye';
                 }
             },
-
             atualizarHeaderTitle(page) {
                 const titleEl = document.getElementById('headerTitle');
                 const badgeEl = document.getElementById('headerBadge');
@@ -2236,7 +2118,6 @@
                     badgeEl.style.display = 'none';
                 }
             },
-
             showToast(type, title, message) {
                 const icons = {success:'check-circle',error:'circle-xmark',warning:'triangle-exclamation',info:'circle-info'};
                 const container = document.getElementById('toastContainer');
@@ -2249,13 +2130,11 @@
                     setTimeout(() => toast.remove(), 300);
                 }, 3500);
             },
-
             updateDate() {
                 const now = new Date();
                 const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
                 document.getElementById('currentDate').textContent = now.toLocaleString('pt-BR', opts);
             },
-
             buildMenu() {
                 const menu = document.getElementById('mainMenu');
                 let html = '';
@@ -2283,7 +2162,6 @@
                     });
                 });
             },
-
             setupModalClickHandlers() {
                 document.querySelectorAll('.modal-overlay').forEach(m => {
                     m.addEventListener('click', e => {
@@ -2297,7 +2175,6 @@
                     });
                 });
             },
-
             setupSidebarClickHandler() {
                 document.addEventListener('click', e => {
                     const sb = document.getElementById('sidebar');
@@ -2306,7 +2183,6 @@
                     }
                 });
             },
-
             setupVirtualKeyboard() {
                 document.addEventListener('focusin', e => {
                     if (State.data.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea')) {
@@ -2314,7 +2190,6 @@
                         if (!State.vkActive) VirtualKeyboard.show();
                     }
                 });
-
                 document.addEventListener('click', e => {
                     const key = e.target.closest('.vk-key');
                     if (!key) return;
@@ -2348,22 +2223,16 @@
             }
         };
 
-        /* ============================================
-           NAVEGAÇÃO
-           ============================================ */
         const Navigation = {
             navigate(page) {
                 document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
                 const link = document.querySelector(`.menu a[data-page="${page}"]`);
                 if (link) link.classList.add('active');
-
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 const el = document.getElementById('page-' + page);
                 if (el) el.classList.add('active');
-
                 UI.aplicarEstadoCursor();
                 UI.atualizarHeaderTitle(page);
-
                 if (page === 'dashboard') Dashboard.render();
                 if (page === 'admin') Admin.renderTable();
                 if (page === 'posto') Posto.render();
@@ -2373,9 +2242,6 @@
             }
         };
 
-        /* ============================================
-           AUTENTICAÇÃO
-           ============================================ */
         const Auth = {
             login(role) {
                 if (role === 'admin') {
@@ -2393,7 +2259,6 @@
                 }
                 this.efetivarLogin(role);
             },
-
             confirmarLoginAdmin() {
                 const senha = document.getElementById('inputSenhaAdmin').value;
                 if (senha === State.data.senhaAdmin) {
@@ -2412,17 +2277,14 @@
                     setTimeout(() => { input.style.borderColor = ''; }, 1500);
                 }
             },
-
             cancelarLoginAdmin() {
                 State.pendingAdminLogin = false;
                 UI.closeModal('modalSenhaAdmin');
             },
-
             efetivarLogin(role) {
                 State.currentUser = role;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
-
                 const labels = {
                     admin: 'Administrador',
                     nano: 'Operador - Nanocerâmico',
@@ -2430,14 +2292,11 @@
                     conferencia: 'Operador - Conferência'
                 };
                 const processos = { nano: 'Nanocerâmico', pintura: 'Pintura', conferencia: 'Conferência' };
-
                 document.getElementById('userLabel').textContent = labels[role];
                 if (role !== 'admin') State.currentPosto = processos[role];
-
                 UI.buildMenu();
                 Config.applyDeviceConfig();
                 UI.aplicarEstadoCursor();
-
                 if (role === 'admin') {
                     Navigation.navigate('dashboard');
                     document.getElementById('cardSeguranca').style.display = 'block';
@@ -2445,14 +2304,11 @@
                     Navigation.navigate('posto');
                     document.getElementById('cardSeguranca').style.display = 'none';
                 }
-
                 UI.showToast('success', 'Bem-vindo', 'Login efetuado como ' + labels[role]);
             },
-
             confirmarLogout() {
                 UI.openModal('modalLogout');
             },
-
             efetivarLogout() {
                 UI.closeModal('modalLogout');
                 State.currentUser = null;
@@ -2464,7 +2320,6 @@
                 if (State.timerInterval) clearInterval(State.timerInterval);
                 UI.showToast('info', 'Sessão encerrada', 'Você voltou para a tela de seleção de perfis');
             },
-
             solicitarConfirmacaoSenha(titulo, aviso, callback) {
                 State.acaoPendenteSenha = callback;
                 document.getElementById('modalConfirmarTitulo').textContent = titulo || 'Confirmação de Segurança';
@@ -2477,7 +2332,6 @@
                     UI.scrollParaElemento(document.getElementById('inputConfirmarSenha'));
                 }, 200);
             },
-
             confirmarAcaoSenha() {
                 const senha = document.getElementById('inputConfirmarSenha').value;
                 if (senha === State.data.senhaAdmin) {
@@ -2495,12 +2349,10 @@
                     setTimeout(() => { input.style.borderColor = ''; }, 1500);
                 }
             },
-
             cancelarConfirmacaoSenha() {
                 State.acaoPendenteSenha = null;
                 UI.closeModal('modalConfirmarSenha');
             },
-
             solicitarLimpeza() {
                 this.solicitarConfirmacaoSenha(
                     'Limpar Todos os Dados',
@@ -2508,7 +2360,6 @@
                     this.executarLimpeza
                 );
             },
-
             executarLimpeza() {
                 State.data.projetos = [];
                 State.data.historico = [];
@@ -2523,16 +2374,12 @@
             }
         };
 
-        /* ============================================
-           CONFIGURAÇÕES
-           ============================================ */
         const Config = {
             loadUI() {
                 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
                 document.getElementById('cfgVkInfo').style.display = State.data.config.dispositivo === 'computador' ? 'block' : 'none';
                 document.getElementById('cardSeguranca').style.display = (State.currentUser === 'admin') ? 'block' : 'none';
             },
-
             salvarDispositivo() {
                 State.data.config.dispositivo = document.getElementById('cfgDevice').value;
                 Storage.salvar();
@@ -2541,18 +2388,15 @@
                 const modo = State.data.config.dispositivo === 'computador' ? 'Computador (cursor oculto)' : 'Tablet (cursor visível)';
                 UI.showToast('success', 'Configuração salva', 'Modo de dispositivo: ' + modo);
             },
-
             applyDeviceConfig() {
                 const isComputer = State.data.config.dispositivo === 'computador';
                 if (isComputer) VirtualKeyboard.hide();
             },
-
             alterarSenha(e) {
                 e.preventDefault();
                 const atual = document.getElementById('senhaAtual').value;
                 const nova = document.getElementById('novaSenha').value;
                 const confirma = document.getElementById('confirmaSenha').value;
-
                 if (atual !== State.data.senhaAdmin) {
                     UI.showToast('error', 'Erro', 'Senha atual incorreta');
                     document.getElementById('senhaAtual').value = '';
@@ -2573,7 +2417,6 @@
                     UI.showToast('warning', 'Atenção', 'A nova senha deve ser diferente da atual');
                     return false;
                 }
-
                 State.data.senhaAdmin = nova;
                 Storage.salvar();
                 document.getElementById('formSenha').reset();
@@ -2581,7 +2424,6 @@
                 UI.showToast('success', 'Senha alterada', 'A nova senha do administrador foi definida com sucesso');
                 return false;
             },
-
             avaliarForcaSenha() {
                 const senha = document.getElementById('novaSenha').value;
                 const el = document.getElementById('pwdStrength');
@@ -2592,21 +2434,16 @@
                 if (/[A-Z]/.test(senha) && /[a-z]/.test(senha)) score++;
                 if (/\d/.test(senha)) score++;
                 if (/[^A-Za-z0-9]/.test(senha)) score++;
-
                 if (score <= 2) { el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
                 else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
                 else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
             }
         };
 
-        /* ============================================
-           DASHBOARD
-           ============================================ */
         const Dashboard = {
             switchTab(tab, el) {
                 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
                 el.classList.add('active');
-                
                 if (tab === 'geral') {
                     document.getElementById('dashboardGeralSection').style.display = 'block';
                     document.getElementById('dashboardPostoSection').style.display = 'none';
@@ -2620,41 +2457,33 @@
                     this.renderPosto();
                 }
             },
-
             render() {
                 const hoje = new Date(); hoje.setHours(0,0,0,0);
                 const hojeCount = State.data.projetos.filter(p => p.criadoEm >= hoje.getTime()).length;
-                
                 document.getElementById('dash-total').textContent = State.data.projetos.length;
                 document.getElementById('dash-total-trend').textContent = hojeCount;
                 document.getElementById('dash-nano').textContent = State.data.projetos.filter(p => p.processo === 'Nanocerâmico').length;
                 document.getElementById('dash-pint').textContent = State.data.projetos.filter(p => p.processo === 'Pintura').length;
                 document.getElementById('dash-conf').textContent = State.data.projetos.filter(p => p.processo === 'Conferência').length;
-                
                 this.atualizarEstatisticas();
                 Charts.render();
             },
-
             atualizarEstatisticas() {
                 const historico = State.data.historico;
                 document.getElementById('totalConcluidos').textContent = historico.length;
-                
                 const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
                 historico.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
                 document.getElementById('turno1-concluidos').textContent = turnos['1º Turno'];
                 document.getElementById('turno2-concluidos').textContent = turnos['2º Turno'];
                 document.getElementById('turno3-concluidos').textContent = turnos['3º Turno'];
-                
                 const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
                 State.data.projetos.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
                 historico.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
-                
                 ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
                     const d = turnosAtivos[turno];
                     const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
                     document.getElementById(`turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
                 });
-                
                 const tempos = historico.filter(p => p.tempoReal).map(p => p.tempoReal);
                 if (tempos.length > 0) {
                     const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
@@ -2664,7 +2493,6 @@
                 } else {
                     document.getElementById('tempoMedioGeral').textContent = '00:00';
                 }
-                
                 if (tempos.length > 0) {
                     const maisRapido = Math.min(...tempos);
                     const projetoRapido = historico.find(p => p.tempoReal === maisRapido);
@@ -2676,7 +2504,6 @@
                     document.getElementById('projetoMaisRapido').textContent = '-';
                     document.getElementById('projetoMaisRapidoTempo').textContent = '00:00 min';
                 }
-                
                 if (historico.length > 0) {
                     const ultimo = historico[0];
                     document.getElementById('ultimoProjeto').textContent = ultimo.diagrama;
@@ -2687,38 +2514,30 @@
                     document.getElementById('ultimoProjetoData').textContent = '-';
                 }
             },
-
             renderPosto() {
                 const posto = State.dashboardPostoAtual;
                 const hoje = new Date(); hoje.setHours(0,0,0,0);
-                
                 const projetosNoPosto = State.data.projetos.filter(p => p.processo === posto);
                 const concluidosNoPosto = State.data.historicoPostos.filter(p => p.processo === posto);
                 const concluidosHoje = concluidosNoPosto.filter(p => p.dataHoraConclusao >= hoje.getTime());
-                
                 document.getElementById('dash-posto-total').textContent = projetosNoPosto.length;
                 document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
                 document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
                 document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
-                
                 const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
                 concluidosNoPosto.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
                 document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
                 document.getElementById('posto-turno2-concluidos').textContent = turnos['2º Turno'];
                 document.getElementById('posto-turno3-concluidos').textContent = turnos['3º Turno'];
-                
                 const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
                 projetosNoPosto.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
                 concluidosNoPosto.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
-                
                 ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
                     const d = turnosAtivos[turno];
                     const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
                     document.getElementById(`posto-turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
                 });
-                
                 document.getElementById('posto-total-concluidos').textContent = concluidosNoPosto.length;
-                
                 const tempos = concluidosNoPosto.filter(p => p.tempoReal).map(p => p.tempoReal);
                 if (tempos.length > 0) {
                     const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
@@ -2728,7 +2547,6 @@
                 } else {
                     document.getElementById('posto-tempo-medio').textContent = '00:00';
                 }
-                
                 if (tempos.length > 0) {
                     const maisRapido = Math.min(...tempos);
                     const projetoRapido = concluidosNoPosto.find(p => p.tempoReal === maisRapido);
@@ -2740,7 +2558,6 @@
                     document.getElementById('posto-mais-rapido').textContent = '-';
                     document.getElementById('posto-mais-rapido-tempo').textContent = '00:00 min';
                 }
-                
                 if (concluidosNoPosto.length > 0) {
                     const ultimo = concluidosNoPosto[0];
                     document.getElementById('posto-ultimo-projeto').textContent = ultimo.diagrama;
@@ -2753,9 +2570,6 @@
             }
         };
 
-        /* ============================================
-           ADMINISTRAÇÃO
-           ============================================ */
         const Admin = {
             focarLeitorEtiqueta() {
                 const input = document.getElementById('leitorEtiquetaInput');
@@ -2763,11 +2577,9 @@
                 input.focus();
                 UI.showToast('info', 'Leitor ativo', 'Posicione o cursor e use o leitor de código de barras');
             },
-
             processarLeituraEtiqueta() {
                 const codigo = document.getElementById('leitorEtiquetaInput').value.trim();
                 if (!codigo) { UI.showToast('warning', 'Código vazio', 'Nenhum código foi lido'); return; }
-
                 const dadosSimulados = {
                     pep: '7S' + Math.floor(Math.random()*900000+100000),
                     diagrama: codigo,
@@ -2775,17 +2587,14 @@
                     volumes: Math.floor(Math.random()*10+1) + ' unidades',
                     descricao: 'Motor W22 ' + Math.floor(Math.random()*200+50) + 'cv'
                 };
-
                 document.getElementById('cad-pep').value = dadosSimulados.pep;
                 document.getElementById('cad-diagrama').value = dadosSimulados.diagrama;
                 document.getElementById('cad-placa').value = dadosSimulados.placa;
                 document.getElementById('cad-volumes').value = dadosSimulados.volumes;
                 document.getElementById('cad-descricao').value = dadosSimulados.descricao;
-
                 UI.showToast('success', 'Etiqueta lida', 'Dados preenchidos automaticamente');
                 document.getElementById('leitorEtiquetaInput').value = '';
             },
-
             toggleVolumesCadastro() {
                 const processo = document.getElementById('cad-processo').value;
                 const groupVolumes = document.getElementById('group-cad-volumes');
@@ -2796,7 +2605,6 @@
                     groupVolumes.style.display = 'block'; 
                 }
             },
-
             toggleVolumesEdicao() {
                 const processo = document.getElementById('edit-processo').value;
                 const groupVolumes = document.getElementById('group-edit-volumes');
@@ -2807,7 +2615,6 @@
                     groupVolumes.style.display = 'block'; 
                 }
             },
-
             cadastrarProjeto(e) {
                 e.preventDefault();
                 const pep = document.getElementById('cad-pep').value.trim();
@@ -2818,19 +2625,16 @@
                 const processo = document.getElementById('cad-processo').value;
                 const prioridade = document.getElementById('cad-prioridade').value;
                 const obs = document.getElementById('cad-obs').value.trim();
-
                 if (State.data.projetos.some(p => (p.pep && p.pep.toLowerCase() === pep.toLowerCase()) || p.diagrama.toLowerCase() === diagrama.toLowerCase()) ||
                     State.data.historico.some(p => (p.pep && p.pep.toLowerCase() === pep.toLowerCase()) || p.diagrama.toLowerCase() === diagrama.toLowerCase())) {
                     UI.showToast('warning', 'Código duplicado', 'Já existe um projeto com este PEP ou Diagrama/Ordem.');
                     return false;
                 }
-
                 let volumesTotal = null;
                 if (processo === 'Nanocerâmico' && volumes) {
                     const match = volumes.match(/\d+/);
                     if (match) volumesTotal = parseInt(match[0]);
                 }
-
                 const novo = {
                     id: Utils.genId(),
                     pep: pep || null,
@@ -2847,7 +2651,6 @@
                     obs,
                     criadoEm: Date.now()
                 };
-
                 State.data.projetos.push(novo);
                 Storage.salvar();
                 document.getElementById('formCadastro').reset();
@@ -2855,19 +2658,16 @@
                 UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo);
                 return false;
             },
-
             setFilter(f, el) {
                 State.admFilter = f;
                 document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active'));
                 el.classList.add('active');
                 this.renderTable();
             },
-
             renderTable() {
                 const tbody = document.getElementById('admTableBody');
                 const search = (document.getElementById('admSearch').value || '').toLowerCase();
                 let data = [...State.data.projetos];
-
                 if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
                 if (search) data = data.filter(p =>
                     (p.pep||'').toLowerCase().includes(search) ||
@@ -2875,18 +2675,14 @@
                     (p.placa||'').toLowerCase().includes(search) ||
                     (p.descricao||'').toLowerCase().includes(search)
                 );
-
                 data = Utils.ordenarPorPrioridade(data);
-
                 if (data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto usando o formulário acima.</p></div></td></tr>`;
                     return;
                 }
-
                 tbody.innerHTML = data.map(p => {
                     const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':p.status==='Concluído'?'concluido':'parcial';
                     const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
-                    
                     let volumesDisplay = '';
                     if (p.volumesTotal && p.volumesTotal > 0) {
                         if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
@@ -2901,7 +2697,6 @@
                     } else {
                         volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`;
                     }
-                    
                     return `<tr>
                         <td style="text-align:center;">${p.pep||'-'}</td>
                         <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
@@ -2918,7 +2713,6 @@
                     </tr>`;
                 }).join('');
             },
-
             abrirEdicao(id) {
                 const p = State.data.projetos.find(x => x.id === id);
                 if (!p) return;
@@ -2932,7 +2726,6 @@
                 document.getElementById('edit-prioridade').value = p.prioridade;
                 document.getElementById('edit-status').value = p.status === 'Bloqueado' ? 'Aguardando' : p.status;
                 document.getElementById('edit-obs').value = p.obs||'';
-                
                 this.toggleVolumesEdicao();
                 UI.openModal('modalEditar');
                 setTimeout(() => {
@@ -2940,16 +2733,13 @@
                     if (firstInput) { firstInput.focus(); UI.scrollParaElemento(firstInput); }
                 }, 100);
             },
-
             salvarEdicao(e) {
                 e.preventDefault();
                 const id = document.getElementById('edit-id').value;
                 const p = State.data.projetos.find(x => x.id === id);
                 if (!p) return false;
-
                 const novoStatus = document.getElementById('edit-status').value;
                 const novoProcesso = document.getElementById('edit-processo').value;
-
                 p.pep = document.getElementById('edit-pep').value.trim() || null;
                 p.diagrama = document.getElementById('edit-diagrama').value.trim();
                 p.placa = document.getElementById('edit-placa').value.trim() || null;
@@ -2958,18 +2748,15 @@
                 p.volumes = document.getElementById('edit-volumes').value.trim();
                 p.prioridade = document.getElementById('edit-prioridade').value;
                 p.obs = document.getElementById('edit-obs').value.trim();
-                
                 if (novoProcesso === 'Nanocerâmico' && p.volumes) {
                     const match = p.volumes.match(/\d+/);
                     if (match) p.volumesTotal = parseInt(match[0]);
                 } else { p.volumesTotal = null; }
-
                 if (novoStatus === 'Concluído' && p.status !== 'Concluído') {
                     Conclusao.concluirDireto(p.id, p.turno || '1º Turno');
                     UI.closeModal('modalEditar');
                     return false;
                 }
-
                 p.status = novoStatus;
                 Storage.salvar();
                 UI.closeModal('modalEditar');
@@ -2979,7 +2766,6 @@
                 UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado');
                 return false;
             },
-
             excluirProjeto(id) {
                 const p = State.data.projetos.find(x => x.id === id);
                 if (!p) return;
@@ -2993,27 +2779,19 @@
             }
         };
 
-        /* ============================================
-           POSTO DE TRABALHO
-           ============================================ */
         const Posto = {
             render() {
                 if (!State.currentPosto) return;
-
                 const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
                 document.getElementById('postoIcon').className = 'fa-solid ' + iconMap[State.currentPosto];
                 document.getElementById('postoTitulo').textContent = 'Posto - ' + State.currentPosto;
                 document.getElementById('postoBadge').textContent = State.currentPosto;
-
                 document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-
                 this.aplicarTurnoAutomatico();
                 this.renderTable();
-                
                 if (State.timerInterval) clearInterval(State.timerInterval);
                 State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
             },
-
             aplicarTurnoAutomatico() {
                 if (!State.currentPosto) return;
                 if (Utils.ehFimDeSemana()) {
@@ -3027,27 +2805,22 @@
                     UI.showToast('info', 'Turno atualizado', 'Turno definido automaticamente como ' + turnoDetectado);
                 }
             },
-
             salvarTurno() {
                 const turno = document.getElementById('postoTurno').value;
                 State.data.turnosPorPosto[State.currentPosto] = turno;
                 Storage.salvar();
                 UI.showToast('info', 'Turno atualizado', 'Turno do posto definido como ' + turno);
             },
-
             setFilter(f, el) {
                 State.postoFilter = f;
                 document.querySelectorAll('#page-posto .filter-chip').forEach(c => c.classList.remove('active'));
                 el.classList.add('active');
                 this.renderTable();
             },
-
             renderTable() {
                 const tbody = document.getElementById('postoTableBody');
                 const search = (document.getElementById('postoSearch').value || '').toLowerCase();
-
                 let data = State.data.projetos.filter(p => p.processo === State.currentPosto && p.status !== 'Concluído');
-
                 if (State.postoFilter !== 'all') data = data.filter(p => p.status === State.postoFilter);
                 if (search) data = data.filter(p =>
                     (p.pep||'').toLowerCase().includes(search) ||
@@ -3055,29 +2828,23 @@
                     (p.placa||'').toLowerCase().includes(search) ||
                     (p.descricao||'').toLowerCase().includes(search)
                 );
-
                 data = Utils.ordenarPorPrioridade(data);
-
                 const todosPosto = State.data.projetos.filter(p => p.processo === State.currentPosto);
                 document.getElementById('posto-aguardando').textContent = todosPosto.filter(p => p.status === 'Aguardando').length;
                 document.getElementById('posto-processo').textContent = todosPosto.filter(p => p.status === 'Em Processo').length;
-
                 const hoje = new Date(); hoje.setHours(0,0,0,0);
                 const concluidosHoje = State.data.historicoPostos.filter(p => 
                     p.processo === State.currentPosto && 
                     p.dataHoraConclusao >= hoje.getTime()
                 ).length;
                 document.getElementById('posto-concluidos').textContent = concluidosHoje;
-
                 if (data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos cadastrados para ${State.currentPosto} no filtro selecionado.</p></div></td></tr>`;
                     return;
                 }
-
                 tbody.innerHTML = data.map(p => {
                     const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
                     const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
-                    
                     let volumesDisplay = '';
                     if (p.volumesTotal && p.volumesTotal > 0) {
                         if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
@@ -3092,21 +2859,18 @@
                     } else {
                         volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`;
                     }
-                    
                     let tempoDisplay = '-';
                     if (p.status === 'Em Processo' && p.dataHoraInicio) {
                         tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
                     } else if (p.dataHoraInicio && p.dataHoraFim) {
                         tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
                     }
-                    
                     let botoesAcao = '';
                     if (p.status === 'Aguardando' || p.status === 'Parcial') {
                         botoesAcao = `<button class="icon-action-lg warning" title="Iniciar Atividade" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Confirmar Conclusão" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`;
                     } else if (p.status === 'Em Processo') {
                         botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Confirmar Conclusão" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`;
                     }
-                    
                     return `<tr>
                         <td style="text-align:center;">${p.pep||'-'}</td>
                         <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
@@ -3119,10 +2883,8 @@
                         <td style="text-align:center;"><div class="action-main">${botoesAcao}</div></td>
                     </tr>`;
                 }).join('');
-                
                 setTimeout(this.atualizarTemposEmTempoReal, 100);
             },
-
             atualizarTemposEmTempoReal() {
                 const agora = Date.now();
                 State.data.projetos.forEach(p => {
@@ -3136,7 +2898,6 @@
                     }
                 });
             },
-
             iniciarProcesso(id) {
                 const p = State.data.projetos.find(x => x.id === id);
                 if (!p) return;
@@ -3147,7 +2908,6 @@
                 this.renderTable();
                 UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new Date().toLocaleTimeString('pt-BR'));
             },
-
             pausarProcesso(id) {
                 const p = State.data.projetos.find(x => x.id === id);
                 if (!p) return;
@@ -3158,20 +2918,15 @@
             }
         };
 
-        /* ============================================
-           CONCLUSÃO DE PROJETOS
-           ============================================ */
         const Conclusao = {
             solicitar(id) {
                 const p = State.data.projetos.find(x => x.id === id);
                 if (!p) return;
                 State.projetoParaConcluir = id;
                 document.getElementById('concluirCodigo').textContent = p.diagrama;
-                
                 document.getElementById('concluirVolumesSection').style.display = 'none';
                 document.getElementById('concluirPinturaSection').style.display = 'none';
                 document.getElementById('concluirTurnoNormal').style.display = 'block';
-                
                 if (p.processo === 'Nanocerâmico') {
                     document.getElementById('concluirVolumesSection').style.display = 'block';
                     document.getElementById('concluirTurnoNormal').style.display = 'none';
@@ -3179,7 +2934,6 @@
                     const total = p.volumesTotal || 0;
                     const jaProcessados = p.volumesProcessados || 0;
                     const faltam = total - jaProcessados;
-                    
                     document.getElementById('concluirTotalVolumes').textContent = total;
                     document.getElementById('concluirJaProcessados').textContent = jaProcessados;
                     document.getElementById('concluirFaltam').textContent = faltam;
@@ -3196,7 +2950,6 @@
                 } else {
                     document.getElementById('concluirTurno').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
                 }
-                
                 UI.openModal('modalConcluir');
                 setTimeout(() => {
                     if (p.processo === 'Nanocerâmico') {
@@ -3208,7 +2961,6 @@
                     }
                 }, 100);
             },
-
             atualizarVolumesRestantes() {
                 const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
                 if (!p) return;
@@ -3219,23 +2971,19 @@
                 document.getElementById('concluirVolumesRestantes').textContent = restantes;
                 document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
             },
-
             confirmar() {
                 if (!State.projetoParaConcluir) return;
                 const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
                 if (!p) return;
-                
                 if (p.processo === 'Nanocerâmico') {
                     const turno = document.getElementById('concluirTurnoNano').value;
                     const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
                     if (volumesProcessados <= 0) { UI.showToast('warning', 'Atenção', 'Informe a quantidade de volumes processados'); return; }
-                    
                     const faltam = (p.volumesTotal || 0) - (p.volumesProcessados || 0);
                     if (volumesProcessados > faltam) {
                         UI.showToast('error', 'Erro', `Você informou ${volumesProcessados}, mas faltam apenas ${faltam} volumes.`);
                         return;
                     }
-                    
                     p.volumesProcessados += volumesProcessados;
                     if (p.volumesProcessados >= p.volumesTotal) {
                         this.concluirDireto(State.projetoParaConcluir, turno);
@@ -3259,7 +3007,6 @@
                 UI.closeModal('modalConcluir');
                 State.projetoParaConcluir = null;
             },
-
             registrarHistoricoPosto(p, turno, tempoReal) {
                 const registro = {
                     id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7),
@@ -3275,17 +3022,13 @@
                 };
                 State.data.historicoPostos.unshift(registro);
             },
-
             concluirDireto(id, turno) {
                 const idx = State.data.projetos.findIndex(x => x.id === id);
                 if (idx < 0) return;
                 const p = State.data.projetos[idx];
-                
                 const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
                 this.registrarHistoricoPosto(p, turno, tempoReal);
-                
                 const proximoProcesso = CONFIG.FLUXO_PROCESSOS[p.processo];
-                
                 if (proximoProcesso) {
                     p.processo = proximoProcesso;
                     p.status = 'Aguardando';
@@ -3295,11 +3038,9 @@
                     p.volumesProcessados = 0;
                     p.dataHoraInicio = null;
                     p.observacaoPintura = null;
-                    
                     Storage.salvar();
                     Posto.renderTable();
                     Admin.renderTable();
-                    
                     const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
                     UI.showToast('success', 'Fluxo atualizado', `${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
                 } else {
@@ -3322,14 +3063,10 @@
             }
         };
 
-        /* ============================================
-           HISTÓRICO
-           ============================================ */
         const Historico = {
             switchTab(tab, el) {
                 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
                 el.classList.add('active');
-                
                 if (tab === 'geral') {
                     document.getElementById('historicoGeralSection').style.display = 'block';
                     document.getElementById('historicoPostosSection').style.display = 'none';
@@ -3339,32 +3076,27 @@
                     this.renderPostos();
                 }
             },
-
             setFilterGeral(f, el) {
                 State.histFilter = f;
                 document.querySelectorAll('#historicoGeralSection .filter-chip').forEach(c => c.classList.remove('active'));
                 el.classList.add('active');
                 this.renderGeral();
             },
-
             setFilterPostos(f, el) {
                 State.histPostoFilter = f;
                 document.querySelectorAll('#historicoPostosSection .filter-chip').forEach(c => c.classList.remove('active'));
                 el.classList.add('active');
                 this.renderPostos();
             },
-
             setFilterPostoAtual(f, el) {
                 State.historicoPostoFilter = f;
                 document.querySelectorAll('#page-historico-posto .filter-chip').forEach(c => c.classList.remove('active'));
                 el.classList.add('active');
                 this.renderPostoAtual();
             },
-
             renderGeral() {
                 const tbody = document.getElementById('histTableBody');
                 const search = (document.getElementById('histSearch').value || '').toLowerCase();
-
                 let data = [...State.data.historico];
                 if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
                 if (search) data = data.filter(p =>
@@ -3372,16 +3104,12 @@
                     p.diagrama.toLowerCase().includes(search) ||
                     (p.placa||'').toLowerCase().includes(search)
                 );
-
                 if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-
                 data.sort((a,b) => b.concluidoEm - a.concluidoEm);
-
                 if (data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3><p>Nenhum projeto concluído ainda.</p></div></td></tr>`;
                     return;
                 }
-
                 tbody.innerHTML = data.map(p => {
                     const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
                     const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
@@ -3402,11 +3130,9 @@
                     </tr>`;
                 }).join('');
             },
-
             renderPostos() {
                 const tbody = document.getElementById('histPostoTableBody');
                 const search = (document.getElementById('histPostoSearch').value || '').toLowerCase();
-
                 let data = [...State.data.historicoPostos];
                 if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
                 if (search) data = data.filter(p =>
@@ -3414,18 +3140,13 @@
                     p.diagrama.toLowerCase().includes(search) ||
                     (p.placa||'').toLowerCase().includes(search)
                 );
-
                 if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-
                 data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
-
                 if (data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3><p>Nenhuma passagem por posto registrada ainda.</p></div></td></tr>`;
                     return;
                 }
-
                 const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
-
                 tbody.innerHTML = data.map(p => {
                     const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
                     const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
@@ -3442,30 +3163,23 @@
                     </tr>`;
                 }).join('');
             },
-
             renderPostoAtual() {
                 const tbody = document.getElementById('historicoPostoTableBody');
                 const search = (document.getElementById('historicoPostoSearch').value || '').toLowerCase();
-
                 document.getElementById('historicoPostoNome').textContent = State.currentPosto;
                 document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
-
                 let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
-                
                 if (State.historicoPostoFilter !== 'all') data = data.filter(p => p.turno === State.historicoPostoFilter);
                 if (search) data = data.filter(p =>
                     (p.pep||'').toLowerCase().includes(search) ||
                     p.diagrama.toLowerCase().includes(search) ||
                     (p.placa||'').toLowerCase().includes(search)
                 );
-
                 data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
-
                 if (data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>Nenhum projeto foi concluído no ${State.currentPosto} ainda.</p></div></td></tr>`;
                     return;
                 }
-
                 tbody.innerHTML = data.map(p => {
                     const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
                     const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
@@ -3481,7 +3195,6 @@
                     </tr>`;
                 }).join('');
             },
-
             reativar(id) {
                 const idx = State.data.historico.findIndex(x => x.id === id);
                 if (idx < 0) return;
@@ -3499,7 +3212,6 @@
                 Charts.render();
                 UI.showToast('success', 'Reativado', p.diagrama + ' voltou para processamento');
             },
-
             excluir(id) {
                 if (!confirm('Excluir permanentemente este registro do histórico?')) return;
                 State.data.historico = State.data.historico.filter(x => x.id !== id);
@@ -3510,9 +3222,6 @@
             }
         };
 
-        /* ============================================
-           TURNO
-           ============================================ */
         const Turno = {
             confirmarFimSemana(turno) {
                 State.data.turnosPorPosto[State.currentPosto] = turno;
@@ -3522,7 +3231,6 @@
                 State.turnoFimSemanaPendente = false;
                 UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno);
             },
-
             cancelarSelecao() {
                 const turnoDetectado = Utils.detectarTurnoAutomatico();
                 State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
@@ -3533,39 +3241,29 @@
             }
         };
 
-        /* ============================================
-           TECLADO VIRTUAL
-           ============================================ */
         const VirtualKeyboard = {
             show() {
                 document.getElementById('virtualKeyboard').classList.add('active');
                 State.vkActive = true;
                 if (State.vkTarget) UI.scrollParaElemento(State.vkTarget);
             },
-
             hide() {
                 document.getElementById('virtualKeyboard').classList.remove('active');
                 State.vkActive = false;
                 State.vkTarget = null;
             },
-
             toggle() {
                 if (State.vkActive) this.hide();
                 else this.show();
             }
         };
 
-        /* ============================================
-           GRÁFICOS
-           ============================================ */
         const Charts = {
             render() {
                 const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
                 const gridColor = 'rgba(128,128,128,0.15)';
-
                 Object.values(State.charts).forEach(c => c.destroy());
                 State.charts = {};
-
                 const ctx1 = document.getElementById('chartProcessos');
                 if (ctx1) {
                     const counts = {
@@ -3586,7 +3284,6 @@
                         }
                     });
                 }
-
                 const ctx2 = document.getElementById('chartTurnos');
                 if (ctx2) {
                     const turnosData = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
@@ -3599,7 +3296,6 @@
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Eficiência por Turno (%)', color: textColor } } }
                     });
                 }
-
                 const ctx3 = document.getElementById('chartTempoExecucao');
                 if (ctx3) {
                     const temposPorProcesso = { 'Nanocerâmico': [], 'Pintura': [], 'Conferência': [] };
@@ -3611,7 +3307,6 @@
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Tempo Médio de Execução por Processo (minutos)', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } }
                     });
                 }
-
                 const ctx4 = document.getElementById('chartEficiencia');
                 if (ctx4) {
                     const prioridades = { 'Urgente': State.data.projetos.filter(p => p.prioridade === 'Urgente').length, 'Alta': State.data.projetos.filter(p => p.prioridade === 'Alta').length, 'Normal': State.data.projetos.filter(p => p.prioridade === 'Normal').length };
@@ -3624,9 +3319,6 @@
             }
         };
 
-        /* ============================================
-           EXPORTAÇÃO
-           ============================================ */
         const Export = {
             downloadFile(name, content, type) {
                 const blob = new Blob([content], {type});
@@ -3635,7 +3327,6 @@
                 a.href = url; a.download = name; a.click();
                 URL.revokeObjectURL(url);
             },
-
             csv() {
                 const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
                 const rows = State.data.projetos.map(p => [p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
@@ -3643,7 +3334,6 @@
                 this.downloadFile('projetos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
                 UI.showToast('success', 'Exportado', 'Arquivo CSV gerado');
             },
-
             historicoCSV() {
                 let data = State.data.historico;
                 if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
@@ -3653,7 +3343,6 @@
                 this.downloadFile('historico_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
                 UI.showToast('success', 'Exportado', 'Histórico exportado');
             },
-
             historicoPostosCSV() {
                 let data = State.data.historicoPostos;
                 if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
@@ -3663,7 +3352,6 @@
                 this.downloadFile('historico_postos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
                 UI.showToast('success', 'Exportado', 'Histórico por posto exportado');
             },
-
             postoConcluidosCSV() {
                 let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
                 const headers = ['PEP','Diagrama/Ordem','Placa','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
@@ -3672,13 +3360,11 @@
                 this.downloadFile(`concluidos_${State.currentPosto.toLowerCase().replace('ê','e').replace('á','a').replace(' ','_')}_${Utils.dateStamp()}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8;');
                 UI.showToast('success', 'Exportado', `Concluídos no ${State.currentPosto} exportados`);
             },
-
             backup() {
                 const json = JSON.stringify(State.data, null, 2);
                 this.downloadFile('backup_weg_' + Utils.dateStamp() + '.json', json, 'application/json');
                 UI.showToast('success', 'Backup', 'Arquivo de backup gerado');
             },
-
             restaurar(e) {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -3706,9 +3392,6 @@
             }
         };
 
-        /* ============================================
-           INICIALIZAÇÃO
-           ============================================ */
         const App = {
             init() {
                 Storage.carregar();
@@ -3721,7 +3404,6 @@
             }
         };
 
-        // Iniciar aplicação
         App.init();
     </script>
 </body>
