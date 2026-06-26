@@ -2438,6 +2438,13 @@ function aplicarEstadoCursor(){
     }else{
         document.body.classList.remove('hide-cursor');
     }
+    // Esconder botão de toggle quando em modo computador
+    const toggleBtn = document.getElementById('vkToggleFloat');
+    if(state.config.dispositivo === 'computador'){
+        toggleBtn.style.display = 'none';
+    }else{
+        toggleBtn.style.display = 'flex';
+    }
 }
 
 function scrollParaElemento(elemento){
@@ -3443,6 +3450,7 @@ function solicitarConclusao(id){
     projetoParaConcluir = id;
     document.getElementById('concluirCodigo').textContent = p.diagrama;
     
+    // Esconder todas as seções primeiro
     document.getElementById('concluirVolumesSection').style.display = 'none';
     document.getElementById('concluirPinturaSection').style.display = 'none';
     document.getElementById('concluirTurnoNormal').style.display = 'block';
@@ -3468,6 +3476,7 @@ function solicitarConclusao(id){
         document.getElementById('concluirTurnoPintura').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
         document.getElementById('concluirObservacaoPintura').value = '';
     }else{
+        // Conferência - mostrar seleção de turno normal
         document.getElementById('concluirTurno').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
     }
     
@@ -3532,6 +3541,7 @@ function confirmarConclusao(){
         p.observacaoPintura = observacao;
         concluirProjetoDireto(projetoParaConcluir, turno);
     }else{
+        // Conferência
         const turno = document.getElementById('concluirTurno').value;
         concluirProjetoDireto(projetoParaConcluir, turno);
     }
@@ -3775,8 +3785,12 @@ function salvarConfigDispositivo(){
 function applyDeviceConfig(){
     const isComputer = state.config.dispositivo === 'computador';
     const toggleFloat = document.getElementById('vkToggleFloat');
-    if(isComputer){ toggleFloat.classList.add('active'); }
-    else{ toggleFloat.classList.remove('active'); hideVirtualKeyboard(); }
+    if(isComputer){ 
+        toggleFloat.style.display = 'none';
+        hideVirtualKeyboard();
+    }else{ 
+        toggleFloat.style.display = 'flex';
+    }
 }
 
 function backupData(){
