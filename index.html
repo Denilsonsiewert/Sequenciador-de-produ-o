@@ -2399,6 +2399,13 @@ const PRIORIDADE_ORDEM = {
     'Normal': 2
 };
 
+// Sequência de fluxo: Nanocerâmico → Pintura → Conferência → Histórico
+const FLUXO_PROCESSOS = {
+    'Nanocerâmico': 'Pintura',
+    'Pintura': 'Conferência',
+    'Conferência': null // Último posto, vai para histórico
+};
+
 let state = {
     projetos: [],
     historico: [],
@@ -3536,22 +3543,46 @@ function concluirProjetoDireto(id, turno){
     const idx = state.projetos.findIndex(x=>x.id===id);
     if(idx<0) return;
     const p = state.projetos[idx];
-    p.dataHoraFim = Date.now();
-    const tempoReal = p.dataHoraFim - (p.dataHoraInicio || p.criadoEm);
-    const concluido = Object.assign({}, p, {
-        status: 'Concluído',
-        turno: turno || p.turno || '1º Turno',
-        concluidoEm: Date.now(),
-        tempoReal: tempoReal
-    });
-    state.historico.unshift(concluido);
-    state.projetos.splice(idx,1);
-    salvar();
-    renderAdminTable();
-    renderPostoTable();
-    renderHistorico();
-    renderCharts();
-    showToast('success','Concluído',p.diagrama+' movido para o histórico. Tempo real: '+formatarTempo(tempoReal));
+    
+    // Verificar se há próximo posto no fluxo
+    const proximoProcesso = FLUXO_PROCESSOS[p.processo];
+    
+    if(proximoProcesso){
+        // Mover para o próximo posto com status "Aguardando"
+        p.processo = proximoProcesso;
+        p.status = 'Aguardando';
+        p.turno = state.turnosPorPosto[proximoProcesso] || turno;
+        p.dataHoraFim = Date.now();
+        p.tempoReal = p.dataHoraFim - (p.dataHoraInicio || p.criadoEm);
+        
+        // Resetar volumes processados para o novo posto
+        p.volumesProcessados = 0;
+        
+        salvar();
+        renderPostoTable();
+        renderAdminTable();
+        
+        const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
+        showToast('success','Fluxo atualizado',`${p.diagrama} movido para ${nomeProximoPosto} em aguardando`);
+    }else{
+        // Último posto - mover para histórico
+        p.dataHoraFim = Date.now();
+        const tempoReal = p.dataHoraFim - (p.dataHoraInicio || p.criadoEm);
+        const concluido = Object.assign({}, p, {
+            status: 'Concluído',
+            turno: turno || p.turno || '1º Turno',
+            concluidoEm: Date.now(),
+            tempoReal: tempoReal
+        });
+        state.historico.unshift(concluido);
+        state.projetos.splice(idx,1);
+        salvar();
+        renderAdminTable();
+        renderPostoTable();
+        renderHistorico();
+        renderCharts();
+        showToast('success','Concluído',p.diagrama+' movido para o histórico. Tempo real: '+formatarTempo(tempoReal));
+    }
 }
 
 function setHistFilter(f,el){
