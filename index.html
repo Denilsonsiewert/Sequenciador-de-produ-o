@@ -43,6 +43,7 @@ body{
     transition:var(--transition);
 }
 
+/* ===== OCULTAR CURSOR ===== */
 body.hide-cursor,
 body.hide-cursor *,
 body.hide-cursor button,
@@ -53,6 +54,7 @@ body.hide-cursor textarea{
     cursor: none !important;
 }
 
+/* ===== BARRA DE ROLAGEM LARGA - OTIMIZADA PARA TOUCH ===== */
 ::-webkit-scrollbar{
     width:30px;
     height:30px;
@@ -84,6 +86,7 @@ body.hide-cursor textarea{
     scrollbar-color:var(--weg-blue) var(--bg);
 }
 
+/* ===== LOGIN ===== */
 .login-screen{
     position:fixed;
     inset:0;
@@ -166,6 +169,7 @@ body.hide-cursor textarea{
     font-size:11px;
 }
 
+/* ===== HEADER REORGANIZADO ===== */
 .header{
     background:linear-gradient(90deg,var(--weg-blue),var(--weg-dark));
     color:white;
@@ -286,11 +290,13 @@ body.hide-cursor textarea{
     transform:scale(.95);
 }
 
+/* ===== LAYOUT ===== */
 .layout{
     display:flex;
     min-height:calc(100vh - var(--header-height));
 }
 
+/* ===== SIDEBAR - APENAS ÍCONES ===== */
 .sidebar{
     width:var(--sidebar-width);
     background:var(--card);
@@ -367,6 +373,7 @@ body.hide-cursor textarea{
     transform:translateY(-50%) translateX(0);
 }
 
+/* ===== CONTENT ===== */
 .content{
     flex:1;
     padding:25px;
@@ -403,6 +410,7 @@ body.hide-cursor textarea{
     font-weight:600;
 }
 
+/* ===== KPI ===== */
 .kpi-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -477,6 +485,7 @@ body.hide-cursor textarea{
 .trend-up{color:var(--success);}
 .trend-down{color:var(--danger);}
 
+/* ===== CARD ===== */
 .card{
     background:var(--card);
     border-radius:var(--radius);
@@ -505,6 +514,7 @@ body.hide-cursor textarea{
 
 .card h2 i{color:var(--weg-blue);}
 
+/* ===== BOTÕES ===== */
 .btn{
     background:var(--weg-blue);
     color:white;
@@ -542,6 +552,7 @@ body.hide-cursor textarea{
 .btn-warning{background:var(--warning);color:#333;}
 .btn-warning:hover{background:#e09e00;}
 
+/* ===== FORMULÁRIO ===== */
 .form-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -592,6 +603,7 @@ body.hide-cursor textarea{
     flex-wrap:wrap;
 }
 
+/* ===== TABELA ===== */
 .table-wrapper{
     overflow-x:auto;
     border-radius:8px;
@@ -647,6 +659,7 @@ body.hide-cursor textarea{
     letter-spacing:.5px;
 }
 
+/* ===== CENTRALIZAR COLUNA AÇÕES ===== */
 .table thead th:last-child{
     text-align:center;
 }
@@ -691,6 +704,7 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
+/* ===== EXIBIÇÃO DE VOLUMES MELHORADA - CENTRALIZADA ===== */
 .volumes-container{
     display:flex;
     flex-direction:column;
@@ -796,6 +810,7 @@ body.hide-cursor textarea{
     font-weight:600;
 }
 
+/* ===== TEMPO EM TEMPO REAL ===== */
 .tempo-real{
     background:var(--weg-light);
     color:var(--weg-blue);
@@ -819,6 +834,7 @@ body.hide-cursor textarea{
     50%{opacity:.7;}
 }
 
+/* ===== AÇÕES DO POSTO - CENTRALIZADO ===== */
 .action-main{
     display:flex;
     gap:8px;
@@ -892,6 +908,7 @@ body.hide-cursor textarea{
     color:white;
 }
 
+/* ===== AÇÕES DA TABELA ADMIN - CENTRALIZADO ===== */
 .row-actions{
     display:flex;
     gap:8px;
@@ -935,6 +952,7 @@ body.hide-cursor textarea{
     color:var(--success);
 }
 
+/* ===== MODAL ===== */
 .modal-overlay{
     position:fixed;
     inset:0;
@@ -996,6 +1014,7 @@ body.hide-cursor textarea{
 
 .modal-close:hover{background:var(--bg);color:var(--danger);}
 
+/* ===== LEITOR DE ETIQUETA ===== */
 .leitor-box{
     border:2px dashed var(--weg-blue);
     border-radius:var(--radius);
@@ -1022,6 +1041,7 @@ body.hide-cursor textarea{
     font-size:12px;
 }
 
+/* ===== TECLADO VIRTUAL ===== */
 .virtual-keyboard{
     position:fixed;
     bottom:20px;
@@ -1155,6 +1175,7 @@ body.hide-cursor textarea{
 
 .vk-toggle.active{display:flex;align-items:center;justify-content:center;}
 
+/* ===== TOAST ===== */
 .toast-container{
     position:fixed;
     top:100px;
@@ -1194,6 +1215,7 @@ body.hide-cursor textarea{
 .toast-title{font-weight:600;font-size:13px;}
 .toast-message{font-size:12px;color:var(--text-light);margin-top:2px;}
 
+/* ===== FILTROS ===== */
 .filter-bar{
     display:flex;
     gap:10px;
@@ -1217,6 +1239,7 @@ body.hide-cursor textarea{
     border-color:var(--weg-blue);
 }
 
+/* ===== EMPTY STATE ===== */
 .empty-state{
     text-align:center;
     padding:50px 20px;
@@ -1235,6 +1258,7 @@ body.hide-cursor textarea{
     color:var(--text);
 }
 
+/* ===== SENHA INPUT ===== */
 .password-wrapper{
     position:relative;
 }
@@ -1279,6 +1303,7 @@ body.hide-cursor textarea{
 .strength-medium{color:var(--warning);}
 .strength-strong{color:var(--success);}
 
+/* ===== ALERT BOX ===== */
 .alert{
     padding:12px 15px;
     border-radius:8px;
@@ -1307,6 +1332,7 @@ body.hide-cursor textarea{
     border-left:4px solid var(--warning);
 }
 
+/* ===== CHARTS ===== */
 .charts-grid{
     display:grid;
     grid-template-columns:2fr 1fr;
@@ -1319,6 +1345,7 @@ body.hide-cursor textarea{
     height:300px;
 }
 
+/* ===== RESPONSIVO ===== */
 @media(max-width:1000px){
     .charts-grid{grid-template-columns:1fr;}
     .sidebar{
@@ -1419,6 +1446,7 @@ body.hide-cursor textarea{
 
 <body>
 
+<!-- ===== LOGIN ===== -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
         <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -1449,6 +1477,7 @@ body.hide-cursor textarea{
     </div>
 </div>
 
+<!-- ===== APP ===== -->
 <div id="app" style="display:none;">
 
 <header class="header">
@@ -1483,6 +1512,7 @@ body.hide-cursor textarea{
 
     <main class="content">
 
+        <!-- ===== DASHBOARD ===== -->
         <section class="page" id="page-dashboard">
             <h1 class="page-title">
                 <i class="fa-solid fa-chart-line"></i>
@@ -1547,6 +1577,7 @@ body.hide-cursor textarea{
             </div>
         </section>
 
+        <!-- ===== ADMIN - CADASTRO ===== -->
         <section class="page" id="page-admin">
             <h1 class="page-title">
                 <i class="fa-solid fa-user-shield"></i>
@@ -1659,6 +1690,7 @@ body.hide-cursor textarea{
             </div>
         </section>
 
+        <!-- ===== POSTO DE TRABALHO ===== -->
         <section class="page" id="page-posto">
             <h1 class="page-title">
                 <i class="fa-solid fa-industry" id="postoIcon"></i>
@@ -1726,6 +1758,7 @@ body.hide-cursor textarea{
             </div>
         </section>
 
+        <!-- ===== HISTÓRICO ===== -->
         <section class="page" id="page-historico">
             <h1 class="page-title">
                 <i class="fa-solid fa-clock-rotate-left"></i>
@@ -1769,6 +1802,7 @@ body.hide-cursor textarea{
             </div>
         </section>
 
+        <!-- ===== CONFIG ===== -->
         <section class="page" id="page-config">
             <h1 class="page-title">
                 <i class="fa-solid fa-gear"></i>
@@ -1860,6 +1894,7 @@ body.hide-cursor textarea{
 </div>
 </div>
 
+<!-- ===== MODAL SELEÇÃO DE TURNO (FIM DE SEMANA) ===== -->
 <div class="modal-overlay" id="modalTurnoFimSemana">
     <div class="modal" style="max-width:420px;">
         <div class="modal-head">
@@ -1884,6 +1919,7 @@ body.hide-cursor textarea{
     </div>
 </div>
 
+<!-- ===== MODAL SENHA ADMIN (login) ===== -->
 <div class="modal-overlay" id="modalSenhaAdmin">
     <div class="modal" style="max-width:420px;">
         <div class="modal-head">
@@ -1912,6 +1948,7 @@ body.hide-cursor textarea{
     </div>
 </div>
 
+<!-- ===== MODAL CONFIRMAÇÃO DE SENHA (genérico) ===== -->
 <div class="modal-overlay" id="modalConfirmarSenha">
     <div class="modal" style="max-width:420px;">
         <div class="modal-head">
@@ -1940,6 +1977,7 @@ body.hide-cursor textarea{
     </div>
 </div>
 
+<!-- ===== MODAL EDITAR PROJETO ===== -->
 <div class="modal-overlay" id="modalEditar">
     <div class="modal">
         <div class="modal-head">
@@ -2005,7 +2043,7 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== MODAL CONCLUIR - CORRIGIDO COM INFORMAÇÕES CLARAS ===== -->
+<!-- ===== MODAL CONFIRMAÇÃO CONCLUSÃO - CORRIGIDO ===== -->
 <div class="modal-overlay" id="modalConcluir">
     <div class="modal" style="max-width:500px;">
         <div class="modal-head">
@@ -2052,8 +2090,10 @@ body.hide-cursor textarea{
     </div>
 </div>
 
+<!-- ===== TOAST ===== -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ===== TECLADO VIRTUAL ===== -->
 <div class="virtual-keyboard" id="virtualKeyboard">
     <div class="vk-header">
         <span><i class="fa-solid fa-keyboard"></i> Teclado Numérico</span>
@@ -2094,6 +2134,9 @@ body.hide-cursor textarea{
 </button>
 
 <script>
+/* =======================
+   ESTADO GLOBAL
+======================= */
 const STORAGE_KEY = 'weg_fluxo_produtivo_v19';
 const SENHA_PADRAO = 'weg2024';
 
@@ -2136,6 +2179,9 @@ let charts = {};
 let turnoFimSemanaPendente = false;
 let timerInterval = null;
 
+/* =======================
+   CONTROLE DE CURSOR
+======================= */
 function aplicarEstadoCursor(){
     if(state.config.dispositivo === 'computador'){
         document.body.classList.add('hide-cursor');
@@ -2144,6 +2190,21 @@ function aplicarEstadoCursor(){
     }
 }
 
+function ocultarCursor(){
+    if(state.config.dispositivo === 'computador'){
+        document.body.classList.add('hide-cursor');
+    }
+}
+
+function mostrarCursor(){
+    if(state.config.dispositivo !== 'computador'){
+        document.body.classList.remove('hide-cursor');
+    }
+}
+
+/* =======================
+   SCROLL PARA ELEMENTO FOCADO
+======================= */
 function scrollParaElemento(elemento){
     setTimeout(() => {
         if(vkActive && state.config.dispositivo === 'computador'){
@@ -2154,6 +2215,9 @@ function scrollParaElemento(elemento){
     }, 300);
 }
 
+/* =======================
+   DETECÇÃO AUTOMÁTICA DE TURNO
+======================= */
 function detectarTurnoAutomatico(){
     const agora = new Date();
     const hora = agora.getHours();
@@ -2204,6 +2268,9 @@ function cancelarSelecaoTurno(){
     turnoFimSemanaPendente = false;
 }
 
+/* =======================
+   PERSISTÊNCIA
+======================= */
 function salvar(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
@@ -2264,6 +2331,9 @@ function genId(){
     return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 }
 
+/* =======================
+   FORMATAÇÃO DE TEMPO
+======================= */
 function formatarTempo(ms){
     if(!ms || ms < 0) return '00:00:00';
     const segundos = Math.floor(ms / 1000);
@@ -2290,11 +2360,16 @@ function atualizarTemposEmTempoReal(){
     });
 }
 
+/* =======================
+   LOGIN / LOGOUT - ADMIN SEMPRE PEDE SENHA
+======================= */
 function login(role){
     if(role === 'admin'){
+        // SEMPRE ABRE O MODAL DE SENHA PARA O ADMINISTRADOR
         pendingAdminLogin = true;
         document.getElementById('inputSenhaAdmin').value = '';
         document.getElementById('senhaAdminErro').style.display = 'none';
+        
         setTimeout(()=>{
             openModal('modalSenhaAdmin');
             setTimeout(()=>{
@@ -2378,6 +2453,9 @@ function logout(){
     if(timerInterval) clearInterval(timerInterval);
 }
 
+/* =======================
+   ALTERAR SENHA
+======================= */
 function alterarSenha(e){
     e.preventDefault();
     const atual = document.getElementById('senhaAtual').value;
@@ -2436,6 +2514,9 @@ function togglePwdVisibility(inputId,btn){
     else{ input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
 }
 
+/* =======================
+   MODAL GENÉRICO DE CONFIRMAÇÃO POR SENHA
+======================= */
 function solicitarConfirmacaoSenha(titulo, aviso, callback){
     acaoPendenteSenha = callback;
     document.getElementById('modalConfirmarTitulo').textContent = titulo || 'Confirmação de Segurança';
@@ -2472,6 +2553,9 @@ function cancelarConfirmacaoSenha(){
     closeModal('modalConfirmarSenha');
 }
 
+/* =======================
+   LIMPAR TUDO (com senha)
+======================= */
 function solicitarLimpeza(){
     solicitarConfirmacaoSenha(
         'Limpar Todos os Dados',
@@ -2491,10 +2575,16 @@ function executarLimpeza(){
     showToast('success','Dados apagados','Todos os projetos e o histórico foram removidos com sucesso');
 }
 
+/* =======================
+   SIDEBAR MOBILE
+======================= */
 function toggleSidebarMobile(){
     document.getElementById('sidebar').classList.toggle('open');
 }
 
+/* =======================
+   MENU DINÂMICO - APENAS ÍCONES
+======================= */
 function buildMenu(){
     const menu = document.getElementById('mainMenu');
     let html = '';
@@ -2566,6 +2656,9 @@ function atualizarHeaderTitle(page){
     }
 }
 
+/* =======================
+   DATA/HORA
+======================= */
 function updateDate(){
     const now = new Date();
     const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
@@ -2574,6 +2667,9 @@ function updateDate(){
 updateDate();
 setInterval(updateDate,1000);
 
+/* =======================
+   TOAST
+======================= */
 function showToast(type,title,message){
     const icons = {success:'check-circle',error:'circle-xmark',warning:'triangle-exclamation',info:'circle-info'};
     const container = document.getElementById('toastContainer');
@@ -2593,6 +2689,9 @@ function showToast(type,title,message){
     },3500);
 }
 
+/* =======================
+   MODAL
+======================= */
 function openModal(id){ document.getElementById(id).classList.add('active'); }
 function closeModal(id){ document.getElementById(id).classList.remove('active'); }
 
@@ -2607,6 +2706,9 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
     });
 });
 
+/* =======================
+   DASHBOARD
+======================= */
 function renderDashboard(){
     const hoje = new Date(); hoje.setHours(0,0,0,0);
     const hojeCount = state.projetos.filter(p => p.criadoEm >= hoje.getTime()).length;
@@ -2620,6 +2722,9 @@ function renderDashboard(){
     renderCharts();
 }
 
+/* =======================
+   LEITOR DE ETIQUETA
+======================= */
 function focarLeitorEtiqueta(){
     const input = document.getElementById('leitorEtiquetaInput');
     input.value = '';
@@ -2649,6 +2754,9 @@ function processarLeituraEtiqueta(){
     document.getElementById('leitorEtiquetaInput').value = '';
 }
 
+/* =======================
+   CONTROLE DE VOLUMES POR PROCESSO
+======================= */
 function toggleVolumesCadastro(){
     const processo = document.getElementById('cad-processo').value;
     const groupVolumes = document.getElementById('group-cad-volumes');
@@ -2663,6 +2771,9 @@ function toggleVolumesEdicao(){
     else{ groupVolumes.style.display = 'block'; }
 }
 
+/* =======================
+   ADMIN - CADASTRO
+======================= */
 function cadastrarProjeto(e){
     e.preventDefault();
     const pep = document.getElementById('cad-pep').value.trim();
@@ -2856,6 +2967,9 @@ function excluirProjeto(id){
     showToast('success','Excluído','Projeto '+p.diagrama+' removido');
 }
 
+/* =======================
+   POSTO DE TRABALHO
+======================= */
 function renderPosto(){
     if(!currentPosto) return;
 
@@ -3027,7 +3141,9 @@ function pausarProcesso(id){
     showToast('info','Processo pausado',p.diagrama+' pausado');
 }
 
-// ===== FUNÇÃO CORRIGIDA: SOLICITAR CONCLUSÃO COM DADOS REAIS =====
+/* =======================
+   CONCLUSÃO → HISTÓRICO COM VOLUMES - CORRIGIDO
+======================= */
 function solicitarConclusao(id){
     const p = state.projetos.find(x=>x.id===id);
     if(!p) return;
@@ -3066,7 +3182,7 @@ function solicitarConclusao(id){
     },100);
 }
 
-// ===== FUNÇÃO CORRIGIDA: CÁLCULO REAL DE VOLUMES RESTANTES =====
+// FUNÇÃO CORRIGIDA: CÁLCULO CORRETO DE VOLUMES RESTANTES
 function atualizarVolumesRestantes(){
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
@@ -3089,7 +3205,7 @@ function atualizarVolumesRestantes(){
     }
 }
 
-// ===== FUNÇÃO CORRIGIDA: CONFIRMAR CONCLUSÃO COM VALIDAÇÃO =====
+// FUNÇÃO CORRIGIDA: VALIDAÇÃO NA CONFIRMAÇÃO
 function confirmarConclusao(){
     if(!projetoParaConcluir) return;
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
@@ -3153,6 +3269,9 @@ function concluirProjetoDireto(id, turno){
     showToast('success','Concluído',p.diagrama+' movido para o histórico. Tempo real: '+formatarTempo(tempoReal));
 }
 
+/* =======================
+   HISTÓRICO
+======================= */
 function setHistFilter(f,el){
     histFilter = f;
     document.querySelectorAll('#page-historico .filter-chip').forEach(c=>c.classList.remove('active'));
@@ -3233,6 +3352,9 @@ function excluirHistorico(id){
     showToast('success','Excluído','Registro removido do histórico');
 }
 
+/* =======================
+   GRÁFICOS / DASHBOARD
+======================= */
 function renderCharts(){
     const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
     const gridColor = 'rgba(128,128,128,0.15)';
@@ -3297,6 +3419,9 @@ function renderCharts(){
     }
 }
 
+/* =======================
+   EXPORT CSV
+======================= */
 function exportCSV(){
     const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
     const rows = state.projetos.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
@@ -3325,6 +3450,9 @@ function downloadFile(name,content,type){
 
 function dateStamp(){return new Date().toISOString().slice(0,10);}
 
+/* =======================
+   CONFIGURAÇÕES
+======================= */
 function loadConfigUI(){
     document.getElementById('cfgDevice').value = state.config.dispositivo || 'tablet';
     document.getElementById('cfgVkInfo').style.display = state.config.dispositivo === 'computador' ? 'block' : 'none';
@@ -3377,6 +3505,9 @@ function restoreData(e){
     e.target.value = '';
 }
 
+/* =======================
+   TECLADO VIRTUAL
+======================= */
 function toggleVirtualKeyboard(){
     if(vkActive) hideVirtualKeyboard();
     else showVirtualKeyboard();
@@ -3430,6 +3561,9 @@ document.addEventListener('click', e=>{
     scrollParaElemento(vkTarget);
 });
 
+/* =======================
+   INIT
+======================= */
 carregar();
 aplicarEstadoCursor();
 
