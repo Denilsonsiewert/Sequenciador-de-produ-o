@@ -659,6 +659,15 @@ body.hide-cursor textarea{
     letter-spacing:.5px;
 }
 
+/* ===== CENTRALIZAR COLUNA AÇÕES ===== */
+.table thead th:last-child{
+    text-align:center;
+}
+
+.table tbody td:last-child{
+    text-align:center;
+}
+
 .table tbody tr{transition:var(--transition);}
 .table tbody tr:hover{background:var(--bg);}
 
@@ -695,36 +704,69 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
-/* Centralizar container de volumes */
+/* ===== EXIBIÇÃO DE VOLUMES MELHORADA - CENTRALIZADA ===== */
 .volumes-container{
     display:flex;
     flex-direction:column;
     gap:4px;
-    align-items:center; /* Alterado de flex-start para center */
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    margin:0 auto;
 }
 
-/* Centralizar barra de progresso */
-.volumes-progress-bar{
-    width:100%;
-    max-width:120px; /* Largura máxima para melhor visualização */
-    height:6px;
-    background:var(--border);
-    border-radius:3px;
-    overflow:hidden;
-    margin:2px auto; /* Centralizado com margin auto */
-}
-
-/* Centralizar informações principais de volumes */
 .volumes-main{
     display:flex;
     align-items:center;
     gap:6px;
     font-weight:700;
     font-size:14px;
-    justify-content:center; /* Centralizado */
+    justify-content:center;
 }
 
-/* Centralizar volumes restantes */
+.volumes-processed{
+    color:var(--weg-blue);
+    font-size:16px;
+}
+
+.volumes-divider{
+    color:var(--text-light);
+    font-weight:400;
+}
+
+.volumes-total{
+    color:var(--text);
+}
+
+.volumes-main.complete{
+    color:var(--success);
+}
+
+.volumes-main.complete i{
+    font-size:16px;
+}
+
+.volumes-progress-bar{
+    width:100%;
+    max-width:120px;
+    height:6px;
+    background:var(--border);
+    border-radius:3px;
+    overflow:hidden;
+    margin:2px auto;
+}
+
+.volumes-progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--warning), var(--weg-blue));
+    border-radius:3px;
+    transition:width 0.3s ease;
+}
+
+.volumes-progress-fill.complete{
+    background:var(--success);
+}
+
 .volumes-remaining{
     display:flex;
     align-items:center;
@@ -735,55 +777,37 @@ body.hide-cursor textarea{
     background:rgba(255,176,0,0.1);
     padding:2px 8px;
     border-radius:12px;
-    justify-content:center; /* Centralizado */
-}
-
-/* Centralizar cabeçalho AÇÕES */
-.table thead th:last-child{
-    text-align:center; /* Centraliza o texto AÇÕES */
-}
-
-/* Centralizar células da coluna de ações */
-.table tbody td:last-child{
-    text-align:center; /* Centraliza o conteúdo */
-}
-
-/* Centralizar container de ações principais */
-.action-main{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    justify-content:center; /* Alterado de flex-start para center */
-    min-width:180px;
-    margin:0 auto; /* Centralizado */
-}
-
-/* Ajustar botões de ação para melhor centralização */
-.icon-action-lg{
-    background:var(--bg);
-    border:2px solid var(--border);
-    cursor:pointer;
-    padding:12px 16px;
-    border-radius:10px;
-    color:var(--text);
-    transition:var(--transition);
-    font-size:20px;
-    min-width:60px;
-    min-height:52px;
-    display:inline-flex;
-    align-items:center;
     justify-content:center;
-    box-shadow:0 2px 4px rgba(0,0,0,.08);
-    flex:0 0 auto; /* Remove flex-grow para não esticar */
+    margin:0 auto;
 }
 
-/* Ações da tabela admin - centralizar */
-.row-actions{
-    display:flex;
-    gap:8px;
-    flex-wrap:nowrap;
-    align-items:center;
-    justify-content:center; /* Alterado para center */
+.volumes-remaining i{
+    font-size:10px;
+}
+
+.volumes-total-only{
+    color:var(--text);
+    font-weight:600;
+    font-size:13px;
+    text-align:center;
+}
+
+.volumes-simple{
+    color:var(--text-light);
+    font-size:13px;
+    text-align:center;
+}
+
+.volumes-info{
+    font-size:11px;
+    color:var(--text-light);
+    margin-top:2px;
+    text-align:center;
+}
+
+.volumes-info.parcial{
+    color:var(--warning);
+    font-weight:600;
 }
 
 /* ===== TEMPO EM TEMPO REAL ===== */
@@ -810,13 +834,14 @@ body.hide-cursor textarea{
     50%{opacity:.7;}
 }
 
-/* ===== AÇÕES DO POSTO - LADO A LADO ===== */
+/* ===== AÇÕES DO POSTO - CENTRALIZADO ===== */
 .action-main{
     display:flex;
     gap:8px;
     align-items:center;
-    justify-content:flex-start;
+    justify-content:center;
     min-width:180px;
+    margin:0 auto;
 }
 
 .icon-action-lg{
@@ -834,7 +859,7 @@ body.hide-cursor textarea{
     align-items:center;
     justify-content:center;
     box-shadow:0 2px 4px rgba(0,0,0,.08);
-    flex:1;
+    flex:0 0 auto;
 }
 
 .icon-action-lg:hover{
@@ -883,13 +908,13 @@ body.hide-cursor textarea{
     color:white;
 }
 
-/* ===== AÇÕES DA TABELA ADMIN ===== */
+/* ===== AÇÕES DA TABELA ADMIN - CENTRALIZADO ===== */
 .row-actions{
     display:flex;
     gap:8px;
     flex-wrap:nowrap;
     align-items:center;
-    justify-content:flex-start;
+    justify-content:center;
 }
 
 .icon-action{
@@ -3063,11 +3088,11 @@ function renderPostoTable(){
         const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
         const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
         
-        // MELHORIA NA EXIBIÇÃO DE VOLUMES
+        // MELHORIA NA EXIBIÇÃO DE VOLUMES - CENTRALIZADO
         let volumesDisplay = '';
         if(p.volumesTotal && p.volumesTotal > 0){
             if(p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal){
-                // Status PARCIAL - Exibição melhorada
+                // Status PARCIAL - Exibição centralizada
                 const restantes = p.volumesTotal - p.volumesProcessados;
                 const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
                 volumesDisplay = `
@@ -3087,7 +3112,7 @@ function renderPostoTable(){
                     </div>
                 `;
             }else if(p.volumesProcessados >= p.volumesTotal){
-                // COMPLETO
+                // COMPLETO - Centralizado
                 volumesDisplay = `
                     <div class="volumes-container">
                         <div class="volumes-main complete">
@@ -3100,7 +3125,7 @@ function renderPostoTable(){
                     </div>
                 `;
             }else{
-                // SEM PROCESSAMENTO
+                // SEM PROCESSAMENTO - Centralizado
                 volumesDisplay = `
                     <div class="volumes-container">
                         <span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span>
