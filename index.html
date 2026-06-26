@@ -1207,25 +1207,6 @@ body.hide-cursor textarea{
     border-color:#1976D2;
 }
 
-.vk-toggle{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    z-index:6500;
-    display:none;
-    background:var(--weg-blue);
-    color:white;
-    border:none;
-    width:64px;
-    height:64px;
-    border-radius:50%;
-    cursor:pointer !important;
-    box-shadow:var(--shadow-lg);
-    font-size:24px;
-}
-
-.vk-toggle.active{display:flex;align-items:center;justify-content:center;}
-
 .toast-container{
     position:fixed;
     top:100px;
@@ -2480,10 +2461,6 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<button class="vk-toggle" id="vkToggleFloat" onclick="toggleVirtualKeyboard()" title="Teclado Virtual">
-    <i class="fa-solid fa-keyboard"></i>
-</button>
-
 <script>
 const STORAGE_KEY = 'weg_fluxo_produtivo_v20';
 const SENHA_PADRAO = 'weg2024';
@@ -2539,12 +2516,6 @@ function aplicarEstadoCursor(){
         document.body.classList.add('hide-cursor');
     }else{
         document.body.classList.remove('hide-cursor');
-    }
-    const toggleBtn = document.getElementById('vkToggleFloat');
-    if(state.config.dispositivo === 'computador'){
-        toggleBtn.style.display = 'none';
-    }else{
-        toggleBtn.style.display = 'flex';
     }
 }
 
@@ -2842,9 +2813,9 @@ function avaliarForcaSenha(){
     if(/\d/.test(senha)) score++;
     if(/[^A-Za-z0-9]/.test(senha)) score++;
 
-    if(score <= 2){ el.textContent = ' Senha fraca'; el.className = 'password-strength strength-weak'; }
+    if(score <= 2){ el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
     else if(score <= 3){ el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
-    else{ el.textContent = ' Senha forte'; el.className = 'password-strength strength-strong'; }
+    else{ el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 
 function togglePwdVisibility(inputId,btn){
@@ -3681,7 +3652,6 @@ function concluirProjetoDireto(id, turno){
     if(idx<0) return;
     const p = state.projetos[idx];
     
-    // Registrar no histórico de postos ANTES de mudar o processo
     const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
     registrarHistoricoPosto(p, turno, tempoReal);
     
@@ -3978,12 +3948,8 @@ function salvarConfigDispositivo(){
 
 function applyDeviceConfig(){
     const isComputer = state.config.dispositivo === 'computador';
-    const toggleFloat = document.getElementById('vkToggleFloat');
     if(isComputer){ 
-        toggleFloat.style.display = 'none';
         hideVirtualKeyboard();
-    }else{ 
-        toggleFloat.style.display = 'flex';
     }
 }
 
