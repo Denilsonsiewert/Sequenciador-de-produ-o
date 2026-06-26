@@ -695,26 +695,20 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
-/* ===== EXIBIÇÃO DE VOLUMES MELHORADA - CENTRALIZADA ===== */
+/* ===== EXIBIÇÃO DE VOLUMES MELHORADA ===== */
 .volumes-container{
     display:flex;
     flex-direction:column;
     gap:4px;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    min-width:140px;
-    text-align:center;
+    align-items:flex-start;
 }
 
 .volumes-main{
     display:flex;
     align-items:center;
-    justify-content:center;
     gap:6px;
     font-weight:700;
     font-size:14px;
-    width:100%;
 }
 
 .volumes-processed{
@@ -762,15 +756,13 @@ body.hide-cursor textarea{
 .volumes-remaining{
     display:flex;
     align-items:center;
-    justify-content:center;
     gap:5px;
     font-size:11px;
     color:var(--warning);
     font-weight:600;
     background:rgba(255,176,0,0.1);
-    padding:2px 10px;
+    padding:2px 8px;
     border-radius:12px;
-    margin-top:2px;
 }
 
 .volumes-remaining i{
@@ -781,7 +773,6 @@ body.hide-cursor textarea{
     color:var(--text);
     font-weight:600;
     font-size:13px;
-    text-align:center;
 }
 
 .volumes-simple{
@@ -949,7 +940,7 @@ body.hide-cursor textarea{
     display:none;
     align-items:flex-start;
     justify-content:center;
-    z-index:6000;
+    z-index:1000;
     backdrop-filter:blur(4px);
     padding:40px 20px 120px 20px;
     overflow-y:auto;
@@ -1041,9 +1032,9 @@ body.hide-cursor textarea{
     border-radius:16px;
     padding:14px;
     box-shadow:0 8px 32px rgba(0,0,0,.25);
-    z-index:7000;
+    z-index:1500;
     display:none;
-    max-width:480px;
+    max-width:420px;
     width:95%;
 }
 
@@ -1066,37 +1057,20 @@ body.hide-cursor textarea{
     gap:6px;
 }
 
-.vk-mode-toggle{
-    background:var(--weg-light);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:4px 10px;
-    font-size:11px;
-    font-weight:600;
-    color:var(--weg-blue);
-    cursor:pointer;
-    transition:var(--transition);
-}
-
-.vk-mode-toggle:hover{
-    background:var(--weg-blue);
-    color:white;
-}
-
 .vk-row{
     display:flex;
-    gap:6px;
-    margin-bottom:6px;
+    gap:8px;
+    margin-bottom:8px;
     justify-content:center;
 }
 
 .vk-key{
     background:var(--card);
     border:2px solid var(--border);
-    border-radius:10px;
-    min-width:42px;
-    height:48px;
-    font-size:16px;
+    border-radius:12px;
+    min-width:60px;
+    height:56px;
+    font-size:18px;
     font-weight:700;
     color:var(--text);
     cursor:pointer;
@@ -1108,13 +1082,13 @@ body.hide-cursor textarea{
     user-select:none;
     box-shadow:0 2px 0 rgba(0,0,0,.1);
     flex:1;
-    max-width:60px;
+    max-width:80px;
 }
 
 .vk-key:hover{
     background:var(--weg-light);
     border-color:var(--weg-blue);
-    transform:translateY(-1px);
+    transform:translateY(-2px);
     box-shadow:0 4px 0 rgba(0,0,0,.1);
 }
 
@@ -1126,9 +1100,9 @@ body.hide-cursor textarea{
 }
 
 .vk-key.wide{
-    min-width:70px;
-    font-size:13px;
-    max-width:90px;
+    min-width:80px;
+    font-size:14px;
+    max-width:100px;
 }
 
 .vk-key.action{
@@ -1162,10 +1136,6 @@ body.hide-cursor textarea{
     border-color:#008a40;
 }
 
-.vk-alpha{display:none;}
-.vk-alpha.active{display:block;}
-.vk-numeric.hidden{display:none;}
-
 .vk-toggle{
     position:fixed;
     bottom:20px;
@@ -1190,7 +1160,7 @@ body.hide-cursor textarea{
     position:fixed;
     top:100px;
     right:25px;
-    z-index:8000;
+    z-index:2000;
     display:flex;
     flex-direction:column;
     gap:10px;
@@ -1381,9 +1351,9 @@ body.hide-cursor textarea{
         padding:10px;
     }
     .vk-key{
-        min-width:36px;
-        height:44px;
-        font-size:14px;
+        min-width:50px;
+        height:50px;
+        font-size:16px;
     }
     .modal-overlay{
         padding:20px 15px 140px 15px;
@@ -1429,7 +1399,8 @@ body.hide-cursor textarea{
     .header{padding:0 15px;}
     .header-title{font-size:16px;}
     .header-logo{font-size:22px;}
-    .vk-key{min-width:32px;height:40px;font-size:13px;}
+    .vk-key{min-width:45px;height:48px;font-size:16px;}
+    .vk-key.wide{min-width:60px;font-size:13px;}
     .icon-action-lg{
         min-width:50px;
         min-height:46px;
@@ -1441,7 +1412,7 @@ body.hide-cursor textarea{
         max-width:320px;
         padding:8px;
     }
-    .vk-row{gap:4px;margin-bottom:4px;}
+    .vk-row{gap:5px;margin-bottom:5px;}
     .icon-action{
         width:32px;
         height:32px;
@@ -1946,7 +1917,7 @@ body.hide-cursor textarea{
         <div class="form-group" style="margin-bottom:15px;">
             <label>Senha <span class="req">*</span></label>
             <div class="password-wrapper">
-                <input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarLoginAdmin();}" onfocus="onAuthFieldFocus(this)">
+                <input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarLoginAdmin();}" onfocus="scrollParaElemento(this)">
                 <button type="button" class="password-toggle" onclick="togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button>
             </div>
         </div>
@@ -1975,7 +1946,7 @@ body.hide-cursor textarea{
         <div class="form-group" style="margin-bottom:15px;">
             <label>Senha do Administrador <span class="req">*</span></label>
             <div class="password-wrapper">
-                <input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarAcaoSenha();}" onfocus="onAuthFieldFocus(this)">
+                <input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarAcaoSenha();}" onfocus="scrollParaElemento(this)">
                 <button type="button" class="password-toggle" onclick="togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button>
             </div>
         </div>
@@ -2096,62 +2067,39 @@ body.hide-cursor textarea{
 <!-- ===== TOAST ===== -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ===== TECLADO VIRTUAL COM MODO ALFANUMÉRICO ===== -->
+<!-- ===== TECLADO VIRTUAL ===== -->
 <div class="virtual-keyboard" id="virtualKeyboard">
     <div class="vk-header">
-        <span><i class="fa-solid fa-keyboard"></i> <span id="vkModeLabel">Teclado Numérico</span></span>
-        <button class="vk-mode-toggle" id="vkModeToggle" onclick="toggleVkMode()">ABC</button>
+        <span><i class="fa-solid fa-keyboard"></i> Teclado Numérico</span>
     </div>
-    <div id="vkNumeric" class="vk-numeric">
-        <div class="vk-row">
-            <button class="vk-key" data-key="7">7</button>
-            <button class="vk-key" data-key="8">8</button>
-            <button class="vk-key" data-key="9">9</button>
-            <button class="vk-key action danger" data-action="backspace" title="Apagar">
-                <i class="fa-solid fa-delete-left"></i>
-            </button>
-        </div>
-        <div class="vk-row">
-            <button class="vk-key" data-key="4">4</button>
-            <button class="vk-key" data-key="5">5</button>
-            <button class="vk-key" data-key="6">6</button>
-            <button class="vk-key action" data-action="clear" title="Limpar">
-                <i class="fa-solid fa-eraser"></i>
-            </button>
-        </div>
-        <div class="vk-row">
-            <button class="vk-key" data-key="1">1</button>
-            <button class="vk-key" data-key="2">2</button>
-            <button class="vk-key" data-key="3">3</button>
-            <button class="vk-key action danger" data-action="close" title="Fechar">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="vk-row">
-            <button class="vk-key" data-key="0" style="flex:2;max-width:128px;">0</button>
-            <button class="vk-key" data-key=".">.</button>
-            <button class="vk-key" data-key="-">-</button>
-        </div>
+    <div class="vk-row">
+        <button class="vk-key" data-key="7">7</button>
+        <button class="vk-key" data-key="8">8</button>
+        <button class="vk-key" data-key="9">9</button>
+        <button class="vk-key action danger" data-action="backspace" title="Apagar">
+            <i class="fa-solid fa-delete-left"></i>
+        </button>
+        <button class="vk-key action danger" data-action="close" title="Fechar teclado">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
-    <div id="vkAlpha" class="vk-alpha">
-        <div class="vk-row">
-            <button class="vk-key" data-key="q">Q</button><button class="vk-key" data-key="w">W</button><button class="vk-key" data-key="e">E</button><button class="vk-key" data-key="r">R</button><button class="vk-key" data-key="t">T</button><button class="vk-key" data-key="y">Y</button><button class="vk-key" data-key="u">U</button><button class="vk-key" data-key="i">I</button><button class="vk-key" data-key="o">O</button><button class="vk-key" data-key="p">P</button>
-        </div>
-        <div class="vk-row">
-            <button class="vk-key" data-key="a">A</button><button class="vk-key" data-key="s">S</button><button class="vk-key" data-key="d">D</button><button class="vk-key" data-key="f">F</button><button class="vk-key" data-key="g">G</button><button class="vk-key" data-key="h">H</button><button class="vk-key" data-key="j">J</button><button class="vk-key" data-key="k">K</button><button class="vk-key" data-key="l">L</button>
-        </div>
-        <div class="vk-row">
-            <button class="vk-key" data-key="z">Z</button><button class="vk-key" data-key="x">X</button><button class="vk-key" data-key="c">C</button><button class="vk-key" data-key="v">V</button><button class="vk-key" data-key="b">B</button><button class="vk-key" data-key="n">N</button><button class="vk-key" data-key="m">M</button><button class="vk-key action danger" data-action="backspace"><i class="fa-solid fa-delete-left"></i></button>
-        </div>
-        <div class="vk-row">
-            <button class="vk-key" data-key="1" style="max-width:40px;">1</button>
-            <button class="vk-key" data-key="2" style="max-width:40px;">2</button>
-            <button class="vk-key" data-key="3" style="max-width:40px;">3</button>
-            <button class="vk-key" data-key="4" style="max-width:40px;">4</button>
-            <button class="vk-key" data-key="5" style="max-width:40px;">5</button>
-            <button class="vk-key" data-key="0" style="max-width:40px;">0</button>
-            <button class="vk-key action danger" data-action="close" style="max-width:50px;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+    <div class="vk-row">
+        <button class="vk-key" data-key="4">4</button>
+        <button class="vk-key" data-key="5">5</button>
+        <button class="vk-key" data-key="6">6</button>
+        <button class="vk-key action" data-action="clear" title="Limpar">
+            <i class="fa-solid fa-eraser"></i>
+        </button>
+    </div>
+    <div class="vk-row">
+        <button class="vk-key" data-key="1">1</button>
+        <button class="vk-key" data-key="2">2</button>
+        <button class="vk-key" data-key="3">3</button>
+    </div>
+    <div class="vk-row">
+        <button class="vk-key" data-key="0" style="flex:2;max-width:168px;">0</button>
+        <button class="vk-key" data-key=".">.</button>
+        <button class="vk-key" data-key="-">-</button>
     </div>
 </div>
 
@@ -2163,7 +2111,7 @@ body.hide-cursor textarea{
 /* =======================
    ESTADO GLOBAL
 ======================= */
-const STORAGE_KEY = 'weg_fluxo_produtivo_v21';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v19';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2193,7 +2141,6 @@ let admFilter = 'all';
 let histFilter = 'all';
 let vkActive = false;
 let vkTarget = null;
-let vkAlphaMode = false;
 let projetoParaConcluir = null;
 let pendingAdminLogin = false;
 let acaoPendenteSenha = null;
@@ -2238,18 +2185,6 @@ function scrollParaElemento(elemento){
             });
         }
     }, 300);
-}
-
-/* =======================
-   FOCO EM CAMPO DE AUTH - ABRE TECLADO ALFANUMÉRICO
-======================= */
-function onAuthFieldFocus(el){
-    vkTarget = el;
-    setVkAlphaMode(true);
-    if(state.config.dispositivo === 'computador'){
-        if(!vkActive) showVirtualKeyboard();
-        else scrollParaElemento(el);
-    }
 }
 
 /* =======================
@@ -2419,23 +2354,21 @@ function atualizarTemposEmTempoReal(){
 }
 
 /* =======================
-   LOGIN / LOGOUT - CORREÇÃO DO BUG DO PRIMEIRO CLIQUE
+   LOGIN / LOGOUT
 ======================= */
 function login(role){
     if(role === 'admin'){
-        // CORREÇÃO: Resetar estado antes de abrir
         pendingAdminLogin = true;
         document.getElementById('inputSenhaAdmin').value = '';
         document.getElementById('senhaAdminErro').style.display = 'none';
-        // CORREÇÃO: Ocultar a tela de login ANTES de abrir o modal
-        // Isso garante que o modal fique visível (z-index 6000 > 5000)
-        document.getElementById('loginScreen').style.display = 'none';
-        openModal('modalSenhaAdmin');
+        
         setTimeout(()=>{
-            const inp = document.getElementById('inputSenhaAdmin');
-            inp.value = '';
-            inp.focus();
-        }, 150);
+            openModal('modalSenhaAdmin');
+            setTimeout(()=>{
+                document.getElementById('inputSenhaAdmin').focus();
+                scrollParaElemento(document.getElementById('inputSenhaAdmin'));
+            },300);
+        },50);
         return;
     }
     efetivarLogin(role);
@@ -2444,21 +2377,18 @@ function login(role){
 function confirmarLoginAdmin(){
     const senha = document.getElementById('inputSenhaAdmin').value;
     if(senha === state.senhaAdmin){
-        // SUCESSO: Fechar modal, fechar teclado, entrar
         document.getElementById('senhaAdminErro').style.display = 'none';
         closeModal('modalSenhaAdmin');
-        hideVirtualKeyboard();
         pendingAdminLogin = false;
         efetivarLogin('admin');
     }else{
-        // ERRO: Mostrar erro, manter teclado aberto, manter foco
-        document.getElementById('senhaAdminErro').style.display = 'flex';
+        const erro = document.getElementById('senhaAdminErro');
+        erro.style.display = 'flex';
         document.getElementById('senhaAdminErroMsg').textContent = 'Senha incorreta. Tente novamente.';
         const input = document.getElementById('inputSenhaAdmin');
         input.value = '';
-        input.style.borderColor = 'var(--danger)';
-        // Manter o teclado aberto e o foco no campo
         input.focus();
+        input.style.borderColor = 'var(--danger)';
         setTimeout(()=>{input.style.borderColor='';},1500);
     }
 }
@@ -2466,9 +2396,6 @@ function confirmarLoginAdmin(){
 function cancelarLoginAdmin(){
     pendingAdminLogin = false;
     closeModal('modalSenhaAdmin');
-    hideVirtualKeyboard();
-    // CORREÇÃO: Restaurar a tela de login ao cancelar
-    document.getElementById('loginScreen').style.display = 'flex';
 }
 
 function efetivarLogin(role){
@@ -2517,8 +2444,6 @@ function logout(){
     document.getElementById('loginScreen').style.display = 'flex';
     hideVirtualKeyboard();
     document.body.classList.remove('hide-cursor');
-    // CORREÇÃO: Resetar estado ao fazer logout
-    pendingAdminLogin = false;
     if(timerInterval) clearInterval(timerInterval);
 }
 
@@ -2937,20 +2862,6 @@ function setAdmFilter(f,el){
     renderAdminTable();
 }
 
-/* =======================
-   FUNÇÃO DE ORDENAÇÃO POR PRIORIDADE (Urgente > Alta > Normal)
-   Garante que projetos urgentes e altos fiquem sempre no topo
-======================= */
-function ordenarPorPrioridade(data){
-    const po = {'Urgente':0, 'Alta':1, 'Normal':2};
-    return data.sort((a,b) => {
-        const pa = po[a.prioridade] ?? 9;
-        const pb = po[b.prioridade] ?? 9;
-        if(pa !== pb) return pa - pb;
-        return b.criadoEm - a.criadoEm;
-    });
-}
-
 function renderAdminTable(){
     const tbody = document.getElementById('admTableBody');
     const search = (document.getElementById('admSearch').value || '').toLowerCase();
@@ -2964,8 +2875,8 @@ function renderAdminTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    // APLICAÇÃO: Ordenação por prioridade (Urgente > Alta > Normal)
-    data = ordenarPorPrioridade(data);
+    const prioOrder = {'Urgente':0,'Alta':1,'Normal':2};
+    data.sort((a,b)=> (prioOrder[a.prioridade]||9) - (prioOrder[b.prioridade]||9) || b.criadoEm - a.criadoEm);
 
     if(data.length === 0){
         tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto usando o formulário acima.</p></div></td></tr>`;
@@ -3137,8 +3048,8 @@ function renderPostoTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    // APLICAÇÃO: Ordenação por prioridade (Urgente > Alta > Normal)
-    data = ordenarPorPrioridade(data);
+    const prioOrder = {'Urgente':0,'Alta':1,'Normal':2};
+    data.sort((a,b)=> (prioOrder[a.prioridade]||9) - (prioOrder[b.prioridade]||9) || a.criadoEm - b.criadoEm);
 
     const todosPosto = state.projetos.filter(p => p.processo === currentPosto);
     document.getElementById('posto-aguardando').textContent = todosPosto.filter(p=>p.status==='Aguardando').length;
@@ -3157,11 +3068,11 @@ function renderPostoTable(){
         const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
         const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
         
-        // EXIBIÇÃO DE VOLUMES MELHORADA E CENTRALIZADA
+        // MELHORIA NA EXIBIÇÃO DE VOLUMES
         let volumesDisplay = '';
         if(p.volumesTotal && p.volumesTotal > 0){
             if(p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal){
-                // Status PARCIAL - Exibição centralizada
+                // Status PARCIAL - Exibição melhorada
                 const restantes = p.volumesTotal - p.volumesProcessados;
                 const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
                 volumesDisplay = `
@@ -3715,7 +3626,7 @@ function restoreData(e){
 }
 
 /* =======================
-   TECLADO VIRTUAL COM MODO ALFANUMÉRICO
+   TECLADO VIRTUAL
 ======================= */
 function toggleVirtualKeyboard(){
     if(vkActive) hideVirtualKeyboard();
@@ -3736,24 +3647,9 @@ function hideVirtualKeyboard(){
     vkTarget = null;
 }
 
-function setVkAlphaMode(alpha){
-    vkAlphaMode = alpha;
-    document.getElementById('vkAlpha').classList.toggle('active', alpha);
-    document.getElementById('vkNumeric').classList.toggle('hidden', alpha);
-    document.getElementById('vkModeLabel').textContent = alpha ? 'Teclado Alfanumérico' : 'Teclado Numérico';
-    document.getElementById('vkModeToggle').textContent = alpha ? '123' : 'ABC';
-}
-
-function toggleVkMode(){
-    setVkAlphaMode(!vkAlphaMode);
-}
-
 document.addEventListener('focusin', e=>{
     if(state.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea')){
         vkTarget = e.target;
-        // Auto-detecta modo: password/text = alfanumérico, number = numérico
-        const isText = e.target.type === 'password' || e.target.type === 'text';
-        setVkAlphaMode(isText);
         if(!vkActive) showVirtualKeyboard();
     }
 });
@@ -3762,7 +3658,6 @@ document.addEventListener('click', e=>{
     const key = e.target.closest('.vk-key');
     if(!key) return;
     e.preventDefault();
-    e.stopPropagation();
 
     const k = key.dataset.key;
     const action = key.dataset.action;
@@ -3775,8 +3670,8 @@ document.addEventListener('click', e=>{
     if(action === 'backspace'){
         const start = vkTarget.selectionStart ?? vkTarget.value.length;
         const end = vkTarget.selectionEnd ?? start;
-        vkTarget.value = vkTarget.value.slice(0, Math.max(0, start-1)) + vkTarget.value.slice(end);
-        vkTarget.setSelectionRange(Math.max(0, start-1), Math.max(0, start-1));
+        vkTarget.value = vkTarget.value.slice(0,start-1) + vkTarget.value.slice(end);
+        vkTarget.setSelectionRange(Math.max(0,start-1), Math.max(0,start-1));
     } else if(action === 'clear'){
         vkTarget.value = '';
     } else if(action === 'close'){
@@ -3785,11 +3680,11 @@ document.addEventListener('click', e=>{
     } else if(k !== undefined){
         const start = vkTarget.selectionStart ?? vkTarget.value.length;
         const end = vkTarget.selectionEnd ?? start;
-        vkTarget.value = vkTarget.value.slice(0, start) + k + vkTarget.value.slice(end);
+        vkTarget.value = vkTarget.value.slice(0,start) + k + vkTarget.value.slice(end);
         vkTarget.setSelectionRange(start+1, start+1);
     }
 
-    vkTarget.dispatchEvent(new Event('input', {bubbles: true}));
+    vkTarget.dispatchEvent(new Event('input',{bubbles:true}));
     vkTarget.focus();
     scrollParaElemento(vkTarget);
 });
