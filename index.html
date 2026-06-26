@@ -43,7 +43,6 @@ body{
     transition:var(--transition);
 }
 
-/* ===== OCULTAR CURSOR ===== */
 body.hide-cursor,
 body.hide-cursor *,
 body.hide-cursor button,
@@ -54,7 +53,6 @@ body.hide-cursor textarea{
     cursor: none !important;
 }
 
-/* ===== BARRA DE ROLAGEM LARGA - OTIMIZADA PARA TOUCH ===== */
 ::-webkit-scrollbar{
     width:30px;
     height:30px;
@@ -86,7 +84,6 @@ body.hide-cursor textarea{
     scrollbar-color:var(--weg-blue) var(--bg);
 }
 
-/* ===== LOGIN ===== */
 .login-screen{
     position:fixed;
     inset:0;
@@ -169,7 +166,6 @@ body.hide-cursor textarea{
     font-size:11px;
 }
 
-/* ===== HEADER REORGANIZADO ===== */
 .header{
     background:linear-gradient(90deg,var(--weg-blue),var(--weg-dark));
     color:white;
@@ -290,13 +286,11 @@ body.hide-cursor textarea{
     transform:scale(.95);
 }
 
-/* ===== LAYOUT ===== */
 .layout{
     display:flex;
     min-height:calc(100vh - var(--header-height));
 }
 
-/* ===== SIDEBAR - APENAS ÍCONES ===== */
 .sidebar{
     width:var(--sidebar-width);
     background:var(--card);
@@ -373,7 +367,6 @@ body.hide-cursor textarea{
     transform:translateY(-50%) translateX(0);
 }
 
-/* ===== CONTENT ===== */
 .content{
     flex:1;
     padding:25px;
@@ -410,7 +403,6 @@ body.hide-cursor textarea{
     font-weight:600;
 }
 
-/* ===== KPI ===== */
 .kpi-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -485,7 +477,6 @@ body.hide-cursor textarea{
 .trend-up{color:var(--success);}
 .trend-down{color:var(--danger);}
 
-/* ===== CARD ===== */
 .card{
     background:var(--card);
     border-radius:var(--radius);
@@ -514,7 +505,6 @@ body.hide-cursor textarea{
 
 .card h2 i{color:var(--weg-blue);}
 
-/* ===== BOTÕES ===== */
 .btn{
     background:var(--weg-blue);
     color:white;
@@ -552,7 +542,6 @@ body.hide-cursor textarea{
 .btn-warning{background:var(--warning);color:#333;}
 .btn-warning:hover{background:#e09e00;}
 
-/* ===== FORMULÁRIO ===== */
 .form-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -603,7 +592,6 @@ body.hide-cursor textarea{
     flex-wrap:wrap;
 }
 
-/* ===== TABELA ===== */
 .table-wrapper{
     overflow-x:auto;
     border-radius:8px;
@@ -659,7 +647,6 @@ body.hide-cursor textarea{
     letter-spacing:.5px;
 }
 
-/* ===== CENTRALIZAR COLUNA AÇÕES ===== */
 .table thead th:last-child{
     text-align:center;
 }
@@ -704,7 +691,6 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
-/* ===== EXIBIÇÃO DE VOLUMES MELHORADA - CENTRALIZADA ===== */
 .volumes-container{
     display:flex;
     flex-direction:column;
@@ -810,7 +796,6 @@ body.hide-cursor textarea{
     font-weight:600;
 }
 
-/* ===== TEMPO EM TEMPO REAL ===== */
 .tempo-real{
     background:var(--weg-light);
     color:var(--weg-blue);
@@ -834,7 +819,6 @@ body.hide-cursor textarea{
     50%{opacity:.7;}
 }
 
-/* ===== AÇÕES DO POSTO - CENTRALIZADO ===== */
 .action-main{
     display:flex;
     gap:8px;
@@ -908,7 +892,6 @@ body.hide-cursor textarea{
     color:white;
 }
 
-/* ===== AÇÕES DA TABELA ADMIN - CENTRALIZADO ===== */
 .row-actions{
     display:flex;
     gap:8px;
@@ -952,7 +935,6 @@ body.hide-cursor textarea{
     color:var(--success);
 }
 
-/* ===== MODAL ===== */
 .modal-overlay{
     position:fixed;
     inset:0;
@@ -1014,7 +996,6 @@ body.hide-cursor textarea{
 
 .modal-close:hover{background:var(--bg);color:var(--danger);}
 
-/* ===== LEITOR DE ETIQUETA ===== */
 .leitor-box{
     border:2px dashed var(--weg-blue);
     border-radius:var(--radius);
@@ -1041,7 +1022,6 @@ body.hide-cursor textarea{
     font-size:12px;
 }
 
-/* ===== TECLADO VIRTUAL ===== */
 .virtual-keyboard{
     position:fixed;
     bottom:20px;
@@ -1175,7 +1155,6 @@ body.hide-cursor textarea{
 
 .vk-toggle.active{display:flex;align-items:center;justify-content:center;}
 
-/* ===== TOAST ===== */
 .toast-container{
     position:fixed;
     top:100px;
@@ -1215,7 +1194,6 @@ body.hide-cursor textarea{
 .toast-title{font-weight:600;font-size:13px;}
 .toast-message{font-size:12px;color:var(--text-light);margin-top:2px;}
 
-/* ===== FILTROS ===== */
 .filter-bar{
     display:flex;
     gap:10px;
@@ -1239,7 +1217,6 @@ body.hide-cursor textarea{
     border-color:var(--weg-blue);
 }
 
-/* ===== EMPTY STATE ===== */
 .empty-state{
     text-align:center;
     padding:50px 20px;
@@ -1258,7 +1235,6 @@ body.hide-cursor textarea{
     color:var(--text);
 }
 
-/* ===== SENHA INPUT ===== */
 .password-wrapper{
     position:relative;
 }
@@ -1303,7 +1279,6 @@ body.hide-cursor textarea{
 .strength-medium{color:var(--warning);}
 .strength-strong{color:var(--success);}
 
-/* ===== ALERT BOX ===== */
 .alert{
     padding:12px 15px;
     border-radius:8px;
@@ -1332,7 +1307,6 @@ body.hide-cursor textarea{
     border-left:4px solid var(--warning);
 }
 
-/* ===== CHARTS ===== */
 .charts-grid{
     display:grid;
     grid-template-columns:2fr 1fr;
@@ -1345,7 +1319,6 @@ body.hide-cursor textarea{
     height:300px;
 }
 
-/* ===== RESPONSIVO ===== */
 @media(max-width:1000px){
     .charts-grid{grid-template-columns:1fr;}
     .sidebar{
@@ -1446,7 +1419,6 @@ body.hide-cursor textarea{
 
 <body>
 
-<!-- ===== LOGIN ===== -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
         <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -1477,7 +1449,6 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== APP ===== -->
 <div id="app" style="display:none;">
 
 <header class="header">
@@ -1512,7 +1483,6 @@ body.hide-cursor textarea{
 
     <main class="content">
 
-        <!-- ===== DASHBOARD ===== -->
         <section class="page" id="page-dashboard">
             <h1 class="page-title">
                 <i class="fa-solid fa-chart-line"></i>
@@ -1577,7 +1547,6 @@ body.hide-cursor textarea{
             </div>
         </section>
 
-        <!-- ===== ADMIN - CADASTRO ===== -->
         <section class="page" id="page-admin">
             <h1 class="page-title">
                 <i class="fa-solid fa-user-shield"></i>
@@ -1690,7 +1659,6 @@ body.hide-cursor textarea{
             </div>
         </section>
 
-        <!-- ===== POSTO DE TRABALHO ===== -->
         <section class="page" id="page-posto">
             <h1 class="page-title">
                 <i class="fa-solid fa-industry" id="postoIcon"></i>
@@ -1758,7 +1726,6 @@ body.hide-cursor textarea{
             </div>
         </section>
 
-        <!-- ===== HISTÓRICO ===== -->
         <section class="page" id="page-historico">
             <h1 class="page-title">
                 <i class="fa-solid fa-clock-rotate-left"></i>
@@ -1802,7 +1769,6 @@ body.hide-cursor textarea{
             </div>
         </section>
 
-        <!-- ===== CONFIG ===== -->
         <section class="page" id="page-config">
             <h1 class="page-title">
                 <i class="fa-solid fa-gear"></i>
@@ -1894,7 +1860,6 @@ body.hide-cursor textarea{
 </div>
 </div>
 
-<!-- ===== MODAL SELEÇÃO DE TURNO (FIM DE SEMANA) ===== -->
 <div class="modal-overlay" id="modalTurnoFimSemana">
     <div class="modal" style="max-width:420px;">
         <div class="modal-head">
@@ -1919,7 +1884,6 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== MODAL SENHA ADMIN (login) ===== -->
 <div class="modal-overlay" id="modalSenhaAdmin">
     <div class="modal" style="max-width:420px;">
         <div class="modal-head">
@@ -1948,7 +1912,6 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== MODAL CONFIRMAÇÃO DE SENHA (genérico) ===== -->
 <div class="modal-overlay" id="modalConfirmarSenha">
     <div class="modal" style="max-width:420px;">
         <div class="modal-head">
@@ -1977,7 +1940,6 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== MODAL EDITAR PROJETO ===== -->
 <div class="modal-overlay" id="modalEditar">
     <div class="modal">
         <div class="modal-head">
@@ -2043,7 +2005,6 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== MODAL CONFIRMAÇÃO CONCLUSÃO ===== -->
 <div class="modal-overlay" id="modalConcluir">
     <div class="modal" style="max-width:500px;">
         <div class="modal-head">
@@ -2084,10 +2045,8 @@ body.hide-cursor textarea{
     </div>
 </div>
 
-<!-- ===== TOAST ===== -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ===== TECLADO VIRTUAL ===== -->
 <div class="virtual-keyboard" id="virtualKeyboard">
     <div class="vk-header">
         <span><i class="fa-solid fa-keyboard"></i> Teclado Numérico</span>
@@ -2128,9 +2087,6 @@ body.hide-cursor textarea{
 </button>
 
 <script>
-/* =======================
-   ESTADO GLOBAL
-======================= */
 const STORAGE_KEY = 'weg_fluxo_produtivo_v19';
 const SENHA_PADRAO = 'weg2024';
 
@@ -2140,12 +2096,17 @@ const TURNO_LEGADO = {
     'Noite': '3º Turno'
 };
 
+// ORDENAÇÃO DE PRIORIDADE: Urgente(0) > Alta(1) > Normal(2)
+const PRIORIDADE_ORDEM = {
+    'Urgente': 0,
+    'Alta': 1,
+    'Normal': 2
+};
+
 let state = {
     projetos: [],
     historico: [],
-    config: {
-        dispositivo: 'tablet'
-    },
+    config: { dispositivo: 'tablet' },
     turnosPorPosto: {
         'Nanocerâmico': '1º Turno',
         'Pintura': '1º Turno',
@@ -2168,9 +2129,6 @@ let charts = {};
 let turnoFimSemanaPendente = false;
 let timerInterval = null;
 
-/* =======================
-   CONTROLE DE CURSOR
-======================= */
 function aplicarEstadoCursor(){
     if(state.config.dispositivo === 'computador'){
         document.body.classList.add('hide-cursor');
@@ -2179,50 +2137,25 @@ function aplicarEstadoCursor(){
     }
 }
 
-function ocultarCursor(){
-    if(state.config.dispositivo === 'computador'){
-        document.body.classList.add('hide-cursor');
-    }
-}
-
-function mostrarCursor(){
-    if(state.config.dispositivo !== 'computador'){
-        document.body.classList.remove('hide-cursor');
-    }
-}
-
-/* =======================
-   SCROLL PARA ELEMENTO FOCADO
-======================= */
 function scrollParaElemento(elemento){
     setTimeout(() => {
         if(vkActive && state.config.dispositivo === 'computador'){
             const elementRect = elemento.getBoundingClientRect();
             const targetPosition = elementRect.top + window.scrollY - 100;
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
         }
     }, 300);
 }
 
-/* =======================
-   DETECÇÃO AUTOMÁTICA DE TURNO
-======================= */
 function detectarTurnoAutomatico(){
     const agora = new Date();
     const hora = agora.getHours();
     const minuto = agora.getMinutes();
     const tempoAtual = hora * 60 + minuto;
     
-    if(tempoAtual >= 300 && tempoAtual < 858){
-        return '1º Turno';
-    }else if(tempoAtual >= 858 && tempoAtual < 1404){
-        return '2º Turno';
-    }else{
-        return '3º Turno';
-    }
+    if(tempoAtual >= 300 && tempoAtual < 858) return '1º Turno';
+    else if(tempoAtual >= 858 && tempoAtual < 1404) return '2º Turno';
+    else return '3º Turno';
 }
 
 function ehFimDeSemana(){
@@ -2264,9 +2197,6 @@ function cancelarSelecaoTurno(){
     turnoFimSemanaPendente = false;
 }
 
-/* =======================
-   PERSISTÊNCIA
-======================= */
 function salvar(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
@@ -2281,16 +2211,10 @@ function migrarTurnosAntigos(){
         }
     }
     state.projetos.forEach(p=>{
-        if(TURNO_LEGADO[p.turno]){
-            p.turno = TURNO_LEGADO[p.turno];
-            mudou = true;
-        }
+        if(TURNO_LEGADO[p.turno]){ p.turno = TURNO_LEGADO[p.turno]; mudou = true; }
     });
     state.historico.forEach(p=>{
-        if(TURNO_LEGADO[p.turno]){
-            p.turno = TURNO_LEGADO[p.turno];
-            mudou = true;
-        }
+        if(TURNO_LEGADO[p.turno]){ p.turno = TURNO_LEGADO[p.turno]; mudou = true; }
     });
     if(mudou) salvar();
 }
@@ -2301,9 +2225,7 @@ function carregar(){
         try{
             const obj = JSON.parse(raw);
             state = Object.assign(state, obj);
-            if(!state.senhaAdmin){
-                state.senhaAdmin = SENHA_PADRAO;
-            }
+            if(!state.senhaAdmin) state.senhaAdmin = SENHA_PADRAO;
             if(!state.turnosPorPosto){
                 state.turnosPorPosto = {
                     'Nanocerâmico': '1º Turno',
@@ -2311,17 +2233,12 @@ function carregar(){
                     'Conferência': '1º Turno'
                 };
             }
-            if(!state.config){
-                state.config = { dispositivo: 'tablet' };
-            }
-            if(!state.config.dispositivo){
-                state.config.dispositivo = 'tablet';
-            }
+            if(!state.config) state.config = { dispositivo: 'tablet' };
+            if(!state.config.dispositivo) state.config.dispositivo = 'tablet';
             migrarTurnosAntigos();
         }catch(e){}
     }
     
-    // SEMPRE CARREGA DADOS DE EXEMPLO SE NÃO HOUVER PROJETOS
     if(state.projetos.length === 0 && state.historico.length === 0){
         const agora = Date.now();
         state.projetos = [
@@ -2340,29 +2257,20 @@ function genId(){
     return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 }
 
-/* =======================
-   FORMATAÇÃO DE TEMPO
-======================= */
 function formatarTempo(ms){
     if(!ms || ms < 0) return '00:00:00';
-    
     const segundos = Math.floor(ms / 1000);
     const dias = Math.floor(segundos / 86400);
     const horas = Math.floor((segundos % 86400) / 3600);
     const minutos = Math.floor((segundos % 3600) / 60);
     const segs = segundos % 60;
-    
     const pad = n => String(n).padStart(2, '0');
-    
-    if(dias > 0){
-        return `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
-    }
+    if(dias > 0) return `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
     return `${pad(horas)}:${pad(minutos)}:${pad(segs)}`;
 }
 
 function atualizarTemposEmTempoReal(){
     const agora = Date.now();
-    
     state.projetos.forEach(p => {
         if(p.status === 'Em Processo' && p.dataHoraInicio){
             const tempoDecorrido = agora - p.dataHoraInicio;
@@ -2375,16 +2283,11 @@ function atualizarTemposEmTempoReal(){
     });
 }
 
-/* =======================
-   LOGIN / LOGOUT - ADMIN SEMPRE PEDE SENHA
-======================= */
 function login(role){
     if(role === 'admin'){
-        // SEMPRE ABRE O MODAL DE SENHA PARA O ADMINISTRADOR
         pendingAdminLogin = true;
         document.getElementById('inputSenhaAdmin').value = '';
         document.getElementById('senhaAdminErro').style.display = 'none';
-        
         setTimeout(()=>{
             openModal('modalSenhaAdmin');
             setTimeout(()=>{
@@ -2394,7 +2297,6 @@ function login(role){
         },50);
         return;
     }
-    // Operadores entram direto sem senha
     efetivarLogin(role);
 }
 
@@ -2441,9 +2343,7 @@ function efetivarLogin(role){
 
     document.getElementById('userLabel').textContent = labels[role];
 
-    if(role !== 'admin'){
-        currentPosto = processos[role];
-    }
+    if(role !== 'admin') currentPosto = processos[role];
 
     buildMenu();
     applyDeviceConfig();
@@ -2471,9 +2371,6 @@ function logout(){
     if(timerInterval) clearInterval(timerInterval);
 }
 
-/* =======================
-   ALTERAR SENHA
-======================= */
 function alterarSenha(e){
     e.preventDefault();
     const atual = document.getElementById('senhaAtual').value;
@@ -2486,19 +2383,16 @@ function alterarSenha(e){
         document.getElementById('senhaAtual').focus();
         return false;
     }
-
     if(nova.length < 4){
         showToast('warning','Atenção','A nova senha deve ter no mínimo 4 caracteres');
         return false;
     }
-
     if(nova !== confirma){
         showToast('error','Erro','A confirmação não confere com a nova senha');
         document.getElementById('confirmaSenha').value = '';
         document.getElementById('confirmaSenha').focus();
         return false;
     }
-
     if(nova === atual){
         showToast('warning','Atenção','A nova senha deve ser diferente da atual');
         return false;
@@ -2515,10 +2409,7 @@ function alterarSenha(e){
 function avaliarForcaSenha(){
     const senha = document.getElementById('novaSenha').value;
     const el = document.getElementById('pwdStrength');
-    if(!senha){
-        el.textContent = '';
-        return;
-    }
+    if(!senha){ el.textContent = ''; return; }
     let score = 0;
     if(senha.length >= 4) score++;
     if(senha.length >= 8) score++;
@@ -2526,33 +2417,18 @@ function avaliarForcaSenha(){
     if(/\d/.test(senha)) score++;
     if(/[^A-Za-z0-9]/.test(senha)) score++;
 
-    if(score <= 2){
-        el.textContent = '🔴 Senha fraca';
-        el.className = 'password-strength strength-weak';
-    }else if(score <= 3){
-        el.textContent = '🟡 Senha média';
-        el.className = 'password-strength strength-medium';
-    }else{
-        el.textContent = '🟢 Senha forte';
-        el.className = 'password-strength strength-strong';
-    }
+    if(score <= 2){ el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
+    else if(score <= 3){ el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
+    else{ el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 
 function togglePwdVisibility(inputId,btn){
     const input = document.getElementById(inputId);
     const icon = btn.querySelector('i');
-    if(input.type === 'password'){
-        input.type = 'text';
-        icon.className = 'fa-solid fa-eye-slash';
-    }else{
-        input.type = 'password';
-        icon.className = 'fa-solid fa-eye';
-    }
+    if(input.type === 'password'){ input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
+    else{ input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
 }
 
-/* =======================
-   MODAL GENÉRICO DE CONFIRMAÇÃO POR SENHA
-======================= */
 function solicitarConfirmacaoSenha(titulo, aviso, callback){
     acaoPendenteSenha = callback;
     document.getElementById('modalConfirmarTitulo').textContent = titulo || 'Confirmação de Segurança';
@@ -2589,9 +2465,6 @@ function cancelarConfirmacaoSenha(){
     closeModal('modalConfirmarSenha');
 }
 
-/* =======================
-   LIMPAR TUDO (com senha)
-======================= */
 function solicitarLimpeza(){
     solicitarConfirmacaoSenha(
         'Limpar Todos os Dados',
@@ -2611,17 +2484,10 @@ function executarLimpeza(){
     showToast('success','Dados apagados','Todos os projetos e o histórico foram removidos com sucesso');
 }
 
-/* =======================
-   SIDEBAR MOBILE
-======================= */
 function toggleSidebarMobile(){
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('open');
+    document.getElementById('sidebar').classList.toggle('open');
 }
 
-/* =======================
-   MENU DINÂMICO - APENAS ÍCONES
-======================= */
 function buildMenu(){
     const menu = document.getElementById('mainMenu');
     let html = '';
@@ -2634,11 +2500,7 @@ function buildMenu(){
             <a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>
         `;
     }else{
-        const iconMap = {
-            'Nanocerâmico':'fa-flask',
-            'Pintura':'fa-paint-roller',
-            'Conferência':'fa-clipboard-check'
-        };
+        const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
         html = `
             <a data-page="posto" class="active" data-tooltip="${currentPosto}"><i class="fa-solid ${iconMap[currentPosto]}"></i></a>
             <a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a>
@@ -2668,9 +2530,7 @@ function navigate(page){
     aplicarEstadoCursor();
     atualizarHeaderTitle(page);
 
-    if(page === 'dashboard') {
-        renderDashboard();
-    }
+    if(page === 'dashboard') renderDashboard();
     if(page === 'admin') renderAdminTable();
     if(page === 'posto') renderPosto();
     if(page === 'historico') renderHistorico();
@@ -2699,9 +2559,6 @@ function atualizarHeaderTitle(page){
     }
 }
 
-/* =======================
-   DATA/HORA
-======================= */
 function updateDate(){
     const now = new Date();
     const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
@@ -2710,9 +2567,6 @@ function updateDate(){
 updateDate();
 setInterval(updateDate,1000);
 
-/* =======================
-   TOAST
-======================= */
 function showToast(type,title,message){
     const icons = {success:'check-circle',error:'circle-xmark',warning:'triangle-exclamation',info:'circle-info'};
     const container = document.getElementById('toastContainer');
@@ -2732,15 +2586,9 @@ function showToast(type,title,message){
     },3500);
 }
 
-/* =======================
-   MODAL
-======================= */
-function openModal(id){
-    document.getElementById(id).classList.add('active');
-}
-function closeModal(id){
-    document.getElementById(id).classList.remove('active');
-}
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
 document.querySelectorAll('.modal-overlay').forEach(m=>{
     m.addEventListener('click',e=>{
         if(e.target===m){
@@ -2752,9 +2600,6 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
     });
 });
 
-/* =======================
-   DASHBOARD
-======================= */
 function renderDashboard(){
     const hoje = new Date(); hoje.setHours(0,0,0,0);
     const hojeCount = state.projetos.filter(p => p.criadoEm >= hoje.getTime()).length;
@@ -2768,9 +2613,6 @@ function renderDashboard(){
     renderCharts();
 }
 
-/* =======================
-   LEITOR DE ETIQUETA
-======================= */
 function focarLeitorEtiqueta(){
     const input = document.getElementById('leitorEtiquetaInput');
     input.value = '';
@@ -2780,10 +2622,7 @@ function focarLeitorEtiqueta(){
 
 function processarLeituraEtiqueta(){
     const codigo = document.getElementById('leitorEtiquetaInput').value.trim();
-    if(!codigo){
-        showToast('warning','Código vazio','Nenhum código foi lido');
-        return;
-    }
+    if(!codigo){ showToast('warning','Código vazio','Nenhum código foi lido'); return; }
 
     const dadosSimulados = {
         pep: '7S' + Math.floor(Math.random()*900000+100000),
@@ -2803,34 +2642,20 @@ function processarLeituraEtiqueta(){
     document.getElementById('leitorEtiquetaInput').value = '';
 }
 
-/* =======================
-   CONTROLE DE VOLUMES POR PROCESSO
-======================= */
 function toggleVolumesCadastro(){
     const processo = document.getElementById('cad-processo').value;
     const groupVolumes = document.getElementById('group-cad-volumes');
-    if(processo === 'Pintura'){
-        groupVolumes.style.display = 'none';
-        document.getElementById('cad-volumes').value = '';
-    }else{
-        groupVolumes.style.display = 'block';
-    }
+    if(processo === 'Pintura'){ groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
+    else{ groupVolumes.style.display = 'block'; }
 }
 
 function toggleVolumesEdicao(){
     const processo = document.getElementById('edit-processo').value;
     const groupVolumes = document.getElementById('group-edit-volumes');
-    if(processo === 'Pintura'){
-        groupVolumes.style.display = 'none';
-        document.getElementById('edit-volumes').value = '';
-    }else{
-        groupVolumes.style.display = 'block';
-    }
+    if(processo === 'Pintura'){ groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
+    else{ groupVolumes.style.display = 'block'; }
 }
 
-/* =======================
-   ADMIN - CADASTRO
-======================= */
 function cadastrarProjeto(e){
     e.preventDefault();
     const pep = document.getElementById('cad-pep').value.trim();
@@ -2886,6 +2711,16 @@ function setAdmFilter(f,el){
     renderAdminTable();
 }
 
+// FUNÇÃO DE ORDENAÇÃO POR PRIORIDADE: Urgente > Alta > Normal
+function ordenarPorPrioridade(data){
+    return data.sort((a,b)=>{
+        const prioA = PRIORIDADE_ORDEM[a.prioridade] !== undefined ? PRIORIDADE_ORDEM[a.prioridade] : 9;
+        const prioB = PRIORIDADE_ORDEM[b.prioridade] !== undefined ? PRIORIDADE_ORDEM[b.prioridade] : 9;
+        if(prioA !== prioB) return prioA - prioB;
+        return b.criadoEm - a.criadoEm;
+    });
+}
+
 function renderAdminTable(){
     const tbody = document.getElementById('admTableBody');
     const search = (document.getElementById('admSearch').value || '').toLowerCase();
@@ -2899,8 +2734,8 @@ function renderAdminTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    const prioOrder = {'Urgente':0,'Alta':1,'Normal':2};
-    data.sort((a,b)=> (prioOrder[a.prioridade]||9) - (prioOrder[b.prioridade]||9) || b.criadoEm - a.criadoEm);
+    // ORDENAÇÃO: Urgente > Alta > Normal
+    data = ordenarPorPrioridade(data);
 
     if(data.length === 0){
         tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto usando o formulário acima.</p></div></td></tr>`;
@@ -2959,10 +2794,7 @@ function abrirEdicao(id){
     openModal('modalEditar');
     setTimeout(()=>{
         const firstInput = document.querySelector('#modalEditar input:not([type="hidden"])');
-        if(firstInput){
-            firstInput.focus();
-            scrollParaElemento(firstInput);
-        }
+        if(firstInput){ firstInput.focus(); scrollParaElemento(firstInput); }
     },100);
 }
 
@@ -2987,9 +2819,7 @@ function salvarEdicao(e){
     if(novoProcesso !== 'Pintura' && p.volumes){
         const match = p.volumes.match(/\d+/);
         if(match) p.volumesTotal = parseInt(match[0]);
-    }else{
-        p.volumesTotal = null;
-    }
+    }else{ p.volumesTotal = null; }
 
     if(novoStatus === 'Concluído' && p.status !== 'Concluído'){
         concluirProjetoDireto(p.id, p.turno || '1º Turno');
@@ -3019,17 +2849,10 @@ function excluirProjeto(id){
     showToast('success','Excluído','Projeto '+p.diagrama+' removido');
 }
 
-/* =======================
-   POSTO DE TRABALHO
-======================= */
 function renderPosto(){
     if(!currentPosto) return;
 
-    const iconMap = {
-        'Nanocerâmico':'fa-flask',
-        'Pintura':'fa-paint-roller',
-        'Conferência':'fa-clipboard-check'
-    };
+    const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
     document.getElementById('postoIcon').className = 'fa-solid ' + iconMap[currentPosto];
     document.getElementById('postoTitulo').textContent = 'Posto - ' + currentPosto;
     document.getElementById('postoBadge').textContent = currentPosto;
@@ -3037,7 +2860,6 @@ function renderPosto(){
     document.getElementById('postoTurno').value = state.turnosPorPosto[currentPosto] || '1º Turno';
 
     aplicarTurnoAutomatico();
-
     renderPostoTable();
     
     if(timerInterval) clearInterval(timerInterval);
@@ -3072,8 +2894,8 @@ function renderPostoTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    const prioOrder = {'Urgente':0,'Alta':1,'Normal':2};
-    data.sort((a,b)=> (prioOrder[a.prioridade]||9) - (prioOrder[b.prioridade]||9) || a.criadoEm - b.criadoEm);
+    // ORDENAÇÃO: Urgente > Alta > Normal
+    data = ordenarPorPrioridade(data);
 
     const todosPosto = state.projetos.filter(p => p.processo === currentPosto);
     document.getElementById('posto-aguardando').textContent = todosPosto.filter(p=>p.status==='Aguardando').length;
@@ -3092,11 +2914,9 @@ function renderPostoTable(){
         const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
         const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
         
-        // MELHORIA NA EXIBIÇÃO DE VOLUMES - CENTRALIZADO
         let volumesDisplay = '';
         if(p.volumesTotal && p.volumesTotal > 0){
             if(p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal){
-                // Status PARCIAL - Exibição centralizada
                 const restantes = p.volumesTotal - p.volumesProcessados;
                 const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
                 volumesDisplay = `
@@ -3116,7 +2936,6 @@ function renderPostoTable(){
                     </div>
                 `;
             }else if(p.volumesProcessados >= p.volumesTotal){
-                // COMPLETO - Centralizado
                 volumesDisplay = `
                     <div class="volumes-container">
                         <div class="volumes-main complete">
@@ -3129,7 +2948,6 @@ function renderPostoTable(){
                     </div>
                 `;
             }else{
-                // SEM PROCESSAMENTO - Centralizado
                 volumesDisplay = `
                     <div class="volumes-container">
                         <span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span>
@@ -3185,11 +3003,9 @@ function renderPostoTable(){
 function iniciarProcesso(id){
     const p = state.projetos.find(x=>x.id===id);
     if(!p) return;
-    
     p.status = 'Em Processo';
     p.dataHoraInicio = Date.now();
     p.dataHoraFim = null;
-    
     salvar();
     renderPostoTable();
     showToast('success','Processo iniciado',p.diagrama+' iniciado às '+new Date().toLocaleTimeString('pt-BR'));
@@ -3198,17 +3014,12 @@ function iniciarProcesso(id){
 function pausarProcesso(id){
     const p = state.projetos.find(x=>x.id===id);
     if(!p) return;
-    
     p.status = 'Aguardando';
-    
     salvar();
     renderPostoTable();
     showToast('info','Processo pausado',p.diagrama+' pausado');
 }
 
-/* =======================
-   CONCLUSÃO → HISTÓRICO COM VOLUMES
-======================= */
 function solicitarConclusao(id){
     const p = state.projetos.find(x=>x.id===id);
     if(!p) return;
@@ -3223,11 +3034,8 @@ function solicitarConclusao(id){
         document.getElementById('concluirVolumesProcessados').value = '';
         document.getElementById('concluirVolumesProcessados').max = p.volumesTotal || 999;
         atualizarVolumesRestantes();
-        
         document.getElementById('concluirVolumesProcessados').oninput = atualizarVolumesRestantes;
-    }else{
-        sectionVolumes.style.display = 'none';
-    }
+    }else{ sectionVolumes.style.display = 'none'; }
     
     openModal('modalConcluir');
     setTimeout(()=>{
@@ -3241,35 +3049,23 @@ function solicitarConclusao(id){
 function atualizarVolumesRestantes(){
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
-    
     const processados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
     const total = p.volumesTotal || 0;
     const restantes = total - processados;
-    
     document.getElementById('concluirVolumesRestantes').textContent = restantes;
-    if(restantes > 0){
-        document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
-    }else{
-        document.getElementById('concluirVolumesRestantes').style.color = 'var(--success)';
-    }
+    document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
 }
 
 function confirmarConclusao(){
     if(!projetoParaConcluir) return;
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
-    
     const turno = document.getElementById('concluirTurno').value;
     
     if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
-        if(volumesProcessados <= 0){
-            showToast('warning','Atenção','Informe a quantidade de volumes processados');
-            return;
-        }
-        
+        if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
         p.volumesProcessados += volumesProcessados;
-        
         if(p.volumesProcessados >= p.volumesTotal){
             concluirProjetoDireto(projetoParaConcluir, turno);
         }else{
@@ -3282,7 +3078,6 @@ function confirmarConclusao(){
     }else{
         concluirProjetoDireto(projetoParaConcluir, turno);
     }
-    
     closeModal('modalConcluir');
     projetoParaConcluir = null;
 }
@@ -3291,11 +3086,8 @@ function concluirProjetoDireto(id, turno){
     const idx = state.projetos.findIndex(x=>x.id===id);
     if(idx<0) return;
     const p = state.projetos[idx];
-    
     p.dataHoraFim = Date.now();
-    
     const tempoReal = p.dataHoraFim - (p.dataHoraInicio || p.criadoEm);
-    
     const concluido = Object.assign({}, p, {
         status: 'Concluído',
         turno: turno || p.turno || '1º Turno',
@@ -3312,9 +3104,6 @@ function concluirProjetoDireto(id, turno){
     showToast('success','Concluído',p.diagrama+' movido para o histórico. Tempo real: '+formatarTempo(tempoReal));
 }
 
-/* =======================
-   HISTÓRICO
-======================= */
 function setHistFilter(f,el){
     histFilter = f;
     document.querySelectorAll('#page-historico .filter-chip').forEach(c=>c.classList.remove('active'));
@@ -3334,9 +3123,10 @@ function renderHistorico(){
         (p.placa||'').toLowerCase().includes(search)
     );
 
-    if(currentUser !== 'admin' && currentPosto){
-        data = data.filter(p => p.processo === currentPosto);
-    }
+    if(currentUser !== 'admin' && currentPosto) data = data.filter(p => p.processo === currentPosto);
+
+    // ORDENAÇÃO POR DATA DE CONCLUSÃO (mais recente primeiro)
+    data.sort((a,b) => b.concluidoEm - a.concluidoEm);
 
     if(data.length === 0){
         tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3><p>Nenhum projeto concluído ainda.</p></div></td></tr>`;
@@ -3394,9 +3184,6 @@ function excluirHistorico(id){
     showToast('success','Excluído','Registro removido do histórico');
 }
 
-/* =======================
-   GRÁFICOS / DASHBOARD
-======================= */
 function renderCharts(){
     const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
     const gridColor = 'rgba(128,128,128,0.15)';
@@ -3415,147 +3202,52 @@ function renderCharts(){
             type: 'bar',
             data: {
                 labels: Object.keys(counts),
-                datasets: [{
-                    label: 'Projetos Ativos',
-                    data: Object.values(counts),
-                    backgroundColor: ['#005BAC', '#00A651', '#FFB000'],
-                    borderRadius: 8
-                }]
+                datasets: [{ label: 'Projetos Ativos', data: Object.values(counts), backgroundColor: ['#005BAC', '#00A651', '#FFB000'], borderRadius: 8 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: 'Projetos por Processo', color: textColor }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
-                    x: { grid: { display: false }, ticks: { color: textColor } }
-                }
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, title: { display: true, text: 'Projetos por Processo', color: textColor } },
+                scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }
             }
         });
     }
 
     const ctx2 = document.getElementById('chartTurnos');
     if(ctx2){
-        const turnosData = {
-            '1º Turno': { total: 0, concluidos: 0 },
-            '2º Turno': { total: 0, concluidos: 0 },
-            '3º Turno': { total: 0, concluidos: 0 }
-        };
-        
-        state.projetos.forEach(p => {
-            if(turnosData[p.turno]) turnosData[p.turno].total++;
-        });
-        state.historico.forEach(p => {
-            if(turnosData[p.turno]) turnosData[p.turno].concluidos++;
-        });
-
-        const eficiencia = Object.keys(turnosData).map(t => {
-            const d = turnosData[t];
-            return d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
-        });
-
+        const turnosData = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
+        state.projetos.forEach(p => { if(turnosData[p.turno]) turnosData[p.turno].total++; });
+        state.historico.forEach(p => { if(turnosData[p.turno]) turnosData[p.turno].concluidos++; });
+        const eficiencia = Object.keys(turnosData).map(t => { const d = turnosData[t]; return d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0; });
         charts.turnos = new Chart(ctx2, {
             type: 'doughnut',
-            data: {
-                labels: Object.keys(turnosData),
-                datasets: [{
-                    data: eficiencia,
-                    backgroundColor: ['#005BAC', '#00A651', '#FFB000']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor } },
-                    title: { display: true, text: 'Eficiência por Turno (%)', color: textColor }
-                }
-            }
+            data: { labels: Object.keys(turnosData), datasets: [{ data: eficiencia, backgroundColor: ['#005BAC', '#00A651', '#FFB000'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Eficiência por Turno (%)', color: textColor } } }
         });
     }
 
     const ctx3 = document.getElementById('chartTempoExecucao');
     if(ctx3){
-        const temposPorProcesso = {
-            'Nanocerâmico': [],
-            'Pintura': [],
-            'Conferência': []
-        };
-        
-        state.historico.forEach(p => {
-            if(p.tempoReal && temposPorProcesso[p.processo]){
-                temposPorProcesso[p.processo].push(p.tempoReal / 60000);
-            }
-        });
-
-        const mediaTempos = Object.keys(temposPorProcesso).map(proc => {
-            const t = temposPorProcesso[proc];
-            return t.length > 0 ? Math.round(t.reduce((a,b)=>a+b,0)/t.length) : 0;
-        });
-
+        const temposPorProcesso = { 'Nanocerâmico': [], 'Pintura': [], 'Conferência': [] };
+        state.historico.forEach(p => { if(p.tempoReal && temposPorProcesso[p.processo]) temposPorProcesso[p.processo].push(p.tempoReal / 60000); });
+        const mediaTempos = Object.keys(temposPorProcesso).map(proc => { const t = temposPorProcesso[proc]; return t.length > 0 ? Math.round(t.reduce((a,b)=>a+b,0)/t.length) : 0; });
         charts.tempo = new Chart(ctx3, {
             type: 'line',
-            data: {
-                labels: Object.keys(temposPorProcesso),
-                datasets: [{
-                    label: 'Tempo Médio (min)',
-                    data: mediaTempos,
-                    borderColor: '#005BAC',
-                    backgroundColor: 'rgba(0,91,172,0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: 'Tempo Médio de Execução por Processo (minutos)', color: textColor }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
-                    x: { grid: { display: false }, ticks: { color: textColor } }
-                }
-            }
+            data: { labels: Object.keys(temposPorProcesso), datasets: [{ label: 'Tempo Médio (min)', data: mediaTempos, borderColor: '#005BAC', backgroundColor: 'rgba(0,91,172,0.1)', tension: 0.4, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Tempo Médio de Execução por Processo (minutos)', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } }
         });
     }
 
     const ctx4 = document.getElementById('chartEficiencia');
     if(ctx4){
-        const prioridades = {
-            'Urgente': state.projetos.filter(p=>p.prioridade==='Urgente').length,
-            'Alta': state.projetos.filter(p=>p.prioridade==='Alta').length,
-            'Normal': state.projetos.filter(p=>p.prioridade==='Normal').length
-        };
-
+        const prioridades = { 'Urgente': state.projetos.filter(p=>p.prioridade==='Urgente').length, 'Alta': state.projetos.filter(p=>p.prioridade==='Alta').length, 'Normal': state.projetos.filter(p=>p.prioridade==='Normal').length };
         charts.eficiencia = new Chart(ctx4, {
             type: 'pie',
-            data: {
-                labels: Object.keys(prioridades),
-                datasets: [{
-                    data: Object.values(prioridades),
-                    backgroundColor: ['#D32F2F', '#FFB000', '#00A651']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor } },
-                    title: { display: true, text: 'Distribuição por Prioridade', color: textColor }
-                }
-            }
+            data: { labels: Object.keys(prioridades), datasets: [{ data: Object.values(prioridades), backgroundColor: ['#D32F2F', '#FFB000', '#00A651'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Distribuição por Prioridade', color: textColor } } }
         });
     }
 }
 
-/* =======================
-   EXPORT CSV
-======================= */
 function exportCSV(){
     const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
     const rows = state.projetos.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
@@ -3566,9 +3258,7 @@ function exportCSV(){
 
 function exportHistoricoCSV(){
     let data = state.historico;
-    if(currentUser !== 'admin' && currentPosto){
-        data = data.filter(p => p.processo === currentPosto);
-    }
+    if(currentUser !== 'admin' && currentPosto) data = data.filter(p => p.processo === currentPosto);
     const headers = ['PEP','Diagrama/Ordem','Placa','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
     const rows = data.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
     const csv = [headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
@@ -3586,9 +3276,6 @@ function downloadFile(name,content,type){
 
 function dateStamp(){return new Date().toISOString().slice(0,10);}
 
-/* =======================
-   CONFIGURAÇÕES
-======================= */
 function loadConfigUI(){
     document.getElementById('cfgDevice').value = state.config.dispositivo || 'tablet';
     document.getElementById('cfgVkInfo').style.display = state.config.dispositivo === 'computador' ? 'block' : 'none';
@@ -3606,15 +3293,9 @@ function salvarConfigDispositivo(){
 
 function applyDeviceConfig(){
     const isComputer = state.config.dispositivo === 'computador';
-    const toggleBtn = document.getElementById('vkToggleBtn');
     const toggleFloat = document.getElementById('vkToggleFloat');
-
-    if(isComputer){
-        toggleFloat.classList.add('active');
-    }else{
-        toggleFloat.classList.remove('active');
-        hideVirtualKeyboard();
-    }
+    if(isComputer){ toggleFloat.classList.add('active'); }
+    else{ toggleFloat.classList.remove('active'); hideVirtualKeyboard(); }
 }
 
 function backupData(){
@@ -3641,17 +3322,12 @@ function restoreData(e){
             aplicarEstadoCursor();
             applyDeviceConfig();
             showToast('success','Restaurado','Dados restaurados com sucesso');
-        }catch(err){
-            showToast('error','Erro','Arquivo inválido');
-        }
+        }catch(err){ showToast('error','Erro','Arquivo inválido'); }
     };
     reader.readAsText(file);
     e.target.value = '';
 }
 
-/* =======================
-   TECLADO VIRTUAL
-======================= */
 function toggleVirtualKeyboard(){
     if(vkActive) hideVirtualKeyboard();
     else showVirtualKeyboard();
@@ -3660,9 +3336,7 @@ function toggleVirtualKeyboard(){
 function showVirtualKeyboard(){
     document.getElementById('virtualKeyboard').classList.add('active');
     vkActive = true;
-    if(vkTarget){
-        scrollParaElemento(vkTarget);
-    }
+    if(vkTarget) scrollParaElemento(vkTarget);
 }
 
 function hideVirtualKeyboard(){
@@ -3686,22 +3360,16 @@ document.addEventListener('click', e=>{
     const k = key.dataset.key;
     const action = key.dataset.action;
 
-    if(!vkTarget){
-        showToast('warning','Teclado virtual','Clique em um campo de texto primeiro');
-        return;
-    }
+    if(!vkTarget){ showToast('warning','Teclado virtual','Clique em um campo de texto primeiro'); return; }
 
     if(action === 'backspace'){
         const start = vkTarget.selectionStart ?? vkTarget.value.length;
         const end = vkTarget.selectionEnd ?? start;
         vkTarget.value = vkTarget.value.slice(0,start-1) + vkTarget.value.slice(end);
         vkTarget.setSelectionRange(Math.max(0,start-1), Math.max(0,start-1));
-    } else if(action === 'clear'){
-        vkTarget.value = '';
-    } else if(action === 'close'){
-        hideVirtualKeyboard();
-        return;
-    } else if(k !== undefined){
+    } else if(action === 'clear'){ vkTarget.value = ''; }
+    else if(action === 'close'){ hideVirtualKeyboard(); return; }
+    else if(k !== undefined){
         const start = vkTarget.selectionStart ?? vkTarget.value.length;
         const end = vkTarget.selectionEnd ?? start;
         vkTarget.value = vkTarget.value.slice(0,start) + k + vkTarget.value.slice(end);
@@ -3713,9 +3381,6 @@ document.addEventListener('click', e=>{
     scrollParaElemento(vkTarget);
 });
 
-/* =======================
-   INIT
-======================= */
 carregar();
 aplicarEstadoCursor();
 
