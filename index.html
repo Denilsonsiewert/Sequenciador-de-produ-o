@@ -948,7 +948,7 @@ body.hide-cursor textarea{
     display:none;
     align-items:center;
     justify-content:center;
-    z-index:1000;
+    z-index:6000;
     backdrop-filter:blur(4px);
     padding:20px;
 }
@@ -1000,7 +1000,6 @@ body.hide-cursor textarea{
 
 .modal-close:hover{background:var(--bg);color:var(--danger);}
 
-/* Modal de Logout - Estilo Melhorado */
 .modal-logout{
     max-width:450px;
     text-align:center;
@@ -1082,7 +1081,7 @@ body.hide-cursor textarea{
     border-radius:16px;
     padding:14px;
     box-shadow:0 8px 32px rgba(0,0,0,.25);
-    z-index:1500;
+    z-index:7000;
     display:none;
     max-width:420px;
     width:95%;
@@ -1190,7 +1189,7 @@ body.hide-cursor textarea{
     position:fixed;
     bottom:20px;
     right:20px;
-    z-index:1400;
+    z-index:6500;
     display:none;
     background:var(--weg-blue);
     color:white;
@@ -1209,7 +1208,7 @@ body.hide-cursor textarea{
     position:fixed;
     top:100px;
     right:25px;
-    z-index:2000;
+    z-index:8000;
     display:flex;
     flex-direction:column;
     gap:10px;
@@ -1921,7 +1920,6 @@ body.hide-cursor textarea{
 </div>
 </div>
 
-<!-- Modal de Logout Personalizado -->
 <div class="modal-overlay" id="modalLogout">
     <div class="modal modal-logout">
         <div class="modal-body">
@@ -2184,7 +2182,6 @@ const TURNO_LEGADO = {
     'Noite': '3º Turno'
 };
 
-// ORDENAÇÃO DE PRIORIDADE: Urgente(0) > Alta(1) > Normal(2)
 const PRIORIDADE_ORDEM = {
     'Urgente': 0,
     'Alta': 1,
@@ -2371,7 +2368,6 @@ function atualizarTemposEmTempoReal(){
     });
 }
 
-// Funções de Logout Personalizado
 function confirmarLogout(){
     openModal('modalLogout');
 }
@@ -2814,7 +2810,6 @@ function setAdmFilter(f,el){
     renderAdminTable();
 }
 
-// FUNÇÃO DE ORDENAÇÃO POR PRIORIDADE: Urgente > Alta > Normal
 function ordenarPorPrioridade(data){
     return data.sort((a,b)=>{
         const prioA = PRIORIDADE_ORDEM[a.prioridade] !== undefined ? PRIORIDADE_ORDEM[a.prioridade] : 9;
@@ -2837,7 +2832,6 @@ function renderAdminTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    // ORDENAÇÃO: Urgente > Alta > Normal
     data = ordenarPorPrioridade(data);
 
     if(data.length === 0){
@@ -2997,7 +2991,6 @@ function renderPostoTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    // ORDENAÇÃO: Urgente > Alta > Normal
     data = ordenarPorPrioridade(data);
 
     const todosPosto = state.projetos.filter(p => p.processo === currentPosto);
@@ -3162,7 +3155,6 @@ function atualizarVolumesRestantes(){
     const processadosAgora = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
     const total = p.volumesTotal || 0;
     const jaProcessados = p.volumesProcessados || 0;
-    // CORREÇÃO: Calcula os restantes considerando o que já foi processado anteriormente
     const restantes = total - jaProcessados - processadosAgora;
     document.getElementById('concluirVolumesRestantes').textContent = restantes;
     document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
@@ -3178,7 +3170,6 @@ function confirmarConclusao(){
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
         if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
         
-        // CORREÇÃO: Valida se o valor informado não ultrapassa o que falta
         const faltam = (p.volumesTotal || 0) - (p.volumesProcessados || 0);
         if(volumesProcessados > faltam){
             showToast('error','Erro',`Você informou ${volumesProcessados}, mas faltam apenas ${faltam} volumes.`);
@@ -3245,7 +3236,6 @@ function renderHistorico(){
 
     if(currentUser !== 'admin' && currentPosto) data = data.filter(p => p.processo === currentPosto);
 
-    // ORDENAÇÃO POR DATA DE CONCLUSÃO (mais recente primeiro)
     data.sort((a,b) => b.concluidoEm - a.concluidoEm);
 
     if(data.length === 0){
