@@ -2331,8 +2331,8 @@ function carregar(){
             {id:genId(),pep:'7S234567',diagrama:'ORDEM002',placa:'PLACA102',descricao:'Motor W22 50cv',volumes:'1 unidade',volumesTotal:1,volumesProcessados:0,processo:'Nanocerâmico',prioridade:'Normal',status:'Aguardando',turno:'1º Turno',obs:'',criadoEm:agora-3600000*3},
             {id:genId(),pep:'7S345678',diagrama:'ORDEM003',placa:'PLACA103',descricao:'Motor W21 200cv',volumes:'',volumesTotal:null,volumesProcessados:0,processo:'Pintura',prioridade:'Urgente',status:'Aguardando',turno:'2º Turno',obs:'',criadoEm:agora-3600000*8},
             {id:genId(),pep:'7S456789',diagrama:'ORDEM004',placa:'PLACA104',descricao:'Motor W22 25cv',volumes:'',volumesTotal:null,volumesProcessados:0,processo:'Pintura',prioridade:'Normal',status:'Aguardando',turno:'2º Turno',obs:'',criadoEm:agora-3600000*2},
-            {id:genId(),pep:'7S567890',diagrama:'ORDEM005',placa:'PLACA105',descricao:'Motor HXR 500cv',volumes:'5 unidades',volumesTotal:5,volumesProcessados:0,processo:'Conferência',prioridade:'Alta',status:'Aguardando',turno:'3º Turno',obs:'',criadoEm:agora-3600000*10},
-            {id:genId(),pep:'7S678901',diagrama:'ORDEM006',placa:'PLACA106',descricao:'Motor HXR 350cv',volumes:'8 unidades',volumesTotal:8,volumesProcessados:0,processo:'Conferência',prioridade:'Normal',status:'Aguardando',turno:'3º Turno',obs:'',criadoEm:agora-3600000*1}
+            {id:genId(),pep:'7S567890',diagrama:'ORDEM005',placa:'PLACA105',descricao:'Motor HXR 500cv',volumes:'',volumesTotal:null,volumesProcessados:0,processo:'Conferência',prioridade:'Alta',status:'Aguardando',turno:'3º Turno',obs:'',criadoEm:agora-3600000*10},
+            {id:genId(),pep:'7S678901',diagrama:'ORDEM006',placa:'PLACA106',descricao:'Motor HXR 350cv',volumes:'',volumesTotal:null,volumesProcessados:0,processo:'Conferência',prioridade:'Normal',status:'Aguardando',turno:'3º Turno',obs:'',criadoEm:agora-3600000*1}
         ];
         salvar();
     }
@@ -2515,8 +2515,8 @@ function avaliarForcaSenha(){
     if(/\d/.test(senha)) score++;
     if(/[^A-Za-z0-9]/.test(senha)) score++;
 
-    if(score <= 2){ el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
-    else if(score <= 3){ el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
+    if(score <= 2){ el.textContent = ' Senha fraca'; el.className = 'password-strength strength-weak'; }
+    else if(score <= 3){ el.textContent = ' Senha média'; el.className = 'password-strength strength-medium'; }
     else{ el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 
@@ -2741,18 +2741,29 @@ function processarLeituraEtiqueta(){
     document.getElementById('leitorEtiquetaInput').value = '';
 }
 
+// ALTERADO: Agora só Nanocerâmico tem volumes (Pintura e Conferência não têm)
 function toggleVolumesCadastro(){
     const processo = document.getElementById('cad-processo').value;
     const groupVolumes = document.getElementById('group-cad-volumes');
-    if(processo === 'Pintura'){ groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
-    else{ groupVolumes.style.display = 'block'; }
+    if(processo === 'Pintura' || processo === 'Conferência'){ 
+        groupVolumes.style.display = 'none'; 
+        document.getElementById('cad-volumes').value = ''; 
+    }
+    else{ 
+        groupVolumes.style.display = 'block'; 
+    }
 }
 
 function toggleVolumesEdicao(){
     const processo = document.getElementById('edit-processo').value;
     const groupVolumes = document.getElementById('group-edit-volumes');
-    if(processo === 'Pintura'){ groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
-    else{ groupVolumes.style.display = 'block'; }
+    if(processo === 'Pintura' || processo === 'Conferência'){ 
+        groupVolumes.style.display = 'none'; 
+        document.getElementById('edit-volumes').value = ''; 
+    }
+    else{ 
+        groupVolumes.style.display = 'block'; 
+    }
 }
 
 function cadastrarProjeto(e){
@@ -2772,8 +2783,9 @@ function cadastrarProjeto(e){
         return false;
     }
 
+    // ALTERADO: Apenas Nanocerâmico recebe volumes
     let volumesTotal = null;
-    if(processo !== 'Pintura' && volumes){
+    if(processo === 'Nanocerâmico' && volumes){
         const match = volumes.match(/\d+/);
         if(match) volumesTotal = parseInt(match[0]);
     }
@@ -2784,7 +2796,7 @@ function cadastrarProjeto(e){
         diagrama,
         placa: placa || null,
         descricao,
-        volumes: volumes || (processo === 'Pintura' ? '' : '1 unidade'),
+        volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''),
         volumesTotal: volumesTotal,
         volumesProcessados: 0,
         processo,
@@ -2913,7 +2925,8 @@ function salvarEdicao(e){
     p.prioridade = document.getElementById('edit-prioridade').value;
     p.obs = document.getElementById('edit-obs').value.trim();
     
-    if(novoProcesso !== 'Pintura' && p.volumes){
+    // ALTERADO: Apenas Nanocerâmico recebe volumes
+    if(novoProcesso === 'Nanocerâmico' && p.volumes){
         const match = p.volumes.match(/\d+/);
         if(match) p.volumesTotal = parseInt(match[0]);
     }else{ p.volumesTotal = null; }
@@ -3116,6 +3129,7 @@ function pausarProcesso(id){
     showToast('info','Processo pausado',p.diagrama+' pausado');
 }
 
+// ALTERADO: Apenas Nanocerâmico exibe a seção de volumes no modal de conclusão
 function solicitarConclusao(id){
     const p = state.projetos.find(x=>x.id===id);
     if(!p) return;
@@ -3124,7 +3138,7 @@ function solicitarConclusao(id){
     document.getElementById('concluirTurno').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
     
     const sectionVolumes = document.getElementById('concluirVolumesSection');
-    if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
+    if(p.processo === 'Nanocerâmico'){
         sectionVolumes.style.display = 'block';
         const total = p.volumesTotal || 0;
         const jaProcessados = p.volumesProcessados || 0;
@@ -3138,7 +3152,9 @@ function solicitarConclusao(id){
         document.getElementById('concluirVolumesRestantes').textContent = faltam;
         document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
         document.getElementById('concluirVolumesProcessados').oninput = atualizarVolumesRestantes;
-    }else{ sectionVolumes.style.display = 'none'; }
+    }else{ 
+        sectionVolumes.style.display = 'none'; 
+    }
     
     openModal('modalConcluir');
     setTimeout(()=>{
@@ -3160,13 +3176,14 @@ function atualizarVolumesRestantes(){
     document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
 }
 
+// ALTERADO: Apenas Nanocerâmico exige volumes na conclusão
 function confirmarConclusao(){
     if(!projetoParaConcluir) return;
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
     const turno = document.getElementById('concluirTurno').value;
     
-    if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
+    if(p.processo === 'Nanocerâmico'){
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
         if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
         
@@ -3187,6 +3204,7 @@ function confirmarConclusao(){
             showToast('info','Conclusão parcial',`${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados} volumes.`);
         }
     }else{
+        // Pintura e Conferência concluem diretamente sem volumes
         concluirProjetoDireto(projetoParaConcluir, turno);
     }
     closeModal('modalConcluir');
