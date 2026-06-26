@@ -542,6 +542,12 @@ body.hide-cursor textarea{
 .btn-warning{background:var(--warning);color:#333;}
 .btn-warning:hover{background:#e09e00;}
 
+.btn-lg{
+    padding:14px 28px;
+    font-size:16px;
+    font-weight:600;
+}
+
 .form-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -940,12 +946,11 @@ body.hide-cursor textarea{
     inset:0;
     background:rgba(0,0,0,.6);
     display:none;
-    align-items:flex-start;
+    align-items:center;
     justify-content:center;
     z-index:1000;
     backdrop-filter:blur(4px);
-    padding:40px 20px 120px 20px;
-    overflow-y:auto;
+    padding:20px;
 }
 
 .modal-overlay.active{display:flex;animation:fadeIn .3s ease;}
@@ -960,7 +965,6 @@ body.hide-cursor textarea{
     overflow-y:auto;
     box-shadow:var(--shadow-lg);
     animation:slideUp .3s ease;
-    margin-top:20px;
 }
 
 @keyframes slideUp{
@@ -995,6 +999,52 @@ body.hide-cursor textarea{
 }
 
 .modal-close:hover{background:var(--bg);color:var(--danger);}
+
+/* Modal de Logout - Estilo Melhorado */
+.modal-logout{
+    max-width:450px;
+    text-align:center;
+}
+
+.modal-logout .modal-body{
+    padding:20px 0;
+}
+
+.modal-logout .logout-icon{
+    width:80px;
+    height:80px;
+    background:var(--weg-light);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 20px;
+    font-size:40px;
+    color:var(--weg-blue);
+}
+
+.modal-logout h3{
+    color:var(--text);
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+.modal-logout p{
+    color:var(--text-light);
+    font-size:15px;
+    margin-bottom:25px;
+}
+
+.modal-logout .modal-actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+}
+
+.modal-logout .btn{
+    min-width:140px;
+    justify-content:center;
+}
 
 .leitor-box{
     border:2px dashed var(--weg-blue);
@@ -1349,7 +1399,7 @@ body.hide-cursor textarea{
         font-size:16px;
     }
     .modal-overlay{
-        padding:20px 15px 140px 15px;
+        padding:15px;
     }
 }
 
@@ -1384,6 +1434,11 @@ body.hide-cursor textarea{
     .volumes-remaining{
         font-size:10px;
     }
+    .modal-logout .btn{
+        min-width:120px;
+        padding:12px 20px;
+        font-size:14px;
+    }
 }
 
 @media(max-width:600px){
@@ -1412,6 +1467,12 @@ body.hide-cursor textarea{
         min-width:32px;
         padding:6px 8px;
         font-size:14px;
+    }
+    .modal-logout .btn{
+        min-width:100%;
+    }
+    .modal-logout .modal-actions{
+        flex-direction:column;
     }
 }
 </style>
@@ -1470,7 +1531,7 @@ body.hide-cursor textarea{
             <div class="user-name"><i class="fa-solid fa-user"></i> <span id="userLabel">Operador</span></div>
             <div class="user-date" id="currentDate"></div>
         </div>
-        <button class="btn-logout" title="Sair" onclick="logout()">
+        <button class="btn-logout" title="Sair" onclick="confirmarLogout()">
             <i class="fa-solid fa-right-from-bracket"></i>
         </button>
     </div>
@@ -1858,6 +1919,27 @@ body.hide-cursor textarea{
 
     </main>
 </div>
+</div>
+
+<!-- Modal de Logout Personalizado -->
+<div class="modal-overlay" id="modalLogout">
+    <div class="modal modal-logout">
+        <div class="modal-body">
+            <div class="logout-icon">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3>Deseja realmente sair?</h3>
+            <p>Você será redirecionado para a tela de seleção de perfis.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary btn-lg" onclick="cancelarLogout()">
+                    <i class="fa-solid fa-xmark"></i> Cancelar
+                </button>
+                <button class="btn btn-danger btn-lg" onclick="efetivarLogout()">
+                    <i class="fa-solid fa-check"></i> Sim, Sair
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal-overlay" id="modalTurnoFimSemana">
@@ -2289,6 +2371,27 @@ function atualizarTemposEmTempoReal(){
     });
 }
 
+// Funções de Logout Personalizado
+function confirmarLogout(){
+    openModal('modalLogout');
+}
+
+function cancelarLogout(){
+    closeModal('modalLogout');
+}
+
+function efetivarLogout(){
+    closeModal('modalLogout');
+    currentUser = null;
+    currentPosto = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    hideVirtualKeyboard();
+    document.body.classList.remove('hide-cursor');
+    if(timerInterval) clearInterval(timerInterval);
+    showToast('info','Sessão encerrada','Você voltou para a tela de seleção de perfis');
+}
+
 function login(role){
     if(role === 'admin'){
         pendingAdminLogin = true;
@@ -2367,14 +2470,7 @@ function efetivarLogin(role){
 }
 
 function logout(){
-    if(!confirm('Deseja realmente sair?')) return;
-    currentUser = null;
-    currentPosto = null;
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'flex';
-    hideVirtualKeyboard();
-    document.body.classList.remove('hide-cursor');
-    if(timerInterval) clearInterval(timerInterval);
+    efetivarLogout();
 }
 
 function alterarSenha(e){
@@ -2601,6 +2697,7 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
             if(m.id === 'modalSenhaAdmin') cancelarLoginAdmin();
             else if(m.id === 'modalConfirmarSenha') cancelarConfirmacaoSenha();
             else if(m.id === 'modalTurnoFimSemana') cancelarSelecaoTurno();
+            else if(m.id === 'modalLogout') cancelarLogout();
             else closeModal(m.id);
         }
     });
