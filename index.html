@@ -1467,6 +1467,40 @@ body.hide-cursor textarea{
     margin-top:5px;
 }
 
+.dashboard-tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    border-bottom:2px solid var(--border);
+    padding-bottom:0;
+    flex-wrap:wrap;
+}
+
+.dashboard-tab{
+    padding:12px 20px;
+    background:transparent;
+    border:none;
+    border-bottom:3px solid transparent;
+    cursor:pointer !important;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-light);
+    transition:var(--transition);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:-2px;
+}
+
+.dashboard-tab:hover{
+    color:var(--weg-blue);
+}
+
+.dashboard-tab.active{
+    color:var(--weg-blue);
+    border-bottom-color:var(--weg-blue);
+}
+
 .historico-tabs{
     display:flex;
     gap:10px;
@@ -1497,39 +1531,6 @@ body.hide-cursor textarea{
 }
 
 .historico-tab.active{
-    color:var(--weg-blue);
-    border-bottom-color:var(--weg-blue);
-}
-
-.posto-tabs{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-    border-bottom:2px solid var(--border);
-    padding-bottom:0;
-}
-
-.posto-tab{
-    padding:12px 20px;
-    background:transparent;
-    border:none;
-    border-bottom:3px solid transparent;
-    cursor:pointer !important;
-    font-size:14px;
-    font-weight:600;
-    color:var(--text-light);
-    transition:var(--transition);
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:-2px;
-}
-
-.posto-tab:hover{
-    color:var(--weg-blue);
-}
-
-.posto-tab.active{
     color:var(--weg-blue);
     border-bottom-color:var(--weg-blue);
 }
@@ -1725,130 +1726,248 @@ body.hide-cursor textarea{
                 <span class="process-badge">Visão Geral</span>
             </h1>
 
-            <div class="kpi-grid">
-                <div class="kpi">
-                    <div class="kpi-head">
-                        <h3>Total Cadastrados</h3>
-                        <div class="kpi-icon"><i class="fa-solid fa-folder-open"></i></div>
-                    </div>
-                    <div class="kpi-value" id="dash-total">0</div>
-                    <div class="kpi-trend trend-up">
-                        <i class="fa-solid fa-arrow-up"></i> <span id="dash-total-trend">0</span> hoje
-                    </div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-head">
-                        <h3>Nanocerâmico</h3>
-                        <div class="kpi-icon"><i class="fa-solid fa-flask"></i></div>
-                    </div>
-                    <div class="kpi-value" id="dash-nano">0</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-head">
-                        <h3>Pintura</h3>
-                        <div class="kpi-icon"><i class="fa-solid fa-paint-roller"></i></div>
-                    </div>
-                    <div class="kpi-value" id="dash-pint">0</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-head">
-                        <h3>Conferência</h3>
-                        <div class="kpi-icon"><i class="fa-solid fa-clipboard-check"></i></div>
-                    </div>
-                    <div class="kpi-value" id="dash-conf">0</div>
-                </div>
+            <div class="dashboard-tabs">
+                <button class="dashboard-tab active" onclick="switchDashboardTab('geral', this)">
+                    <i class="fa-solid fa-chart-line"></i> Geral
+                </button>
+                <button class="dashboard-tab" onclick="switchDashboardTab('nano', this)">
+                    <i class="fa-solid fa-flask"></i> Nanocerâmico
+                </button>
+                <button class="dashboard-tab" onclick="switchDashboardTab('pintura', this)">
+                    <i class="fa-solid fa-paint-roller"></i> Pintura
+                </button>
+                <button class="dashboard-tab" onclick="switchDashboardTab('conferencia', this)">
+                    <i class="fa-solid fa-clipboard-check"></i> Conferência
+                </button>
             </div>
 
-            <div class="card">
-                <div class="card-head">
-                    <h2><i class="fa-solid fa-chart-line"></i> Indicadores de Produção</h2>
-                </div>
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <canvas id="chartProcessos"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="chartTurnos"></canvas>
-                    </div>
-                </div>
-                <div class="charts-grid" style="margin-top:20px;">
-                    <div class="chart-container">
-                        <canvas id="chartTempoExecucao"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="chartEficiencia"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-head">
-                    <h2><i class="fa-solid fa-trophy"></i> Comparativo de Desempenho por Turno</h2>
-                </div>
-                <div class="comparison-grid">
-                    <div class="comparison-card">
-                        <h3><i class="fa-solid fa-clock"></i> Projetos Concluídos por Turno</h3>
-                        <div class="turno-comparison" id="turnoConcluidos">
-                            <div class="turno-stat">
-                                <div class="turno-name">1º Turno</div>
-                                <div class="turno-value" id="turno1-concluidos">0</div>
-                                <div class="turno-label">projetos</div>
-                            </div>
-                            <div class="turno-stat">
-                                <div class="turno-name">2º Turno</div>
-                                <div class="turno-value" id="turno2-concluidos">0</div>
-                                <div class="turno-label">projetos</div>
-                            </div>
-                            <div class="turno-stat">
-                                <div class="turno-name">3º Turno</div>
-                                <div class="turno-value" id="turno3-concluidos">0</div>
-                                <div class="turno-label">projetos</div>
-                            </div>
+            <div id="dashboardGeralSection">
+                <div class="kpi-grid">
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Total Cadastrados</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-folder-open"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-total">0</div>
+                        <div class="kpi-trend trend-up">
+                            <i class="fa-solid fa-arrow-up"></i> <span id="dash-total-trend">0</span> hoje
                         </div>
                     </div>
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Nanocerâmico</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-flask"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-nano">0</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Pintura</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-paint-roller"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-pint">0</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Conferência</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-conf">0</div>
+                    </div>
+                </div>
 
-                    <div class="comparison-card">
-                        <h3><i class="fa-solid fa-bolt"></i> Eficiência por Turno</h3>
-                        <div class="turno-comparison" id="turnoEficiencia">
-                            <div class="turno-stat">
-                                <div class="turno-name">1º Turno</div>
-                                <div class="turno-value" id="turno1-eficiencia">0%</div>
-                                <div class="turno-label">eficiência</div>
-                            </div>
-                            <div class="turno-stat">
-                                <div class="turno-name">2º Turno</div>
-                                <div class="turno-value" id="turno2-eficiencia">0%</div>
-                                <div class="turno-label">eficiência</div>
-                            </div>
-                            <div class="turno-stat">
-                                <div class="turno-name">3º Turno</div>
-                                <div class="turno-value" id="turno3-eficiencia">0%</div>
-                                <div class="turno-label">eficiência</div>
-                            </div>
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-chart-line"></i> Indicadores de Produção</h2>
+                    </div>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <canvas id="chartProcessos"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartTurnos"></canvas>
+                        </div>
+                    </div>
+                    <div class="charts-grid" style="margin-top:20px;">
+                        <div class="chart-container">
+                            <canvas id="chartTempoExecucao"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartEficiencia"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <div class="dashboard-stats" style="margin-top:20px;">
-                    <div class="stat-card">
-                        <h4>Total Concluídos (Histórico)</h4>
-                        <div class="stat-value" id="totalConcluidos">0</div>
-                        <div class="stat-label">projetos finalizados</div>
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-trophy"></i> Comparativo de Desempenho por Turno</h2>
                     </div>
-                    <div class="stat-card">
-                        <h4>Tempo Médio Geral</h4>
-                        <div class="stat-value" id="tempoMedioGeral">00:00</div>
-                        <div class="stat-label">minutos por projeto</div>
+                    <div class="comparison-grid">
+                        <div class="comparison-card">
+                            <h3><i class="fa-solid fa-clock"></i> Projetos Concluídos por Turno</h3>
+                            <div class="turno-comparison" id="turnoConcluidos">
+                                <div class="turno-stat">
+                                    <div class="turno-name">1º Turno</div>
+                                    <div class="turno-value" id="turno1-concluidos">0</div>
+                                    <div class="turno-label">projetos</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">2º Turno</div>
+                                    <div class="turno-value" id="turno2-concluidos">0</div>
+                                    <div class="turno-label">projetos</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">3º Turno</div>
+                                    <div class="turno-value" id="turno3-concluidos">0</div>
+                                    <div class="turno-label">projetos</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comparison-card">
+                            <h3><i class="fa-solid fa-bolt"></i> Eficiência por Turno</h3>
+                            <div class="turno-comparison" id="turnoEficiencia">
+                                <div class="turno-stat">
+                                    <div class="turno-name">1º Turno</div>
+                                    <div class="turno-value" id="turno1-eficiencia">0%</div>
+                                    <div class="turno-label">eficiência</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">2º Turno</div>
+                                    <div class="turno-value" id="turno2-eficiencia">0%</div>
+                                    <div class="turno-label">eficiência</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">3º Turno</div>
+                                    <div class="turno-value" id="turno3-eficiencia">0%</div>
+                                    <div class="turno-label">eficiência</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h4>Projeto Mais Rápido</h4>
-                        <div class="stat-value" id="projetoMaisRapido">-</div>
-                        <div class="stat-label" id="projetoMaisRapidoTempo">00:00 min</div>
+
+                    <div class="dashboard-stats" style="margin-top:20px;">
+                        <div class="stat-card">
+                            <h4>Total Concluídos (Histórico)</h4>
+                            <div class="stat-value" id="totalConcluidos">0</div>
+                            <div class="stat-label">projetos finalizados</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Tempo Médio Geral</h4>
+                            <div class="stat-value" id="tempoMedioGeral">00:00</div>
+                            <div class="stat-label">minutos por projeto</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Projeto Mais Rápido</h4>
+                            <div class="stat-value" id="projetoMaisRapido">-</div>
+                            <div class="stat-label" id="projetoMaisRapidoTempo">00:00 min</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Último Projeto Concluído</h4>
+                            <div class="stat-value" id="ultimoProjeto" style="font-size:16px;">-</div>
+                            <div class="stat-label" id="ultimoProjetoData">-</div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h4>Último Projeto Concluído</h4>
-                        <div class="stat-value" id="ultimoProjeto" style="font-size:16px;">-</div>
-                        <div class="stat-label" id="ultimoProjetoData">-</div>
+                </div>
+            </div>
+
+            <div id="dashboardPostoSection" style="display:none;">
+                <div class="kpi-grid">
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Projetos no Posto</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-industry"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-posto-total">0</div>
+                        <div class="kpi-trend trend-up">
+                            <i class="fa-solid fa-arrow-up"></i> <span id="dash-posto-hoje">0</span> hoje
+                        </div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Em Andamento</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-gear"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-posto-andamento">0</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-head">
+                            <h3>Concluídos no Posto</h3>
+                            <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        </div>
+                        <div class="kpi-value" id="dash-posto-concluidos">0</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-trophy"></i> Desempenho por Turno - <span id="dash-posto-nome"></span></h2>
+                    </div>
+                    <div class="comparison-grid">
+                        <div class="comparison-card">
+                            <h3><i class="fa-solid fa-clock"></i> Projetos Concluídos por Turno</h3>
+                            <div class="turno-comparison" id="posto-turno-concluidos">
+                                <div class="turno-stat">
+                                    <div class="turno-name">1º Turno</div>
+                                    <div class="turno-value" id="posto-turno1-concluidos">0</div>
+                                    <div class="turno-label">projetos</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">2º Turno</div>
+                                    <div class="turno-value" id="posto-turno2-concluidos">0</div>
+                                    <div class="turno-label">projetos</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">3º Turno</div>
+                                    <div class="turno-value" id="posto-turno3-concluidos">0</div>
+                                    <div class="turno-label">projetos</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comparison-card">
+                            <h3><i class="fa-solid fa-bolt"></i> Eficiência por Turno</h3>
+                            <div class="turno-comparison" id="posto-turno-eficiencia">
+                                <div class="turno-stat">
+                                    <div class="turno-name">1º Turno</div>
+                                    <div class="turno-value" id="posto-turno1-eficiencia">0%</div>
+                                    <div class="turno-label">eficiência</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">2º Turno</div>
+                                    <div class="turno-value" id="posto-turno2-eficiencia">0%</div>
+                                    <div class="turno-label">eficiência</div>
+                                </div>
+                                <div class="turno-stat">
+                                    <div class="turno-name">3º Turno</div>
+                                    <div class="turno-value" id="posto-turno3-eficiencia">0%</div>
+                                    <div class="turno-label">eficiência</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-stats" style="margin-top:20px;">
+                        <div class="stat-card">
+                            <h4>Total Concluídos no Posto</h4>
+                            <div class="stat-value" id="posto-total-concluidos">0</div>
+                            <div class="stat-label">projetos finalizados</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Tempo Médio no Posto</h4>
+                            <div class="stat-value" id="posto-tempo-medio">00:00</div>
+                            <div class="stat-label">minutos por projeto</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Projeto Mais Rápido</h4>
+                            <div class="stat-value" id="posto-mais-rapido">-</div>
+                            <div class="stat-label" id="posto-mais-rapido-tempo">00:00 min</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Último Projeto Concluído</h4>
+                            <div class="stat-value" id="posto-ultimo-projeto" style="font-size:16px;">-</div>
+                            <div class="stat-label" id="posto-ultimo-data">-</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1973,110 +2092,62 @@ body.hide-cursor textarea{
                 <span class="process-badge" id="postoBadge"></span>
             </h1>
 
-            <div class="posto-tabs">
-                <button class="posto-tab active" onclick="switchPostoTab('processamento', this)">
-                    <i class="fa-solid fa-list-check"></i> Em Processamento
-                </button>
-                <button class="posto-tab" onclick="switchPostoTab('concluidos', this)">
-                    <i class="fa-solid fa-circle-check"></i> Concluídos no Posto
-                </button>
-            </div>
-
-            <div id="postoProcessamentoSection">
-                <div class="kpi-grid">
-                    <div class="kpi">
-                        <div class="kpi-head"><h3>Aguardando</h3><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div></div>
-                        <div class="kpi-value" id="posto-aguardando">0</div>
-                    </div>
-                    <div class="kpi">
-                        <div class="kpi-head"><h3>Em Processo</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div>
-                        <div class="kpi-value" id="posto-processo">0</div>
-                    </div>
-                    <div class="kpi">
-                        <div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div>
-                        <div class="kpi-value" id="posto-concluidos">0</div>
-                    </div>
+            <div class="kpi-grid">
+                <div class="kpi">
+                    <div class="kpi-head"><h3>Aguardando</h3><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div></div>
+                    <div class="kpi-value" id="posto-aguardando">0</div>
                 </div>
-
-                <div class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
-                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                            <label style="font-size:13px;font-weight:600;">Turno atual:</label>
-                            <select id="postoTurno" onchange="salvarTurnoPosto()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
-                                <option value="1º Turno">1º Turno</option>
-                                <option value="2º Turno">2º Turno</option>
-                                <option value="3º Turno">3º Turno</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="table-toolbar" style="margin-top:15px;">
-                        <div class="search-box">
-                            <i class="fa-solid fa-search"></i>
-                            <input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="renderPostoTable()" data-vk>
-                        </div>
-                        <div class="filter-bar">
-                            <span class="filter-chip active" data-filter="all" onclick="setPostoFilter('all',this)">Todos</span>
-                            <span class="filter-chip" data-filter="Aguardando" onclick="setPostoFilter('Aguardando',this)">Aguardando</span>
-                            <span class="filter-chip" data-filter="Em Processo" onclick="setPostoFilter('Em Processo',this)">Em Processo</span>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>PEP</th>
-                                    <th>Diagrama/Ordem</th>
-                                    <th>Placa</th>
-                                    <th>Volumes</th>
-                                    <th>Prioridade</th>
-                                    <th>Turno</th>
-                                    <th>Tempo</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="postoTableBody"></tbody>
-                        </table>
-                    </div>
+                <div class="kpi">
+                    <div class="kpi-head"><h3>Em Processo</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div>
+                    <div class="kpi-value" id="posto-processo">0</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div>
+                    <div class="kpi-value" id="posto-concluidos">0</div>
                 </div>
             </div>
 
-            <div id="postoConcluidosSection" style="display:none;">
-                <div class="card">
-                    <div class="card-head">
-                        <h2><i class="fa-solid fa-circle-check"></i> Concluídos no <span id="postoConcluidosTitulo"></span></h2>
-                        <button class="btn btn-sm btn-secondary" onclick="exportPostoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button>
+            <div class="card">
+                <div class="card-head">
+                    <h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <label style="font-size:13px;font-weight:600;">Turno atual:</label>
+                        <select id="postoTurno" onchange="salvarTurnoPosto()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
+                            <option value="1º Turno">1º Turno</option>
+                            <option value="2º Turno">2º Turno</option>
+                            <option value="3º Turno">3º Turno</option>
+                        </select>
                     </div>
-                    <div class="table-toolbar">
-                        <div class="search-box">
-                            <i class="fa-solid fa-search"></i>
-                            <input type="text" id="postoConcluidosSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="renderPostoConcluidos()" data-vk>
-                        </div>
-                        <div class="filter-bar">
-                            <span class="filter-chip active" data-filter="all" onclick="setPostoConcluidosFilter('all',this)">Todos</span>
-                            <span class="filter-chip" data-filter="1º Turno" onclick="setPostoConcluidosFilter('1º Turno',this)">1º Turno</span>
-                            <span class="filter-chip" data-filter="2º Turno" onclick="setPostoConcluidosFilter('2º Turno',this)">2º Turno</span>
-                            <span class="filter-chip" data-filter="3º Turno" onclick="setPostoConcluidosFilter('3º Turno',this)">3º Turno</span>
-                        </div>
+                </div>
+
+                <div class="table-toolbar" style="margin-top:15px;">
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="renderPostoTable()" data-vk>
                     </div>
-                    <div class="table-wrapper">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>PEP</th>
-                                    <th>Diagrama/Ordem</th>
-                                    <th>Placa</th>
-                                    <th>Turno</th>
-                                    <th>Tempo no Posto</th>
-                                    <th>Data/Hora Conclusão</th>
-                                    <th>Observação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="postoConcluidosTableBody"></tbody>
-                        </table>
+                    <div class="filter-bar">
+                        <span class="filter-chip active" data-filter="all" onclick="setPostoFilter('all',this)">Todos</span>
+                        <span class="filter-chip" data-filter="Aguardando" onclick="setPostoFilter('Aguardando',this)">Aguardando</span>
+                        <span class="filter-chip" data-filter="Em Processo" onclick="setPostoFilter('Em Processo',this)">Em Processo</span>
                     </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>PEP</th>
+                                <th>Diagrama/Ordem</th>
+                                <th>Placa</th>
+                                <th>Volumes</th>
+                                <th>Prioridade</th>
+                                <th>Turno</th>
+                                <th>Tempo</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postoTableBody"></tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -2587,7 +2658,7 @@ body.hide-cursor textarea{
 </div>
 
 <script>
-const STORAGE_KEY = 'weg_fluxo_produtivo_v22';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v24';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2623,8 +2694,8 @@ let state = {
 
 let currentUser = null;
 let currentPosto = null;
+let dashboardPostoAtual = 'Nanocerâmico';
 let postoFilter = 'all';
-let postoConcluidosFilter = 'all';
 let historicoPostoFilter = 'all';
 let admFilter = 'all';
 let histFilter = 'all';
@@ -3063,19 +3134,26 @@ function navigate(page){
     if(page === 'config') loadConfigUI();
 }
 
-function switchPostoTab(tab, el){
-    document.querySelectorAll('.posto-tab').forEach(t => t.classList.remove('active'));
+function switchDashboardTab(tab, el){
+    document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     
-    if(tab === 'processamento'){
-        document.getElementById('postoProcessamentoSection').style.display = 'block';
-        document.getElementById('postoConcluidosSection').style.display = 'none';
-        renderPostoTable();
+    if(tab === 'geral'){
+        document.getElementById('dashboardGeralSection').style.display = 'block';
+        document.getElementById('dashboardPostoSection').style.display = 'none';
+        renderDashboard();
     }else{
-        document.getElementById('postoProcessamentoSection').style.display = 'none';
-        document.getElementById('postoConcluidosSection').style.display = 'block';
-        document.getElementById('postoConcluidosTitulo').textContent = currentPosto;
-        renderPostoConcluidos();
+        document.getElementById('dashboardGeralSection').style.display = 'none';
+        document.getElementById('dashboardPostoSection').style.display = 'block';
+        
+        const postoMap = {
+            'nano': 'Nanocerâmico',
+            'pintura': 'Pintura',
+            'conferencia': 'Conferência'
+        };
+        dashboardPostoAtual = postoMap[tab];
+        document.getElementById('dash-posto-nome').textContent = dashboardPostoAtual;
+        renderDashboardPosto();
     }
 }
 
@@ -3173,6 +3251,78 @@ function renderDashboard(){
     
     atualizarEstatisticasDashboard();
     renderCharts();
+}
+
+function renderDashboardPosto(){
+    const posto = dashboardPostoAtual;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    
+    const projetosNoPosto = state.projetos.filter(p => p.processo === posto);
+    const concluidosNoPosto = state.historicoPostos.filter(p => p.processo === posto);
+    const concluidosHoje = concluidosNoPosto.filter(p => p.dataHoraConclusao >= hoje.getTime());
+    
+    document.getElementById('dash-posto-total').textContent = projetosNoPosto.length;
+    document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
+    document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
+    document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
+    
+    // Projetos concluídos por turno
+    const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
+    concluidosNoPosto.forEach(p => {
+        if(turnos[p.turno] !== undefined) turnos[p.turno]++;
+    });
+    document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
+    document.getElementById('posto-turno2-concluidos').textContent = turnos['2º Turno'];
+    document.getElementById('posto-turno3-concluidos').textContent = turnos['3º Turno'];
+    
+    // Eficiência por turno
+    const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
+    projetosNoPosto.forEach(p => { if(turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
+    concluidosNoPosto.forEach(p => { if(turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
+    
+    ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
+        const d = turnosAtivos[turno];
+        const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
+        document.getElementById(`posto-turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
+    });
+    
+    // Total concluídos
+    document.getElementById('posto-total-concluidos').textContent = concluidosNoPosto.length;
+    
+    // Tempo médio
+    const tempos = concluidosNoPosto.filter(p => p.tempoReal).map(p => p.tempoReal);
+    if(tempos.length > 0){
+        const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
+        const minutos = Math.floor(media / 60000);
+        const segundos = Math.floor((media % 60000) / 1000);
+        document.getElementById('posto-tempo-medio').textContent = `${minutos}:${String(segundos).padStart(2,'0')}`;
+    }else{
+        document.getElementById('posto-tempo-medio').textContent = '00:00';
+    }
+    
+    // Projeto mais rápido
+    if(tempos.length > 0){
+        const maisRapido = Math.min(...tempos);
+        const projetoRapido = concluidosNoPosto.find(p => p.tempoReal === maisRapido);
+        const minutosRapido = Math.floor(maisRapido / 60000);
+        const segundosRapido = Math.floor((maisRapido % 60000) / 1000);
+        document.getElementById('posto-mais-rapido').textContent = projetoRapido ? projetoRapido.diagrama : '-';
+        document.getElementById('posto-mais-rapido-tempo').textContent = `${minutosRapido}:${String(segundosRapido).padStart(2,'0')} min`;
+    }else{
+        document.getElementById('posto-mais-rapido').textContent = '-';
+        document.getElementById('posto-mais-rapido-tempo').textContent = '00:00 min';
+    }
+    
+    // Último projeto concluído
+    if(concluidosNoPosto.length > 0){
+        const ultimo = concluidosNoPosto[0];
+        document.getElementById('posto-ultimo-projeto').textContent = ultimo.diagrama;
+        const dataUltimo = new Date(ultimo.dataHoraConclusao);
+        document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    }else{
+        document.getElementById('posto-ultimo-projeto').textContent = '-';
+        document.getElementById('posto-ultimo-data').textContent = '-';
+    }
 }
 
 function atualizarEstatisticasDashboard(){
@@ -3522,7 +3672,6 @@ function renderPosto(){
 
     aplicarTurnoAutomatico();
     renderPostoTable();
-    renderPostoConcluidos();
     
     if(timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(atualizarTemposEmTempoReal, 1000);
@@ -3537,18 +3686,9 @@ function salvarTurnoPosto(){
 
 function setPostoFilter(f,el){
     postoFilter = f;
-    document.querySelectorAll('#page-posto .filter-chip').forEach(c=>{
-        if(c.closest('#postoProcessamentoSection')) c.classList.remove('active');
-    });
+    document.querySelectorAll('#page-posto .filter-chip').forEach(c=>c.classList.remove('active'));
     el.classList.add('active');
     renderPostoTable();
-}
-
-function setPostoConcluidosFilter(f,el){
-    postoConcluidosFilter = f;
-    document.querySelectorAll('#postoConcluidosSection .filter-chip').forEach(c=>c.classList.remove('active'));
-    el.classList.add('active');
-    renderPostoConcluidos();
 }
 
 function setHistoricoPostoFilter(f,el){
@@ -3579,7 +3719,10 @@ function renderPostoTable(){
     document.getElementById('posto-processo').textContent = todosPosto.filter(p=>p.status==='Em Processo').length;
 
     const hoje = new Date(); hoje.setHours(0,0,0,0);
-    const concluidosHoje = state.historico.filter(p => p.processo === currentPosto && p.concluidoEm >= hoje.getTime()).length;
+    const concluidosHoje = state.historicoPostos.filter(p => 
+        p.processo === currentPosto && 
+        p.dataHoraConclusao >= hoje.getTime()
+    ).length;
     document.getElementById('posto-concluidos').textContent = concluidosHoje;
 
     if(data.length === 0){
@@ -3675,44 +3818,6 @@ function renderPostoTable(){
     }).join('');
     
     setTimeout(atualizarTemposEmTempoReal, 100);
-}
-
-function renderPostoConcluidos(){
-    const tbody = document.getElementById('postoConcluidosTableBody');
-    const search = (document.getElementById('postoConcluidosSearch').value || '').toLowerCase();
-
-    let data = state.historicoPostos.filter(p => p.processo === currentPosto);
-    
-    if(postoConcluidosFilter !== 'all') data = data.filter(p => p.turno === postoConcluidosFilter);
-    if(search) data = data.filter(p =>
-        (p.pep||'').toLowerCase().includes(search) ||
-        p.diagrama.toLowerCase().includes(search) ||
-        (p.placa||'').toLowerCase().includes(search)
-    );
-
-    data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
-
-    if(data.length === 0){
-        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>Nenhum projeto foi concluído neste posto ainda.</p></div></td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = data.map(p=>{
-        const tempoStr = p.tempoReal ? formatarTempo(p.tempoReal) : '-';
-        const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
-        const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
-        return `
-            <tr>
-                <td style="text-align:center;">${p.pep||'-'}</td>
-                <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
-                <td style="text-align:center;">${p.placa||'-'}</td>
-                <td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td>
-                <td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
-                <td style="text-align:center;">${dataConclusao}</td>
-                <td style="text-align:center;">${obs}</td>
-            </tr>
-        `;
-    }).join('');
 }
 
 function renderHistoricoPostoAtual(){
@@ -3913,7 +4018,6 @@ function concluirProjetoDireto(id, turno){
         
         salvar();
         renderPostoTable();
-        renderPostoConcluidos();
         renderAdminTable();
         
         const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
@@ -3931,7 +4035,6 @@ function concluirProjetoDireto(id, turno){
         salvar();
         renderAdminTable();
         renderPostoTable();
-        renderPostoConcluidos();
         renderHistorico();
         renderCharts();
         showToast('success','Concluído',p.diagrama+' finalizado. Tempo total: '+formatarTempo(tempoReal));
