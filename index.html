@@ -27,7 +27,6 @@
     --radius:12px;
     --transition:all .25s ease;
     --sidebar-width:72px;
-    --sidebar-expanded:240px;
     --header-height:90px;
 }
 
@@ -55,7 +54,7 @@ body.hide-cursor textarea{
     cursor: none !important;
 }
 
-/* ===== BARRA DE ROLAGEM LARGA ===== */
+/* ===== BARRA DE ROLAGEM LARGA - OTIMIZADA PARA TOUCH ===== */
 ::-webkit-scrollbar{
     width:30px;
     height:30px;
@@ -170,7 +169,7 @@ body.hide-cursor textarea{
     font-size:11px;
 }
 
-/* ===== HEADER ===== */
+/* ===== HEADER REORGANIZADO ===== */
 .header{
     background:linear-gradient(90deg,var(--weg-blue),var(--weg-dark));
     color:white;
@@ -297,70 +296,18 @@ body.hide-cursor textarea{
     min-height:calc(100vh - var(--header-height));
 }
 
-/* ===== SIDEBAR COM TOGGLE ===== */
+/* ===== SIDEBAR - APENAS ÍCONES ===== */
 .sidebar{
     width:var(--sidebar-width);
     background:var(--card);
     border-right:1px solid var(--border);
     display:flex;
     flex-direction:column;
-    flex-shrink:0;
-    transition:width .3s ease;
-    position:relative;
-    overflow:visible;
-}
-
-.sidebar.expanded{
-    width:var(--sidebar-expanded);
-}
-
-/* ===== BOTÃO DE TOGGLE DA SIDEBAR - GRANDE E VISÍVEL ===== */
-.sidebar-toggle{
-    width:100%;
-    height:56px;
-    background:var(--weg-blue);
-    color:white;
-    border:none;
-    cursor:pointer;
-    display:flex;
     align-items:center;
-    justify-content:center;
-    gap:12px;
-    font-size:16px;
-    font-weight:600;
-    transition:var(--transition);
+    padding-top:20px;
     flex-shrink:0;
-    position:relative;
-    z-index:5;
 }
 
-.sidebar-toggle:hover{
-    background:var(--weg-dark);
-}
-
-.sidebar-toggle:active{
-    transform:scale(.98);
-}
-
-.sidebar-toggle i{
-    font-size:18px;
-    transition:transform .3s ease;
-}
-
-.sidebar.expanded .sidebar-toggle i{
-    transform:rotate(180deg);
-}
-
-.sidebar-toggle-label{
-    display:none;
-    white-space:nowrap;
-}
-
-.sidebar.expanded .sidebar-toggle-label{
-    display:inline;
-}
-
-/* ===== MENU ===== */
 .menu{
     width:100%;
     display:flex;
@@ -368,14 +315,6 @@ body.hide-cursor textarea{
     align-items:center;
     gap:8px;
     padding:10px 8px;
-    flex:1;
-    overflow-y:auto;
-    overflow-x:visible;
-}
-
-.sidebar.expanded .menu{
-    align-items:stretch;
-    padding:10px;
 }
 
 .menu a{
@@ -392,28 +331,13 @@ body.hide-cursor textarea{
     cursor:pointer;
     position:relative;
     border:2px solid transparent;
-    flex-shrink:0;
-}
-
-.sidebar.expanded .menu a{
-    width:100%;
-    height:48px;
-    justify-content:flex-start;
-    padding:0 16px;
-    gap:14px;
-    font-size:15px;
-    color:var(--text);
 }
 
 .menu a:hover{
     background:var(--weg-light);
     color:var(--weg-blue);
     border-color:var(--weg-blue);
-    transform:scale(1.05);
-}
-
-.sidebar.expanded .menu a:hover{
-    transform:translateX(4px);
+    transform:scale(1.08);
 }
 
 .menu a.active{
@@ -423,23 +347,12 @@ body.hide-cursor textarea{
     box-shadow:0 4px 12px rgba(0,91,172,.35);
 }
 
-.menu a .menu-text{
-    display:none;
-    font-weight:600;
-    white-space:nowrap;
-}
-
-.sidebar.expanded .menu a .menu-text{
-    display:inline;
-}
-
-/* Tooltip quando NÃO está expandida */
 .menu a::after{
     content:attr(data-tooltip);
     position:absolute;
     left:calc(100% + 12px);
     top:50%;
-    transform:translateY(-50%) translateX(-6px);
+    transform:translateY(-50%);
     background:var(--weg-dark);
     color:white;
     padding:8px 14px;
@@ -452,9 +365,10 @@ body.hide-cursor textarea{
     transition:opacity .2s ease, transform .2s ease;
     z-index:100;
     box-shadow:var(--shadow);
+    transform:translateY(-50%) translateX(-6px);
 }
 
-.sidebar:not(.expanded) .menu a:hover::after{
+.menu a:hover::after{
     opacity:1;
     transform:translateY(-50%) translateX(0);
 }
@@ -781,6 +695,100 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
+/* ===== EXIBIÇÃO DE VOLUMES MELHORADA - CENTRALIZADA ===== */
+.volumes-container{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    min-width:140px;
+    text-align:center;
+}
+
+.volumes-main{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-weight:700;
+    font-size:14px;
+    width:100%;
+}
+
+.volumes-processed{
+    color:var(--weg-blue);
+    font-size:16px;
+}
+
+.volumes-divider{
+    color:var(--text-light);
+    font-weight:400;
+}
+
+.volumes-total{
+    color:var(--text);
+}
+
+.volumes-main.complete{
+    color:var(--success);
+}
+
+.volumes-main.complete i{
+    font-size:16px;
+}
+
+.volumes-progress-bar{
+    width:100%;
+    height:6px;
+    background:var(--border);
+    border-radius:3px;
+    overflow:hidden;
+    margin-top:2px;
+}
+
+.volumes-progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--warning), var(--weg-blue));
+    border-radius:3px;
+    transition:width 0.3s ease;
+}
+
+.volumes-progress-fill.complete{
+    background:var(--success);
+}
+
+.volumes-remaining{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    font-size:11px;
+    color:var(--warning);
+    font-weight:600;
+    background:rgba(255,176,0,0.1);
+    padding:2px 10px;
+    border-radius:12px;
+    margin-top:2px;
+}
+
+.volumes-remaining i{
+    font-size:10px;
+}
+
+.volumes-total-only{
+    color:var(--text);
+    font-weight:600;
+    font-size:13px;
+    text-align:center;
+}
+
+.volumes-simple{
+    color:var(--text-light);
+    font-size:13px;
+}
+
 .volumes-info{
     font-size:11px;
     color:var(--text-light);
@@ -816,7 +824,7 @@ body.hide-cursor textarea{
     50%{opacity:.7;}
 }
 
-/* ===== AÇÕES DO POSTO ===== */
+/* ===== AÇÕES DO POSTO - LADO A LADO ===== */
 .action-main{
     display:flex;
     gap:8px;
@@ -941,7 +949,7 @@ body.hide-cursor textarea{
     display:none;
     align-items:flex-start;
     justify-content:center;
-    z-index:1000;
+    z-index:6000;
     backdrop-filter:blur(4px);
     padding:40px 20px 120px 20px;
     overflow-y:auto;
@@ -1033,9 +1041,9 @@ body.hide-cursor textarea{
     border-radius:16px;
     padding:14px;
     box-shadow:0 8px 32px rgba(0,0,0,.25);
-    z-index:1500;
+    z-index:7000;
     display:none;
-    max-width:420px;
+    max-width:480px;
     width:95%;
 }
 
@@ -1058,20 +1066,37 @@ body.hide-cursor textarea{
     gap:6px;
 }
 
+.vk-mode-toggle{
+    background:var(--weg-light);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:4px 10px;
+    font-size:11px;
+    font-weight:600;
+    color:var(--weg-blue);
+    cursor:pointer;
+    transition:var(--transition);
+}
+
+.vk-mode-toggle:hover{
+    background:var(--weg-blue);
+    color:white;
+}
+
 .vk-row{
     display:flex;
-    gap:8px;
-    margin-bottom:8px;
+    gap:6px;
+    margin-bottom:6px;
     justify-content:center;
 }
 
 .vk-key{
     background:var(--card);
     border:2px solid var(--border);
-    border-radius:12px;
-    min-width:60px;
-    height:56px;
-    font-size:18px;
+    border-radius:10px;
+    min-width:42px;
+    height:48px;
+    font-size:16px;
     font-weight:700;
     color:var(--text);
     cursor:pointer;
@@ -1083,13 +1108,13 @@ body.hide-cursor textarea{
     user-select:none;
     box-shadow:0 2px 0 rgba(0,0,0,.1);
     flex:1;
-    max-width:80px;
+    max-width:60px;
 }
 
 .vk-key:hover{
     background:var(--weg-light);
     border-color:var(--weg-blue);
-    transform:translateY(-2px);
+    transform:translateY(-1px);
     box-shadow:0 4px 0 rgba(0,0,0,.1);
 }
 
@@ -1101,9 +1126,9 @@ body.hide-cursor textarea{
 }
 
 .vk-key.wide{
-    min-width:80px;
-    font-size:14px;
-    max-width:100px;
+    min-width:70px;
+    font-size:13px;
+    max-width:90px;
 }
 
 .vk-key.action{
@@ -1137,6 +1162,10 @@ body.hide-cursor textarea{
     border-color:#008a40;
 }
 
+.vk-alpha{display:none;}
+.vk-alpha.active{display:block;}
+.vk-numeric.hidden{display:none;}
+
 .vk-toggle{
     position:fixed;
     bottom:20px;
@@ -1161,7 +1190,7 @@ body.hide-cursor textarea{
     position:fixed;
     top:100px;
     right:25px;
-    z-index:2000;
+    z-index:8000;
     display:flex;
     flex-direction:column;
     gap:10px;
@@ -1327,6 +1356,40 @@ body.hide-cursor textarea{
 }
 
 /* ===== RESPONSIVO ===== */
+@media(max-width:1000px){
+    .charts-grid{grid-template-columns:1fr;}
+    .sidebar{
+        position:fixed;
+        left:0;
+        top:var(--header-height);
+        height:calc(100vh - var(--header-height));
+        z-index:99;
+        box-shadow:var(--shadow-lg);
+        transform:translateX(-100%);
+        transition:transform .3s ease;
+    }
+    .sidebar.open{transform:translateX(0);}
+    .form-grid{grid-template-columns:1fr;}
+    .full,.form-actions{grid-column:span 1;}
+    .header-title{font-size:18px;}
+    .header-subtitle{display:none;}
+    .user-info{display:none;}
+    .role-grid{grid-template-columns:1fr;}
+    .virtual-keyboard{
+        max-width:360px;
+        bottom:10px;
+        padding:10px;
+    }
+    .vk-key{
+        min-width:36px;
+        height:44px;
+        font-size:14px;
+    }
+    .modal-overlay{
+        padding:20px 15px 140px 15px;
+    }
+}
+
 .menu-toggle{
     display:none;
     background:rgba(255,255,255,.15);
@@ -1342,38 +1405,21 @@ body.hide-cursor textarea{
 }
 
 @media(max-width:1000px){
-    .charts-grid{grid-template-columns:1fr;}
-    .sidebar{
-        position:fixed;
-        left:0;
-        top:var(--header-height);
-        height:calc(100vh - var(--header-height));
-        z-index:99;
-        box-shadow:var(--shadow-lg);
-        transform:translateX(-100%);
-        transition:transform .3s ease, width .3s ease;
-    }
-    .sidebar.open{transform:translateX(0);}
-    .sidebar.expanded{width:var(--sidebar-expanded);}
     .menu-toggle{display:flex;}
-    .form-grid{grid-template-columns:1fr;}
-    .full,.form-actions{grid-column:span 1;}
-    .header-title{font-size:18px;}
-    .header-subtitle{display:none;}
-    .user-info{display:none;}
-    .role-grid{grid-template-columns:1fr;}
-    .virtual-keyboard{
-        max-width:360px;
-        bottom:10px;
-        padding:10px;
+}
+
+@media(max-width:768px){
+    .volumes-container{
+        min-width:120px;
     }
-    .vk-key{
-        min-width:50px;
-        height:50px;
-        font-size:16px;
+    .volumes-main{
+        font-size:12px;
     }
-    .modal-overlay{
-        padding:20px 15px 140px 15px;
+    .volumes-processed{
+        font-size:14px;
+    }
+    .volumes-remaining{
+        font-size:10px;
     }
 }
 
@@ -1383,8 +1429,7 @@ body.hide-cursor textarea{
     .header{padding:0 15px;}
     .header-title{font-size:16px;}
     .header-logo{font-size:22px;}
-    .vk-key{min-width:45px;height:48px;font-size:16px;}
-    .vk-key.wide{min-width:60px;font-size:13px;}
+    .vk-key{min-width:32px;height:40px;font-size:13px;}
     .icon-action-lg{
         min-width:50px;
         min-height:46px;
@@ -1396,7 +1441,7 @@ body.hide-cursor textarea{
         max-width:320px;
         padding:8px;
     }
-    .vk-row{gap:5px;margin-bottom:5px;}
+    .vk-row{gap:4px;margin-bottom:4px;}
     .icon-action{
         width:32px;
         height:32px;
@@ -1428,7 +1473,7 @@ body.hide-cursor textarea{
                 <small>Operador do posto</small>
             </div>
             <div class="role-btn" onclick="login('pintura')">
-                <i class="fa-solid fa-spray-can"></i>
+                <i class="fa-solid fa-paint-roller"></i>
                 <strong>Pintura</strong>
                 <small>Operador do posto</small>
             </div>
@@ -1471,10 +1516,6 @@ body.hide-cursor textarea{
 
 <div class="layout">
     <aside class="sidebar" id="sidebar">
-        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Expandir/Recolher menu">
-            <i class="fa-solid fa-chevron-right" id="sidebarToggleIcon"></i>
-            <span class="sidebar-toggle-label">Recolher Menu</span>
-        </button>
         <nav class="menu" id="mainMenu"></nav>
     </aside>
 
@@ -1509,7 +1550,7 @@ body.hide-cursor textarea{
                 <div class="kpi">
                     <div class="kpi-head">
                         <h3>Pintura</h3>
-                        <div class="kpi-icon"><i class="fa-solid fa-spray-can"></i></div>
+                        <div class="kpi-icon"><i class="fa-solid fa-paint-roller"></i></div>
                     </div>
                     <div class="kpi-value" id="dash-pint">0</div>
                 </div>
@@ -1823,7 +1864,7 @@ body.hide-cursor textarea{
                     <div class="form-group full">
                         <label>Modo de operação</label>
                         <select id="cfgDevice" onchange="salvarConfigDispositivo()">
-                            <option value="tablet">📱 Tablet / Touchscreen (com teclado físico opcional)</option>
+                            <option value="tablet"> Tablet / Touchscreen (com teclado físico opcional)</option>
                             <option value="computador">💻 Computador (Touch sem teclado/mouse)</option>
                         </select>
                     </div>
@@ -1905,7 +1946,7 @@ body.hide-cursor textarea{
         <div class="form-group" style="margin-bottom:15px;">
             <label>Senha <span class="req">*</span></label>
             <div class="password-wrapper">
-                <input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarLoginAdmin();}" onfocus="scrollParaElemento(this)">
+                <input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarLoginAdmin();}" onfocus="onAuthFieldFocus(this)">
                 <button type="button" class="password-toggle" onclick="togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button>
             </div>
         </div>
@@ -1934,7 +1975,7 @@ body.hide-cursor textarea{
         <div class="form-group" style="margin-bottom:15px;">
             <label>Senha do Administrador <span class="req">*</span></label>
             <div class="password-wrapper">
-                <input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarAcaoSenha();}" onfocus="scrollParaElemento(this)">
+                <input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarAcaoSenha();}" onfocus="onAuthFieldFocus(this)">
                 <button type="button" class="password-toggle" onclick="togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button>
             </div>
         </div>
@@ -2055,39 +2096,62 @@ body.hide-cursor textarea{
 <!-- ===== TOAST ===== -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ===== TECLADO VIRTUAL ===== -->
+<!-- ===== TECLADO VIRTUAL COM MODO ALFANUMÉRICO ===== -->
 <div class="virtual-keyboard" id="virtualKeyboard">
     <div class="vk-header">
-        <span><i class="fa-solid fa-keyboard"></i> Teclado Numérico</span>
+        <span><i class="fa-solid fa-keyboard"></i> <span id="vkModeLabel">Teclado Numérico</span></span>
+        <button class="vk-mode-toggle" id="vkModeToggle" onclick="toggleVkMode()">ABC</button>
     </div>
-    <div class="vk-row">
-        <button class="vk-key" data-key="7">7</button>
-        <button class="vk-key" data-key="8">8</button>
-        <button class="vk-key" data-key="9">9</button>
-        <button class="vk-key action danger" data-action="backspace" title="Apagar">
-            <i class="fa-solid fa-delete-left"></i>
-        </button>
-        <button class="vk-key action danger" data-action="close" title="Fechar teclado">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+    <div id="vkNumeric" class="vk-numeric">
+        <div class="vk-row">
+            <button class="vk-key" data-key="7">7</button>
+            <button class="vk-key" data-key="8">8</button>
+            <button class="vk-key" data-key="9">9</button>
+            <button class="vk-key action danger" data-action="backspace" title="Apagar">
+                <i class="fa-solid fa-delete-left"></i>
+            </button>
+        </div>
+        <div class="vk-row">
+            <button class="vk-key" data-key="4">4</button>
+            <button class="vk-key" data-key="5">5</button>
+            <button class="vk-key" data-key="6">6</button>
+            <button class="vk-key action" data-action="clear" title="Limpar">
+                <i class="fa-solid fa-eraser"></i>
+            </button>
+        </div>
+        <div class="vk-row">
+            <button class="vk-key" data-key="1">1</button>
+            <button class="vk-key" data-key="2">2</button>
+            <button class="vk-key" data-key="3">3</button>
+            <button class="vk-key action danger" data-action="close" title="Fechar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="vk-row">
+            <button class="vk-key" data-key="0" style="flex:2;max-width:128px;">0</button>
+            <button class="vk-key" data-key=".">.</button>
+            <button class="vk-key" data-key="-">-</button>
+        </div>
     </div>
-    <div class="vk-row">
-        <button class="vk-key" data-key="4">4</button>
-        <button class="vk-key" data-key="5">5</button>
-        <button class="vk-key" data-key="6">6</button>
-        <button class="vk-key action" data-action="clear" title="Limpar">
-            <i class="fa-solid fa-eraser"></i>
-        </button>
-    </div>
-    <div class="vk-row">
-        <button class="vk-key" data-key="1">1</button>
-        <button class="vk-key" data-key="2">2</button>
-        <button class="vk-key" data-key="3">3</button>
-    </div>
-    <div class="vk-row">
-        <button class="vk-key" data-key="0" style="flex:2;max-width:168px;">0</button>
-        <button class="vk-key" data-key=".">.</button>
-        <button class="vk-key" data-key="-">-</button>
+    <div id="vkAlpha" class="vk-alpha">
+        <div class="vk-row">
+            <button class="vk-key" data-key="q">Q</button><button class="vk-key" data-key="w">W</button><button class="vk-key" data-key="e">E</button><button class="vk-key" data-key="r">R</button><button class="vk-key" data-key="t">T</button><button class="vk-key" data-key="y">Y</button><button class="vk-key" data-key="u">U</button><button class="vk-key" data-key="i">I</button><button class="vk-key" data-key="o">O</button><button class="vk-key" data-key="p">P</button>
+        </div>
+        <div class="vk-row">
+            <button class="vk-key" data-key="a">A</button><button class="vk-key" data-key="s">S</button><button class="vk-key" data-key="d">D</button><button class="vk-key" data-key="f">F</button><button class="vk-key" data-key="g">G</button><button class="vk-key" data-key="h">H</button><button class="vk-key" data-key="j">J</button><button class="vk-key" data-key="k">K</button><button class="vk-key" data-key="l">L</button>
+        </div>
+        <div class="vk-row">
+            <button class="vk-key" data-key="z">Z</button><button class="vk-key" data-key="x">X</button><button class="vk-key" data-key="c">C</button><button class="vk-key" data-key="v">V</button><button class="vk-key" data-key="b">B</button><button class="vk-key" data-key="n">N</button><button class="vk-key" data-key="m">M</button><button class="vk-key action danger" data-action="backspace"><i class="fa-solid fa-delete-left"></i></button>
+        </div>
+        <div class="vk-row">
+            <button class="vk-key" data-key="1" style="max-width:40px;">1</button>
+            <button class="vk-key" data-key="2" style="max-width:40px;">2</button>
+            <button class="vk-key" data-key="3" style="max-width:40px;">3</button>
+            <button class="vk-key" data-key="4" style="max-width:40px;">4</button>
+            <button class="vk-key" data-key="5" style="max-width:40px;">5</button>
+            <button class="vk-key" data-key="0" style="max-width:40px;">0</button>
+            <button class="vk-key action danger" data-action="close" style="max-width:50px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
     </div>
 </div>
 
@@ -2099,7 +2163,7 @@ body.hide-cursor textarea{
 /* =======================
    ESTADO GLOBAL
 ======================= */
-const STORAGE_KEY = 'weg_fluxo_produtivo_v20';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v21';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2112,8 +2176,7 @@ let state = {
     projetos: [],
     historico: [],
     config: {
-        dispositivo: 'tablet',
-        sidebarExpanded: false
+        dispositivo: 'tablet'
     },
     turnosPorPosto: {
         'Nanocerâmico': '1º Turno',
@@ -2130,6 +2193,7 @@ let admFilter = 'all';
 let histFilter = 'all';
 let vkActive = false;
 let vkTarget = null;
+let vkAlphaMode = false;
 let projetoParaConcluir = null;
 let pendingAdminLogin = false;
 let acaoPendenteSenha = null;
@@ -2174,6 +2238,18 @@ function scrollParaElemento(elemento){
             });
         }
     }, 300);
+}
+
+/* =======================
+   FOCO EM CAMPO DE AUTH - ABRE TECLADO ALFANUMÉRICO
+======================= */
+function onAuthFieldFocus(el){
+    vkTarget = el;
+    setVkAlphaMode(true);
+    if(state.config.dispositivo === 'computador'){
+        if(!vkActive) showVirtualKeyboard();
+        else scrollParaElemento(el);
+    }
 }
 
 /* =======================
@@ -2281,13 +2357,10 @@ function carregar(){
                 };
             }
             if(!state.config){
-                state.config = { dispositivo: 'tablet', sidebarExpanded: false };
+                state.config = { dispositivo: 'tablet' };
             }
             if(!state.config.dispositivo){
                 state.config.dispositivo = 'tablet';
-            }
-            if(state.config.sidebarExpanded === undefined){
-                state.config.sidebarExpanded = false;
             }
             migrarTurnosAntigos();
         }catch(e){}
@@ -2346,21 +2419,23 @@ function atualizarTemposEmTempoReal(){
 }
 
 /* =======================
-   LOGIN / LOGOUT
+   LOGIN / LOGOUT - CORREÇÃO DO BUG DO PRIMEIRO CLIQUE
 ======================= */
 function login(role){
     if(role === 'admin'){
+        // CORREÇÃO: Resetar estado antes de abrir
         pendingAdminLogin = true;
         document.getElementById('inputSenhaAdmin').value = '';
         document.getElementById('senhaAdminErro').style.display = 'none';
-        
+        // CORREÇÃO: Ocultar a tela de login ANTES de abrir o modal
+        // Isso garante que o modal fique visível (z-index 6000 > 5000)
+        document.getElementById('loginScreen').style.display = 'none';
+        openModal('modalSenhaAdmin');
         setTimeout(()=>{
-            openModal('modalSenhaAdmin');
-            setTimeout(()=>{
-                document.getElementById('inputSenhaAdmin').focus();
-                scrollParaElemento(document.getElementById('inputSenhaAdmin'));
-            },300);
-        },50);
+            const inp = document.getElementById('inputSenhaAdmin');
+            inp.value = '';
+            inp.focus();
+        }, 150);
         return;
     }
     efetivarLogin(role);
@@ -2369,18 +2444,21 @@ function login(role){
 function confirmarLoginAdmin(){
     const senha = document.getElementById('inputSenhaAdmin').value;
     if(senha === state.senhaAdmin){
+        // SUCESSO: Fechar modal, fechar teclado, entrar
         document.getElementById('senhaAdminErro').style.display = 'none';
         closeModal('modalSenhaAdmin');
+        hideVirtualKeyboard();
         pendingAdminLogin = false;
         efetivarLogin('admin');
     }else{
-        const erro = document.getElementById('senhaAdminErro');
-        erro.style.display = 'flex';
+        // ERRO: Mostrar erro, manter teclado aberto, manter foco
+        document.getElementById('senhaAdminErro').style.display = 'flex';
         document.getElementById('senhaAdminErroMsg').textContent = 'Senha incorreta. Tente novamente.';
         const input = document.getElementById('inputSenhaAdmin');
         input.value = '';
-        input.focus();
         input.style.borderColor = 'var(--danger)';
+        // Manter o teclado aberto e o foco no campo
+        input.focus();
         setTimeout(()=>{input.style.borderColor='';},1500);
     }
 }
@@ -2388,6 +2466,9 @@ function confirmarLoginAdmin(){
 function cancelarLoginAdmin(){
     pendingAdminLogin = false;
     closeModal('modalSenhaAdmin');
+    hideVirtualKeyboard();
+    // CORREÇÃO: Restaurar a tela de login ao cancelar
+    document.getElementById('loginScreen').style.display = 'flex';
 }
 
 function efetivarLogin(role){
@@ -2416,7 +2497,6 @@ function efetivarLogin(role){
     buildMenu();
     applyDeviceConfig();
     aplicarEstadoCursor();
-    aplicarEstadoSidebar();
 
     if(role === 'admin'){
         navigate('dashboard');
@@ -2437,6 +2517,8 @@ function logout(){
     document.getElementById('loginScreen').style.display = 'flex';
     hideVirtualKeyboard();
     document.body.classList.remove('hide-cursor');
+    // CORREÇÃO: Resetar estado ao fazer logout
+    pendingAdminLogin = false;
     if(timerInterval) clearInterval(timerInterval);
 }
 
@@ -2581,51 +2663,15 @@ function executarLimpeza(){
 }
 
 /* =======================
-   SIDEBAR TOGGLE - EXPANDIR/RECOLHER
+   SIDEBAR MOBILE
 ======================= */
-function toggleSidebar(){
-    const sidebar = document.getElementById('sidebar');
-    const icon = document.getElementById('sidebarToggleIcon');
-    const label = sidebar.querySelector('.sidebar-toggle-label');
-    
-    sidebar.classList.toggle('expanded');
-    state.config.sidebarExpanded = sidebar.classList.contains('expanded');
-    
-    // Atualiza ícone e label
-    if(state.config.sidebarExpanded){
-        icon.className = 'fa-solid fa-chevron-left';
-        label.textContent = 'Recolher Menu';
-    }else{
-        icon.className = 'fa-solid fa-chevron-right';
-        label.textContent = 'Expandir Menu';
-    }
-    
-    salvar();
-}
-
-function aplicarEstadoSidebar(){
-    const sidebar = document.getElementById('sidebar');
-    const icon = document.getElementById('sidebarToggleIcon');
-    const label = sidebar.querySelector('.sidebar-toggle-label');
-    
-    if(state.config.sidebarExpanded){
-        sidebar.classList.add('expanded');
-        if(icon) icon.className = 'fa-solid fa-chevron-left';
-        if(label) label.textContent = 'Recolher Menu';
-    }else{
-        sidebar.classList.remove('expanded');
-        if(icon) icon.className = 'fa-solid fa-chevron-right';
-        if(label) label.textContent = 'Expandir Menu';
-    }
-}
-
 function toggleSidebarMobile(){
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('open');
 }
 
 /* =======================
-   MENU DINÂMICO - COM TEXTO EXPANSÍVEL
+   MENU DINÂMICO - APENAS ÍCONES
 ======================= */
 function buildMenu(){
     const menu = document.getElementById('mainMenu');
@@ -2633,42 +2679,21 @@ function buildMenu(){
 
     if(currentUser === 'admin'){
         html = `
-            <a data-page="dashboard" class="active" data-tooltip="Dashboard">
-                <i class="fa-solid fa-chart-line"></i>
-                <span class="menu-text">Dashboard</span>
-            </a>
-            <a data-page="admin" data-tooltip="Administração">
-                <i class="fa-solid fa-user-shield"></i>
-                <span class="menu-text">Administração</span>
-            </a>
-            <a data-page="historico" data-tooltip="Histórico">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span class="menu-text">Histórico</span>
-            </a>
-            <a data-page="config" data-tooltip="Configurações">
-                <i class="fa-solid fa-gear"></i>
-                <span class="menu-text">Configurações</span>
-            </a>
+            <a data-page="dashboard" class="active" data-tooltip="Dashboard"><i class="fa-solid fa-chart-line"></i></a>
+            <a data-page="admin" data-tooltip="Administração"><i class="fa-solid fa-user-shield"></i></a>
+            <a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a>
+            <a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>
         `;
     }else{
         const iconMap = {
             'Nanocerâmico':'fa-flask',
-            'Pintura':'fa-spray-can',
+            'Pintura':'fa-paint-roller',
             'Conferência':'fa-clipboard-check'
         };
         html = `
-            <a data-page="posto" class="active" data-tooltip="${currentPosto}">
-                <i class="fa-solid ${iconMap[currentPosto]}"></i>
-                <span class="menu-text">${currentPosto}</span>
-            </a>
-            <a data-page="historico" data-tooltip="Histórico">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span class="menu-text">Histórico</span>
-            </a>
-            <a data-page="config" data-tooltip="Configurações">
-                <i class="fa-solid fa-gear"></i>
-                <span class="menu-text">Configurações</span>
-            </a>
+            <a data-page="posto" class="active" data-tooltip="${currentPosto}"><i class="fa-solid ${iconMap[currentPosto]}"></i></a>
+            <a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a>
+            <a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>
         `;
     }
     menu.innerHTML = html;
@@ -2912,6 +2937,20 @@ function setAdmFilter(f,el){
     renderAdminTable();
 }
 
+/* =======================
+   FUNÇÃO DE ORDENAÇÃO POR PRIORIDADE (Urgente > Alta > Normal)
+   Garante que projetos urgentes e altos fiquem sempre no topo
+======================= */
+function ordenarPorPrioridade(data){
+    const po = {'Urgente':0, 'Alta':1, 'Normal':2};
+    return data.sort((a,b) => {
+        const pa = po[a.prioridade] ?? 9;
+        const pb = po[b.prioridade] ?? 9;
+        if(pa !== pb) return pa - pb;
+        return b.criadoEm - a.criadoEm;
+    });
+}
+
 function renderAdminTable(){
     const tbody = document.getElementById('admTableBody');
     const search = (document.getElementById('admSearch').value || '').toLowerCase();
@@ -2925,8 +2964,8 @@ function renderAdminTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    const prioOrder = {'Urgente':0,'Alta':1,'Normal':2};
-    data.sort((a,b)=> (prioOrder[a.prioridade]||9) - (prioOrder[b.prioridade]||9) || b.criadoEm - a.criadoEm);
+    // APLICAÇÃO: Ordenação por prioridade (Urgente > Alta > Normal)
+    data = ordenarPorPrioridade(data);
 
     if(data.length === 0){
         tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto usando o formulário acima.</p></div></td></tr>`;
@@ -3053,7 +3092,7 @@ function renderPosto(){
 
     const iconMap = {
         'Nanocerâmico':'fa-flask',
-        'Pintura':'fa-spray-can',
+        'Pintura':'fa-paint-roller',
         'Conferência':'fa-clipboard-check'
     };
     document.getElementById('postoIcon').className = 'fa-solid ' + iconMap[currentPosto];
@@ -3098,8 +3137,8 @@ function renderPostoTable(){
         (p.descricao||'').toLowerCase().includes(search)
     );
 
-    const prioOrder = {'Urgente':0,'Alta':1,'Normal':2};
-    data.sort((a,b)=> (prioOrder[a.prioridade]||9) - (prioOrder[b.prioridade]||9) || a.criadoEm - b.criadoEm);
+    // APLICAÇÃO: Ordenação por prioridade (Urgente > Alta > Normal)
+    data = ordenarPorPrioridade(data);
 
     const todosPosto = state.projetos.filter(p => p.processo === currentPosto);
     document.getElementById('posto-aguardando').textContent = todosPosto.filter(p=>p.status==='Aguardando').length;
@@ -3118,10 +3157,52 @@ function renderPostoTable(){
         const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
         const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
         
-        let volumesInfo = p.volumes || '-';
-        if(p.volumesTotal && p.volumesTotal > 0 && p.volumesProcessados > 0){
-            const restantes = p.volumesTotal - p.volumesProcessados;
-            volumesInfo += ` <span class="volumes-info ${restantes>0?'parcial':''}">(${p.volumesProcessados}/${p.volumesTotal})</span>`;
+        // EXIBIÇÃO DE VOLUMES MELHORADA E CENTRALIZADA
+        let volumesDisplay = '';
+        if(p.volumesTotal && p.volumesTotal > 0){
+            if(p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal){
+                // Status PARCIAL - Exibição centralizada
+                const restantes = p.volumesTotal - p.volumesProcessados;
+                const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
+                volumesDisplay = `
+                    <div class="volumes-container">
+                        <div class="volumes-main">
+                            <span class="volumes-processed">${p.volumesProcessados}</span>
+                            <span class="volumes-divider">/</span>
+                            <span class="volumes-total">${p.volumesTotal}</span>
+                        </div>
+                        <div class="volumes-progress-bar">
+                            <div class="volumes-progress-fill" style="width: ${porcentagem}%"></div>
+                        </div>
+                        <div class="volumes-remaining">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                            <span>${restantes} restante${restantes !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                `;
+            }else if(p.volumesProcessados >= p.volumesTotal){
+                // COMPLETO
+                volumesDisplay = `
+                    <div class="volumes-container">
+                        <div class="volumes-main complete">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <span>${p.volumesTotal}/${p.volumesTotal}</span>
+                        </div>
+                        <div class="volumes-progress-bar">
+                            <div class="volumes-progress-fill complete" style="width: 100%"></div>
+                        </div>
+                    </div>
+                `;
+            }else{
+                // SEM PROCESSAMENTO
+                volumesDisplay = `
+                    <div class="volumes-container">
+                        <span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            }
+        }else{
+            volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`;
         }
         
         let tempoDisplay = '-';
@@ -3149,7 +3230,7 @@ function renderPostoTable(){
                 <td>${p.pep||'-'}</td>
                 <td><strong>${p.diagrama}</strong></td>
                 <td>${p.placa||'-'}</td>
-                <td>${volumesInfo}</td>
+                <td>${volumesDisplay}</td>
                 <td><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
                 <td><span class="turno-badge">${p.turno||'-'}</span></td>
                 <td>${tempoDisplay}</td>
@@ -3590,6 +3671,7 @@ function salvarConfigDispositivo(){
 
 function applyDeviceConfig(){
     const isComputer = state.config.dispositivo === 'computador';
+    const toggleBtn = document.getElementById('vkToggleBtn');
     const toggleFloat = document.getElementById('vkToggleFloat');
 
     if(isComputer){
@@ -3623,7 +3705,6 @@ function restoreData(e){
             renderCharts();
             aplicarEstadoCursor();
             applyDeviceConfig();
-            aplicarEstadoSidebar();
             showToast('success','Restaurado','Dados restaurados com sucesso');
         }catch(err){
             showToast('error','Erro','Arquivo inválido');
@@ -3634,7 +3715,7 @@ function restoreData(e){
 }
 
 /* =======================
-   TECLADO VIRTUAL
+   TECLADO VIRTUAL COM MODO ALFANUMÉRICO
 ======================= */
 function toggleVirtualKeyboard(){
     if(vkActive) hideVirtualKeyboard();
@@ -3655,9 +3736,24 @@ function hideVirtualKeyboard(){
     vkTarget = null;
 }
 
+function setVkAlphaMode(alpha){
+    vkAlphaMode = alpha;
+    document.getElementById('vkAlpha').classList.toggle('active', alpha);
+    document.getElementById('vkNumeric').classList.toggle('hidden', alpha);
+    document.getElementById('vkModeLabel').textContent = alpha ? 'Teclado Alfanumérico' : 'Teclado Numérico';
+    document.getElementById('vkModeToggle').textContent = alpha ? '123' : 'ABC';
+}
+
+function toggleVkMode(){
+    setVkAlphaMode(!vkAlphaMode);
+}
+
 document.addEventListener('focusin', e=>{
     if(state.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea')){
         vkTarget = e.target;
+        // Auto-detecta modo: password/text = alfanumérico, number = numérico
+        const isText = e.target.type === 'password' || e.target.type === 'text';
+        setVkAlphaMode(isText);
         if(!vkActive) showVirtualKeyboard();
     }
 });
@@ -3666,6 +3762,7 @@ document.addEventListener('click', e=>{
     const key = e.target.closest('.vk-key');
     if(!key) return;
     e.preventDefault();
+    e.stopPropagation();
 
     const k = key.dataset.key;
     const action = key.dataset.action;
@@ -3678,8 +3775,8 @@ document.addEventListener('click', e=>{
     if(action === 'backspace'){
         const start = vkTarget.selectionStart ?? vkTarget.value.length;
         const end = vkTarget.selectionEnd ?? start;
-        vkTarget.value = vkTarget.value.slice(0,start-1) + vkTarget.value.slice(end);
-        vkTarget.setSelectionRange(Math.max(0,start-1), Math.max(0,start-1));
+        vkTarget.value = vkTarget.value.slice(0, Math.max(0, start-1)) + vkTarget.value.slice(end);
+        vkTarget.setSelectionRange(Math.max(0, start-1), Math.max(0, start-1));
     } else if(action === 'clear'){
         vkTarget.value = '';
     } else if(action === 'close'){
@@ -3688,11 +3785,11 @@ document.addEventListener('click', e=>{
     } else if(k !== undefined){
         const start = vkTarget.selectionStart ?? vkTarget.value.length;
         const end = vkTarget.selectionEnd ?? start;
-        vkTarget.value = vkTarget.value.slice(0,start) + k + vkTarget.value.slice(end);
+        vkTarget.value = vkTarget.value.slice(0, start) + k + vkTarget.value.slice(end);
         vkTarget.setSelectionRange(start+1, start+1);
     }
 
-    vkTarget.dispatchEvent(new Event('input',{bubbles:true}));
+    vkTarget.dispatchEvent(new Event('input', {bubbles: true}));
     vkTarget.focus();
     scrollParaElemento(vkTarget);
 });
@@ -3702,10 +3799,6 @@ document.addEventListener('click', e=>{
 ======================= */
 carregar();
 aplicarEstadoCursor();
-
-document.addEventListener('DOMContentLoaded', ()=>{
-    aplicarEstadoSidebar();
-});
 
 document.addEventListener('click',e=>{
     const sb = document.getElementById('sidebar');
