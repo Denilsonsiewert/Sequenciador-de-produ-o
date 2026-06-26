@@ -1473,6 +1473,7 @@ body.hide-cursor textarea{
     margin-bottom:20px;
     border-bottom:2px solid var(--border);
     padding-bottom:0;
+    flex-wrap:wrap;
 }
 
 .historico-tab{
@@ -1496,6 +1497,39 @@ body.hide-cursor textarea{
 }
 
 .historico-tab.active{
+    color:var(--weg-blue);
+    border-bottom-color:var(--weg-blue);
+}
+
+.posto-tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    border-bottom:2px solid var(--border);
+    padding-bottom:0;
+}
+
+.posto-tab{
+    padding:12px 20px;
+    background:transparent;
+    border:none;
+    border-bottom:3px solid transparent;
+    cursor:pointer !important;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-light);
+    transition:var(--transition);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:-2px;
+}
+
+.posto-tab:hover{
+    color:var(--weg-blue);
+}
+
+.posto-tab.active{
     color:var(--weg-blue);
     border-bottom-color:var(--weg-blue);
 }
@@ -1939,62 +1973,110 @@ body.hide-cursor textarea{
                 <span class="process-badge" id="postoBadge"></span>
             </h1>
 
-            <div class="kpi-grid">
-                <div class="kpi">
-                    <div class="kpi-head"><h3>Aguardando</h3><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div></div>
-                    <div class="kpi-value" id="posto-aguardando">0</div>
+            <div class="posto-tabs">
+                <button class="posto-tab active" onclick="switchPostoTab('processamento', this)">
+                    <i class="fa-solid fa-list-check"></i> Em Processamento
+                </button>
+                <button class="posto-tab" onclick="switchPostoTab('concluidos', this)">
+                    <i class="fa-solid fa-circle-check"></i> Concluídos no Posto
+                </button>
+            </div>
+
+            <div id="postoProcessamentoSection">
+                <div class="kpi-grid">
+                    <div class="kpi">
+                        <div class="kpi-head"><h3>Aguardando</h3><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div></div>
+                        <div class="kpi-value" id="posto-aguardando">0</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-head"><h3>Em Processo</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div>
+                        <div class="kpi-value" id="posto-processo">0</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div>
+                        <div class="kpi-value" id="posto-concluidos">0</div>
+                    </div>
                 </div>
-                <div class="kpi">
-                    <div class="kpi-head"><h3>Em Processo</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div>
-                    <div class="kpi-value" id="posto-processo">0</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div>
-                    <div class="kpi-value" id="posto-concluidos">0</div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <label style="font-size:13px;font-weight:600;">Turno atual:</label>
+                            <select id="postoTurno" onchange="salvarTurnoPosto()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
+                                <option value="1º Turno">1º Turno</option>
+                                <option value="2º Turno">2º Turno</option>
+                                <option value="3º Turno">3º Turno</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar" style="margin-top:15px;">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="renderPostoTable()" data-vk>
+                        </div>
+                        <div class="filter-bar">
+                            <span class="filter-chip active" data-filter="all" onclick="setPostoFilter('all',this)">Todos</span>
+                            <span class="filter-chip" data-filter="Aguardando" onclick="setPostoFilter('Aguardando',this)">Aguardando</span>
+                            <span class="filter-chip" data-filter="Em Processo" onclick="setPostoFilter('Em Processo',this)">Em Processo</span>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>PEP</th>
+                                    <th>Diagrama/Ordem</th>
+                                    <th>Placa</th>
+                                    <th>Volumes</th>
+                                    <th>Prioridade</th>
+                                    <th>Turno</th>
+                                    <th>Tempo</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="postoTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-head">
-                    <h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
-                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                        <label style="font-size:13px;font-weight:600;">Turno atual:</label>
-                        <select id="postoTurno" onchange="salvarTurnoPosto()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);">
-                            <option value="1º Turno">1º Turno</option>
-                            <option value="2º Turno">2º Turno</option>
-                            <option value="3º Turno">3º Turno</option>
-                        </select>
+            <div id="postoConcluidosSection" style="display:none;">
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-circle-check"></i> Concluídos no <span id="postoConcluidosTitulo"></span></h2>
+                        <button class="btn btn-sm btn-secondary" onclick="exportPostoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button>
                     </div>
-                </div>
-
-                <div class="table-toolbar" style="margin-top:15px;">
-                    <div class="search-box">
-                        <i class="fa-solid fa-search"></i>
-                        <input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="renderPostoTable()" data-vk>
+                    <div class="table-toolbar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="postoConcluidosSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="renderPostoConcluidos()" data-vk>
+                        </div>
+                        <div class="filter-bar">
+                            <span class="filter-chip active" data-filter="all" onclick="setPostoConcluidosFilter('all',this)">Todos</span>
+                            <span class="filter-chip" data-filter="1º Turno" onclick="setPostoConcluidosFilter('1º Turno',this)">1º Turno</span>
+                            <span class="filter-chip" data-filter="2º Turno" onclick="setPostoConcluidosFilter('2º Turno',this)">2º Turno</span>
+                            <span class="filter-chip" data-filter="3º Turno" onclick="setPostoConcluidosFilter('3º Turno',this)">3º Turno</span>
+                        </div>
                     </div>
-                    <div class="filter-bar">
-                        <span class="filter-chip active" data-filter="all" onclick="setPostoFilter('all',this)">Todos</span>
-                        <span class="filter-chip" data-filter="Aguardando" onclick="setPostoFilter('Aguardando',this)">Aguardando</span>
-                        <span class="filter-chip" data-filter="Em Processo" onclick="setPostoFilter('Em Processo',this)">Em Processo</span>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>PEP</th>
+                                    <th>Diagrama/Ordem</th>
+                                    <th>Placa</th>
+                                    <th>Turno</th>
+                                    <th>Tempo no Posto</th>
+                                    <th>Data/Hora Conclusão</th>
+                                    <th>Observação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="postoConcluidosTableBody"></tbody>
+                        </table>
                     </div>
-                </div>
-                <div class="table-wrapper">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>PEP</th>
-                                <th>Diagrama/Ordem</th>
-                                <th>Placa</th>
-                                <th>Volumes</th>
-                                <th>Prioridade</th>
-                                <th>Turno</th>
-                                <th>Tempo</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="postoTableBody"></tbody>
-                    </table>
                 </div>
             </div>
         </section>
@@ -2462,7 +2544,7 @@ body.hide-cursor textarea{
 </div>
 
 <script>
-const STORAGE_KEY = 'weg_fluxo_produtivo_v20';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v21';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2499,6 +2581,7 @@ let state = {
 let currentUser = null;
 let currentPosto = null;
 let postoFilter = 'all';
+let postoConcluidosFilter = 'all';
 let admFilter = 'all';
 let histFilter = 'all';
 let histPostoFilter = 'all';
@@ -2875,7 +2958,7 @@ function executarLimpeza(){
     state.historicoPostos = [];
     salvar();
     renderAdminTable();
-    renderPostoTable();
+    renderPosto();
     renderHistorico();
     renderHistoricoPostos();
     renderCharts();
@@ -2933,6 +3016,36 @@ function navigate(page){
     if(page === 'posto') renderPosto();
     if(page === 'historico'){ renderHistorico(); renderHistoricoPostos(); }
     if(page === 'config') loadConfigUI();
+}
+
+function switchPostoTab(tab, el){
+    document.querySelectorAll('.posto-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    
+    if(tab === 'processamento'){
+        document.getElementById('postoProcessamentoSection').style.display = 'block';
+        document.getElementById('postoConcluidosSection').style.display = 'none';
+        renderPostoTable();
+    }else{
+        document.getElementById('postoProcessamentoSection').style.display = 'none';
+        document.getElementById('postoConcluidosSection').style.display = 'block';
+        document.getElementById('postoConcluidosTitulo').textContent = currentPosto;
+        renderPostoConcluidos();
+    }
+}
+
+function switchHistoricoTab(tab, el){
+    document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    
+    if(tab === 'geral'){
+        document.getElementById('historicoGeralSection').style.display = 'block';
+        document.getElementById('historicoPostosSection').style.display = 'none';
+    }else{
+        document.getElementById('historicoGeralSection').style.display = 'none';
+        document.getElementById('historicoPostosSection').style.display = 'block';
+        renderHistoricoPostos();
+    }
 }
 
 function atualizarHeaderTitle(page){
@@ -2998,20 +3111,6 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
         }
     });
 });
-
-function switchHistoricoTab(tab, el){
-    document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    
-    if(tab === 'geral'){
-        document.getElementById('historicoGeralSection').style.display = 'block';
-        document.getElementById('historicoPostosSection').style.display = 'none';
-    }else{
-        document.getElementById('historicoGeralSection').style.display = 'none';
-        document.getElementById('historicoPostosSection').style.display = 'block';
-        renderHistoricoPostos();
-    }
-}
 
 function renderDashboard(){
     const hoje = new Date(); hoje.setHours(0,0,0,0);
@@ -3374,6 +3473,7 @@ function renderPosto(){
 
     aplicarTurnoAutomatico();
     renderPostoTable();
+    renderPostoConcluidos();
     
     if(timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(atualizarTemposEmTempoReal, 1000);
@@ -3388,9 +3488,18 @@ function salvarTurnoPosto(){
 
 function setPostoFilter(f,el){
     postoFilter = f;
-    document.querySelectorAll('#page-posto .filter-chip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('#page-posto .filter-chip').forEach(c=>{
+        if(c.closest('#postoProcessamentoSection')) c.classList.remove('active');
+    });
     el.classList.add('active');
     renderPostoTable();
+}
+
+function setPostoConcluidosFilter(f,el){
+    postoConcluidosFilter = f;
+    document.querySelectorAll('#postoConcluidosSection .filter-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    renderPostoConcluidos();
 }
 
 function renderPostoTable(){
@@ -3510,6 +3619,44 @@ function renderPostoTable(){
     }).join('');
     
     setTimeout(atualizarTemposEmTempoReal, 100);
+}
+
+function renderPostoConcluidos(){
+    const tbody = document.getElementById('postoConcluidosTableBody');
+    const search = (document.getElementById('postoConcluidosSearch').value || '').toLowerCase();
+
+    let data = state.historicoPostos.filter(p => p.processo === currentPosto);
+    
+    if(postoConcluidosFilter !== 'all') data = data.filter(p => p.turno === postoConcluidosFilter);
+    if(search) data = data.filter(p =>
+        (p.pep||'').toLowerCase().includes(search) ||
+        p.diagrama.toLowerCase().includes(search) ||
+        (p.placa||'').toLowerCase().includes(search)
+    );
+
+    data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
+
+    if(data.length === 0){
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>Nenhum projeto foi concluído neste posto ainda.</p></div></td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = data.map(p=>{
+        const tempoStr = p.tempoReal ? formatarTempo(p.tempoReal) : '-';
+        const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+        const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
+        return `
+            <tr>
+                <td style="text-align:center;">${p.pep||'-'}</td>
+                <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
+                <td style="text-align:center;">${p.placa||'-'}</td>
+                <td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td>
+                <td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
+                <td style="text-align:center;">${dataConclusao}</td>
+                <td style="text-align:center;">${obs}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function iniciarProcesso(id){
@@ -3669,6 +3816,7 @@ function concluirProjetoDireto(id, turno){
         
         salvar();
         renderPostoTable();
+        renderPostoConcluidos();
         renderAdminTable();
         
         const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
@@ -3686,6 +3834,7 @@ function concluirProjetoDireto(id, turno){
         salvar();
         renderAdminTable();
         renderPostoTable();
+        renderPostoConcluidos();
         renderHistorico();
         renderCharts();
         showToast('success','Concluído',p.diagrama+' finalizado. Tempo total: '+formatarTempo(tempoReal));
@@ -3815,7 +3964,7 @@ function reativar(id){
     salvar();
     renderHistorico();
     renderAdminTable();
-    renderPostoTable();
+    renderPosto();
     renderCharts();
     showToast('success','Reativado',p.diagrama+' voltou para processamento');
 }
@@ -3921,6 +4070,15 @@ function exportHistoricoPostosCSV(){
     showToast('success','Exportado','Histórico por posto exportado');
 }
 
+function exportPostoConcluidosCSV(){
+    let data = state.historicoPostos.filter(p => p.processo === currentPosto);
+    const headers = ['PEP','Diagrama/Ordem','Placa','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
+    const rows = data.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
+    const csv = [headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+    downloadFile(`concluidos_${currentPosto.toLowerCase().replace('ê','e').replace('á','a').replace(' ','_')}_${dateStamp()}.csv`, '\ufeff'+csv, 'text/csv;charset=utf-8;');
+    showToast('success','Exportado',`Concluídos no ${currentPosto} exportados`);
+}
+
 function downloadFile(name,content,type){
     const blob = new Blob([content],{type});
     const url = URL.createObjectURL(blob);
@@ -3972,7 +4130,7 @@ function restoreData(e){
             salvar();
             migrarTurnosAntigos();
             renderAdminTable();
-            renderPostoTable();
+            renderPosto();
             renderHistorico();
             renderHistoricoPostos();
             renderCharts();
