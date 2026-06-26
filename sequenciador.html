@@ -27,6 +27,7 @@
     --radius:12px;
     --transition:all .25s ease;
     --sidebar-width:72px;
+    --sidebar-expanded:240px;
     --header-height:90px;
 }
 
@@ -54,7 +55,7 @@ body.hide-cursor textarea{
     cursor: none !important;
 }
 
-/* ===== BARRA DE ROLAGEM LARGA - OTIMIZADA PARA TOUCH ===== */
+/* ===== BARRA DE ROLAGEM LARGA ===== */
 ::-webkit-scrollbar{
     width:30px;
     height:30px;
@@ -86,6 +87,7 @@ body.hide-cursor textarea{
     scrollbar-color:var(--weg-blue) var(--bg);
 }
 
+/* ===== LOGIN ===== */
 .login-screen{
     position:fixed;
     inset:0;
@@ -168,7 +170,7 @@ body.hide-cursor textarea{
     font-size:11px;
 }
 
-/* ===== HEADER REORGANIZADO ===== */
+/* ===== HEADER ===== */
 .header{
     background:linear-gradient(90deg,var(--weg-blue),var(--weg-dark));
     color:white;
@@ -295,18 +297,70 @@ body.hide-cursor textarea{
     min-height:calc(100vh - var(--header-height));
 }
 
-/* ===== SIDEBAR - APENAS ÍCONES ===== */
+/* ===== SIDEBAR COM TOGGLE ===== */
 .sidebar{
     width:var(--sidebar-width);
     background:var(--card);
     border-right:1px solid var(--border);
     display:flex;
     flex-direction:column;
-    align-items:center;
-    padding-top:20px;
     flex-shrink:0;
+    transition:width .3s ease;
+    position:relative;
+    overflow:visible;
 }
 
+.sidebar.expanded{
+    width:var(--sidebar-expanded);
+}
+
+/* ===== BOTÃO DE TOGGLE DA SIDEBAR - GRANDE E VISÍVEL ===== */
+.sidebar-toggle{
+    width:100%;
+    height:56px;
+    background:var(--weg-blue);
+    color:white;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    font-size:16px;
+    font-weight:600;
+    transition:var(--transition);
+    flex-shrink:0;
+    position:relative;
+    z-index:5;
+}
+
+.sidebar-toggle:hover{
+    background:var(--weg-dark);
+}
+
+.sidebar-toggle:active{
+    transform:scale(.98);
+}
+
+.sidebar-toggle i{
+    font-size:18px;
+    transition:transform .3s ease;
+}
+
+.sidebar.expanded .sidebar-toggle i{
+    transform:rotate(180deg);
+}
+
+.sidebar-toggle-label{
+    display:none;
+    white-space:nowrap;
+}
+
+.sidebar.expanded .sidebar-toggle-label{
+    display:inline;
+}
+
+/* ===== MENU ===== */
 .menu{
     width:100%;
     display:flex;
@@ -314,6 +368,14 @@ body.hide-cursor textarea{
     align-items:center;
     gap:8px;
     padding:10px 8px;
+    flex:1;
+    overflow-y:auto;
+    overflow-x:visible;
+}
+
+.sidebar.expanded .menu{
+    align-items:stretch;
+    padding:10px;
 }
 
 .menu a{
@@ -330,13 +392,28 @@ body.hide-cursor textarea{
     cursor:pointer;
     position:relative;
     border:2px solid transparent;
+    flex-shrink:0;
+}
+
+.sidebar.expanded .menu a{
+    width:100%;
+    height:48px;
+    justify-content:flex-start;
+    padding:0 16px;
+    gap:14px;
+    font-size:15px;
+    color:var(--text);
 }
 
 .menu a:hover{
     background:var(--weg-light);
     color:var(--weg-blue);
     border-color:var(--weg-blue);
-    transform:scale(1.08);
+    transform:scale(1.05);
+}
+
+.sidebar.expanded .menu a:hover{
+    transform:translateX(4px);
 }
 
 .menu a.active{
@@ -346,12 +423,23 @@ body.hide-cursor textarea{
     box-shadow:0 4px 12px rgba(0,91,172,.35);
 }
 
+.menu a .menu-text{
+    display:none;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+.sidebar.expanded .menu a .menu-text{
+    display:inline;
+}
+
+/* Tooltip quando NÃO está expandida */
 .menu a::after{
     content:attr(data-tooltip);
     position:absolute;
     left:calc(100% + 12px);
     top:50%;
-    transform:translateY(-50%);
+    transform:translateY(-50%) translateX(-6px);
     background:var(--weg-dark);
     color:white;
     padding:8px 14px;
@@ -364,10 +452,9 @@ body.hide-cursor textarea{
     transition:opacity .2s ease, transform .2s ease;
     z-index:100;
     box-shadow:var(--shadow);
-    transform:translateY(-50%) translateX(-6px);
 }
 
-.menu a:hover::after{
+.sidebar:not(.expanded) .menu a:hover::after{
     opacity:1;
     transform:translateY(-50%) translateX(0);
 }
@@ -694,91 +781,6 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
-/* ===== EXIBIÇÃO DE VOLUMES MELHORADA ===== */
-.volumes-container{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    align-items:flex-start;
-}
-
-.volumes-main{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-weight:700;
-    font-size:14px;
-}
-
-.volumes-processed{
-    color:var(--weg-blue);
-    font-size:16px;
-}
-
-.volumes-divider{
-    color:var(--text-light);
-    font-weight:400;
-}
-
-.volumes-total{
-    color:var(--text);
-}
-
-.volumes-main.complete{
-    color:var(--success);
-}
-
-.volumes-main.complete i{
-    font-size:16px;
-}
-
-.volumes-progress-bar{
-    width:100%;
-    height:6px;
-    background:var(--border);
-    border-radius:3px;
-    overflow:hidden;
-    margin-top:2px;
-}
-
-.volumes-progress-fill{
-    height:100%;
-    background:linear-gradient(90deg, var(--warning), var(--weg-blue));
-    border-radius:3px;
-    transition:width 0.3s ease;
-}
-
-.volumes-progress-fill.complete{
-    background:var(--success);
-}
-
-.volumes-remaining{
-    display:flex;
-    align-items:center;
-    gap:5px;
-    font-size:11px;
-    color:var(--warning);
-    font-weight:600;
-    background:rgba(255,176,0,0.1);
-    padding:2px 8px;
-    border-radius:12px;
-}
-
-.volumes-remaining i{
-    font-size:10px;
-}
-
-.volumes-total-only{
-    color:var(--text);
-    font-weight:600;
-    font-size:13px;
-}
-
-.volumes-simple{
-    color:var(--text-light);
-    font-size:13px;
-}
-
 .volumes-info{
     font-size:11px;
     color:var(--text-light);
@@ -814,7 +816,7 @@ body.hide-cursor textarea{
     50%{opacity:.7;}
 }
 
-/* ===== AÇÕES DO POSTO - LADO A LADO ===== */
+/* ===== AÇÕES DO POSTO ===== */
 .action-main{
     display:flex;
     gap:8px;
@@ -1325,6 +1327,20 @@ body.hide-cursor textarea{
 }
 
 /* ===== RESPONSIVO ===== */
+.menu-toggle{
+    display:none;
+    background:rgba(255,255,255,.15);
+    border:none;
+    color:white;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    cursor:pointer;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+}
+
 @media(max-width:1000px){
     .charts-grid{grid-template-columns:1fr;}
     .sidebar{
@@ -1335,9 +1351,11 @@ body.hide-cursor textarea{
         z-index:99;
         box-shadow:var(--shadow-lg);
         transform:translateX(-100%);
-        transition:transform .3s ease;
+        transition:transform .3s ease, width .3s ease;
     }
     .sidebar.open{transform:translateX(0);}
+    .sidebar.expanded{width:var(--sidebar-expanded);}
+    .menu-toggle{display:flex;}
     .form-grid{grid-template-columns:1fr;}
     .full,.form-actions{grid-column:span 1;}
     .header-title{font-size:18px;}
@@ -1356,39 +1374,6 @@ body.hide-cursor textarea{
     }
     .modal-overlay{
         padding:20px 15px 140px 15px;
-    }
-}
-
-.menu-toggle{
-    display:none;
-    background:rgba(255,255,255,.15);
-    border:none;
-    color:white;
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    cursor:pointer;
-    align-items:center;
-    justify-content:center;
-    font-size:16px;
-}
-
-@media(max-width:1000px){
-    .menu-toggle{display:flex;}
-}
-
-@media(max-width:768px){
-    .volumes-container{
-        min-width:120px;
-    }
-    .volumes-main{
-        font-size:12px;
-    }
-    .volumes-processed{
-        font-size:14px;
-    }
-    .volumes-remaining{
-        font-size:10px;
     }
 }
 
@@ -1443,7 +1428,7 @@ body.hide-cursor textarea{
                 <small>Operador do posto</small>
             </div>
             <div class="role-btn" onclick="login('pintura')">
-                <i class="fa-solid fa-paint-roller"></i>
+                <i class="fa-solid fa-spray-can"></i>
                 <strong>Pintura</strong>
                 <small>Operador do posto</small>
             </div>
@@ -1486,6 +1471,10 @@ body.hide-cursor textarea{
 
 <div class="layout">
     <aside class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Expandir/Recolher menu">
+            <i class="fa-solid fa-chevron-right" id="sidebarToggleIcon"></i>
+            <span class="sidebar-toggle-label">Recolher Menu</span>
+        </button>
         <nav class="menu" id="mainMenu"></nav>
     </aside>
 
@@ -1520,7 +1509,7 @@ body.hide-cursor textarea{
                 <div class="kpi">
                     <div class="kpi-head">
                         <h3>Pintura</h3>
-                        <div class="kpi-icon"><i class="fa-solid fa-paint-roller"></i></div>
+                        <div class="kpi-icon"><i class="fa-solid fa-spray-can"></i></div>
                     </div>
                     <div class="kpi-value" id="dash-pint">0</div>
                 </div>
@@ -1834,7 +1823,7 @@ body.hide-cursor textarea{
                     <div class="form-group full">
                         <label>Modo de operação</label>
                         <select id="cfgDevice" onchange="salvarConfigDispositivo()">
-                            <option value="tablet"> Tablet / Touchscreen (com teclado físico opcional)</option>
+                            <option value="tablet">📱 Tablet / Touchscreen (com teclado físico opcional)</option>
                             <option value="computador">💻 Computador (Touch sem teclado/mouse)</option>
                         </select>
                     </div>
@@ -2110,7 +2099,7 @@ body.hide-cursor textarea{
 /* =======================
    ESTADO GLOBAL
 ======================= */
-const STORAGE_KEY = 'weg_fluxo_produtivo_v19';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v20';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2123,7 +2112,8 @@ let state = {
     projetos: [],
     historico: [],
     config: {
-        dispositivo: 'tablet'
+        dispositivo: 'tablet',
+        sidebarExpanded: false
     },
     turnosPorPosto: {
         'Nanocerâmico': '1º Turno',
@@ -2291,10 +2281,13 @@ function carregar(){
                 };
             }
             if(!state.config){
-                state.config = { dispositivo: 'tablet' };
+                state.config = { dispositivo: 'tablet', sidebarExpanded: false };
             }
             if(!state.config.dispositivo){
                 state.config.dispositivo = 'tablet';
+            }
+            if(state.config.sidebarExpanded === undefined){
+                state.config.sidebarExpanded = false;
             }
             migrarTurnosAntigos();
         }catch(e){}
@@ -2423,6 +2416,7 @@ function efetivarLogin(role){
     buildMenu();
     applyDeviceConfig();
     aplicarEstadoCursor();
+    aplicarEstadoSidebar();
 
     if(role === 'admin'){
         navigate('dashboard');
@@ -2587,15 +2581,51 @@ function executarLimpeza(){
 }
 
 /* =======================
-   SIDEBAR MOBILE
+   SIDEBAR TOGGLE - EXPANDIR/RECOLHER
 ======================= */
+function toggleSidebar(){
+    const sidebar = document.getElementById('sidebar');
+    const icon = document.getElementById('sidebarToggleIcon');
+    const label = sidebar.querySelector('.sidebar-toggle-label');
+    
+    sidebar.classList.toggle('expanded');
+    state.config.sidebarExpanded = sidebar.classList.contains('expanded');
+    
+    // Atualiza ícone e label
+    if(state.config.sidebarExpanded){
+        icon.className = 'fa-solid fa-chevron-left';
+        label.textContent = 'Recolher Menu';
+    }else{
+        icon.className = 'fa-solid fa-chevron-right';
+        label.textContent = 'Expandir Menu';
+    }
+    
+    salvar();
+}
+
+function aplicarEstadoSidebar(){
+    const sidebar = document.getElementById('sidebar');
+    const icon = document.getElementById('sidebarToggleIcon');
+    const label = sidebar.querySelector('.sidebar-toggle-label');
+    
+    if(state.config.sidebarExpanded){
+        sidebar.classList.add('expanded');
+        if(icon) icon.className = 'fa-solid fa-chevron-left';
+        if(label) label.textContent = 'Recolher Menu';
+    }else{
+        sidebar.classList.remove('expanded');
+        if(icon) icon.className = 'fa-solid fa-chevron-right';
+        if(label) label.textContent = 'Expandir Menu';
+    }
+}
+
 function toggleSidebarMobile(){
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('open');
 }
 
 /* =======================
-   MENU DINÂMICO - APENAS ÍCONES
+   MENU DINÂMICO - COM TEXTO EXPANSÍVEL
 ======================= */
 function buildMenu(){
     const menu = document.getElementById('mainMenu');
@@ -2603,21 +2633,42 @@ function buildMenu(){
 
     if(currentUser === 'admin'){
         html = `
-            <a data-page="dashboard" class="active" data-tooltip="Dashboard"><i class="fa-solid fa-chart-line"></i></a>
-            <a data-page="admin" data-tooltip="Administração"><i class="fa-solid fa-user-shield"></i></a>
-            <a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a>
-            <a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>
+            <a data-page="dashboard" class="active" data-tooltip="Dashboard">
+                <i class="fa-solid fa-chart-line"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+            <a data-page="admin" data-tooltip="Administração">
+                <i class="fa-solid fa-user-shield"></i>
+                <span class="menu-text">Administração</span>
+            </a>
+            <a data-page="historico" data-tooltip="Histórico">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span class="menu-text">Histórico</span>
+            </a>
+            <a data-page="config" data-tooltip="Configurações">
+                <i class="fa-solid fa-gear"></i>
+                <span class="menu-text">Configurações</span>
+            </a>
         `;
     }else{
         const iconMap = {
             'Nanocerâmico':'fa-flask',
-            'Pintura':'fa-paint-roller',
+            'Pintura':'fa-spray-can',
             'Conferência':'fa-clipboard-check'
         };
         html = `
-            <a data-page="posto" class="active" data-tooltip="${currentPosto}"><i class="fa-solid ${iconMap[currentPosto]}"></i></a>
-            <a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a>
-            <a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>
+            <a data-page="posto" class="active" data-tooltip="${currentPosto}">
+                <i class="fa-solid ${iconMap[currentPosto]}"></i>
+                <span class="menu-text">${currentPosto}</span>
+            </a>
+            <a data-page="historico" data-tooltip="Histórico">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span class="menu-text">Histórico</span>
+            </a>
+            <a data-page="config" data-tooltip="Configurações">
+                <i class="fa-solid fa-gear"></i>
+                <span class="menu-text">Configurações</span>
+            </a>
         `;
     }
     menu.innerHTML = html;
@@ -3002,7 +3053,7 @@ function renderPosto(){
 
     const iconMap = {
         'Nanocerâmico':'fa-flask',
-        'Pintura':'fa-paint-roller',
+        'Pintura':'fa-spray-can',
         'Conferência':'fa-clipboard-check'
     };
     document.getElementById('postoIcon').className = 'fa-solid ' + iconMap[currentPosto];
@@ -3067,52 +3118,10 @@ function renderPostoTable(){
         const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
         const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
         
-        // MELHORIA NA EXIBIÇÃO DE VOLUMES
-        let volumesDisplay = '';
-        if(p.volumesTotal && p.volumesTotal > 0){
-            if(p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal){
-                // Status PARCIAL - Exibição melhorada
-                const restantes = p.volumesTotal - p.volumesProcessados;
-                const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
-                volumesDisplay = `
-                    <div class="volumes-container">
-                        <div class="volumes-main">
-                            <span class="volumes-processed">${p.volumesProcessados}</span>
-                            <span class="volumes-divider">/</span>
-                            <span class="volumes-total">${p.volumesTotal}</span>
-                        </div>
-                        <div class="volumes-progress-bar">
-                            <div class="volumes-progress-fill" style="width: ${porcentagem}%"></div>
-                        </div>
-                        <div class="volumes-remaining">
-                            <i class="fa-solid fa-hourglass-half"></i>
-                            <span>${restantes} restante${restantes !== 1 ? 's' : ''}</span>
-                        </div>
-                    </div>
-                `;
-            }else if(p.volumesProcessados >= p.volumesTotal){
-                // COMPLETO
-                volumesDisplay = `
-                    <div class="volumes-container">
-                        <div class="volumes-main complete">
-                            <i class="fa-solid fa-check-circle"></i>
-                            <span>${p.volumesTotal}/${p.volumesTotal}</span>
-                        </div>
-                        <div class="volumes-progress-bar">
-                            <div class="volumes-progress-fill complete" style="width: 100%"></div>
-                        </div>
-                    </div>
-                `;
-            }else{
-                // SEM PROCESSAMENTO
-                volumesDisplay = `
-                    <div class="volumes-container">
-                        <span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span>
-                    </div>
-                `;
-            }
-        }else{
-            volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`;
+        let volumesInfo = p.volumes || '-';
+        if(p.volumesTotal && p.volumesTotal > 0 && p.volumesProcessados > 0){
+            const restantes = p.volumesTotal - p.volumesProcessados;
+            volumesInfo += ` <span class="volumes-info ${restantes>0?'parcial':''}">(${p.volumesProcessados}/${p.volumesTotal})</span>`;
         }
         
         let tempoDisplay = '-';
@@ -3140,7 +3149,7 @@ function renderPostoTable(){
                 <td>${p.pep||'-'}</td>
                 <td><strong>${p.diagrama}</strong></td>
                 <td>${p.placa||'-'}</td>
-                <td>${volumesDisplay}</td>
+                <td>${volumesInfo}</td>
                 <td><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
                 <td><span class="turno-badge">${p.turno||'-'}</span></td>
                 <td>${tempoDisplay}</td>
@@ -3581,7 +3590,6 @@ function salvarConfigDispositivo(){
 
 function applyDeviceConfig(){
     const isComputer = state.config.dispositivo === 'computador';
-    const toggleBtn = document.getElementById('vkToggleBtn');
     const toggleFloat = document.getElementById('vkToggleFloat');
 
     if(isComputer){
@@ -3615,6 +3623,7 @@ function restoreData(e){
             renderCharts();
             aplicarEstadoCursor();
             applyDeviceConfig();
+            aplicarEstadoSidebar();
             showToast('success','Restaurado','Dados restaurados com sucesso');
         }catch(err){
             showToast('error','Erro','Arquivo inválido');
@@ -3693,6 +3702,10 @@ document.addEventListener('click', e=>{
 ======================= */
 carregar();
 aplicarEstadoCursor();
+
+document.addEventListener('DOMContentLoaded', ()=>{
+    aplicarEstadoSidebar();
+});
 
 document.addEventListener('click',e=>{
     const sb = document.getElementById('sidebar');
