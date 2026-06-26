@@ -301,6 +301,8 @@ body.hide-cursor textarea{
     align-items:center;
     padding-top:20px;
     flex-shrink:0;
+    position:relative;
+    z-index:50;
 }
 
 .menu{
@@ -345,12 +347,12 @@ body.hide-cursor textarea{
 .menu a::after{
     content:attr(data-tooltip);
     position:absolute;
-    left:calc(100% + 12px);
+    left:calc(100% + 15px);
     top:50%;
-    transform:translateY(-50%);
+    transform:translateY(-50%) translateX(-6px);
     background:var(--weg-dark);
     color:white;
-    padding:8px 14px;
+    padding:10px 16px;
     border-radius:8px;
     font-size:13px;
     font-weight:600;
@@ -358,9 +360,8 @@ body.hide-cursor textarea{
     opacity:0;
     pointer-events:none;
     transition:opacity .2s ease, transform .2s ease;
-    z-index:100;
-    box-shadow:var(--shadow);
-    transform:translateY(-50%) translateX(-6px);
+    z-index:9999;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
 }
 
 .menu a:hover::after{
@@ -656,10 +657,6 @@ body.hide-cursor textarea{
     letter-spacing:.5px;
 }
 
-.table thead th:first-child{
-    text-align:left;
-}
-
 .table tbody tr{transition:var(--transition);}
 .table tbody tr:hover{background:var(--bg);}
 
@@ -669,15 +666,6 @@ body.hide-cursor textarea{
     font-size:14px;
     vertical-align:middle;
     text-align:center;
-}
-
-.table td:first-child{
-    text-align:left;
-}
-
-.table td:nth-child(2){
-    text-align:left;
-    font-weight:600;
 }
 
 .status{
@@ -2080,7 +2068,7 @@ body.hide-cursor textarea{
                     <div class="form-group full">
                         <label>Modo de operação</label>
                         <select id="cfgDevice" onchange="salvarConfigDispositivo()">
-                            <option value="tablet"> Tablet / Touchscreen (com teclado físico opcional)</option>
+                            <option value="tablet">📱 Tablet / Touchscreen (com teclado físico opcional)</option>
                             <option value="computador">💻 Computador (Touch sem teclado/mouse)</option>
                         </select>
                     </div>
@@ -3180,14 +3168,14 @@ function renderAdminTable(){
         
         return `
             <tr>
-                <td>${p.pep||'-'}</td>
-                <td><strong>${p.diagrama}</strong></td>
-                <td>${p.placa||'-'}</td>
-                <td>${p.processo}</td>
-                <td>${volumesDisplay}</td>
-                <td><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
-                <td><span class="status ${statusClass}">${p.status}</span></td>
-                <td>
+                <td style="text-align:center;">${p.pep||'-'}</td>
+                <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
+                <td style="text-align:center;">${p.placa||'-'}</td>
+                <td style="text-align:center;">${p.processo}</td>
+                <td style="text-align:center;">${volumesDisplay}</td>
+                <td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
+                <td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td>
+                <td style="text-align:center;">
                     <div class="row-actions">
                         <button class="icon-action" title="Editar" onclick="abrirEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button>
                         <button class="icon-action success" title="Concluir" onclick="solicitarConclusao('${p.id}')"><i class="fa-solid fa-check"></i></button>
@@ -3402,15 +3390,15 @@ function renderPostoTable(){
         
         return `
             <tr>
-                <td>${p.pep||'-'}</td>
-                <td><strong>${p.diagrama}</strong></td>
-                <td>${p.placa||'-'}</td>
-                <td>${volumesDisplay}</td>
-                <td><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
-                <td><span class="turno-badge">${p.turno||'-'}</span></td>
-                <td>${tempoDisplay}</td>
-                <td><span class="status ${statusClass}">${p.status}</span></td>
-                <td>
+                <td style="text-align:center;">${p.pep||'-'}</td>
+                <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
+                <td style="text-align:center;">${p.placa||'-'}</td>
+                <td style="text-align:center;">${volumesDisplay}</td>
+                <td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td>
+                <td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td>
+                <td style="text-align:center;">${tempoDisplay}</td>
+                <td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td>
+                <td style="text-align:center;">
                     <div class="action-main">
                         ${botoesAcao}
                     </div>
@@ -3448,7 +3436,6 @@ function solicitarConclusao(id){
     projetoParaConcluir = id;
     document.getElementById('concluirCodigo').textContent = p.diagrama;
     
-    // Esconder todas as seções primeiro
     document.getElementById('concluirVolumesSection').style.display = 'none';
     document.getElementById('concluirPinturaSection').style.display = 'none';
     document.getElementById('concluirTurnoNormal').style.display = 'block';
@@ -3602,14 +3589,14 @@ function renderHistorico(){
         const obsPintura = p.observacaoPintura ? `<br><small style="color:var(--text-light);">${p.observacaoPintura}</small>` : '';
         return `
             <tr>
-                <td>${p.pep||'-'}</td>
-                <td><strong>${p.diagrama}</strong>${obsPintura}</td>
-                <td>${p.processo}</td>
-                <td><span class="turno-badge">${p.turno||'-'}</span></td>
-                <td><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
-                <td>${dtInicio}</td>
-                <td>${dtFim}</td>
-                <td>
+                <td style="text-align:center;">${p.pep||'-'}</td>
+                <td style="text-align:center;"><strong>${p.diagrama}</strong>${obsPintura}</td>
+                <td style="text-align:center;">${p.processo}</td>
+                <td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td>
+                <td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
+                <td style="text-align:center;">${dtInicio}</td>
+                <td style="text-align:center;">${dtFim}</td>
+                <td style="text-align:center;">
                     <div class="row-actions">
                         ${currentUser === 'admin' ? `<button class="icon-action" title="Reativar" onclick="reativar('${p.id}')"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                         ${currentUser === 'admin' ? `<button class="icon-action delete" title="Excluir" onclick="excluirHistorico('${p.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
