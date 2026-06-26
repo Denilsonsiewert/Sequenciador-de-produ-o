@@ -2167,6 +2167,7 @@ let acaoPendenteSenha = null;
 let charts = {};
 let turnoFimSemanaPendente = false;
 let timerInterval = null;
+let isFirstAccess = false;
 
 /* =======================
    CONTROLE DE CURSOR
@@ -2319,7 +2320,11 @@ function carregar(){
             }
             migrarTurnosAntigos();
         }catch(e){}
+    }else{
+        // PRIMEIRO ACESSO - Sem dados no localStorage
+        isFirstAccess = true;
     }
+    
     if(state.projetos.length === 0 && state.historico.length === 0){
         const agora = Date.now();
         state.projetos = [
@@ -3710,10 +3715,18 @@ document.addEventListener('click', e=>{
 });
 
 /* =======================
-   INIT
+   INIT - AUTO LOGIN ADMIN NO PRIMEIRO ACESSO
 ======================= */
 carregar();
 aplicarEstadoCursor();
+
+// VERIFICA SE É PRIMEIRO ACESSO E ENTRA DIRETO COMO ADMIN
+if(isFirstAccess){
+    setTimeout(() => {
+        efetivarLogin('admin');
+        showToast('info', 'Primeiro Acesso', 'Bem-vindo! Você está logado como Administrador para configuração inicial.');
+    }, 500);
+}
 
 document.addEventListener('click',e=>{
     const sb = document.getElementById('sidebar');
