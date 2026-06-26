@@ -694,6 +694,18 @@ body.hide-cursor textarea{
     display:inline-block;
 }
 
+.posto-badge{
+    padding:4px 10px;
+    border-radius:12px;
+    font-size:11px;
+    font-weight:700;
+    display:inline-block;
+}
+
+.posto-nano{background:#E3F2FD;color:#1565C0;}
+.posto-pintura{background:#FFF3E0;color:#E65100;}
+.posto-conferencia{background:#E8F5E9;color:#2E7D32;}
+
 .volumes-container{
     display:flex;
     flex-direction:column;
@@ -1474,6 +1486,39 @@ body.hide-cursor textarea{
     margin-top:5px;
 }
 
+.historico-tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    border-bottom:2px solid var(--border);
+    padding-bottom:0;
+}
+
+.historico-tab{
+    padding:12px 20px;
+    background:transparent;
+    border:none;
+    border-bottom:3px solid transparent;
+    cursor:pointer !important;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-light);
+    transition:var(--transition);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:-2px;
+}
+
+.historico-tab:hover{
+    color:var(--weg-blue);
+}
+
+.historico-tab.active{
+    color:var(--weg-blue);
+    border-bottom-color:var(--weg-blue);
+}
+
 @media(max-width:1000px){
     .charts-grid{grid-template-columns:1fr;}
     .sidebar{
@@ -1976,42 +2021,90 @@ body.hide-cursor textarea{
         <section class="page" id="page-historico">
             <h1 class="page-title">
                 <i class="fa-solid fa-clock-rotate-left"></i>
-                Histórico de Concluídos
+                Histórico
             </h1>
 
-            <div class="card">
-                <div class="card-head">
-                    <h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2>
-                    <button class="btn btn-sm btn-secondary" onclick="exportHistoricoCSV()"><i class="fa-solid fa-download"></i> Exportar</button>
-                </div>
-                <div class="table-toolbar">
-                    <div class="search-box">
-                        <i class="fa-solid fa-search"></i>
-                        <input type="text" id="histSearch" placeholder="Buscar por PEP..." oninput="renderHistorico()" data-vk>
+            <div class="historico-tabs">
+                <button class="historico-tab active" onclick="switchHistoricoTab('geral', this)">
+                    <i class="fa-solid fa-archive"></i> Histórico Geral
+                </button>
+                <button class="historico-tab" onclick="switchHistoricoTab('postos', this)">
+                    <i class="fa-solid fa-route"></i> Histórico por Posto
+                </button>
+            </div>
+
+            <div id="historicoGeralSection">
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2>
+                        <button class="btn btn-sm btn-secondary" onclick="exportHistoricoCSV()"><i class="fa-solid fa-download"></i> Exportar</button>
                     </div>
-                    <div class="filter-bar">
-                        <span class="filter-chip active" data-filter="all" onclick="setHistFilter('all',this)">Todos</span>
-                        <span class="filter-chip" data-filter="Nanocerâmico" onclick="setHistFilter('Nanocerâmico',this)">Nanocerâmico</span>
-                        <span class="filter-chip" data-filter="Pintura" onclick="setHistFilter('Pintura',this)">Pintura</span>
-                        <span class="filter-chip" data-filter="Conferência" onclick="setHistFilter('Conferência',this)">Conferência</span>
+                    <div class="table-toolbar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="histSearch" placeholder="Buscar por PEP..." oninput="renderHistorico()" data-vk>
+                        </div>
+                        <div class="filter-bar">
+                            <span class="filter-chip active" data-filter="all" onclick="setHistFilter('all',this)">Todos</span>
+                            <span class="filter-chip" data-filter="Nanocerâmico" onclick="setHistFilter('Nanocerâmico',this)">Nanocerâmico</span>
+                            <span class="filter-chip" data-filter="Pintura" onclick="setHistFilter('Pintura',this)">Pintura</span>
+                            <span class="filter-chip" data-filter="Conferência" onclick="setHistFilter('Conferência',this)">Conferência</span>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>PEP</th>
+                                    <th>Diagrama/Ordem</th>
+                                    <th>Processo</th>
+                                    <th>Turno</th>
+                                    <th>Tempo Real</th>
+                                    <th>Início</th>
+                                    <th>Término</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="histTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="table-wrapper">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>PEP</th>
-                                <th>Diagrama/Ordem</th>
-                                <th>Processo</th>
-                                <th>Turno</th>
-                                <th>Tempo Real</th>
-                                <th>Início</th>
-                                <th>Término</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="histTableBody"></tbody>
-                    </table>
+            </div>
+
+            <div id="historicoPostosSection" style="display:none;">
+                <div class="card">
+                    <div class="card-head">
+                        <h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2>
+                        <button class="btn btn-sm btn-secondary" onclick="exportHistoricoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button>
+                    </div>
+                    <div class="table-toolbar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="histPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="renderHistoricoPostos()" data-vk>
+                        </div>
+                        <div class="filter-bar">
+                            <span class="filter-chip active" data-filter="all" onclick="setHistPostoFilter('all',this)">Todos</span>
+                            <span class="filter-chip" data-filter="Nanocerâmico" onclick="setHistPostoFilter('Nanocerâmico',this)">Nanocerâmico</span>
+                            <span class="filter-chip" data-filter="Pintura" onclick="setHistPostoFilter('Pintura',this)">Pintura</span>
+                            <span class="filter-chip" data-filter="Conferência" onclick="setHistPostoFilter('Conferência',this)">Conferência</span>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>PEP</th>
+                                    <th>Diagrama/Ordem</th>
+                                    <th>Posto</th>
+                                    <th>Turno</th>
+                                    <th>Tempo no Posto</th>
+                                    <th>Data/Hora Conclusão</th>
+                                    <th>Observação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="histPostoTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2283,9 +2376,17 @@ body.hide-cursor textarea{
         <div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;">
             <div class="alert alert-info" style="margin-bottom:10px;">
                 <i class="fa-solid fa-info-circle"></i>
-                <div>Informe quantos volumes foram processados neste turno.</div>
+                <div>Informe quantos volumes foram processados e qual turno processou.</div>
             </div>
             <div class="form-group">
+                <label>Turno que processou <span class="req">*</span></label>
+                <select id="concluirTurnoNano">
+                    <option value="1º Turno">1º Turno</option>
+                    <option value="2º Turno">2º Turno</option>
+                    <option value="3º Turno">3º Turno</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
                 <label>Total de volumes do projeto: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong></label>
             </div>
             <div class="form-group" style="margin-top:8px;">
@@ -2317,9 +2418,9 @@ body.hide-cursor textarea{
                 </select>
             </div>
             <div class="form-group" style="margin-top:12px;">
-                <label>Observação <span class="req">*</span></label>
+                <label>Observação (opcional)</label>
                 <select id="concluirObservacaoPintura">
-                    <option value="">Selecione...</option>
+                    <option value="">Nenhuma</option>
                     <option value="Peças em reprocesso/repintura">Peças em reprocesso/repintura</option>
                     <option value="Gancherias/volumes pendentes">Gancherias/volumes pendentes</option>
                 </select>
@@ -2384,7 +2485,7 @@ body.hide-cursor textarea{
 </button>
 
 <script>
-const STORAGE_KEY = 'weg_fluxo_produtivo_v19';
+const STORAGE_KEY = 'weg_fluxo_produtivo_v20';
 const SENHA_PADRAO = 'weg2024';
 
 const TURNO_LEGADO = {
@@ -2399,16 +2500,16 @@ const PRIORIDADE_ORDEM = {
     'Normal': 2
 };
 
-// Sequência de fluxo: Nanocerâmico → Pintura → Conferência → Histórico
 const FLUXO_PROCESSOS = {
     'Nanocerâmico': 'Pintura',
     'Pintura': 'Conferência',
-    'Conferência': null // Último posto, vai para histórico
+    'Conferência': null
 };
 
 let state = {
     projetos: [],
     historico: [],
+    historicoPostos: [],
     config: { dispositivo: 'tablet' },
     turnosPorPosto: {
         'Nanocerâmico': '1º Turno',
@@ -2423,6 +2524,7 @@ let currentPosto = null;
 let postoFilter = 'all';
 let admFilter = 'all';
 let histFilter = 'all';
+let histPostoFilter = 'all';
 let vkActive = false;
 let vkTarget = null;
 let projetoParaConcluir = null;
@@ -2438,7 +2540,6 @@ function aplicarEstadoCursor(){
     }else{
         document.body.classList.remove('hide-cursor');
     }
-    // Esconder botão de toggle quando em modo computador
     const toggleBtn = document.getElementById('vkToggleFloat');
     if(state.config.dispositivo === 'computador'){
         toggleBtn.style.display = 'none';
@@ -2545,6 +2646,7 @@ function carregar(){
             }
             if(!state.config) state.config = { dispositivo: 'tablet' };
             if(!state.config.dispositivo) state.config.dispositivo = 'tablet';
+            if(!state.historicoPostos) state.historicoPostos = [];
             migrarTurnosAntigos();
         }catch(e){}
     }
@@ -2740,9 +2842,9 @@ function avaliarForcaSenha(){
     if(/\d/.test(senha)) score++;
     if(/[^A-Za-z0-9]/.test(senha)) score++;
 
-    if(score <= 2){ el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
+    if(score <= 2){ el.textContent = ' Senha fraca'; el.className = 'password-strength strength-weak'; }
     else if(score <= 3){ el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
-    else{ el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
+    else{ el.textContent = ' Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 
 function togglePwdVisibility(inputId,btn){
@@ -2799,10 +2901,12 @@ function solicitarLimpeza(){
 function executarLimpeza(){
     state.projetos = [];
     state.historico = [];
+    state.historicoPostos = [];
     salvar();
     renderAdminTable();
     renderPostoTable();
     renderHistorico();
+    renderHistoricoPostos();
     renderCharts();
     showToast('success','Dados apagados','Todos os projetos e o histórico foram removidos com sucesso');
 }
@@ -2856,7 +2960,7 @@ function navigate(page){
     if(page === 'dashboard') renderDashboard();
     if(page === 'admin') renderAdminTable();
     if(page === 'posto') renderPosto();
-    if(page === 'historico') renderHistorico();
+    if(page === 'historico'){ renderHistorico(); renderHistoricoPostos(); }
     if(page === 'config') loadConfigUI();
 }
 
@@ -2868,7 +2972,7 @@ function atualizarHeaderTitle(page){
         'dashboard': 'Dashboard de Produção',
         'admin': 'Administração',
         'posto': currentPosto ? 'Posto - ' + currentPosto : 'Posto de Trabalho',
-        'historico': 'Histórico de Concluídos',
+        'historico': 'Histórico',
         'config': 'Configurações'
     };
     
@@ -2924,6 +3028,20 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
     });
 });
 
+function switchHistoricoTab(tab, el){
+    document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    
+    if(tab === 'geral'){
+        document.getElementById('historicoGeralSection').style.display = 'block';
+        document.getElementById('historicoPostosSection').style.display = 'none';
+    }else{
+        document.getElementById('historicoGeralSection').style.display = 'none';
+        document.getElementById('historicoPostosSection').style.display = 'block';
+        renderHistoricoPostos();
+    }
+}
+
 function renderDashboard(){
     const hoje = new Date(); hoje.setHours(0,0,0,0);
     const hojeCount = state.projetos.filter(p => p.criadoEm >= hoje.getTime()).length;
@@ -2935,7 +3053,6 @@ function renderDashboard(){
     document.getElementById('dash-conf').textContent = state.projetos.filter(p=>p.processo==='Conferência').length;
     
     atualizarEstatisticasDashboard();
-    
     renderCharts();
 }
 
@@ -3450,7 +3567,6 @@ function solicitarConclusao(id){
     projetoParaConcluir = id;
     document.getElementById('concluirCodigo').textContent = p.diagrama;
     
-    // Esconder todas as seções primeiro
     document.getElementById('concluirVolumesSection').style.display = 'none';
     document.getElementById('concluirPinturaSection').style.display = 'none';
     document.getElementById('concluirTurnoNormal').style.display = 'block';
@@ -3458,6 +3574,7 @@ function solicitarConclusao(id){
     if(p.processo === 'Nanocerâmico'){
         document.getElementById('concluirVolumesSection').style.display = 'block';
         document.getElementById('concluirTurnoNormal').style.display = 'none';
+        document.getElementById('concluirTurnoNano').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
         const total = p.volumesTotal || 0;
         const jaProcessados = p.volumesProcessados || 0;
         const faltam = total - jaProcessados;
@@ -3476,7 +3593,6 @@ function solicitarConclusao(id){
         document.getElementById('concluirTurnoPintura').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
         document.getElementById('concluirObservacaoPintura').value = '';
     }else{
-        // Conferência - mostrar seleção de turno normal
         document.getElementById('concluirTurno').value = p.turno || state.turnosPorPosto[p.processo] || '1º Turno';
     }
     
@@ -3509,7 +3625,7 @@ function confirmarConclusao(){
     if(!p) return;
     
     if(p.processo === 'Nanocerâmico'){
-        const turno = document.getElementById('concluirTurno').value;
+        const turno = document.getElementById('concluirTurnoNano').value;
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
         if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
         
@@ -3524,24 +3640,19 @@ function confirmarConclusao(){
             concluirProjetoDireto(projetoParaConcluir, turno);
         }else{
             p.status = 'Parcial';
+            p.turno = turno;
             salvar();
             renderPostoTable();
             renderAdminTable();
-            showToast('info','Conclusão parcial',`${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados} volumes.`);
+            showToast('info','Conclusão parcial',`${volumesProcessados} volumes processados no ${turno}. Faltam ${p.volumesTotal - p.volumesProcessados} volumes.`);
         }
     }else if(p.processo === 'Pintura'){
         const turno = document.getElementById('concluirTurnoPintura').value;
         const observacao = document.getElementById('concluirObservacaoPintura').value;
         
-        if(!observacao){
-            showToast('warning','Atenção','Selecione uma observação');
-            return;
-        }
-        
-        p.observacaoPintura = observacao;
+        p.observacaoPintura = observacao || null;
         concluirProjetoDireto(projetoParaConcluir, turno);
     }else{
-        // Conferência
         const turno = document.getElementById('concluirTurno').value;
         concluirProjetoDireto(projetoParaConcluir, turno);
     }
@@ -3549,35 +3660,51 @@ function confirmarConclusao(){
     projetoParaConcluir = null;
 }
 
+function registrarHistoricoPosto(p, turno, tempoReal){
+    const registro = {
+        id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        projetoId: p.id,
+        pep: p.pep,
+        diagrama: p.diagrama,
+        placa: p.placa,
+        processo: p.processo,
+        turno: turno,
+        tempoReal: tempoReal,
+        observacao: p.observacaoPintura || null,
+        dataHoraConclusao: Date.now()
+    };
+    state.historicoPostos.unshift(registro);
+}
+
 function concluirProjetoDireto(id, turno){
     const idx = state.projetos.findIndex(x=>x.id===id);
     if(idx<0) return;
     const p = state.projetos[idx];
     
-    // Verificar se há próximo posto no fluxo
+    // Registrar no histórico de postos ANTES de mudar o processo
+    const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
+    registrarHistoricoPosto(p, turno, tempoReal);
+    
     const proximoProcesso = FLUXO_PROCESSOS[p.processo];
     
     if(proximoProcesso){
-        // Mover para o próximo posto com status "Aguardando"
         p.processo = proximoProcesso;
         p.status = 'Aguardando';
         p.turno = state.turnosPorPosto[proximoProcesso] || turno;
         p.dataHoraFim = Date.now();
-        p.tempoReal = p.dataHoraFim - (p.dataHoraInicio || p.criadoEm);
-        
-        // Resetar volumes processados para o novo posto
+        p.tempoReal = tempoReal;
         p.volumesProcessados = 0;
+        p.dataHoraInicio = null;
+        p.observacaoPintura = null;
         
         salvar();
         renderPostoTable();
         renderAdminTable();
         
         const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
-        showToast('success','Fluxo atualizado',`${p.diagrama} movido para ${nomeProximoPosto} em aguardando`);
+        showToast('success','Fluxo atualizado',`${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
     }else{
-        // Último posto - mover para histórico
         p.dataHoraFim = Date.now();
-        const tempoReal = p.dataHoraFim - (p.dataHoraInicio || p.criadoEm);
         const concluido = Object.assign({}, p, {
             status: 'Concluído',
             turno: turno || p.turno || '1º Turno',
@@ -3591,15 +3718,26 @@ function concluirProjetoDireto(id, turno){
         renderPostoTable();
         renderHistorico();
         renderCharts();
-        showToast('success','Concluído',p.diagrama+' movido para o histórico. Tempo real: '+formatarTempo(tempoReal));
+        showToast('success','Concluído',p.diagrama+' finalizado. Tempo total: '+formatarTempo(tempoReal));
     }
 }
 
 function setHistFilter(f,el){
     histFilter = f;
-    document.querySelectorAll('#page-historico .filter-chip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('#page-historico .filter-chip').forEach(c=>{
+        if(c.closest('#historicoGeralSection')) c.classList.remove('active');
+    });
     el.classList.add('active');
     renderHistorico();
+}
+
+function setHistPostoFilter(f,el){
+    histPostoFilter = f;
+    document.querySelectorAll('#page-historico .filter-chip').forEach(c=>{
+        if(c.closest('#historicoPostosSection')) c.classList.remove('active');
+    });
+    el.classList.add('active');
+    renderHistoricoPostos();
 }
 
 function renderHistorico(){
@@ -3643,6 +3781,52 @@ function renderHistorico(){
                         ${currentUser === 'admin' ? `<button class="icon-action delete" title="Excluir" onclick="excluirHistorico('${p.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderHistoricoPostos(){
+    const tbody = document.getElementById('histPostoTableBody');
+    const search = (document.getElementById('histPostoSearch').value || '').toLowerCase();
+
+    let data = [...state.historicoPostos];
+    if(histPostoFilter !== 'all') data = data.filter(p => p.processo === histPostoFilter);
+    if(search) data = data.filter(p =>
+        (p.pep||'').toLowerCase().includes(search) ||
+        p.diagrama.toLowerCase().includes(search) ||
+        (p.placa||'').toLowerCase().includes(search)
+    );
+
+    if(currentUser !== 'admin' && currentPosto) data = data.filter(p => p.processo === currentPosto);
+
+    data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
+
+    if(data.length === 0){
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3><p>Nenhuma passagem por posto registrada ainda.</p></div></td></tr>`;
+        return;
+    }
+
+    const postoClassMap = {
+        'Nanocerâmico': 'posto-nano',
+        'Pintura': 'posto-pintura',
+        'Conferência': 'posto-conferencia'
+    };
+
+    tbody.innerHTML = data.map(p=>{
+        const tempoStr = p.tempoReal ? formatarTempo(p.tempoReal) : '-';
+        const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+        const postoClass = postoClassMap[p.processo] || '';
+        const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
+        return `
+            <tr>
+                <td style="text-align:center;">${p.pep||'-'}</td>
+                <td style="text-align:center;"><strong>${p.diagrama}</strong></td>
+                <td style="text-align:center;"><span class="posto-badge ${postoClass}">${p.processo}</span></td>
+                <td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td>
+                <td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td>
+                <td style="text-align:center;">${dataConclusao}</td>
+                <td style="text-align:center;">${obs}</td>
             </tr>
         `;
     }).join('');
@@ -3757,6 +3941,16 @@ function exportHistoricoCSV(){
     showToast('success','Exportado','Histórico exportado');
 }
 
+function exportHistoricoPostosCSV(){
+    let data = state.historicoPostos;
+    if(currentUser !== 'admin' && currentPosto) data = data.filter(p => p.processo === currentPosto);
+    const headers = ['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
+    const rows = data.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
+    const csv = [headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+    downloadFile('historico_postos_'+dateStamp()+'.csv', '\ufeff'+csv, 'text/csv;charset=utf-8;');
+    showToast('success','Exportado','Histórico por posto exportado');
+}
+
 function downloadFile(name,content,type){
     const blob = new Blob([content],{type});
     const url = URL.createObjectURL(blob);
@@ -3808,11 +4002,13 @@ function restoreData(e){
             const obj = JSON.parse(ev.target.result);
             if(!confirm('Isso substituirá todos os dados atuais. Continuar?')) return;
             state = Object.assign(state, obj);
+            if(!state.historicoPostos) state.historicoPostos = [];
             salvar();
             migrarTurnosAntigos();
             renderAdminTable();
             renderPostoTable();
             renderHistorico();
+            renderHistoricoPostos();
             renderCharts();
             aplicarEstadoCursor();
             applyDeviceConfig();
