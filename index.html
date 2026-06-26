@@ -54,6 +54,7 @@
             cursor: none !important;
         }
 
+        /* CORREÇÃO DE HITBOX - ÁREA DE CLIQUE */
         button, a, .btn, .icon-action, .icon-action-lg, .role-btn, 
         .menu a, .filter-chip, .historico-tab, .dashboard-tab,
         .posto-tab, .password-toggle, .modal-close, .vk-key {
@@ -64,18 +65,17 @@
             cursor: pointer !important;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            z-index: 1;
         }
 
-        button i, a i, .btn i, .icon-action i, .icon-action-lg i,
-        .role-btn i, .menu a i, .filter-chip i, .historico-tab i,
-        .dashboard-tab i, .posto-tab i, .password-toggle i,
-        .modal-close i, .vk-key i {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
+        /* Ícones não devem interceptar cliques */
+        button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
+        .role-btn > i, .menu a > i, .filter-chip > i, .historico-tab > i,
+        .dashboard-tab > i, .posto-tab > i, .password-toggle > i,
+        .modal-close > i, .vk-key > i {
             pointer-events: none;
+            position: relative;
+            z-index: 2;
         }
 
         ::-webkit-scrollbar { width: 30px; height: 30px; }
@@ -154,6 +154,7 @@
             text-align: center;
             width: 100%;
             flex-direction: column;
+            gap: 8px;
         }
 
         .role-btn:hover {
@@ -165,8 +166,8 @@
         .role-btn i {
             font-size: 32px;
             color: var(--weg-blue);
-            margin-bottom: 8px;
-            pointer-events: none;
+            margin-bottom: 0;
+            display: block;
         }
 
         .role-btn strong {
@@ -266,7 +267,6 @@
         .user-name i {
             font-size: 14px;
             opacity: .8;
-            pointer-events: none;
         }
 
         .user-date {
@@ -299,7 +299,6 @@
         }
 
         .btn-logout:active { transform: scale(.95); }
-        .btn-logout i { pointer-events: none; }
 
         .layout {
             display: flex;
@@ -357,10 +356,6 @@
             color: white;
             border-color: var(--weg-blue);
             box-shadow: 0 4px 12px rgba(0,91,172,.35);
-        }
-
-        .menu a i {
-            pointer-events: none;
         }
 
         .menu a::after {
@@ -480,8 +475,6 @@
             font-size: 18px;
         }
 
-        .kpi-icon i { pointer-events: none; }
-
         .kpi-value {
             font-size: 34px;
             color: var(--weg-blue);
@@ -555,7 +548,6 @@
         }
 
         .btn:active { transform: translateY(0); }
-        .btn i { pointer-events: none; }
 
         .btn-secondary {
             background: transparent;
@@ -857,13 +849,6 @@
             box-shadow: 0 1px 2px rgba(0,0,0,.08);
         }
 
-        .icon-action-lg i {
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .icon-action-lg.success { background: var(--success); border-color: var(--success); color: white; }
         .icon-action-lg.success:hover { background: #008a40; border-color: #008a40; color: white; }
         .icon-action-lg.warning { background: var(--warning); border-color: var(--warning); color: #333; }
@@ -902,13 +887,6 @@
             background: var(--weg-light);
             color: var(--weg-blue);
             transform: scale(1.1);
-        }
-
-        .icon-action i {
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .icon-action.delete:hover { background: rgba(211,47,47,.1); color: var(--danger); }
@@ -973,7 +951,6 @@
         }
 
         .modal-close:hover { background: var(--bg); color: var(--danger); }
-        .modal-close i { pointer-events: none; }
         
         .modal-logout { max-width: 450px; text-align: center; }
         .modal-logout .modal-body { padding: 20px 0; }
@@ -991,7 +968,6 @@
             color: var(--weg-blue);
         }
 
-        .modal-logout .logout-icon i { pointer-events: none; }
         .modal-logout h3 { color: var(--text); font-size: 22px; margin-bottom: 10px; }
         .modal-logout p { color: var(--text-light); font-size: 15px; margin-bottom: 25px; }
         .modal-logout .modal-actions { display: flex; gap: 12px; justify-content: center; }
@@ -1083,13 +1059,6 @@
             box-shadow: 0 1px 2px rgba(0,0,0,.05);
         }
 
-        .vk-key i {
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .vk-key.wide { min-width: 90px; font-size: 16px; max-width: 110px; }
         .vk-key.action { background: var(--weg-blue); color: white; border-color: var(--weg-blue); }
         .vk-key.action:hover { background: var(--weg-dark); border-color: var(--weg-dark); }
@@ -1134,7 +1103,7 @@
         .toast.error i { color: var(--danger); }
         .toast.warning { border-left-color: var(--warning); }
         .toast.warning i { color: var(--warning); }
-        .toast i { font-size: 18px; pointer-events: none; }
+        .toast i { font-size: 18px; }
         .toast-content { flex: 1; }
         .toast-title { font-weight: 600; font-size: 13px; }
         .toast-message { font-size: 12px; color: var(--text-light); margin-top: 2px; }
@@ -1209,7 +1178,6 @@
         }
 
         .password-toggle:hover { background: var(--bg); color: var(--weg-blue); }
-        .password-toggle i { pointer-events: none; }
         
         .password-strength { margin-top: 6px; font-size: 11px; font-weight: 600; }
         .strength-weak { color: var(--danger); }
@@ -1386,11 +1354,6 @@
             border-bottom-color: var(--weg-blue);
         }
 
-        .dashboard-tab i,
-        .historico-tab i {
-            pointer-events: none;
-        }
-
         @media(max-width:1000px){
             .charts-grid { grid-template-columns: 1fr; }
             .sidebar {
@@ -1430,8 +1393,6 @@
             font-size: 16px;
         }
 
-        .menu-toggle i { pointer-events: none; }
-
         @media(max-width:1000px){ .menu-toggle { display: inline-flex; } }
 
         @media(max-width:768px){
@@ -1470,10 +1431,26 @@
             <h1>WEG</h1>
             <p>Centro de Fluxo Produtivo<br>Selecione seu perfil para continuar</p>
             <div class="role-grid">
-                <div class="role-btn" onclick="Auth.login('admin')"><i class="fa-solid fa-user-shield"></i><strong>Administrador</strong><small>Coordenação / Cadastros</small></div>
-                <div class="role-btn" onclick="Auth.login('nano')"><i class="fa-solid fa-flask"></i><strong>Nanocerâmico</strong><small>Operador do posto</small></div>
-                <div class="role-btn" onclick="Auth.login('pintura')"><i class="fa-solid fa-paint-roller"></i><strong>Pintura</strong><small>Operador do posto</small></div>
-                <div class="role-btn" onclick="Auth.login('conferencia')"><i class="fa-solid fa-clipboard-check"></i><strong>Conferência</strong><small>Operador do posto</small></div>
+                <div class="role-btn" onclick="Auth.login('admin')">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <strong>Administrador</strong>
+                    <small>Coordenação / Cadastros</small>
+                </div>
+                <div class="role-btn" onclick="Auth.login('nano')">
+                    <i class="fa-solid fa-flask"></i>
+                    <strong>Nanocerâmico</strong>
+                    <small>Operador do posto</small>
+                </div>
+                <div class="role-btn" onclick="Auth.login('pintura')">
+                    <i class="fa-solid fa-paint-roller"></i>
+                    <strong>Pintura</strong>
+                    <small>Operador do posto</small>
+                </div>
+                <div class="role-btn" onclick="Auth.login('conferencia')">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <strong>Conferência</strong>
+                    <small>Operador do posto</small>
+                </div>
             </div>
         </div>
     </div>
