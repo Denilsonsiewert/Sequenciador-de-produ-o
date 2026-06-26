@@ -2005,6 +2005,7 @@ body.hide-cursor textarea{
     </div>
 </div>
 
+<!-- ===== MODAL CONCLUIR - CORRIGIDO COM INFORMAÇÕES CLARAS ===== -->
 <div class="modal-overlay" id="modalConcluir">
     <div class="modal" style="max-width:500px;">
         <div class="modal-head">
@@ -2022,11 +2023,17 @@ body.hide-cursor textarea{
                 <label>Total de volumes do projeto: <strong id="concluirTotalVolumes">0</strong></label>
             </div>
             <div class="form-group" style="margin-top:10px;">
-                <label>Volumes processados agora <span class="req">*</span></label>
-                <input type="number" id="concluirVolumesProcessados" min="1" required placeholder="Ex: 5" onfocus="scrollParaElemento(this)">
+                <label>Volumes já processados anteriormente: <strong id="concluirJaProcessados" style="color:var(--info);">0</strong></label>
             </div>
             <div class="form-group" style="margin-top:10px;">
-                <label>Volumes restantes: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></label>
+                <label>Volumes restantes antes desta ação: <strong id="concluirFaltantesAntes" style="color:var(--warning);">0</strong></label>
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label>Volumes a processar agora <span class="req">*</span></label>
+                <input type="number" id="concluirVolumesProcessados" min="1" required placeholder="Ex: 3" onfocus="scrollParaElemento(this)">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label>Volumes que restarão após esta ação: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></label>
             </div>
         </div>
 
@@ -3020,6 +3027,7 @@ function pausarProcesso(id){
     showToast('info','Processo pausado',p.diagrama+' pausado');
 }
 
+// ===== FUNÇÃO CORRIGIDA: SOLICITAR CONCLUSÃO COM DADOS REAIS =====
 function solicitarConclusao(id){
     const p = state.projetos.find(x=>x.id===id);
     if(!p) return;
@@ -3030,12 +3038,24 @@ function solicitarConclusao(id){
     const sectionVolumes = document.getElementById('concluirVolumesSection');
     if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
         sectionVolumes.style.display = 'block';
-        document.getElementById('concluirTotalVolumes').textContent = p.volumesTotal || 0;
+        
+        const total = p.volumesTotal || 0;
+        const jaProcessados = p.volumesProcessados || 0;
+        const faltantes = total - jaProcessados;
+        
+        // Preenche todas as informações do modal
+        document.getElementById('concluirTotalVolumes').textContent = total;
+        document.getElementById('concluirJaProcessados').textContent = jaProcessados;
+        document.getElementById('concluirFaltantesAntes').textContent = faltantes;
         document.getElementById('concluirVolumesProcessados').value = '';
-        document.getElementById('concluirVolumesProcessados').max = p.volumesTotal || 999;
+        document.getElementById('concluirVolumesProcessados').max = faltantes > 0 ? faltantes : total;
+        
+        // Atualiza os restantes considerando os já processados
         atualizarVolumesRestantes();
         document.getElementById('concluirVolumesProcessados').oninput = atualizarVolumesRestantes;
-    }else{ sectionVolumes.style.display = 'none'; }
+    }else{ 
+        sectionVolumes.style.display = 'none'; 
+    }
     
     openModal('modalConcluir');
     setTimeout(()=>{
@@ -3046,16 +3066,30 @@ function solicitarConclusao(id){
     },100);
 }
 
+// ===== FUNÇÃO CORRIGIDA: CÁLCULO REAL DE VOLUMES RESTANTES =====
 function atualizarVolumesRestantes(){
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
     if(!p) return;
-    const processados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
+    
     const total = p.volumesTotal || 0;
-    const restantes = total - processados;
+    const jaProcessados = p.volumesProcessados || 0;
+    const processadosAgora = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
+    
+    // Fórmula correta: Restantes = Total - Já Processados - Processados Agora
+    const restantes = total - jaProcessados - processadosAgora;
+    
     document.getElementById('concluirVolumesRestantes').textContent = restantes;
-    document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
+    
+    if(restantes > 0){
+        document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
+    }else if(restantes === 0){
+        document.getElementById('concluirVolumesRestantes').style.color = 'var(--success)';
+    }else{
+        document.getElementById('concluirVolumesRestantes').style.color = 'var(--danger)';
+    }
 }
 
+// ===== FUNÇÃO CORRIGIDA: CONFIRMAR CONCLUSÃO COM VALIDAÇÃO =====
 function confirmarConclusao(){
     if(!projetoParaConcluir) return;
     const p = state.projetos.find(x=>x.id===projetoParaConcluir);
@@ -3064,16 +3098,31 @@ function confirmarConclusao(){
     
     if(p.processo === 'Nanocerâmico' || p.processo === 'Conferência'){
         const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
-        if(volumesProcessados <= 0){ showToast('warning','Atenção','Informe a quantidade de volumes processados'); return; }
-        p.volumesProcessados += volumesProcessados;
-        if(p.volumesProcessados >= p.volumesTotal){
+        if(volumesProcessados <= 0){ 
+            showToast('warning','Atenção','Informe a quantidade de volumes processados'); 
+            return; 
+        }
+        
+        const total = p.volumesTotal || 0;
+        const jaProcessados = p.volumesProcessados || 0;
+        const faltantes = total - jaProcessados;
+        
+        // Validação: não pode processar mais do que o faltante
+        if(volumesProcessados > faltantes){
+            showToast('error','Erro','Não é possível processar mais volumes do que o faltante ('+faltantes+')');
+            return;
+        }
+        
+        p.volumesProcessados = jaProcessados + volumesProcessados;
+        
+        if(p.volumesProcessados >= total){
             concluirProjetoDireto(projetoParaConcluir, turno);
         }else{
             p.status = 'Parcial';
             salvar();
             renderPostoTable();
             renderAdminTable();
-            showToast('info','Conclusão parcial',`${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados} volumes.`);
+            showToast('info','Conclusão parcial',`${volumesProcessados} volumes processados. Faltam ${total - p.volumesProcessados} volumes.`);
         }
     }else{
         concluirProjetoDireto(projetoParaConcluir, turno);
@@ -3346,7 +3395,7 @@ function hideVirtualKeyboard(){
 }
 
 document.addEventListener('focusin', e=>{
-    if(state.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea')){
+    if(state.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea)'){
         vkTarget = e.target;
         if(!vkActive) showVirtualKeyboard();
     }
