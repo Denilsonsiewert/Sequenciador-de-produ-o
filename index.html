@@ -568,7 +568,8 @@ STORAGE_KEY: 'weg_fluxo_produtivo_v25',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
-FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null }
+FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
+TURNO_COOLDOWN: 2 * 60 * 60 * 1000 // 2 horas em milissegundos
 };
 // ==========================================
 // ESTADO DA APLICAÇÃO
@@ -580,7 +581,8 @@ historico: [],
 historicoPostos: [],
 config: { dispositivo: 'tablet' },
 turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' },
-senhaAdmin: CONFIG.SENHA_PADRAO
+senhaAdmin: CONFIG.SENHA_PADRAO,
+ultimaSelecaoTurno: 0 // Timestamp da última seleção de turno no fim de semana
 },
 currentUser: null,
 currentPosto: null,
@@ -668,6 +670,7 @@ if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '
 if (!State.data.config) State.data.config = { dispositivo: 'tablet' };
 if (!State.data.config.dispositivo) State.data.config.dispositivo = 'tablet';
 if (!State.data.historicoPostos) State.data.historicoPostos = [];
+if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
 this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
@@ -981,7 +984,6 @@ this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</str
 async executarLimpeza() {
 UI.showToast('info', 'Limpando', 'Apagando dados da nuvem e do navegador...');
   
-  // CORREÇÃO: Limpa TUDO da planilha (Projetos, Histórico, HistóricoPostos)
   if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
     try {
       await API.clearAllData();
@@ -992,15 +994,14 @@ UI.showToast('info', 'Limpando', 'Apagando dados da nuvem e do navegador...');
     }
   }
   
-  // Limpa dados locais
   State.data.projetos = [];
   State.data.historico = [];
   State.data.historicoPostos = [];
-  State.data.senhaAdmin = CONFIG.SENHA_PADRAO; // Reseta senha para o padrão
+  State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
+  State.data.ultimaSelecaoTurno = 0;
   
   Storage.salvarLocal();
   
-  // Atualiza todas as telas
   Admin.renderTable();
   Posto.render();
   Historico.renderGeral();
@@ -1039,7 +1040,6 @@ if (nova.length < 4) { UI.showToast('warning', 'Atenção', 'A nova senha deve t
 if (nova !== confirma) { UI.showToast('error', 'Erro', 'A confirmação não confere com a nova senha'); document.getElementById('confirmaSenha').value = ''; document.getElementById('confirmaSenha').focus(); return false; }
 if (nova === atual) { UI.showToast('warning', 'Atenção', 'A nova senha deve ser diferente da atual'); return false; }
 
-// CORREÇÃO: Salva a senha no localStorage E na planilha
 State.data.senhaAdmin = nova;
 Storage.salvarLocal();
 
@@ -1337,8 +1337,22 @@ State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 },
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
-if (Utils.ehFimDeSemana()) { State.turnoFimSemanaPendente = true; UI.openModal('modalTurnoFimSemana'); } 
-else {
+if (Utils.ehFimDeSemana()) {
+  // CORREÇÃO: Verifica se passaram 2 horas desde a última seleção
+  const agora = Date.now();
+  const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
+  
+  if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+    // Ainda não passaram 2 horas, usa o turno já selecionado
+    const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+    document.getElementById('postoTurno').value = turnoSalvo;
+    console.log(`Turno do fim de semana (cooldown ativo): ${turnoSalvo}`);
+  } else {
+    // Passaram 2 horas, mostra o modal novamente
+    State.turnoFimSemanaPendente = true;
+    UI.openModal('modalTurnoFimSemana');
+  }
+} else {
 const turnoDetectado = Utils.detectarTurnoAutomatico();
 State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
 Storage.salvarLocal();
@@ -1634,8 +1648,24 @@ UI.showToast('success', 'Excluído', 'Registro removido do histórico');
 // TURNO, TECLADO, GRÁFICOS, EXPORT
 // ==========================================
 const Turno = {
-confirmarFimSemana(turno) { State.data.turnosPorPosto[State.currentPosto] = turno; Storage.salvarLocal(); document.getElementById('postoTurno').value = turno; UI.closeModal('modalTurnoFimSemana'); State.turnoFimSemanaPendente = false; UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno); },
-cancelarSelecao() { const turnoDetectado = Utils.detectarTurnoAutomatico(); State.data.turnosPorPosto[State.currentPosto] = turnoDetectado; Storage.salvarLocal(); document.getElementById('postoTurno').value = turnoDetectado; UI.closeModal('modalTurnoFimSemana'); State.turnoFimSemanaPendente = false; }
+confirmarFimSemana(turno) { 
+  State.data.turnosPorPosto[State.currentPosto] = turno; 
+  State.data.ultimaSelecaoTurno = Date.now(); // CORREÇÃO: Salva o timestamp da seleção
+  Storage.salvarLocal(); 
+  document.getElementById('postoTurno').value = turno; 
+  UI.closeModal('modalTurnoFimSemana'); 
+  State.turnoFimSemanaPendente = false; 
+  UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno + '. O modal só aparecerá novamente após 2 horas.'); 
+},
+cancelarSelecao() { 
+  const turnoDetectado = Utils.detectarTurnoAutomatico(); 
+  State.data.turnosPorPosto[State.currentPosto] = turnoDetectado; 
+  State.data.ultimaSelecaoTurno = Date.now(); // CORREÇÃO: Salva o timestamp mesmo ao cancelar
+  Storage.salvarLocal(); 
+  document.getElementById('postoTurno').value = turnoDetectado; 
+  UI.closeModal('modalTurnoFimSemana'); 
+  State.turnoFimSemanaPendente = false; 
+}
 };
 const VirtualKeyboard = {
 show() { document.getElementById('virtualKeyboard').classList.add('active'); State.vkActive = true; if (State.vkTarget) UI.scrollParaElemento(State.vkTarget); },
