@@ -6,6 +6,8 @@
 <title>WEG - Centro de Fluxo Produtivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Biblioteca para leitura de código de barras/QR Code -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
 :root {
 --weg-blue: #005BAC;
@@ -186,6 +188,17 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .leitor-box i { color: var(--weg-blue); font-size: 40px; margin-bottom: 10px; }
 .leitor-box p { color: var(--text); font-size: 14px; font-weight: 600; }
 .leitor-box small { color: var(--text-light); font-size: 12px; }
+.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; }
+.camera-container video { width: 100%; display: block; border-radius: 12px; }
+.camera-container canvas { display: none; }
+.camera-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+.scan-line { position: absolute; top: 50%; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, transparent, var(--success), transparent); animation: scan 2s ease-in-out infinite; box-shadow: 0 0 10px var(--success); }
+@keyframes scan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(50px); } }
+.camera-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+.camera-status { text-align: center; padding: 10px; margin-top: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.camera-status.scanning { background: var(--weg-light); color: var(--weg-blue); }
+.camera-status.success { background: rgba(0,166,81,.1); color: var(--success); }
+.camera-status.error { background: rgba(211,47,47,.1); color: var(--danger); }
 .virtual-keyboard { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.15); z-index: 7000; display: none; max-width: 380px; width: 95%; }
 .virtual-keyboard.active { display: block; animation: slideUp .3s ease; }
 .vk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
@@ -371,24 +384,81 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 </section>
 <section class="page" id="page-admin">
 <h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
-<div class="card"><div class="card-head"><h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2><button class="btn btn-sm" onclick="Admin.focarLeitorEtiqueta()"><i class="fa-solid fa-barcode"></i> Ler Etiqueta</button></div>
-<div class="leitor-box"><i class="fa-solid fa-barcode"></i><p>Leitor de Código de Barras/QR Code</p><small>Posicione o cursor no campo abaixo e use o leitor integrado ou scanner conectado</small>
-<input type="text" id="leitorEtiquetaInput" placeholder="Aguardando leitura..." style="margin-top:10px; padding:10px; border:2px solid var(--weg-blue); border-radius:8px; width:100%; max-width:400px; text-align:center; font-size:16px;" onkeypress="if(event.key==='Enter'){event.preventDefault();Admin.processarLeituraEtiqueta();}"></div>
-<form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)"><div class="form-grid">
-<div class="form-group"><label>PEP</label><input type="text" id="cad-pep" placeholder="Ex: 7S123456" data-vk></div>
-<div class="form-group"><label>Diagrama / Ordem <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: ORDEM001" data-vk></div>
+<div class="card">
+<div class="card-head">
+<h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2>
+<div style="display:flex;gap:8px;">
+<button class="btn btn-sm btn-success" onclick="Admin.abrirCamera()"><i class="fa-solid fa-camera"></i> Ler Etiqueta (Câmera)</button>
+<button class="btn btn-sm" onclick="Admin.focarLeitorEtiqueta()"><i class="fa-solid fa-barcode"></i> Scanner USB</button>
+</div>
+</div>
+
+<!-- Container da Câmera -->
+<div id="cameraSection" style="display:none;">
+<div class="camera-container">
+<video id="cameraVideo" autoplay playsinline></video>
+<canvas id="cameraCanvas"></canvas>
+<div class="camera-overlay">
+<div class="scan-line"></div>
+</div>
+</div>
+<div id="cameraStatus" class="camera-status scanning">
+<i class="fa-solid fa-spinner fa-spin"></i> Posicione a etiqueta na frente da câmera...
+</div>
+<div class="camera-controls">
+<button class="btn btn-danger" onclick="Admin.fecharCamera()"><i class="fa-solid fa-times"></i> Fechar Câmera</button>
+<button class="btn btn-secondary" onclick="Admin.capturarManual()"><i class="fa-solid fa-camera"></i> Capturar Manualmente</button>
+</div>
+</div>
+
+<!-- Scanner USB (mantido para compatibilidade) -->
+<div id="scannerSection">
+<div class="leitor-box">
+<i class="fa-solid fa-barcode"></i>
+<p>Leitor de Código de Barras/QR Code (USB)</p>
+<small>Posicione o cursor no campo abaixo e use o scanner conectado</small>
+<input type="text" id="leitorEtiquetaInput" placeholder="Aguardando leitura..." style="margin-top:10px; padding:10px; border:2px solid var(--weg-blue); border-radius:8px; width:100%; max-width:400px; text-align:center; font-size:16px;" onkeypress="if(event.key==='Enter'){event.preventDefault();Admin.processarLeituraEtiqueta();}">
+</div>
+</div>
+
+<form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
+<div class="form-grid">
+<div class="form-group"><label>PEP</label><input type="text" id="cad-pep" placeholder="Ex: 7S123456" data-vk readonly></div>
+<div class="form-group"><label>Diagrama / Ordem <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: ORDEM001" data-vk readonly></div>
 <div class="form-group"><label>Placa de Identificação</label><input type="text" id="cad-placa" placeholder="Ex: PLACA123" data-vk></div>
 <div class="form-group" id="group-cad-volumes"><label>Quantidade / Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 10 unidades" data-vk></div>
 <div class="form-group"><label>Descrição</label><input type="text" id="cad-descricao" placeholder="Ex: Motor W22 Premium" data-vk></div>
 <div class="form-group"><label>Processo de Destino <span class="req">*</span></label><select id="cad-processo" required onchange="Admin.toggleVolumesCadastro()"><option value="">Selecione...</option><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
 <div class="form-group"><label>Prioridade</label><select id="cad-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
 <div class="form-group full"><label>Observações</label><textarea id="cad-obs" rows="2" placeholder="Observações adicionais..." data-vk></textarea></div>
-<div class="form-actions"><button type="reset" class="btn btn-secondary"><i class="fa-solid fa-rotate-left"></i> Limpar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar Projeto</button></div>
-</div></form></div>
-<div class="card"><div class="card-head"><h2><i class="fa-solid fa-list"></i> Projetos Cadastrados</h2><div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, descrição..." oninput="Admin.renderTable()" data-vk></div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span></div></div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="admTableBody"></tbody></table></div></div>
+<div class="form-actions">
+<button type="button" class="btn btn-secondary" onclick="Admin.limparFormulario()"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+<button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar Projeto</button>
+</div>
+</div>
+</form>
+</div>
+<div class="card">
+<div class="card-head">
+<h2><i class="fa-solid fa-list"></i> Projetos Cadastrados</h2>
+<div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+</div>
+<div class="table-toolbar">
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, descrição..." oninput="Admin.renderTable()" data-vk></div>
+<div class="filter-bar">
+<span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
+<span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
+<span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span>
+<span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span>
+</div>
+</div>
+<div class="table-wrapper">
+<table class="table">
+<thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
+<tbody id="admTableBody"></tbody>
+</table>
+</div>
+</div>
 </section>
 <section class="page" id="page-posto">
 <h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto de Trabalho</span> <span class="process-badge" id="postoBadge"></span></h1>
@@ -564,7 +634,7 @@ window.API = { createProject, updateProject, deleteProject, updateConfig, getCon
 // CONFIGURAÇÕES GLOBAIS
 // ==========================================
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v25',
+STORAGE_KEY: 'weg_fluxo_produtivo_v26',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
@@ -582,7 +652,7 @@ historicoPostos: [],
 config: { dispositivo: 'tablet' },
 turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' },
 senhaAdmin: CONFIG.SENHA_PADRAO,
-ultimaSelecaoTurno: 0 // Timestamp da última seleção de turno no fim de semana
+ultimaSelecaoTurno: 0
 },
 currentUser: null,
 currentPosto: null,
@@ -603,7 +673,9 @@ timerInterval: null,
 isOnline: navigator.onLine,
 lastSync: 0,
 syncQueue: [],
-apiAvailable: false
+apiAvailable: false,
+cameraStream: null,
+cameraInterval: null
 };
 // ==========================================
 // UTILITÁRIOS
@@ -653,6 +725,36 @@ volumesTotal: apiProj.VolumesTotal, volumesProcessados: apiProj.VolumesProcessad
 prioridade: apiProj.Prioridade, status: apiProj.Status, turno: apiProj.Turno, obs: apiProj.Obs,
 criadoEm: apiProj.CriadoEm, atualizadoEm: apiProj.AtualizadoEm
 };
+},
+extrairDadosEtiqueta(texto) {
+  // Tenta extrair PEP e Diagrama/Ordem do texto capturado
+  const dados = { pep: null, diagrama: null };
+  
+  // Remove espaços extras e converte para maiúsculas
+  const textoLimpo = texto.trim().toUpperCase();
+  
+  // Tenta encontrar PEP (formato comum: 7S + números)
+  const pepMatch = textoLimpo.match(/7S\d{6,}/);
+  if (pepMatch) {
+    dados.pep = pepMatch[0];
+  }
+  
+  // Tenta encontrar Diagrama/Ordem (formato: ORDEM + números ou apenas números)
+  const diagramaMatch = textoLimpo.match(/ORDEM\d+/i) || textoLimpo.match(/\b\d{4,}\b/);
+  if (diagramaMatch) {
+    dados.diagrama = diagramaMatch[0];
+  }
+  
+  // Se não encontrou com regex, tenta dividir por espaços ou caracteres especiais
+  if (!dados.pep || !dados.diagrama) {
+    const partes = textoLimpo.split(/[\s\-_,;]+/).filter(p => p.length > 0);
+    if (partes.length >= 2) {
+      if (!dados.pep && partes[0].match(/7S/)) dados.pep = partes[0];
+      if (!dados.diagrama) dados.diagrama = partes[partes.length - 1];
+    }
+  }
+  
+  return dados;
 }
 };
 // ==========================================
@@ -675,7 +777,6 @@ this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
 
-// CORREÇÃO: Busca a senha da planilha ao iniciar (garante que alterações persistam)
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
 try {
@@ -836,7 +937,7 @@ if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e
 },
 setupVirtualKeyboard() {
 document.addEventListener('focusin', e => {
-if (State.data.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea')) {
+if (State.data.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea') && !e.target.readOnly) {
 State.vkTarget = e.target;
 if (!State.vkActive) VirtualKeyboard.show();
 }
@@ -1187,18 +1288,155 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 // ADMINISTRAÇÃO
 // ==========================================
 const Admin = {
-focarLeitorEtiqueta() { const input = document.getElementById('leitorEtiquetaInput'); input.value = ''; input.focus(); UI.showToast('info', 'Leitor ativo', 'Posicione o cursor e use o leitor de código de barras'); },
+focarLeitorEtiqueta() {
+const input = document.getElementById('leitorEtiquetaInput');
+input.value = '';
+input.focus();
+UI.showToast('info', 'Scanner USB ativo', 'Posicione o cursor e use o scanner conectado');
+},
+async abrirCamera() {
+  try {
+    const video = document.getElementById('cameraVideo');
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        facingMode: 'environment', // Usa câmera traseira em dispositivos móveis
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      } 
+    });
+    
+    State.cameraStream = stream;
+    video.srcObject = stream;
+    
+    document.getElementById('cameraSection').style.display = 'block';
+    document.getElementById('scannerSection').style.display = 'none';
+    
+    // Inicia scanning automático
+    this.iniciarScanning();
+    
+    UI.showToast('success', 'Câmera ativada', 'Posicione a etiqueta na frente da câmera');
+  } catch (error) {
+    console.error('Erro ao acessar câmera:', error);
+    UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera. Verifique as permissões.');
+  }
+},
+fecharCamera() {
+  if (State.cameraStream) {
+    State.cameraStream.getTracks().forEach(track => track.stop());
+    State.cameraStream = null;
+  }
+  if (State.cameraInterval) {
+    clearInterval(State.cameraInterval);
+    State.cameraInterval = null;
+  }
+  
+  document.getElementById('cameraSection').style.display = 'none';
+  document.getElementById('scannerSection').style.display = 'block';
+  document.getElementById('cameraStatus').className = 'camera-status scanning';
+  document.getElementById('cameraStatus').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posicione a etiqueta na frente da câmera...';
+},
+iniciarScanning() {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  const context = canvas.getContext('2d');
+  
+  State.cameraInterval = setInterval(() => {
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      
+      // Tenta ler QR Code
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      
+      if (code) {
+        console.log('QR Code detectado:', code.data);
+        this.processarImagemEtiqueta(code.data);
+      } else {
+        // Se não encontrou QR Code, tenta OCR simples (captura texto da imagem)
+        // Por enquanto, vamos apenas capturar manualmente
+        console.log('Nenhum QR Code detectado');
+      }
+    }
+  }, 500); // Verifica a cada 500ms
+},
+capturarManual() {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  const context = canvas.getContext('2d');
+  
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Captura a imagem como base64
+    const imageData = canvas.toDataURL('image/png');
+    
+    // Por enquanto, vamos simular a extração
+    // Em uma implementação real, você enviaria essa imagem para um serviço OCR
+    UI.showToast('info', 'Captura manual', 'Funcionalidade OCR em desenvolvimento. Use o scanner USB ou digite manualmente.');
+    
+    // Simula dados extraídos (remover em produção)
+    const dadosSimulados = '7S' + Math.floor(Math.random()*900000+100000) + ' ORDEM' + Math.floor(Math.random()*900+100);
+    this.processarImagemEtiqueta(dadosSimulados);
+  }
+},
+processarImagemEtiqueta(texto) {
+  const dados = Utils.extrairDadosEtiqueta(texto);
+  
+  if (dados.pep || dados.diagrama) {
+    if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
+    if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
+    
+    const statusEl = document.getElementById('cameraStatus');
+    statusEl.className = 'camera-status success';
+    statusEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> Dados capturados com sucesso! PEP: ${dados.pep || 'N/A'} | Diagrama: ${dados.diagrama || 'N/A'}`;
+    
+    UI.showToast('success', 'Etiqueta lida', 'PEP e Diagrama/Ordem preenchidos automaticamente');
+    
+    // Para o scanning após sucesso
+    if (State.cameraInterval) {
+      clearInterval(State.cameraInterval);
+      State.cameraInterval = null;
+    }
+    
+    // Foca no próximo campo (Placa)
+    setTimeout(() => {
+      document.getElementById('cad-placa').focus();
+    }, 500);
+  } else {
+    const statusEl = document.getElementById('cameraStatus');
+    statusEl.className = 'camera-status error';
+    statusEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Não foi possível extrair os dados. Tente novamente ou use o scanner USB.';
+    
+    UI.showToast('warning', 'Atenção', 'Não foi possível ler a etiqueta. Tente posicionar melhor ou use o scanner USB.');
+  }
+},
 processarLeituraEtiqueta() {
 const codigo = document.getElementById('leitorEtiquetaInput').value.trim();
 if (!codigo) { UI.showToast('warning', 'Código vazio', 'Nenhum código foi lido'); return; }
-const dadosSimulados = { pep: '7S' + Math.floor(Math.random()*900000+100000), diagrama: codigo, placa: 'PLACA' + Math.floor(Math.random()*900+100), volumes: Math.floor(Math.random()*10+1) + ' unidades', descricao: 'Motor W22 ' + Math.floor(Math.random()*200+50) + 'cv' };
-document.getElementById('cad-pep').value = dadosSimulados.pep;
-document.getElementById('cad-diagrama').value = dadosSimulados.diagrama;
-document.getElementById('cad-placa').value = dadosSimulados.placa;
-document.getElementById('cad-volumes').value = dadosSimulados.volumes;
-document.getElementById('cad-descricao').value = dadosSimulados.descricao;
+
+const dados = Utils.extrairDadosEtiqueta(codigo);
+
+if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
+if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
+
 UI.showToast('success', 'Etiqueta lida', 'Dados preenchidos automaticamente');
 document.getElementById('leitorEtiquetaInput').value = '';
+
+// Foca no próximo campo (Placa)
+setTimeout(() => {
+  document.getElementById('cad-placa').focus();
+}, 300);
+},
+limparFormulario() {
+  document.getElementById('formCadastro').reset();
+  document.getElementById('cad-pep').removeAttribute('readonly');
+  document.getElementById('cad-diagrama').removeAttribute('readonly');
+  UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
 },
 toggleVolumesCadastro() {
 const processo = document.getElementById('cad-processo').value;
@@ -1338,17 +1576,14 @@ State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
 if (Utils.ehFimDeSemana()) {
-  // CORREÇÃO: Verifica se passaram 2 horas desde a última seleção
   const agora = Date.now();
   const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
   
   if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
-    // Ainda não passaram 2 horas, usa o turno já selecionado
     const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
     document.getElementById('postoTurno').value = turnoSalvo;
     console.log(`Turno do fim de semana (cooldown ativo): ${turnoSalvo}`);
   } else {
-    // Passaram 2 horas, mostra o modal novamente
     State.turnoFimSemanaPendente = true;
     UI.openModal('modalTurnoFimSemana');
   }
@@ -1650,7 +1885,7 @@ UI.showToast('success', 'Excluído', 'Registro removido do histórico');
 const Turno = {
 confirmarFimSemana(turno) { 
   State.data.turnosPorPosto[State.currentPosto] = turno; 
-  State.data.ultimaSelecaoTurno = Date.now(); // CORREÇÃO: Salva o timestamp da seleção
+  State.data.ultimaSelecaoTurno = Date.now();
   Storage.salvarLocal(); 
   document.getElementById('postoTurno').value = turno; 
   UI.closeModal('modalTurnoFimSemana'); 
@@ -1660,7 +1895,7 @@ confirmarFimSemana(turno) {
 cancelarSelecao() { 
   const turnoDetectado = Utils.detectarTurnoAutomatico(); 
   State.data.turnosPorPosto[State.currentPosto] = turnoDetectado; 
-  State.data.ultimaSelecaoTurno = Date.now(); // CORREÇÃO: Salva o timestamp mesmo ao cancelar
+  State.data.ultimaSelecaoTurno = Date.now();
   Storage.salvarLocal(); 
   document.getElementById('postoTurno').value = turnoDetectado; 
   UI.closeModal('modalTurnoFimSemana'); 
@@ -1780,7 +2015,6 @@ UI.setupVirtualKeyboard();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
 
-// LISTENERS DA API (Sincronização em Tempo Real)
 if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
@@ -1828,7 +2062,6 @@ API.on('sync:complete', (data) => { console.log(`Sync completo: ${data.count} al
 API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar. Verifique sua conexão.'); });
 }
 
-// LISTENERS DE CONEXÃO
 window.addEventListener('online', () => {
 State.isOnline = true;
 State.apiAvailable = (typeof API !== 'undefined');
