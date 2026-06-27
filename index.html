@@ -114,6 +114,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .form-group label .req { color: var(--danger); }
 .form-group input, .form-group select, .form-group textarea { padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--card); color: var(--text); transition: var(--transition); font-family: inherit; cursor: text !important; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--weg-blue); box-shadow: 0 0 0 3px rgba(0,91,172,.15); }
+.form-group input[readonly] { background: var(--bg); cursor: not-allowed; }
 .full { grid-column: span 2; }
 .form-actions { grid-column: span 2; display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
 .table-wrapper { overflow-x: auto; border-radius: 8px; margin-top: 15px; }
@@ -403,7 +404,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
 <div class="form-grid">
 <div class="form-group"><label>PEP</label><input type="text" id="cad-pep" placeholder="Ex: 170-2500343-121 (opcional)" data-vk></div>
-<div class="form-group"><label>Diagrama / Ordem do Invólucro <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: 450890224" data-vk></div>
+<div class="form-group"><label>Diagrama / Ordem do Invólucro <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: 45089024" data-vk></div>
 <div class="form-group"><label>Placa de Identificação</label><input type="text" id="cad-placa" placeholder="Ex: PLACA123" data-vk></div>
 <div class="form-group" id="group-cad-volumes"><label>Quantidade / Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 28" data-vk></div>
 <div class="form-group"><label>Descrição</label><input type="text" id="cad-descricao" placeholder="Ex: Motor W22 Premium" data-vk></div>
@@ -439,15 +440,170 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 </div>
 </div>
 </section>
+<section class="page" id="page-posto">
+<h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto de Trabalho</span> <span class="process-badge" id="postoBadge"></span></h1>
+<div class="kpi-grid">
+<div class="kpi"><div class="kpi-head"><h3>Aguardando</h3><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div></div><div class="kpi-value" id="posto-aguardando">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Em Processo</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div><div class="kpi-value" id="posto-processo">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div><div class="kpi-value" id="posto-concluidos">0</div></div>
+</div>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno atual:</label>
+<select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
+<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="Posto.renderTable()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
+</section>
+<section class="page" id="page-historico">
+<h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
+<div class="historico-tabs"><button class="historico-tab active" onclick="Historico.switchTab('geral', this)"><i class="fa-solid fa-archive"></i> Histórico Geral</button><button class="historico-tab" onclick="Historico.switchTab('postos', this)"><i class="fa-solid fa-route"></i> Histórico por Posto</button></div>
+<div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP..." oninput="Historico.renderGeral()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Processo</th><th>Turno</th><th>Tempo Real</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
+<div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostos()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
+</section>
+<section class="page" id="page-historico-posto">
+<h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostoAtual()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
+</section>
+<section class="page" id="page-config">
+<h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
+<div class="card" id="cardSeguranca" style="display:none;"><h2><i class="fa-solid fa-shield-halved"></i> Segurança - Senha do Administrador</h2><p style="margin-top:8px;color:var(--text-light);font-size:14px;">Altere a senha de acesso ao painel administrativo. A senha atual será exigida para confirmação.</p>
+<form id="formSenha" onsubmit="return Config.alterarSenha(event)" style="margin-top:15px;"><div class="form-grid" style="max-width:600px;">
+<div class="form-group full"><label>Senha Atual <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="senhaAtual" required data-vk><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('senhaAtual',this)"><i class="fa-solid fa-eye"></i></button></div></div>
+<div class="form-group full"><label>Nova Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="novaSenha" required minlength="4" oninput="Config.avaliarForcaSenha()" data-vk><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('novaSenha',this)"><i class="fa-solid fa-eye"></i></button></div><div class="password-strength" id="pwdStrength"></div></div>
+<div class="form-group full"><label>Confirmar Nova Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="confirmaSenha" required minlength="4" data-vk><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('confirmaSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div>
+<div class="form-actions"><button type="reset" class="btn btn-secondary" onclick="document.getElementById('pwdStrength').textContent=''"><i class="fa-solid fa-rotate-left"></i> Limpar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-key"></i> Alterar Senha</button></div>
+</div></form></div>
+<div class="card"><h2><i class="fa-solid fa-display"></i> Tipo de Dispositivo</h2><p style="margin-top:8px;color:var(--text-light);font-size:14px;">Selecione o tipo de dispositivo onde o sistema está sendo executado.</p>
+<div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet"> Tablet / Touchscreen (com teclado físico opcional)</option><option value="computador">💻 Computador (Touch sem teclado/mouse)</option></select></div>
+<div class="form-group full" id="cfgVkInfo" style="display:none;"><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador ativado:</strong> O cursor do mouse será ocultado automaticamente e um teclado virtual numérico estará disponível ao tocar em campos de preenchimento.</div></div></div></div></div>
+<div class="card"><h2><i class="fa-solid fa-database"></i> Gerenciar Dados</h2><p style="margin-top:8px;color:var(--text-light);font-size:14px;">Os dados são armazenados localmente no navegador e na nuvem (Google Sheets).</p>
+<div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> A ação "Limpar Tudo" é irreversível e exige a senha do administrador. Ela apagará TODOS os dados do navegador E da planilha do Google Sheets.</div></div>
+<div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;"><button class="btn btn-secondary" onclick="Export.backup()"><i class="fa-solid fa-download"></i> Backup (JSON)</button><button class="btn btn-secondary" onclick="document.getElementById('restoreFile').click()"><i class="fa-solid fa-upload"></i> Restaurar</button><input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="Export.restaurar(event)"><button class="btn btn-danger" onclick="Auth.solicitarLimpeza()"><i class="fa-solid fa-trash"></i> Limpar Tudo</button></div></div>
+</section>
 </main>
 </div>
 </div>
-
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você será redirecionado para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
-
+<div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno está processando os materiais?</div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
+<div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha do administrador para acessar o perfil de <strong>Coordenação</strong>.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha do Administrador <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}" onfocus="UI.scrollParaElemento(this)"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
+<div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação de Segurança</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Esta ação é irreversível. Digite a senha do administrador para continuar.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha do administrador incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha do Administrador <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}" onfocus="UI.scrollParaElemento(this)"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+<div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid">
+<div class="form-group"><label>PEP</label><input type="text" id="edit-pep" data-vk onfocus="UI.scrollParaElemento(this)"></div>
+<div class="form-group"><label>Diagrama / Ordem</label><input type="text" id="edit-diagrama" data-vk onfocus="UI.scrollParaElemento(this)"></div>
+<div class="form-group"><label>Placa de Identificação</label><input type="text" id="edit-placa" data-vk onfocus="UI.scrollParaElemento(this)"></div>
+<div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
+<div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes" data-vk onfocus="UI.scrollParaElemento(this)"></div>
+<div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao" data-vk onfocus="UI.scrollParaElemento(this)"></div>
+<div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
+<div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div>
+<div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2" data-vk onfocus="UI.scrollParaElemento(this)"></textarea></div>
+<div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div>
+</div></form></div></div>
+<div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Deseja marcar o projeto <strong id="concluirCodigo"></strong> como <strong>concluído</strong>?</p>
+<div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="alert alert-info" style="margin-bottom:10px;"><i class="fa-solid fa-info-circle"></i><div>Informe quantos volumes foram processados e qual turno processou.</div></div>
+<div class="form-group"><label>Turno que processou <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
+<div class="form-group" style="margin-top:12px;"><label>Total de volumes do projeto: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong></label></div>
+<div class="form-group" style="margin-top:8px;"><label>Já processados anteriormente: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong></label></div>
+<div class="form-group" style="margin-top:8px;"><label>Faltam processar: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></label></div>
+<div class="form-group" style="margin-top:12px;"><label>Processar agora (neste turno) <span class="req">*</span></label><input type="number" id="concluirVolumesProcessados" min="1" required placeholder="Ex: 5" onfocus="UI.scrollParaElemento(this)"></div>
+<div class="form-group" style="margin-top:10px;"><label>Restará para próximo turno: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></label></div></div>
+<div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="alert alert-info" style="margin-bottom:10px;"><i class="fa-solid fa-info-circle"></i><div>Informe o turno e a observação sobre o projeto.</div></div>
+<div class="form-group"><label>Turno de conclusão <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
+<div class="form-group" style="margin-top:12px;"><label>Observação (opcional)</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso/repintura">Peças em reprocesso/repintura</option><option value="Gancherias/volumes pendentes">Gancherias/volumes pendentes</option></select></div></div>
+<div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno de conclusão</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
+<div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="toast-container" id="toastContainer"></div>
-<div class="virtual-keyboard" id="virtualKeyboard"><div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div><div class="vk-row"><button class="vk-key" data-key="7">7</button><button class="vk-key" data-key="8">8</button><button class="vk-key" data-key="9">9</button><button class="vk-key action danger" data-action="backspace" title="Apagar"><i class="fa-solid fa-delete-left"></i></button></div><div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear" title="Limpar"><i class="fa-solid fa-eraser"></i></button></div><div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close" title="Fechar"><i class="fa-solid fa-xmark"></i></button></div><div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
-
+<div class="virtual-keyboard" id="virtualKeyboard"><div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
+<div class="vk-row"><button class="vk-key" data-key="7">7</button><button class="vk-key" data-key="8">8</button><button class="vk-key" data-key="9">9</button><button class="vk-key action danger" data-action="backspace" title="Apagar"><i class="fa-solid fa-delete-left"></i></button></div>
+<div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear" title="Limpar"><i class="fa-solid fa-eraser"></i></button></div>
+<div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close" title="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
+<!-- CLIENTE DA API -->
+<script>
+const API_CONFIG = {
+URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
+SECRET: "16101961",
+POLLING_INTERVAL: 5000
+};
+let lastSyncTimestamp = 0;
+let syncInProgress = false;
+const eventListeners = {};
+async function apiRequest(action, payload = {}, method = 'POST') {
+try {
+const url = new URL(API_CONFIG.URL);
+url.searchParams.append('action', action);
+const options = { method: method, mode: 'cors', redirect: 'follow' };
+if (method === 'POST') {
+options.body = JSON.stringify({ action, secret: API_CONFIG.SECRET, ...payload });
+} else if (method === 'GET') {
+if (payload.since) url.searchParams.append('since', payload.since);
+if (payload.key) url.searchParams.append('key', payload.key);
+url.searchParams.append('secret', API_CONFIG.SECRET);
+}
+const response = await fetch(url.toString(), options);
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+const result = await response.json();
+if (!result.success) throw new Error(result.error || 'Erro na API');
+return result;
+} catch (error) {
+console.error('API Request failed:', error);
+throw error;
+}
+}
+async function createProject(projectData) {
+const result = await apiRequest('create', { data: projectData });
+triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
+return result;
+}
+async function updateProject(projectData) {
+const result = await apiRequest('update', { data: projectData });
+triggerEvent('project:updated', { ...projectData, AtualizadoEm: Date.now() });
+return result;
+}
+async function deleteProject(projectId) {
+const result = await apiRequest('delete', { id: projectId });
+triggerEvent('project:deleted', projectId);
+return result;
+}
+async function updateConfig(key, value) { return await apiRequest('updateConfig', { key, value }); }
+async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
+async function clearAllData() { return await apiRequest('clearAll', {}); }
+async function syncData() {
+if (syncInProgress) return;
+syncInProgress = true;
+try {
+const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
+if (result.success && result.data) {
+result.data.forEach(remoteProj => triggerEvent('project:synced', remoteProj));
+lastSyncTimestamp = result.timestamp;
+triggerEvent('sync:complete', { count: result.data.length });
+}
+} catch (error) {
+console.error('Sync failed:', error);
+triggerEvent('sync:error', error);
+} finally { syncInProgress = false; }
+}
+function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
+syncData();
+const timer = setInterval(syncData, interval);
+return timer;
+}
+function on(event, callback) { if (!eventListeners[event]) eventListeners[event] = []; eventListeners[event].push(callback); }
+function off(event, callback) { if (eventListeners[event]) eventListeners[event] = eventListeners[event].filter(cb => cb !== callback); }
+function triggerEvent(event, data) {
+if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); } });
+}
+window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, startPolling, on, off };
+</script>
 <script>
 // ==========================================
 // CONFIGURAÇÕES GLOBAIS
@@ -457,9 +613,9 @@ STORAGE_KEY: 'weg_fluxo_produtivo_v28',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
-FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null }
+FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
+TURNO_COOLDOWN: 2 * 60 * 60 * 1000
 };
-
 // ==========================================
 // ESTADO DA APLICAÇÃO
 // ==========================================
@@ -470,7 +626,8 @@ historico: [],
 historicoPostos: [],
 config: { dispositivo: 'tablet' },
 turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' },
-senhaAdmin: CONFIG.SENHA_PADRAO
+senhaAdmin: CONFIG.SENHA_PADRAO,
+ultimaSelecaoTurno: 0
 },
 currentUser: null,
 currentPosto: null,
@@ -495,7 +652,6 @@ apiAvailable: false,
 cameraStream: null,
 scanInterval: null
 };
-
 // ==========================================
 // UTILITÁRIOS
 // ==========================================
@@ -544,7 +700,12 @@ Status: projeto.status,
 Turno: projeto.turno,
 Obs: projeto.obs,
 CriadoEm: projeto.criadoEm,
-AtualizadoEm: projeto.atualizadoEm || Date.now()
+AtualizadoEm: projeto.atualizadoEm || Date.now(),
+DataHoraInicio: projeto.dataHoraInicio || null,
+DataHoraFim: projeto.dataHoraFim || null,
+TempoReal: projeto.tempoReal || null,
+ConcluidoEm: projeto.concluidoEm || null,
+ObservacaoPintura: projeto.observacaoPintura || null
 };
 },
 fromApiFormat(apiProj) {
@@ -562,7 +723,12 @@ status: apiProj.Status,
 turno: apiProj.Turno,
 obs: apiProj.Obs,
 criadoEm: apiProj.CriadoEm,
-atualizadoEm: apiProj.AtualizadoEm
+atualizadoEm: apiProj.AtualizadoEm,
+dataHoraInicio: apiProj.DataHoraInicio || null,
+dataHoraFim: apiProj.DataHoraFim || null,
+tempoReal: apiProj.TempoReal || null,
+concluidoEm: apiProj.ConcluidoEm || null,
+observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 // Extração de dados da etiqueta usando OCR
@@ -646,7 +812,6 @@ console.log('📊 Resultado:', result);
 return result;
 }
 };
-
 // ==========================================
 // ARMAZENAMENTO HÍBRIDO
 // ==========================================
@@ -662,10 +827,10 @@ if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '
 if (!State.data.config) State.data.config = { dispositivo: 'tablet' };
 if (!State.data.config.dispositivo) State.data.config.dispositivo = 'tablet';
 if (!State.data.historicoPostos) State.data.historicoPostos = [];
+if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
 this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
-
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
 try {
@@ -736,7 +901,6 @@ State.data.historico.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno 
 if (mudou) this.salvarLocal();
 }
 };
-
 // ==========================================
 // INTERFACE (UI)
 // ==========================================
@@ -855,7 +1019,6 @@ UI.scrollParaElemento(State.vkTarget);
 });
 }
 };
-
 // ==========================================
 // NAVEGAÇÃO
 // ==========================================
@@ -877,7 +1040,6 @@ if (page === 'historico-posto') Historico.renderPostoAtual();
 if (page === 'config') Config.loadUI();
 }
 };
-
 // ==========================================
 // AUTENTICAÇÃO
 // ==========================================
@@ -987,7 +1149,6 @@ Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPo
 UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos. Senha resetada para o padrão.');
 }
 };
-
 // ==========================================
 // CONFIGURAÇÕES
 // ==========================================
@@ -1039,7 +1200,6 @@ else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'pas
 else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 };
-
 // ==========================================
 // DASHBOARD
 // ==========================================
@@ -1153,7 +1313,6 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 } else { document.getElementById('posto-ultimo-projeto').textContent = '-'; document.getElementById('posto-ultimo-data').textContent = '-'; }
 }
 };
-
 // ==========================================
 // ADMINISTRAÇÃO
 // ==========================================
@@ -1172,7 +1331,6 @@ cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando 
 try {
 const video = document.getElementById('cameraVideo');
 const canvas = document.getElementById('cameraCanvas');
-const ctx = canvas.getContext('2d');
 
 State.cameraStream = await navigator.mediaDevices.getUserMedia({
 video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
@@ -1222,12 +1380,11 @@ const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
 if (pep) document.getElementById('cad-pep').value = pep;
 if (diagrama) document.getElementById('cad-diagrama').value = diagrama;
 
-if (pep && diagrama) {
+if (pep || diagrama) {
 cameraStatus.className = 'camera-status success';
-cameraStatus.innerHTML = `<i class="fa-solid fa-check-circle"></i> PEP: ${pep} | Diagrama: ${diagrama}`;
-UI.showToast('success', 'Etiqueta lida', 'PEP e Diagrama preenchidos!');
+cameraStatus.innerHTML = `<i class="fa-solid fa-check-circle"></i> PEP: ${pep || 'N/A'} | Diagrama: ${diagrama || 'N/A'}`;
+UI.showToast('success', 'Etiqueta lida', 'Dados preenchidos!');
 
-// Para após leitura bem-sucedida
 if (State.scanInterval) {
 clearInterval(State.scanInterval);
 State.scanInterval = null;
@@ -1400,7 +1557,6 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
 }
 };
-
 // ==========================================
 // POSTO DE TRABALHO
 // ==========================================
@@ -1420,8 +1576,15 @@ State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
 if (Utils.ehFimDeSemana()) {
+const agora = Date.now();
+const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
+if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+document.getElementById('postoTurno').value = turnoSalvo;
+} else {
 State.turnoFimSemanaPendente = true;
 UI.openModal('modalTurnoFimSemana');
+}
 } else {
 const turnoDetectado = Utils.detectarTurnoAutomatico();
 State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
@@ -1460,8 +1623,11 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 } else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
 } else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
 let tempoDisplay = '-';
-if (p.status === 'Em Processo' && p.dataHoraInicio) { tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`; }
-else if (p.dataHoraInicio && p.dataHoraFim) { tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`; }
+if (p.status === 'Em Processo' && p.dataHoraInicio) {
+tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
+} else if (p.dataHoraInicio && p.dataHoraFim) {
+tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
+}
 let botoesAcao = '';
 if (p.status === 'Aguardando' || p.status === 'Parcial') { botoesAcao = `<button class="icon-action-lg warning" title="Iniciar Atividade" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Confirmar Conclusão" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
 else if (p.status === 'Em Processo') { botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Confirmar Conclusão" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
@@ -1485,7 +1651,9 @@ if (!p) return;
 p.status = 'Em Processo';
 p.dataHoraInicio = Date.now();
 p.dataHoraFim = null;
+p.tempoReal = null;
 p.atualizadoEm = Date.now();
+Storage.salvarLocal();
 await Storage.salvarApi('update', p);
 this.renderTable();
 UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new Date().toLocaleTimeString('pt-BR'));
@@ -1500,7 +1668,6 @@ this.renderTable();
 UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
 }
 };
-
 // ==========================================
 // CONCLUSÃO DE PROJETOS
 // ==========================================
@@ -1624,7 +1791,6 @@ UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo total: ' 
 }
 }
 };
-
 // ==========================================
 // HISTÓRICO
 // ==========================================
@@ -1716,35 +1882,34 @@ Charts.render();
 UI.showToast('success', 'Excluído', 'Registro removido do histórico');
 }
 };
-
 // ==========================================
 // TURNO, TECLADO, GRÁFICOS, EXPORT
 // ==========================================
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
+State.data.ultimaSelecaoTurno = Date.now();
 Storage.salvarLocal();
 document.getElementById('postoTurno').value = turno;
 UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
-UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno);
+UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno + '. O modal só aparecerá novamente após 2 horas.');
 },
 cancelarSelecao() {
 const turnoDetectado = Utils.detectarTurnoAutomatico();
 State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+State.data.ultimaSelecaoTurno = Date.now();
 Storage.salvarLocal();
 document.getElementById('postoTurno').value = turnoDetectado;
 UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
 }
 };
-
 const VirtualKeyboard = {
 show() { document.getElementById('virtualKeyboard').classList.add('active'); State.vkActive = true; if (State.vkTarget) UI.scrollParaElemento(State.vkTarget); },
 hide() { document.getElementById('virtualKeyboard').classList.remove('active'); State.vkActive = false; State.vkTarget = null; },
 toggle() { if (State.vkActive) this.hide(); else this.show(); }
 };
-
 const Charts = {
 render() {
 const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
@@ -1778,7 +1943,6 @@ State.charts.eficiencia = new Chart(ctx4, { type: 'pie', data: { labels: Object.
 }
 }
 };
-
 const Export = {
 downloadFile(name, content, type) { const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); },
 csv() {
@@ -1836,7 +2000,6 @@ reader.readAsText(file);
 e.target.value = '';
 }
 };
-
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
@@ -1849,16 +2012,23 @@ UI.setupSidebarClickHandler();
 UI.setupVirtualKeyboard();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
-
 if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) { State.data.projetos.push(projLocal); }
-else {
+if (index === -1) {
+State.data.projetos.push(projLocal);
+} else {
 const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
 const remoteAtualizado = projLocal.atualizadoEm || 0;
-if (remoteAtualizado > localAtualizado) State.data.projetos[index] = projLocal;
+if (remoteAtualizado > localAtualizado) {
+State.data.projetos[index] = {
+...State.data.projetos[index],
+...projLocal,
+dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
+};
+}
 }
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
@@ -1879,7 +2049,15 @@ API.on('project:updated', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
 if (index !== -1) {
-State.data.projetos[index] = projLocal;
+State.data.projetos[index] = {
+...State.data.projetos[index],
+...projLocal,
+dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
+tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
+concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
+observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
+};
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
@@ -1896,7 +2074,6 @@ Charts.render();
 API.on('sync:complete', (data) => { console.log(`Sync completo: ${data.count} alterações`); });
 API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
 }
-
 window.addEventListener('online', () => {
 State.isOnline = true;
 State.apiAvailable = (typeof API !== 'undefined');
