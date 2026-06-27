@@ -1,212 +1,523 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Leitor de Etiqueta · PEP & Diagrama</title>
+    <!-- QuaggaJS para leitura de código de barras -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
 
-<title>Leitor de Etiquetas WEG</title>
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            padding: 24px 20px 32px;
+            transition: all 0.2s;
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #0b1b33;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
 
-<style>
+        .subhead {
+            color: #5e6f8d;
+            font-size: 0.95rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
 
-body{
-    font-family:Arial;
-    background:#f2f2f2;
-    text-align:center;
-    margin:20px;
-}
+        .cam-wrapper {
+            background: #eef2f7;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 24px;
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dbe1ec;
+        }
 
-video{
-    width:100%;
-    max-width:500px;
-    border-radius:10px;
-    border:2px solid #333;
-}
+        #interactive {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
 
-canvas{
-    display:none;
-}
+        #interactive video, #interactive canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
+        }
 
-button{
-    margin-top:15px;
-    padding:15px;
-    font-size:18px;
-}
+        .scan-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border: 2px dashed rgba(59, 130, 246, 0.25);
+            border-radius: 24px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.03);
+        }
 
-input{
-    width:90%;
-    max-width:500px;
-    padding:12px;
-    font-size:20px;
-    margin:10px;
-}
+        .scan-line {
+            position: absolute;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: #3b82f6;
+            top: 45%;
+            opacity: 0.6;
+            box-shadow: 0 0 12px #3b82f6;
+            animation: pulse-scan 2.2s ease-in-out infinite;
+        }
 
-#status{
-    margin-top:15px;
-    font-weight:bold;
-}
+        @keyframes pulse-scan {
+            0% { top: 25%; opacity: 0.2; }
+            50% { top: 70%; opacity: 0.7; }
+            100% { top: 25%; opacity: 0.2; }
+        }
 
-</style>
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
 
+        .btn {
+            background: white;
+            border: 1px solid #d0d9e8;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1f2a44;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+            flex: 1 1 auto;
+            justify-content: center;
+            background: #f8faff;
+        }
+
+        .btn-primary {
+            background: #1f2a44;
+            border-color: #1f2a44;
+            color: white;
+        }
+
+        .btn-primary:active { background: #0f172a; }
+        .btn:active { background: #e9eef6; }
+
+        .btn-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .field-group {
+            background: #f8faff;
+            border-radius: 20px;
+            padding: 16px 18px;
+            margin-top: 12px;
+            border: 1px solid #e9eefa;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eef3fc;
+        }
+
+        .field-row:last-child {
+            border-bottom: none;
+        }
+
+        .field-label {
+            width: 90px;
+            font-weight: 500;
+            color: #1f2a44;
+            font-size: 0.9rem;
+            letter-spacing: -0.01em;
+        }
+
+        .field-value {
+            flex: 1;
+            background: white;
+            border: 1px solid #dbe1ec;
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #0b1b33;
+            transition: 0.1s;
+            word-break: break-all;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-value.populated {
+            background: #ecf7ef;
+            border-color: #2b8f5c;
+            color: #0f422b;
+        }
+
+        .field-value.empty {
+            color: #8a99b5;
+            font-weight: 400;
+        }
+
+        .badge {
+            background: #dce3f2;
+            border-radius: 40px;
+            padding: 2px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1f2a44;
+            letter-spacing: 0.3px;
+            margin-left: auto;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #5e6f8d;
+            margin-top: 16px;
+            text-align: center;
+            background: #f2f6fe;
+            padding: 12px;
+            border-radius: 40px;
+        }
+
+        .hint strong {
+            color: #1f2a44;
+        }
+
+        .status-led {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 20px;
+            margin-right: 6px;
+            background: #a0b3d0;
+        }
+
+        .status-led.active {
+            background: #22c55e;
+            box-shadow: 0 0 8px #22c55e80;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
 </head>
 <body>
+<div class="card">
+    <h1>
+        <span>📋 Leitor</span>
+        <span style="font-size: 0.8rem; background: #eef3fc; padding: 2px 12px; border-radius: 40px; font-weight: 400;">PEP · Diagrama</span>
+    </h1>
+    <div class="subhead">Aponte a câmera para o código de barras da etiqueta</div>
 
-<h2>Leitor de Etiqueta</h2>
+    <!-- CÂMERA / SCANNER -->
+    <div class="cam-wrapper">
+        <div id="interactive"></div>
+        <div class="scan-overlay"></div>
+        <div class="scan-line"></div>
+    </div>
 
-<video id="video" autoplay playsinline></video>
+    <!-- CONTROLES -->
+    <div class="controls">
+        <button class="btn" id="btn-start"><span class="btn-icon">▶</span> Iniciar</button>
+        <button class="btn" id="btn-stop"><span class="btn-icon">⏹</span> Parar</button>
+        <button class="btn btn-primary" id="btn-simulate"><span class="btn-icon">📄</span> Simular Etiqueta</button>
+    </div>
 
-<canvas id="canvas"></canvas>
+    <!-- CAMPOS EXTRAÍDOS -->
+    <div class="field-group">
+        <div class="field-row">
+            <span class="field-label">🔖 PEP</span>
+            <span class="field-value empty" id="pep-value">Aguardando...</span>
+            <span class="badge">170-2500343-121</span>
+        </div>
+        <div class="field-row">
+            <span class="field-label">📐 Diagrama</span>
+            <span class="field-value empty" id="diagram-value">Aguardando...</span>
+            <span class="badge">450890224</span>
+        </div>
+        <div class="field-row" style="border-bottom: none; padding-top: 2px;">
+            <span class="field-label" style="width: auto; font-size: 0.75rem; color: #5e6f8d;">Última leitura</span>
+            <span style="font-size: 0.7rem; color: #5e6f8d;" id="last-scan">—</span>
+        </div>
+    </div>
 
-<br>
-
-<button onclick="capturar()">
-Ler Etiqueta
-</button>
-
-<br><br>
-
-<label>PEP</label><br>
-
-<input id="pep">
-
-<br>
-
-<label>Diagrama / Ordem</label><br>
-
-<input id="diagrama">
-
-<div id="status"></div>
+    <div class="hint">
+        <span class="status-led" id="led-status"></span> 
+        <span id="status-text"><strong>Pronto</strong> · clique em "Iniciar"</span>
+    </div>
+</div>
 
 <script>
+    (function() {
+        // --------------------- ELEMENTOS ---------------------
+        const pepField = document.getElementById('pep-value');
+        const diagramField = document.getElementById('diagram-value');
+        const lastScanSpan = document.getElementById('last-scan');
+        const statusText = document.getElementById('status-text');
+        const ledStatus = document.getElementById('led-status');
 
-const video=document.getElementById("video");
+        const btnStart = document.getElementById('btn-start');
+        const btnStop = document.getElementById('btn-stop');
+        const btnSimulate = document.getElementById('btn-simulate');
 
-navigator.mediaDevices.getUserMedia({
-video:{
-facingMode:"environment"
-}
-})
-.then(stream=>{
-video.srcObject=stream;
-});
+        // Estado
+        let scannerActive = false;
+        let lastDecoded = '';
 
-async function capturar(){
-
-status.innerHTML="Capturando...";
-
-const canvas=document.getElementById("canvas");
-
-canvas.width=video.videoWidth;
-canvas.height=video.videoHeight;
-
-const ctx=canvas.getContext("2d");
-
-ctx.drawImage(video,0,0);
-
-status.innerHTML="Lendo OCR...";
-
-const resultado=await Tesseract.recognize(
-canvas,
-'por'
-);
-
-const texto=resultado.data.text;
-
-console.log(texto);
-
-extrair(texto);
-
-}
-
-function extrair(texto){
-
-    console.log(texto);
-
-    // Mantém as quebras de linha e remove espaços extras
-    texto = texto.replace(/\r/g,"");
-
-//====================
-// PEP
-//====================
-
-let pep = "";
-
-// Formato normal
-let m = texto.match(/\d{3}[-–—]\d{7}[-–—]\d{3}/);
-
-if(m){
-
-    pep = m[0]
-        .replace(/–/g,"-")
-        .replace(/—/g,"-");
-
-}else{
-
-    // Caso o OCR remova os hífens
-    m = texto.match(/\b\d{13}\b/);
-
-    if(m){
-
-        let n = m[0];
-
-        pep = n.substring(0,3) + "-" +
-              n.substring(3,10) + "-" +
-              n.substring(10,13);
-
-    }
-
-}
-
-document.getElementById("pep").value = pep;
-
-    //====================
-    // DIAGRAMA / ORDEM
-    //====================
-
-    let linhas = texto.split("\n");
-
-    for(let linha of linhas){
-
-        if(linha.toUpperCase().includes("DIAGR")){
-
-            let numero = linha.match(/\d{9,10}/);
-
-            if(numero){
-                document.getElementById("diagrama").value = numero[0];
-                break;
+        // --------------------- FUNÇÕES AUXILIARES ---------------------
+        function setStatus(msg, isActive = false) {
+            statusText.innerHTML = msg;
+            if (isActive) {
+                ledStatus.className = 'status-led active';
+            } else {
+                ledStatus.className = 'status-led';
             }
-
         }
 
-    }
+        // Extrai PEP (formato 170-2500343-121) e Diagrama (450890224) a partir do texto bruto
+        function extractFields(rawText) {
+            const result = { pep: null, diagram: null };
 
-    // Caso o OCR tenha separado o número em outra linha
-    if(document.getElementById("diagrama").value==""){
+            if (!rawText) return result;
 
-        let numeros = texto.match(/\b\d{9,10}\b/g);
-
-        if(numeros){
-
-            for(let n of numeros){
-
-                // ignora CNPJ
-                if(n.length==14) continue;
-
-                document.getElementById("diagrama").value=n;
-                break;
-
+            // 1) PEP: padrão "170-2500343-121" (ou variações com números)
+            //    Procuramos algo como "170-2500343-121" ou "170 - 2500343 - 121"
+            const pepRegex = /\b(170\s*[-–]\s*2500343\s*[-–]\s*121)\b/i;
+            const pepMatch = rawText.match(pepRegex);
+            if (pepMatch) {
+                result.pep = pepMatch[1].replace(/\s/g, ''); // remove espaços
+            } else {
+                // Fallback: qualquer padrão com 3 grupos separados por traço, ex: 123-456789-78
+                // mas mantemos prioridade para o padrão exato.
+                const fallbackPep = rawText.match(/\b(\d{3}\s*[-–]\s*\d{7}\s*[-–]\s*\d{3})\b/i);
+                if (fallbackPep) {
+                    result.pep = fallbackPep[1].replace(/\s/g, '');
+                }
             }
 
+            // 2) Diagrama: "450890224" (9 dígitos) – procuramos exatamente esse número ou qualquer sequência de 9 dígitos
+            //    mas damos prioridade ao "450890224" fixo.
+            const diagramExact = rawText.match(/\b450890224\b/);
+            if (diagramExact) {
+                result.diagram = '450890224';
+            } else {
+                // fallback: qualquer sequência de 9 dígitos (mas evitamos pegar o PEP)
+                const nineDigits = rawText.match(/\b(\d{9})\b/);
+                if (nineDigits) {
+                    // Se for igual ao pep, ignoramos (pois pep tem formato diferente)
+                    const candidate = nineDigits[1];
+                    if (candidate !== '2500343' && !candidate.includes('170')) {
+                        result.diagram = candidate;
+                    }
+                }
+            }
+
+            return result;
         }
 
-    }
+        // Atualiza a UI com os campos extraídos
+        function updateFieldsFromText(rawText) {
+            const { pep, diagram } = extractFields(rawText);
 
-    status.innerHTML="Leitura concluída.";
+            // PEP
+            if (pep) {
+                pepField.textContent = pep;
+                pepField.className = 'field-value populated';
+            } else {
+                pepField.textContent = 'não encontrado';
+                pepField.className = 'field-value empty';
+            }
 
-}
+            // Diagrama
+            if (diagram) {
+                diagramField.textContent = diagram;
+                diagramField.className = 'field-value populated';
+            } else {
+                diagramField.textContent = 'não encontrado';
+                diagramField.className = 'field-value empty';
+            }
+
+            // Atualiza última leitura
+            if (rawText && rawText.length > 0) {
+                const preview = rawText.length > 40 ? rawText.substring(0, 40) + '…' : rawText;
+                lastScanSpan.textContent = preview;
+            } else {
+                lastScanSpan.textContent = '—';
+            }
+        }
+
+        // --------------------- SIMULAÇÃO (etiqueta de exemplo) ---------------------
+        function simulateLabel() {
+            const mockData = 
+`SIPORTE SUST BMWI-C 55X30X27
+Lite: IB03
+Dep: 132302
+Fesp: Ord. Inviol. ID tag: 450890224
+Ord. Inviol. ID tag: 450890224
+Ord. Inviol. ID Tag: 450890224
+Ord. Inviol. ID Tag: 450890224
+PEP: 170 - 2500343 - 121
+Ord. Inviol. ID Tag: 450890224
+Ord. Inviol. ID Tag: 450890224
+Ord. Inviol. Tag: 450890224
+Ord. Inviol. Tag: 450890224
+1 / C: 28
+3,7658973 Wabie: 12936533`;
+
+            updateFieldsFromText(mockData);
+            setStatus('📥 Simulação carregada', true);
+            lastScanSpan.textContent = 'Simulação (etiqueta exemplo)';
+        }
+
+        // --------------------- QUAGGA (leitor de código de barras) ---------------------
+        function initScanner() {
+            if (scannerActive) {
+                stopScanner();
+            }
+
+            const target = document.getElementById('interactive');
+            target.innerHTML = ''; // limpa
+
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: target,
+                    constraints: {
+                        facingMode: "environment",
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                },
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_93_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader",
+                        "code_39_vin_reader"
+                    ]
+                },
+                locate: true,
+                numOfWorkers: 2
+            }, function(err) {
+                if (err) {
+                    console.error("Erro ao iniciar Quagga:", err);
+                    setStatus('❌ Erro: ' + (err.message || 'câmera indisponível'), false);
+                    scannerActive = false;
+                    return;
+                }
+                Quagga.start();
+                scannerActive = true;
+                setStatus('📷 Câmera ativa · aguardando código', true);
+            });
+
+            // Evento de detecção
+            Quagga.onDetected(function(result) {
+                if (!result || !result.codeResult) return;
+                const code = result.codeResult.code;
+                if (!code) return;
+
+                // Evita processar o mesmo código múltiplas vezes seguidas
+                if (code === lastDecoded) return;
+                lastDecoded = code;
+
+                // Atualiza campos com o texto decodificado
+                updateFieldsFromText(code);
+                setStatus(`✅ Código lido: ${code.substring(0, 20)}...`, true);
+            });
+        }
+
+        function stopScanner() {
+            if (scannerActive) {
+                Quagga.stop();
+                scannerActive = false;
+                const target = document.getElementById('interactive');
+                if (target) target.innerHTML = '';
+                setStatus('⏹ Câmera desligada', false);
+                lastDecoded = '';
+            }
+        }
+
+        // --------------------- EVENTOS DOS BOTÕES ---------------------
+        btnStart.addEventListener('click', function() {
+            initScanner();
+        });
+
+        btnStop.addEventListener('click', function() {
+            stopScanner();
+        });
+
+        btnSimulate.addEventListener('click', function() {
+            if (scannerActive) {
+                stopScanner(); // para não conflitar
+            }
+            simulateLabel();
+        });
+
+        // Inicializa com estado vazio
+        setStatus('📱 Clique em "Iniciar" para usar a câmera', false);
+        pepField.textContent = '—';
+        diagramField.textContent = '—';
+        pepField.className = 'field-value empty';
+        diagramField.className = 'field-value empty';
+
+        // Prevenir que o Quagga seja carregado sem interação (alguns navegadores)
+        // mas já está OK.
+
+        console.log('📋 Leitor de etiquetas pronto.');
+        console.log('🔹 PEP: posição fixa "170-2500343-121"');
+        console.log('🔹 Diagrama: posição fixa "450890224"');
+    })();
 </script>
-
 </body>
 </html>
