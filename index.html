@@ -3,276 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner Ultra-Rápido de Etiquetas</title>
+    <title>Scanner Profissional v4</title>
+    <!-- Bibliotecas externas leves -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        :root {
-            --primary: #00ff88;
-            --bg: #0a0a0a;
-            --card: #1a1a1a;
-        }
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg);
-            color: white;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .header {
-            padding: 10px;
-            text-align: center;
-            background: var(--card);
-            border-bottom: 1px solid #333;
-        }
-        #viewport {
-            position: relative;
-            flex: 1;
-            background: #000;
-            overflow: hidden;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        /* Zonas de Detecção */
-        .zones-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
-        }
-        .zone {
-            width: 85%;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        .zone-pep { height: 15%; margin-bottom: 10px; border-color: #4cc9f0; }
-        .zone-ordem { height: 15%; border-color: #f72585; }
+        :root { --accent: #00e676; --bg: #000; --card: #121212; }
+        body { font-family: sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
         
-        .zone-label {
-            position: absolute;
-            top: -20px;
-            left: 5px;
-            font-size: 10px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-        .zone-pep .zone-label { color: #4cc9f0; }
-        .zone-ordem .zone-label { color: #f72585; }
-
-        .active-zone { border-color: var(--primary); border-width: 3px; box-shadow: 0 0 15px var(--primary); }
-
-        .controls {
-            background: var(--card);
-            padding: 15px;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
-        }
-        .field {
-            margin-bottom: 12px;
-        }
-        .field label {
-            display: block;
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 4px;
-        }
-        .field input {
-            width: 100%;
-            padding: 12px;
-            background: #252525;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: var(--primary);
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-sizing: border-box;
-        }
-        #status {
-            font-size: 12px;
-            color: #aaa;
-            text-align: center;
-            margin-bottom: 10px;
-            height: 15px;
-        }
-        .btn-clear {
-            width: 100%;
-            padding: 10px;
-            background: #333;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-        canvas { display: none; }
+        #reader { width: 100%; flex: 1; background: #000; }
+        
+        .overlay-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; }
+        .scanner-target { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .target-box { width: 80%; height: 30%; border: 2px solid var(--accent); border-radius: 15px; box-shadow: 0 0 20px rgba(0, 230, 118, 0.3); position: relative; }
+        .target-box::after { content: "ALINHE O TEXTO OU QR CODE AQUI"; position: absolute; bottom: -25px; width: 100%; text-align: center; font-size: 10px; color: var(--accent); font-weight: bold; }
+        
+        .bottom-panel { background: var(--card); padding: 20px; border-radius: 25px 25px 0 0; border-top: 1px solid #333; pointer-events: auto; }
+        .input-row { margin-bottom: 15px; }
+        .input-row label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; }
+        .input-row input { width: 100%; background: #1e1e1e; border: 1px solid #333; padding: 12px; border-radius: 8px; color: var(--accent); font-size: 1.1rem; font-weight: bold; box-sizing: border-box; }
+        
+        .flash-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; padding: 10px; border-radius: 50%; pointer-events: auto; color: white; }
+        
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div style="font-weight: bold; color: var(--primary);">SCANNER DE ALTA PRECISÃO</div>
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px;">Iniciando Scanner...</p>
 </div>
 
-<div id="viewport">
-    <video id="video" autoplay playsinline></video>
-    <div class="zones-overlay">
-        <div class="zone zone-pep" id="box-pep">
-            <span class="zone-label">POSICIONE O PEP AQUI</span>
-        </div>
-        <div class="zone zone-ordem" id="box-ordem">
-            <span class="zone-label">POSICIONE A ORDEM AQUI</span>
-        </div>
-    </div>
-</div>
+<div id="reader"></div>
 
-<div class="controls">
-    <div id="status">Iniciando sistema...</div>
-    
-    <div class="field">
-        <label>PEP DETECTADO</label>
-        <input type="text" id="pep" readonly placeholder="...">
+<div class="overlay-ui">
+    <button class="flash-btn" id="torch-btn">🔦</button>
+    <div class="scanner-target">
+        <div class="target-box"></div>
     </div>
     
-    <div class="field">
-        <label>ORDEM / DIAGRAMA DETECTADO</label>
-        <input type="text" id="ordem" readonly placeholder="...">
+    <div class="bottom-panel">
+        <div class="input-row">
+            <label>PEP (IDENTIFICADO)</label>
+            <input type="text" id="pep-result" readonly placeholder="Aguardando...">
+        </div>
+        <div class="input-row">
+            <label>ORDEM / DIAGRAMA (IDENTIFICADO)</label>
+            <input type="text" id="ordem-result" readonly placeholder="Aguardando...">
+        </div>
+        <button onclick="location.reload()" style="width:100%; padding:10px; background:#333; border:none; color:#fff; border-radius:8px;">REINICIAR SCANNER</button>
     </div>
-
-    <button class="btn-clear" onclick="reset()">LIMPAR SCANNER</button>
 </div>
-
-<canvas id="canvas-pep"></canvas>
-<canvas id="canvas-ordem"></canvas>
 
 <script>
-    const video = document.getElementById('video');
-    const status = document.getElementById('status');
-    const pepIn = document.getElementById('pep');
-    const ordemIn = document.getElementById('ordem');
-    const boxPep = document.getElementById('box-pep');
-    const boxOrdem = document.getElementById('box-ordem');
+    const pepInput = document.getElementById('pep-result');
+    const ordemInput = document.getElementById('ordem-result');
+    let html5QrCode;
+    let tesseractWorker;
+    let isOcrProcessing = false;
 
-    let worker = null;
-    let isBusy = false;
-
-    async function init() {
+    async function startScanner() {
         try {
-            status.innerText = "Configurando Câmera...";
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: 1280, height: 720 }
-            });
-            video.srcObject = stream;
-
-            status.innerText = "Carregando Inteligência...";
-            worker = await Tesseract.createWorker('por');
-            // Otimização: Apenas números e caracteres específicos para ser mais rápido
-            await worker.setParameters({
-                tessedit_char_whitelist: '0123456789-./ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            // 1. Iniciar Tesseract em segundo plano para OCR
+            tesseractWorker = await Tesseract.createWorker('por');
+            await tesseractWorker.setParameters({
+                tessedit_char_whitelist: '0123456789-./',
+                tessedit_pageseg_mode: '7', // Tratar como uma única linha de texto
             });
 
-            status.innerText = "Scanner Ativo";
-            scanLoop();
-        } catch (e) {
-            status.innerText = "Erro ao iniciar: " + e.message;
-        }
-    }
-
-    function processImage(ctx, w, h) {
-        const imgData = ctx.getImageData(0, 0, w, h);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            const v = (data[i] + data[i+1] + data[i+2]) / 3;
-            const res = v < 110 ? 0 : 255; // Threshold agressivo para letras falhadas
-            data[i] = data[i+1] = data[i+2] = res;
-        }
-        ctx.putImageData(imgData, 0, 0);
-    }
-
-    async function scanLoop() {
-        if (isBusy) {
-            setTimeout(scanLoop, 100);
-            return;
-        }
-
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            isBusy = true;
+            // 2. Iniciar Html5QrCode (muito mais rápido que Tesseract para imagem)
+            html5QrCode = new Html5Qrcode("reader");
             
-            const vW = video.videoWidth;
-            const vH = video.videoHeight;
+            const config = { 
+                fps: 10, 
+                qrbox: { width: 250, height: 150 },
+                aspectRatio: 1.0
+            };
 
-            // Captura Zona PEP
-            if (!pepIn.value) {
-                await captureAndRead('pep', vW, vH, 0.35, 0.15); // Posição superior
-            }
+            await html5QrCode.start(
+                { facingMode: "environment" }, 
+                config,
+                onScanSuccess,
+                onScanFailure
+            );
 
-            // Captura Zona Ordem
-            if (!ordemIn.value) {
-                await captureAndRead('ordem', vW, vH, 0.55, 0.15); // Posição inferior
-            }
-
-            isBusy = false;
+            document.getElementById('loading-overlay').style.display = 'none';
+        } catch (err) {
+            alert("Erro ao iniciar câmera: " + err);
         }
-        setTimeout(scanLoop, 200); // Frequência de scan alta
     }
 
-    async function captureAndRead(type, vW, vH, yFactor, hFactor) {
-        const canvas = document.getElementById(`canvas-${type}`);
-        const box = document.getElementById(`box-${type === 'pep' ? 'pep' : 'ordem'}`);
-        
-        const sW = vW * 0.85;
-        const sH = vH * hFactor;
-        const sX = (vW - sW) / 2;
-        const sY = vH * yFactor;
+    function onScanSuccess(decodedText, decodedResult) {
+        // Se encontrar um QR Code, processar os dados
+        console.log("QR Code detectado:", decodedText);
+        // Tentar extrair dados do QR Code se ele tiver formato específico
+        parseData(decodedText);
+    }
 
+    function onScanFailure(error) {
+        // Se falhar o QR Code, tentamos o OCR no frame atual
+        if (!isOcrProcessing && (!pepInput.value || !ordemInput.value)) {
+            runOcrOnFrame();
+        }
+    }
+
+    async function runOcrOnFrame() {
+        const video = document.querySelector('video');
+        if (!video) return;
+
+        isOcrProcessing = true;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Capturar apenas a zona central para velocidade
+        const vW = video.videoWidth;
+        const vH = video.videoHeight;
+        const sW = vW * 0.6;
+        const sH = vH * 0.3;
         canvas.width = sW;
         canvas.height = sH;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, sX, sY, sW, sH, 0, 0, sW, sH);
-        processImage(ctx, sW, sH);
+        
+        ctx.drawImage(video, (vW-sW)/2, (vH-sH)/2, sW, sH, 0, 0, sW, sH);
+        
+        // Filtro de contraste rápido
+        const imgData = ctx.getImageData(0,0,sW,sH);
+        for (let i=0; i<imgData.data.length; i+=4) {
+            const avg = (imgData.data[i] + imgData.data[i+1] + imgData.data[i+2])/3;
+            const val = avg < 128 ? 0 : 255;
+            imgData.data[i] = imgData.data[i+1] = imgData.data[i+2] = val;
+        }
+        ctx.putImageData(imgData, 0, 0);
 
         try {
-            const { data: { text } } = await worker.recognize(canvas);
-            const clean = text.replace(/\s/g, '').toUpperCase();
-            
-            if (type === 'pep') {
-                // Regex PEP: Deve ter o formato com hifens (ex: 170-2500343-121)
-                const match = clean.match(/\d{3}-\d{7}-\d{3}/);
-                if (match) {
-                    pepIn.value = match[0];
-                    box.classList.add('active-zone');
-                }
-            } else {
-                // Regex Ordem: 9 dígitos exatos
-                const match = clean.match(/\b\d{9}\b/);
-                if (match) {
-                    ordemIn.value = match[0];
-                    box.classList.add('active-zone');
-                }
-            }
+            const { data: { text } } = await tesseractWorker.recognize(canvas);
+            parseData(text);
         } catch (e) {}
+        
+        isOcrProcessing = false;
     }
 
-    function reset() {
-        pepIn.value = "";
-        ordemIn.value = "";
-        boxPep.classList.remove('active-zone');
-        boxOrdem.classList.remove('active-zone');
-        status.innerText = "Scanner Reiniciado";
+    function parseData(text) {
+        const clean = text.replace(/\s/g, '').toUpperCase();
+        
+        // PEP: XXX-XXXXXXX-XXX
+        const pepMatch = clean.match(/\d{3}-\d{7}-\d{3}/);
+        if (pepMatch && !pepInput.value) {
+            pepInput.value = pepMatch[0];
+            vibrate();
+        }
+
+        // Ordem: 9 dígitos
+        const ordemMatch = clean.match(/\b\d{9}\b/);
+        if (ordemMatch && !ordemInput.value) {
+            ordemInput.value = ordemMatch[0];
+            vibrate();
+        }
     }
 
-    window.onload = init;
+    function vibrate() {
+        if (navigator.vibrate) navigator.vibrate(100);
+    }
+
+    document.getElementById('torch-btn').addEventListener('click', async () => {
+        const track = html5QrCode.getRunningTrack();
+        if (track && track.getCapabilities().torch) {
+            const current = track.getSettings().torch;
+            await track.applyConstraints({ advanced: [{ torch: !current }] });
+        } else {
+            alert("Lanterna não suportada neste dispositivo.");
+        }
+    });
+
+    window.onload = startScanner;
 </script>
 
 </body>
