@@ -3,40 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor de Etiquetas - OCR</title>
+    <title>Leitor Automático de Etiquetas</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-            background-color: #f0f2f5;
+            padding: 15px;
+            background-color: #121212;
+            color: white;
             margin: 0;
+            height: 100vh;
+            overflow: hidden;
         }
         .container {
-            max-width: 500px;
             width: 100%;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         h1 {
-            font-size: 1.5rem;
-            color: #1a73e8;
+            font-size: 1.2rem;
             text-align: center;
-            margin-bottom: 20px;
+            margin: 10px 0;
+            color: #4cc9f0;
         }
         #video-container {
             position: relative;
             width: 100%;
-            aspect-ratio: 3/4;
+            flex: 1;
             background: #000;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 20px;
+            border: 2px solid #333;
         }
         video {
             width: 100%;
@@ -49,9 +51,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: 2px solid rgba(26, 115, 232, 0.5);
-            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             pointer-events: none;
+        }
+        .guide-box {
+            width: 80%;
+            height: 40%;
+            border: 2px dashed #4cc9f0;
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
         .scan-line {
             position: absolute;
@@ -59,198 +71,236 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: #1a73e8;
-            box-shadow: 0 0 8px #1a73e8;
-            animation: scan 3s linear infinite;
+            background: #4cc9f0;
+            box-shadow: 0 0 10px #4cc9f0;
+            animation: scan 2s linear infinite;
         }
         @keyframes scan {
             0% { top: 0%; }
             100% { top: 100%; }
         }
+        .results {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 12px 12px 0 0;
+            margin-top: 10px;
+        }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #444;
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 4px;
         }
         input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            background: #2d2d2d;
+            border: 1px solid #444;
             border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 6px;
+            color: #fff;
             font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
+            font-family: monospace;
         }
-        button:disabled {
-            background-color: #ccc;
+        input:focus {
+            border-color: #4cc9f0;
+            outline: none;
         }
-        #status {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #666;
+        #status-bar {
+            padding: 8px;
+            font-size: 0.8rem;
             text-align: center;
+            background: #333;
+            width: 100%;
+            box-sizing: border-box;
         }
-        canvas {
-            display: none;
+        .flash-success {
+            animation: flash 0.5s;
         }
+        @keyframes flash {
+            0% { background: #1e1e1e; }
+            50% { background: #2e7d32; }
+            100% { background: #1e1e1e; }
+        }
+        canvas { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Leitor de Etiqueta</h1>
+    <h1>Scanner Inteligente</h1>
 
     <div id="video-container">
         <video id="video" autoplay playsinline></video>
         <div class="overlay">
-            <div class="scan-line"></div>
+            <div class="guide-box">
+                <div class="scan-line"></div>
+            </div>
         </div>
     </div>
 
-    <button id="capture-btn">Capturar e Ler Etiqueta</button>
-    <div id="status">Aguardando câmera...</div>
+    <div id="status-bar">Iniciando câmera...</div>
 
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-
-    <div class="form-group">
-        <label for="pep">PEP:</label>
-        <input type="text" id="pep" placeholder="O campo PEP aparecerá aqui">
+    <div class="results" id="results-panel">
+        <div class="form-group">
+            <label>PEP (Automático)</label>
+            <input type="text" id="pep" readonly placeholder="Aguardando detecção...">
+        </div>
+        <div class="form-group">
+            <label>DIAGRAMA / ORDEM (Automático)</label>
+            <input type="text" id="diagrama" readonly placeholder="Aguardando detecção...">
+        </div>
+        <button onclick="clearFields()" style="width:100%; padding:8px; background:#444; color:white; border:none; border-radius:4px; font-size:0.8rem;">Limpar Campos</button>
     </div>
-
-    <div class="form-group">
-        <label for="diagrama">Diagrama / Ordem:</label>
-        <input type="text" id="diagrama" placeholder="O campo Diagrama/Ordem aparecerá aqui">
-    </div>
-
-    <canvas id="canvas"></canvas>
 </div>
+
+<canvas id="canvas"></canvas>
+<canvas id="preprocess-canvas"></canvas>
 
 <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
-    const captureBtn = document.getElementById('capture-btn');
-    const statusDiv = document.getElementById('status');
+    const preCanvas = document.getElementById('preprocess-canvas');
+    const statusBar = document.getElementById('status-bar');
     const pepInput = document.getElementById('pep');
     const diagramaInput = document.getElementById('diagrama');
+    const resultsPanel = document.getElementById('results-panel');
 
-    // Iniciar Câmera
+    let isProcessing = false;
+    let worker = null;
+
+    async function initOCR() {
+        statusBar.innerText = "Carregando motor de OCR...";
+        worker = await Tesseract.createWorker('por', 1, {
+            logger: m => {
+                if(m.status === 'recognizing') {
+                    statusBar.innerText = `Escaneando: ${Math.round(m.progress * 100)}%`;
+                }
+            }
+        });
+        statusBar.innerText = "Pronto para escanear.";
+        startScanningLoop();
+    }
+
     async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' },
-                audio: false
+                video: { 
+                    facingMode: 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
             });
             video.srcObject = stream;
-            statusDiv.innerText = "Câmera pronta. Posicione a etiqueta.";
+            initOCR();
         } catch (err) {
-            console.error("Erro ao acessar câmera: ", err);
-            statusDiv.innerText = "Erro ao acessar a câmera. Verifique as permissões.";
+            statusBar.innerText = "Erro: Sem acesso à câmera.";
         }
     }
 
-    startCamera();
-
-    captureBtn.addEventListener('click', async () => {
-        captureBtn.disabled = true;
-        statusDiv.innerText = "Processando imagem... Por favor, aguarde.";
+    function preprocessImage(ctx, width, height) {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
         
-        // Desenhar frame do vídeo no canvas
-        const context = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Realizar OCR usando Tesseract.js
-        try {
-            const result = await Tesseract.recognize(
-                canvas.toDataURL('image/png'),
-                'por', // Idioma Português
-                { logger: m => console.log(m) }
-            );
-
-            const text = result.data.text;
-            console.log("Texto Extraído:", text);
-            processText(text);
-            
-            statusDiv.innerText = "Leitura concluída!";
-        } catch (err) {
-            console.error("Erro no OCR:", err);
-            statusDiv.innerText = "Erro ao ler a etiqueta. Tente novamente.";
-        } finally {
-            captureBtn.disabled = false;
+        // Converter para escala de cinza e aumentar contraste
+        for (let i = 0; i < data.length; i += 4) {
+            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+            // Filtro de Limiar (Threshold) simples para lidar com impressão falhada
+            // Se for muito claro, vira branco. Se for escuro, vira preto.
+            const threshold = 120; 
+            const val = avg > threshold ? 255 : 0;
+            data[i] = data[i+1] = data[i+2] = val;
         }
-    });
+        ctx.putImageData(imageData, 0, 0);
+    }
 
-    function processText(text) {
-        // Normalizar o texto (remover espaços extras, converter para maiúsculas para facilitar busca)
-        const lines = text.split('\n').map(line => line.trim());
+    async function startScanningLoop() {
+        if (isProcessing) return;
         
-        let foundPep = "";
-        let foundDiagrama = "";
-
-        // Regex para o padrão PEP (ex: 170-2500343-121)
-        // O padrão parece ser XXX-XXXXXXX-XXX
-        const pepRegex = /\d{3}-\d{7}-\d{3}/;
-        
-        // Regex para o padrão Diagrama/Ordem (ex: 450890224)
-        // Geralmente uma sequência numérica de 9 dígitos
-        const diagramaRegex = /\b\d{9}\b/;
-
-        for (let line of lines) {
-            // Tentar encontrar PEP
-            if (!foundPep) {
-                const matchPep = line.match(pepRegex);
-                if (matchPep) foundPep = matchPep[0];
-            }
-
-            // Tentar encontrar Diagrama/Ordem
-            // Como o diagrama costuma vir após o texto "Ord. Invól./Diagr.:"
-            if (!foundDiagrama) {
-                const matchDiag = line.match(diagramaRegex);
-                if (matchDiag) foundDiagrama = matchDiag[0];
-            }
-        }
-
-        // Se não encontrou pelo regex exato, tenta buscar por palavras-chave
-        if (!foundPep || !foundDiagrama) {
-            lines.forEach((line, index) => {
-                const upperLine = line.toUpperCase();
+        const loop = async () => {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                isProcessing = true;
                 
-                if (!foundPep && upperLine.includes("PEP")) {
-                    // Tenta pegar o número na mesma linha ou na próxima
-                    const match = line.match(/\d{3}-\d{7}-\d{3}/) || (lines[index+1] && lines[index+1].match(/\d{3}-\d{7}-\d{3}/));
-                    if (match) foundPep = match[0];
+                // Capturar apenas a área central (guide-box)
+                const vW = video.videoWidth;
+                const vH = video.videoHeight;
+                
+                // Definir área de corte (baseado na guide-box de 80% largura e 40% altura)
+                const sW = vW * 0.8;
+                const sH = vH * 0.4;
+                const sX = (vW - sW) / 2;
+                const sY = (vH - sH) / 2;
+
+                canvas.width = sW;
+                canvas.height = sH;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, sX, sY, sW, sH, 0, 0, sW, sH);
+                
+                // Aplicar pré-processamento para melhorar leitura de impressão ruim
+                preprocessImage(ctx, sW, sH);
+
+                try {
+                    const { data: { text } } = await worker.recognize(canvas);
+                    processExtractedText(text);
+                } catch (e) {
+                    console.error(e);
                 }
                 
-                if (!foundDiagrama && (upperLine.includes("DIAGR") || upperLine.includes("ORD"))) {
-                    const match = line.match(/\d{9}/) || (lines[index+1] && lines[index+1].match(/\d{9}/));
-                    if (match) foundDiagrama = match[0];
-                }
-            });
+                isProcessing = false;
+            }
+            // Aguarda um pouco antes da próxima tentativa para não travar o dispositivo
+            setTimeout(loop, 500); 
+        };
+        loop();
+    }
+
+    function processExtractedText(text) {
+        // Limpeza básica para lidar com falhas de OCR (ex: trocar 'O' por '0', 'I' por '1')
+        const cleanText = text.toUpperCase()
+            .replace(/[OI]/g, (m) => m === 'O' ? '0' : '1')
+            .replace(/[^A-Z0-9-\s\.\/:]/g, '');
+
+        console.log("OCR bruto:", text);
+        console.log("OCR limpo:", cleanText);
+
+        // Regex flexível para PEP: busca algo como XXX-XXXXXXX-XXX
+        // Aceita variações de separadores causadas por falha de impressão
+        const pepRegex = /(\d{3})[-.\s]?(\d{7})[-.\s]?(\d{3})/;
+        const pepMatch = cleanText.match(pepRegex);
+        
+        // Regex para Diagrama/Ordem: 9 dígitos
+        const diagRegex = /\b(\d{9})\b/;
+        const diagMatch = cleanText.match(diagRegex);
+
+        let found = false;
+
+        if (pepMatch && !pepInput.value) {
+            const formattedPep = `${pepMatch[1]}-${pepMatch[2]}-${pepMatch[3]}`;
+            pepInput.value = formattedPep;
+            found = true;
         }
 
-        if (foundPep) pepInput.value = foundPep;
-        if (foundDiagrama) diagramaInput.value = foundDiagrama;
-        
-        if (!foundPep && !foundDiagrama) {
-            statusDiv.innerText = "Não foi possível identificar os campos. Tente focar melhor.";
+        if (diagMatch && !diagramaInput.value) {
+            diagramaInput.value = diagMatch[1];
+            found = true;
+        }
+
+        if (found) {
+            resultsPanel.classList.add('flash-success');
+            setTimeout(() => resultsPanel.classList.remove('flash-success'), 500);
+            statusBar.innerText = "Dados capturados!";
         }
     }
+
+    function clearFields() {
+        pepInput.value = "";
+        diagramaInput.value = "";
+        statusBar.innerText = "Campos limpos. Aguardando nova etiqueta...";
+    }
+
+    window.onload = startCamera;
 </script>
 
 </body>
