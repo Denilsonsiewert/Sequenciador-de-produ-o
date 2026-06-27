@@ -1,7 +1,7 @@
-// js/api.js - Cliente da API Google Apps Script
+// js/api.js - Cliente da API Google Apps Script (Corrigido para CORS e Redirecionamento)
 
 const API_CONFIG = {
-  // COLE AQUI A URL DA SUA API DO GOOGLE APPS SCRIPT
+  // URL da sua API do Google Apps Script
   URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
   
   // Senha definida no Apps Script
@@ -22,20 +22,41 @@ let localCache = {
 // Sistema de eventos
 const eventListeners = {};
 
+/**
+ * Função principal de comunicação com a API
+ * Ajustada para evitar problemas de CORS "Preflight" e lidar com redirecionamentos do Google
+ */
 async function apiRequest(action, payload = {}, method = 'POST') {
   try {
-    const url = method === 'GET' && payload.since 
-      ? `${API_CONFIG.URL}?action=${action}&since=${payload.since}`
-      : API_CONFIG.URL;
+    const url = new URL(API_CONFIG.URL);
     
-    const response = await fetch(url, {
+    // Sempre passamos a ação na URL para facilitar o roteamento no backend
+    url.searchParams.append('action', action);
+    
+    const options = {
       method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_CONFIG.SECRET}`
-      },
-      body: method === 'POST' ? JSON.stringify({ action, ...payload }) : undefined
-    });
+      mode: 'cors',
+      redirect: 'follow'
+    };
+
+    if (method === 'POST') {
+      // NOTA: Não incluímos headers customizados como 'Authorization' ou 'Content-Type: application/json'
+      // para evitar que o navegador envie uma requisição OPTIONS (Preflight), que o GAS não lida bem.
+      // O GAS aceita o corpo da requisição mesmo sem o Content-Type explícito.
+      options.body = JSON.stringify({ 
+        action, 
+        secret: API_CONFIG.SECRET, // Enviamos o segredo no corpo para validação
+        ...payload 
+      });
+    } else if (method === 'GET') {
+      // Para GET, adicionamos todos os parâmetros na URL
+      if (payload.since) url.searchParams.append('since', payload.since);
+      if (payload.key) url.searchParams.append('key', payload.key);
+      // Adicionamos o segredo na URL para GET
+      url.searchParams.append('secret', API_CONFIG.SECRET);
+    }
+    
+    const response = await fetch(url.toString(), options);
     
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
@@ -55,8 +76,9 @@ async function apiRequest(action, payload = {}, method = 'POST') {
 // Operações CRUD
 async function createProject(projectData) {
   const result = await apiRequest('create', { data: projectData });
-  localCache.projetos.push({ ...projectData, ID: result.id, AtualizadoEm: Date.now() });
-  triggerEvent('project:created', localCache.projetos[localCache.projetos.length - 1]);
+  const newProject = { ...projectData, ID: result.id, AtualizadoEm: Date.now() };
+  localCache.projetos.push(newProject);
+  triggerEvent('project:created', newProject);
   return result;
 }
 
@@ -73,6 +95,7 @@ async function updateProject(projectData) {
 async function deleteProject(projectId) {
   const result = await apiRequest('delete', { id: projectId });
   localCache.projetos = localCache.projetos.filter(p => p.ID !== projectId);
+  triggerEvent('project:deleted', projectId);
   return result;
 }
 
@@ -129,8 +152,9 @@ async function syncData() {
 
 function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
   syncData();
-  setInterval(syncData, interval);
+  const timer = setInterval(syncData, interval);
   console.log(`Polling iniciado: ${interval}ms`);
+  return timer;
 }
 
 // Sistema de eventos
@@ -187,7 +211,7 @@ window.API = {
   clearCache
 };
 
-// Iniciar polling automaticamente
+// Iniciar polling automaticamente após o carregamento da página
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => startPolling());
 } else {
