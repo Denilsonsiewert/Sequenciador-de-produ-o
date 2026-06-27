@@ -122,46 +122,68 @@ extrair(texto);
 
 function extrair(texto){
 
-texto=texto.replace(/\n/g," ");
+    console.log(texto);
 
-//
-// PEP
-//
+    // Mantém as quebras de linha e remove espaços extras
+    texto = texto.replace(/\r/g,"");
 
-let pep=texto.match(/(\d{3}-\d{7}-\d{3})/);
+    //====================
+    // PEP
+    //====================
 
-if(pep){
+    let pep = texto.match(/\d{3}-\d{7}-\d{3}/);
 
-document.getElementById("pep").value=pep[1];
+    if(pep){
+        document.getElementById("pep").value = pep[0];
+    }else{
+        document.getElementById("pep").value = "";
+    }
+
+    //====================
+    // DIAGRAMA / ORDEM
+    //====================
+
+    let linhas = texto.split("\n");
+
+    for(let linha of linhas){
+
+        if(linha.toUpperCase().includes("DIAGR")){
+
+            let numero = linha.match(/\d{9,10}/);
+
+            if(numero){
+                document.getElementById("diagrama").value = numero[0];
+                break;
+            }
+
+        }
+
+    }
+
+    // Caso o OCR tenha separado o número em outra linha
+    if(document.getElementById("diagrama").value==""){
+
+        let numeros = texto.match(/\b\d{9,10}\b/g);
+
+        if(numeros){
+
+            for(let n of numeros){
+
+                // ignora CNPJ
+                if(n.length==14) continue;
+
+                document.getElementById("diagrama").value=n;
+                break;
+
+            }
+
+        }
+
+    }
+
+    status.innerHTML="Leitura concluída.";
 
 }
-
-//
-// DIAGRAMA
-//
-
-let diag=texto.match(/Ord.*?Diagr.*?(\d{9})/i);
-
-if(diag){
-
-document.getElementById("diagrama").value=diag[1];
-
-}else{
-
-let numero=texto.match(/\b\d{9}\b/);
-
-if(numero){
-
-document.getElementById("diagrama").value=numero[0];
-
-}
-
-}
-
-status.innerHTML="Leitura concluída.";
-
-}
-
 </script>
 
 </body>
