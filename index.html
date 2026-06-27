@@ -1,457 +1,185 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Leitor de Etiqueta</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px;
-    }
-
-    header {
-      width: 100%;
-      max-width: 520px;
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    header h1 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #38bdf8;
-      letter-spacing: 0.5px;
-    }
-
-    header p {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      margin-top: 4px;
-    }
-
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 16px;
-      width: 100%;
-      max-width: 520px;
-      margin-bottom: 16px;
-    }
-
-    /* ── Câmera ── */
-    #reader {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #000;
-    }
-
-    #reader video {
-      width: 100% !important;
-      border-radius: 12px;
-    }
-
-    /* esconde o logo e botões extras do html5-qrcode */
-    #reader__dashboard_section_swaplink,
-    #reader__dashboard_section_fileselection,
-    img[alt="Info icon"] { display: none !important; }
-
-    #reader__scan_region { border-radius: 12px; }
-
-    /* ── Status ── */
-    #status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      margin-top: 12px;
-      transition: all 0.3s;
-    }
-
-    #status.idle     { background: #1e3a5f; color: #7dd3fc; }
-    #status.scanning { background: #1a3a2a; color: #4ade80; }
-    #status.success  { background: #14532d; color: #86efac; }
-    #status.error    { background: #450a0a; color: #fca5a5; }
-
-    .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .idle .dot     { background: #38bdf8; }
-    .scanning .dot { background: #4ade80; animation: pulse 1s infinite; }
-    .success .dot  { background: #86efac; }
-    .error .dot    { background: #fca5a5; }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* ── Campos ── */
-    .fields { display: flex; flex-direction: column; gap: 14px; }
-
-    .field-group label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 6px;
-    }
-
-    .field-wrapper {
-      position: relative;
-    }
-
-    .field-wrapper input {
-      width: 100%;
-      background: #0f172a;
-      border: 1.5px solid #334155;
-      color: #f1f5f9;
-      font-size: 1rem;
-      padding: 12px 42px 12px 14px;
-      border-radius: 10px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .field-wrapper input:focus {
-      border-color: #38bdf8;
-    }
-
-    .field-wrapper input.filled {
-      border-color: #4ade80;
-      background: #0d2318;
-    }
-
-    .field-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.1rem;
-      pointer-events: none;
-    }
-
-    /* ── Botões ── */
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-    }
-
-    button:active { transform: scale(0.97); }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    #btnStart  { background: #0ea5e9; color: #fff; }
-    #btnStop   { background: #475569; color: #fff; }
-    #btnClear  { background: #334155; color: #cbd5e1; }
-
-    /* ── Raw data ── */
-    #rawData {
-      font-size: 0.72rem;
-      color: #64748b;
-      margin-top: 10px;
-      word-break: break-all;
-      min-height: 16px;
-    }
-
-    /* ── Toast ── */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: #22c55e;
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 24px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: transform 0.35s ease;
-      z-index: 999;
-      white-space: nowrap;
-    }
-
-    #toast.show { transform: translateX(-50%) translateY(0); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scanner Industrial - Leitura Vertical</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root { --main: #2196F3; --bg: #121212; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        
+        #video-wrap { position: relative; flex: 1; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .ui-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; }
+        .focus-area { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .box { width: 280px; height: 280px; border: 2px solid var(--main); border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); position: relative; }
+        .box::after { content: "CENTRALIZE O PEP OU ORDEM"; position: absolute; top: -30px; width: 100%; text-align: center; color: var(--main); font-size: 12px; font-weight: bold; }
+        
+        .data-panel { background: #1e1e1e; padding: 20px; border-radius: 20px 20px 0 0; pointer-events: auto; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; color: #aaa; margin-bottom: 5px; }
+        input { width: 100%; background: #2d2d2d; border: 1px solid #444; padding: 12px; border-radius: 8px; color: #00E676; font-size: 1.2rem; font-weight: bold; box-sizing: border-box; }
+        
+        #status { font-size: 10px; text-align: center; margin-bottom: 10px; color: var(--main); height: 12px; }
+        .flash-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; padding: 15px; border-radius: 50%; pointer-events: auto; color: white; font-size: 20px; }
+        
+        canvas { display: none; }
+    </style>
 </head>
 <body>
 
-<header>
-  <h1>📦 Leitor de Etiqueta</h1>
-  <p>Aponte a câmera para o código DataMatrix / QR da etiqueta</p>
-</header>
-
-<!-- Câmera -->
-<div class="card">
-  <div id="reader"></div>
-  <div id="status" class="idle">
-    <span class="dot"></span>
-    <span id="statusText">Pressione "Iniciar Câmera" para começar</span>
-  </div>
-  <div class="btn-row" style="margin-top:12px;">
-    <button id="btnStart">▶ Iniciar Câmera</button>
-    <button id="btnStop" disabled>⏹ Parar</button>
-  </div>
+<div id="video-wrap">
+    <video id="video" autoplay playsinline></video>
+    <div class="ui-overlay">
+        <button class="flash-btn" id="torch">🔦</button>
+        <div class="focus-area">
+            <div class="box"></div>
+        </div>
+        <div class="data-panel">
+            <div id="status">Iniciando motor de leitura...</div>
+            <div class="input-group">
+                <label>PEP (AUTOMÁTICO)</label>
+                <input type="text" id="pep" readonly placeholder="---">
+            </div>
+            <div class="input-group">
+                <label>DIAGRAMA / ORDEM (AUTOMÁTICO)</label>
+                <input type="text" id="ordem" readonly placeholder="---">
+            </div>
+            <button onclick="reset()" style="width:100%; padding:12px; background:#333; border:none; color:white; border-radius:8px; font-weight:bold;">LIMPAR CAMPOS</button>
+        </div>
+    </div>
 </div>
 
-<!-- Campos -->
-<div class="card">
-  <div class="fields">
-
-    <div class="field-group">
-      <label>PEP</label>
-      <div class="field-wrapper">
-        <input type="text" id="fieldPep" placeholder="Ex: 170-2500343-121" />
-        <span class="field-icon" id="iconPep">🔲</span>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <label>Diagrama / Ordem</label>
-      <div class="field-wrapper">
-        <input type="text" id="fieldOrdem" placeholder="Ex: 450890224" />
-        <span class="field-icon" id="iconOrdem">🔲</span>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="btn-row" style="margin-top:14px;">
-    <button id="btnClear">🗑 Limpar Campos</button>
-  </div>
-
-  <div id="rawData"></div>
-</div>
-
-<div id="toast">✅ Etiqueta lida com sucesso!</div>
+<canvas id="canvas"></canvas>
 
 <script>
-  // ── Estado ──
-  let scanner = null;
-  let scanning = false;
-  let lastDecodedText = '';
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const pepIn = document.getElementById('pep');
+    const ordemIn = document.getElementById('ordem');
+    let worker;
+    let isProcessing = false;
+    let torchOn = false;
 
-  const btnStart  = document.getElementById('btnStart');
-  const btnStop   = document.getElementById('btnStop');
-  const btnClear  = document.getElementById('btnClear');
-  const statusEl  = document.getElementById('status');
-  const statusTxt = document.getElementById('statusText');
-  const rawEl     = document.getElementById('rawData');
-  const toast     = document.getElementById('toast');
+    async function init() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+            });
+            video.srcObject = stream;
 
-  const fieldPep   = document.getElementById('fieldPep');
-  const fieldOrdem = document.getElementById('fieldOrdem');
-  const iconPep    = document.getElementById('iconPep');
-  const iconOrdem  = document.getElementById('iconOrdem');
+            worker = await Tesseract.createWorker('por');
+            await worker.setParameters({
+                tessedit_char_whitelist: '0123456789-./',
+                tessedit_pageseg_mode: '1', // Detecção automática de orientação
+            });
 
-  // ── Helpers ──
-  function setStatus(type, msg) {
-    statusEl.className = type;
-    statusTxt.textContent = msg;
-  }
-
-  function showToast(msg = '✅ Etiqueta lida com sucesso!') {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
-
-  function markFilled(input, icon, ok) {
-    if (ok) {
-      input.classList.add('filled');
-      icon.textContent = '✅';
-    } else {
-      input.classList.remove('filled');
-      icon.textContent = '🔲';
-    }
-  }
-
-  // ── Parser da etiqueta ──
-  // PEP: padrão NNN-NNNNNNN-NNN  (ex: 170-2500343-121)
-  // Ordem: sequência numérica longa isolada (ex: 450890224) – tipicamente 9+ dígitos
-  function parseLabel(text) {
-    const result = { pep: null, ordem: null };
-
-    // PEP – formato com hifens: NNN-NNNNNNN-NNN (pode variar)
-    const pepMatch = text.match(/\b(\d{2,4}-\d{6,8}-\d{2,4})\b/);
-    if (pepMatch) result.pep = pepMatch[1];
-
-    // Ordem/Diagrama – número com 7–12 dígitos, NÃO o PEP
-    // Remove dígitos que fazem parte do PEP antes de procurar
-    const textSemPep = result.pep ? text.replace(result.pep.replace(/-/g, ''), '') : text;
-    const ordemMatch = textSemPep.match(/\b(\d{7,12})\b/g);
-    if (ordemMatch) {
-      // Pega o primeiro que NÃO seja sub-string do PEP e não seja apenas zeros
-      const pepDigits = result.pep ? result.pep.replace(/-/g, '') : '';
-      for (const m of ordemMatch) {
-        if (m !== pepDigits && !/^0+$/.test(m)) {
-          result.ordem = m;
-          break;
+            status.innerText = "Scanner Pronto - Suporta leitura vertical";
+            loop();
+        } catch (e) {
+            status.innerText = "Erro: " + e.message;
         }
-      }
     }
 
-    return result;
-  }
+    async function loop() {
+        if (isProcessing) {
+            setTimeout(loop, 100);
+            return;
+        }
 
-  // ── Callback de leitura ──
-  function onScanSuccess(decodedText, decodedResult) {
-    if (decodedText === lastDecodedText) return; // evita repetição
-    lastDecodedText = decodedText;
-
-    console.log('Decoded:', decodedText);
-    rawEl.textContent = 'Raw: ' + decodedText;
-
-    const { pep, ordem } = parseLabel(decodedText);
-
-    let preencheu = false;
-
-    if (pep) {
-      fieldPep.value = pep;
-      markFilled(fieldPep, iconPep, true);
-      preencheu = true;
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            isProcessing = true;
+            await processFrame();
+            isProcessing = false;
+        }
+        setTimeout(loop, 300);
     }
 
-    if (ordem) {
-      fieldOrdem.value = ordem;
-      markFilled(fieldOrdem, iconOrdem, true);
-      preencheu = true;
+    async function processFrame() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Capturar área central
+        const size = Math.min(video.videoWidth, video.videoHeight) * 0.7;
+        const x = (video.videoWidth - size) / 2;
+        const y = (video.videoHeight - size) / 2;
+        
+        canvas.width = size;
+        canvas.height = size;
+        ctx.drawImage(video, x, y, size, size, 0, 0, size, size);
+
+        // APLICAR FILTROS DE NITIDEZ E CONTRASTE (Crucial para impressão falhada)
+        const imgData = ctx.getImageData(0, 0, size, size);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+            // Filtro de limiar dinâmico
+            const val = avg < 130 ? 0 : 255; 
+            data[i] = data[i+1] = data[i+2] = val;
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+        try {
+            // Tentar ler na orientação normal
+            let result = await worker.recognize(canvas);
+            parse(result.data.text);
+
+            // Se não encontrou PEP ou Ordem, rotacionar o canvas em 90 graus e tentar novamente
+            if (!pepIn.value || !ordemIn.value) {
+                const rotCanvas = document.createElement('canvas');
+                rotCanvas.width = size;
+                rotCanvas.height = size;
+                const rotCtx = rotCanvas.getContext('2d');
+                rotCtx.translate(size/2, size/2);
+                rotCtx.rotate(Math.PI / 2);
+                rotCtx.drawImage(canvas, -size/2, -size/2);
+                
+                result = await worker.recognize(rotCanvas);
+                parse(result.data.text);
+            }
+        } catch (e) {}
     }
 
-    if (preencheu) {
-      setStatus('success', 'Etiqueta lida! Campos preenchidos.');
-      showToast();
-      // Vibra o celular se disponível
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    } else {
-      setStatus('error', 'Código lido, mas dados não reconhecidos. Tente novamente.');
-      rawEl.textContent += ' ← sem PEP/Ordem detectados';
+    function parse(text) {
+        const clean = text.replace(/\s/g, '').toUpperCase();
+        
+        // PEP: XXX-XXXXXXX-XXX (Permite pequenas falhas no separador)
+        const pepMatch = clean.match(/(\d{3})[-.\s/]?(\d{7})[-.\s/]?(\d{3})/);
+        if (pepMatch && !pepIn.value) {
+            pepIn.value = `${pepMatch[1]}-${pepMatch[2]}-${pepMatch[3]}`;
+            vibrate();
+        }
+
+        // Ordem: 9 dígitos exatos
+        const ordemMatch = clean.match(/\b\d{9}\b/);
+        if (ordemMatch && !ordemIn.value) {
+            ordemIn.value = ordemMatch[0];
+            vibrate();
+        }
     }
-  }
 
-  function onScanFailure(error) {
-    // silencioso – falha normal enquanto procura o código
-  }
-
-  // ── Iniciar câmera ──
-  btnStart.addEventListener('click', async () => {
-    if (scanning) return;
-
-    lastDecodedText = '';
-    setStatus('scanning', 'Câmera iniciando…');
-
-    try {
-      scanner = new Html5Qrcode('reader');
-
-      // Preferência: câmera traseira
-      const devices = await Html5Qrcode.getCameras();
-      let cameraId = null;
-      if (devices && devices.length) {
-        // Tenta encontrar câmera traseira
-        const back = devices.find(d =>
-          /back|rear|environment|traseira/i.test(d.label)
-        );
-        cameraId = back ? back.id : devices[devices.length - 1].id;
-      }
-
-      const config = {
-        fps: 15,
-        qrbox: { width: 240, height: 240 },
-        aspectRatio: 1.0,
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.QR_CODE,
-          Html5QrcodeSupportedFormats.DATA_MATRIX,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.PDF_417,
-          Html5QrcodeSupportedFormats.AZTEC,
-        ],
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-        rememberLastUsedCamera: false,
-        showTorchButtonIfSupported: true,
-        showZoomSliderIfSupported: true,
-      };
-
-      if (cameraId) {
-        await scanner.start(cameraId, config, onScanSuccess, onScanFailure);
-      } else {
-        await scanner.start(
-          { facingMode: 'environment' },
-          config,
-          onScanSuccess,
-          onScanFailure
-        );
-      }
-
-      scanning = true;
-      btnStart.disabled = true;
-      btnStop.disabled = false;
-      setStatus('scanning', 'Apontando para o código DataMatrix…');
-
-    } catch (err) {
-      console.error(err);
-      setStatus('error', 'Erro ao acessar câmera: ' + err.message);
+    function vibrate() {
+        if (navigator.vibrate) navigator.vibrate(100);
     }
-  });
 
-  // ── Parar câmera ──
-  btnStop.addEventListener('click', async () => {
-    if (!scanning || !scanner) return;
-    try {
-      await scanner.stop();
-      scanner.clear();
-    } catch (e) { /* ignora */ }
-    scanning = false;
-    scanner = null;
-    btnStart.disabled = false;
-    btnStop.disabled = true;
-    setStatus('idle', 'Câmera parada.');
-  });
+    function reset() {
+        pepIn.value = "";
+        ordemIn.value = "";
+        status.innerText = "Scanner Reiniciado";
+    }
 
-  // ── Limpar ──
-  btnClear.addEventListener('click', () => {
-    fieldPep.value = '';
-    fieldOrdem.value = '';
-    markFilled(fieldPep, iconPep, false);
-    markFilled(fieldOrdem, iconOrdem, false);
-    rawEl.textContent = '';
-    lastDecodedText = '';
-    if (!scanning) setStatus('idle', 'Campos limpos. Pronto para nova leitura.');
-    else setStatus('scanning', 'Campos limpos. Apontando para o código…');
-  });
+    document.getElementById('torch').onclick = async () => {
+        const track = video.srcObject.getVideoTracks()[0];
+        if (track.getCapabilities().torch) {
+            torchOn = !torchOn;
+            await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+        }
+    };
+
+    window.onload = init;
 </script>
 
 </body>
 </html>
-</thinking>
