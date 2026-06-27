@@ -6,7 +6,6 @@
 <title>WEG - Centro de Fluxo Produtivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- Biblioteca para leitura de código de barras/QR Code -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
 :root {
@@ -115,6 +114,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .form-group label .req { color: var(--danger); }
 .form-group input, .form-group select, .form-group textarea { padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--card); color: var(--text); transition: var(--transition); font-family: inherit; cursor: text !important; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--weg-blue); box-shadow: 0 0 0 3px rgba(0,91,172,.15); }
+.form-group input[readonly] { background: var(--bg); cursor: not-allowed; }
 .full { grid-column: span 2; }
 .form-actions { grid-column: span 2; display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
 .table-wrapper { overflow-x: auto; border-radius: 8px; margin-top: 15px; }
@@ -184,21 +184,21 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .modal-logout p { color: var(--text-light); font-size: 15px; margin-bottom: 25px; }
 .modal-logout .modal-actions { display: flex; gap: 12px; justify-content: center; }
 .modal-logout .btn { min-width: 140px; justify-content: center; }
-.leitor-box { border: 2px dashed var(--weg-blue); border-radius: var(--radius); text-align: center; padding: 30px 20px; background: var(--weg-light); margin-bottom: 15px; }
-.leitor-box i { color: var(--weg-blue); font-size: 40px; margin-bottom: 10px; }
-.leitor-box p { color: var(--text); font-size: 14px; font-weight: 600; }
-.leitor-box small { color: var(--text-light); font-size: 12px; }
-.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; }
-.camera-container video { width: 100%; display: block; border-radius: 12px; }
+.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; }
+.camera-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .camera-container canvas { display: none; }
-.camera-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+.camera-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; border: 3px solid var(--weg-blue); border-radius: 12px; }
 .scan-line { position: absolute; top: 50%; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, transparent, var(--success), transparent); animation: scan 2s ease-in-out infinite; box-shadow: 0 0 10px var(--success); }
-@keyframes scan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(50px); } }
+@keyframes scan { 0%, 100% { transform: translateY(-60px); } 50% { transform: translateY(60px); } }
 .camera-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
 .camera-status { text-align: center; padding: 10px; margin-top: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; }
 .camera-status.scanning { background: var(--weg-light); color: var(--weg-blue); }
 .camera-status.success { background: rgba(0,166,81,.1); color: var(--success); }
 .camera-status.error { background: rgba(211,47,47,.1); color: var(--danger); }
+.leitor-box { border: 2px dashed var(--weg-blue); border-radius: var(--radius); text-align: center; padding: 30px 20px; background: var(--weg-light); margin-bottom: 15px; }
+.leitor-box i { color: var(--weg-blue); font-size: 40px; margin-bottom: 10px; }
+.leitor-box p { color: var(--text); font-size: 14px; font-weight: 600; }
+.leitor-box small { color: var(--text-light); font-size: 12px; }
 .virtual-keyboard { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.15); z-index: 7000; display: none; max-width: 380px; width: 95%; }
 .virtual-keyboard.active { display: block; animation: slideUp .3s ease; }
 .vk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
@@ -387,23 +387,17 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="card">
 <div class="card-head">
 <h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2>
-<div style="display:flex;gap:8px;">
 <button class="btn btn-sm btn-success" onclick="Admin.abrirCamera()"><i class="fa-solid fa-camera"></i> Ler Etiqueta (Câmera)</button>
-<button class="btn btn-sm" onclick="Admin.focarLeitorEtiqueta()"><i class="fa-solid fa-barcode"></i> Scanner USB</button>
-</div>
 </div>
 
-<!-- Container da Câmera -->
 <div id="cameraSection" style="display:none;">
 <div class="camera-container">
 <video id="cameraVideo" autoplay playsinline></video>
 <canvas id="cameraCanvas"></canvas>
-<div class="camera-overlay">
-<div class="scan-line"></div>
-</div>
+<div class="camera-overlay"><div class="scan-line"></div></div>
 </div>
 <div id="cameraStatus" class="camera-status scanning">
-<i class="fa-solid fa-spinner fa-spin"></i> Posicione a etiqueta na frente da câmera...
+<i class="fa-solid fa-spinner fa-spin"></i> Posicione o QR Code da etiqueta na frente da câmera...
 </div>
 <div class="camera-controls">
 <button class="btn btn-danger" onclick="Admin.fecharCamera()"><i class="fa-solid fa-times"></i> Fechar Câmera</button>
@@ -411,22 +405,12 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 </div>
 </div>
 
-<!-- Scanner USB (mantido para compatibilidade) -->
-<div id="scannerSection">
-<div class="leitor-box">
-<i class="fa-solid fa-barcode"></i>
-<p>Leitor de Código de Barras/QR Code (USB)</p>
-<small>Posicione o cursor no campo abaixo e use o scanner conectado</small>
-<input type="text" id="leitorEtiquetaInput" placeholder="Aguardando leitura..." style="margin-top:10px; padding:10px; border:2px solid var(--weg-blue); border-radius:8px; width:100%; max-width:400px; text-align:center; font-size:16px;" onkeypress="if(event.key==='Enter'){event.preventDefault();Admin.processarLeituraEtiqueta();}">
-</div>
-</div>
-
 <form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
 <div class="form-grid">
-<div class="form-group"><label>PEP</label><input type="text" id="cad-pep" placeholder="Ex: 7S123456" data-vk readonly></div>
-<div class="form-group"><label>Diagrama / Ordem <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: ORDEM001" data-vk readonly></div>
+<div class="form-group"><label>PEP <span class="req">*</span></label><input type="text" id="cad-pep" required placeholder="Ex: 170-2500343-121" data-vk></div>
+<div class="form-group"><label>Diagrama / Ordem do Invólucro <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: 45089024" data-vk></div>
 <div class="form-group"><label>Placa de Identificação</label><input type="text" id="cad-placa" placeholder="Ex: PLACA123" data-vk></div>
-<div class="form-group" id="group-cad-volumes"><label>Quantidade / Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 10 unidades" data-vk></div>
+<div class="form-group" id="group-cad-volumes"><label>Quantidade / Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 28" data-vk></div>
 <div class="form-group"><label>Descrição</label><input type="text" id="cad-descricao" placeholder="Ex: Motor W22 Premium" data-vk></div>
 <div class="form-group"><label>Processo de Destino <span class="req">*</span></label><select id="cad-processo" required onchange="Admin.toggleVolumesCadastro()"><option value="">Selecione...</option><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
 <div class="form-group"><label>Prioridade</label><select id="cad-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
@@ -503,7 +487,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="form-actions"><button type="reset" class="btn btn-secondary" onclick="document.getElementById('pwdStrength').textContent=''"><i class="fa-solid fa-rotate-left"></i> Limpar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-key"></i> Alterar Senha</button></div>
 </div></form></div>
 <div class="card"><h2><i class="fa-solid fa-display"></i> Tipo de Dispositivo</h2><p style="margin-top:8px;color:var(--text-light);font-size:14px;">Selecione o tipo de dispositivo onde o sistema está sendo executado.</p>
-<div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet">📱 Tablet / Touchscreen (com teclado físico opcional)</option><option value="computador">💻 Computador (Touch sem teclado/mouse)</option></select></div>
+<div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet"> Tablet / Touchscreen (com teclado físico opcional)</option><option value="computador">💻 Computador (Touch sem teclado/mouse)</option></select></div>
 <div class="form-group full" id="cfgVkInfo" style="display:none;"><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador ativado:</strong> O cursor do mouse será ocultado automaticamente e um teclado virtual numérico estará disponível ao tocar em campos de preenchimento.</div></div></div></div></div>
 <div class="card"><h2><i class="fa-solid fa-database"></i> Gerenciar Dados</h2><p style="margin-top:8px;color:var(--text-light);font-size:14px;">Os dados são armazenados localmente no navegador e na nuvem (Google Sheets).</p>
 <div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> A ação "Limpar Tudo" é irreversível e exige a senha do administrador. Ela apagará TODOS os dados do navegador E da planilha do Google Sheets.</div></div>
@@ -548,7 +532,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close" title="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
 
-<!-- CLIENTE DA API (Embutido e Corrigido) -->
+<!-- CLIENTE DA API -->
 <script>
 const API_CONFIG = {
   URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
@@ -634,12 +618,12 @@ window.API = { createProject, updateProject, deleteProject, updateConfig, getCon
 // CONFIGURAÇÕES GLOBAIS
 // ==========================================
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v26',
+STORAGE_KEY: 'weg_fluxo_produtivo_v27',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
 FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
-TURNO_COOLDOWN: 2 * 60 * 60 * 1000 // 2 horas em milissegundos
+TURNO_COOLDOWN: 2 * 60 * 60 * 1000
 };
 // ==========================================
 // ESTADO DA APLICAÇÃO
@@ -710,55 +694,97 @@ if (prioA !== prioB) return prioA - prioB;
 return b.criadoEm - a.criadoEm;
 });
 },
+// CORREÇÃO CRÍTICA: Adicionados todos os campos de tempo e conclusão
 toApiFormat(projeto) {
 return {
-ID: projeto.id, PEP: projeto.pep, Diagrama: projeto.diagrama, Placa: projeto.placa, Descricao: projeto.descricao,
-VolumesTotal: projeto.volumesTotal, VolumesProcessados: projeto.volumesProcessados, Processo: projeto.processo,
-Prioridade: projeto.prioridade, Status: projeto.status, Turno: projeto.turno, Obs: projeto.obs,
-CriadoEm: projeto.criadoEm, AtualizadoEm: projeto.atualizadoEm || Date.now()
+ID: projeto.id,
+PEP: projeto.pep,
+Diagrama: projeto.diagrama,
+Placa: projeto.placa,
+Descricao: projeto.descricao,
+VolumesTotal: projeto.volumesTotal,
+VolumesProcessados: projeto.volumesProcessados,
+Processo: projeto.processo,
+Prioridade: projeto.prioridade,
+Status: projeto.status,
+Turno: projeto.turno,
+Obs: projeto.obs,
+CriadoEm: projeto.criadoEm,
+AtualizadoEm: projeto.atualizadoEm || Date.now(),
+// NOVOS CAMPOS - essenciais para o cronômetro funcionar
+DataHoraInicio: projeto.dataHoraInicio || null,
+DataHoraFim: projeto.dataHoraFim || null,
+TempoReal: projeto.tempoReal || null,
+ConcluidoEm: projeto.concluidoEm || null,
+ObservacaoPintura: projeto.observacaoPintura || null
 };
 },
 fromApiFormat(apiProj) {
 return {
-id: apiProj.ID, pep: apiProj.PEP, diagrama: apiProj.Diagrama, placa: apiProj.Placa, descricao: apiProj.Descricao,
-volumesTotal: apiProj.VolumesTotal, volumesProcessados: apiProj.VolumesProcessados, processo: apiProj.Processo,
-prioridade: apiProj.Prioridade, status: apiProj.Status, turno: apiProj.Turno, obs: apiProj.Obs,
-criadoEm: apiProj.CriadoEm, atualizadoEm: apiProj.AtualizadoEm
+id: apiProj.ID,
+pep: apiProj.PEP,
+diagrama: apiProj.Diagrama,
+placa: apiProj.Placa,
+descricao: apiProj.Descricao,
+volumesTotal: apiProj.VolumesTotal,
+volumesProcessados: apiProj.VolumesProcessados,
+processo: apiProj.Processo,
+prioridade: apiProj.Prioridade,
+status: apiProj.Status,
+turno: apiProj.Turno,
+obs: apiProj.Obs,
+criadoEm: apiProj.CriadoEm,
+atualizadoEm: apiProj.AtualizadoEm,
+// NOVOS CAMPOS
+dataHoraInicio: apiProj.DataHoraInicio || null,
+dataHoraFim: apiProj.DataHoraFim || null,
+tempoReal: apiProj.TempoReal || null,
+concluidoEm: apiProj.ConcluidoEm || null,
+observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
+// CORREÇÃO: Extração específica para o formato da etiqueta WEG
 extrairDadosEtiqueta(texto) {
-  // Tenta extrair PEP e Diagrama/Ordem do texto capturado
-  const dados = { pep: null, diagrama: null };
-  
-  // Remove espaços extras e converte para maiúsculas
-  const textoLimpo = texto.trim().toUpperCase();
-  
-  // Tenta encontrar PEP (formato comum: 7S + números)
-  const pepMatch = textoLimpo.match(/7S\d{6,}/);
-  if (pepMatch) {
-    dados.pep = pepMatch[0];
-  }
-  
-  // Tenta encontrar Diagrama/Ordem (formato: ORDEM + números ou apenas números)
-  const diagramaMatch = textoLimpo.match(/ORDEM\d+/i) || textoLimpo.match(/\b\d{4,}\b/);
-  if (diagramaMatch) {
-    dados.diagrama = diagramaMatch[0];
-  }
-  
-  // Se não encontrou com regex, tenta dividir por espaços ou caracteres especiais
-  if (!dados.pep || !dados.diagrama) {
-    const partes = textoLimpo.split(/[\s\-_,;]+/).filter(p => p.length > 0);
-    if (partes.length >= 2) {
-      if (!dados.pep && partes[0].match(/7S/)) dados.pep = partes[0];
-      if (!dados.diagrama) dados.diagrama = partes[partes.length - 1];
-    }
-  }
-  
-  return dados;
+const dados = { pep: null, diagrama: null };
+if (!texto) return dados;
+
+const linhas = texto.split(/[\n\r]+/);
+
+for (const linha of linhas) {
+const linhaLimpa = linha.trim();
+
+// Procura PEP: 170-2500343-121
+if (!dados.pep) {
+const pepMatch = linhaLimpa.match(/PEP[:\s]+([0-9\-]+)/i);
+if (pepMatch) {
+dados.pep = pepMatch[1].trim();
+}
+}
+
+// Procura Ord. Invol./Diagr.: 45089024 ou Diagr.: 45089024
+if (!dados.diagrama) {
+const diagMatch = linhaLimpa.match(/(?:Ord\.?\s*Invol\.?\/?Diagr\.?|Diagr\.?)[:\s]+(\d+)/i);
+if (diagMatch) {
+dados.diagrama = diagMatch[1].trim();
+}
+}
+}
+
+// Fallback: se não encontrou com as labels específicas, tenta padrões genéricos
+if (!dados.pep) {
+const pepFallback = texto.match(/(?:^|\s)(\d{3}-\d{7}-\d{3})(?:\s|$)/);
+if (pepFallback) dados.pep = pepFallback[1];
+}
+if (!dados.diagrama) {
+const diagFallback = texto.match(/(?:^|\s)(\d{8})(?:\s|$)/);
+if (diagFallback) dados.diagrama = diagFallback[1];
+}
+
+return dados;
 }
 };
 // ==========================================
-// ARMAZENAMENTO HÍBRIDO (API + LocalStorage)
+// ARMAZENAMENTO HÍBRIDO
 // ==========================================
 const Storage = {
 async carregar() {
@@ -784,11 +810,8 @@ const senhaApi = await API.getConfig('senhaAdmin');
 if (senhaApi && senhaApi !== 'null' && senhaApi !== 'undefined') {
 State.data.senhaAdmin = senhaApi;
 this.salvarLocal();
-console.log('Senha carregada da planilha:', senhaApi);
 }
-} catch(e) {
-console.log('Senha não encontrada na planilha, usando localStorage ou padrão');
-}
+} catch(e) { console.log('Senha não encontrada na planilha'); }
 API.startPolling(API_CONFIG.POLLING_INTERVAL);
 } else {
 State.apiAvailable = false;
@@ -803,7 +826,7 @@ async salvarApi(acao, dados) {
 if (!State.apiAvailable || !State.isOnline || typeof API === 'undefined') {
 this.salvarLocal();
 State.syncQueue.push({ acao, dados, timestamp: Date.now() });
-if (State.syncQueue.length === 1) UI.showToast('warning', 'Offline', 'Alteração salva localmente. Sincronizará quando online.');
+if (State.syncQueue.length === 1) UI.showToast('warning', 'Offline', 'Alteração salva localmente.');
 return { success: true, offline: true };
 }
 try {
@@ -822,7 +845,7 @@ throw new Error(result ? result.error : 'Erro na API');
 console.error('Erro ao salvar na API:', error);
 this.salvarLocal();
 State.syncQueue.push({ acao, dados, timestamp: Date.now() });
-if (State.syncQueue.length === 1) UI.showToast('warning', 'Sincronização', 'Salvo localmente. Tentando sincronizar...');
+if (State.syncQueue.length === 1) UI.showToast('warning', 'Sincronização', 'Salvo localmente.');
 return { success: true, offline: true, error: error.message };
 }
 },
@@ -1080,37 +1103,22 @@ setTimeout(() => { input.style.borderColor = ''; }, 1500);
 },
 cancelarConfirmacaoSenha() { State.acaoPendenteSenha = null; UI.closeModal('modalConfirmarSenha'); },
 solicitarLimpeza() {
-this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</strong> Esta ação apagará PERMANENTEMENTE todos os projetos, histórico e resetará a senha para o padrão. A operação não pode ser desfeita.<br><br>Digite a senha do administrador para confirmar.', this.executarLimpeza);
+this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</strong> Esta ação apagará PERMANENTEMENTE todos os projetos, histórico e resetará a senha para o padrão.<br><br>Digite a senha do administrador para confirmar.', this.executarLimpeza);
 },
 async executarLimpeza() {
 UI.showToast('info', 'Limpando', 'Apagando dados da nuvem e do navegador...');
-  
-  if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
-    try {
-      await API.clearAllData();
-      UI.showToast('success', 'Nuvem limpa', 'Dados da planilha apagados com sucesso');
-    } catch(e) {
-      console.error('Erro ao limpar API:', e);
-      UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha. Limpando apenas localmente.');
-    }
-  }
-  
-  State.data.projetos = [];
-  State.data.historico = [];
-  State.data.historicoPostos = [];
-  State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
-  State.data.ultimaSelecaoTurno = 0;
-  
-  Storage.salvarLocal();
-  
-  Admin.renderTable();
-  Posto.render();
-  Historico.renderGeral();
-  Historico.renderPostos();
-  Dashboard.render();
-  Charts.render();
-  
-  UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos. A senha foi resetada para o padrão.');
+if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
+try { await API.clearAllData(); UI.showToast('success', 'Nuvem limpa', 'Dados da planilha apagados'); } 
+catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
+}
+State.data.projetos = [];
+State.data.historico = [];
+State.data.historicoPostos = [];
+State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
+State.data.ultimaSelecaoTurno = 0;
+Storage.salvarLocal();
+Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
+UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos. Senha resetada para o padrão.');
 }
 };
 // ==========================================
@@ -1125,8 +1133,7 @@ document.getElementById('cardSeguranca').style.display = (State.currentUser === 
 async salvarDispositivo() {
 State.data.config.dispositivo = document.getElementById('cfgDevice').value;
 await Storage.salvarApi('config', { key: 'dispositivo', value: State.data.config.dispositivo });
-this.applyDeviceConfig();
-UI.aplicarEstadoCursor();
+this.applyDeviceConfig(); UI.aplicarEstadoCursor();
 const modo = State.data.config.dispositivo === 'computador' ? 'Computador (cursor oculto)' : 'Tablet (cursor visível)';
 UI.showToast('success', 'Configuração salva', 'Modo de dispositivo: ' + modo);
 },
@@ -1138,20 +1145,14 @@ const nova = document.getElementById('novaSenha').value;
 const confirma = document.getElementById('confirmaSenha').value;
 if (atual !== State.data.senhaAdmin) { UI.showToast('error', 'Erro', 'Senha atual incorreta'); document.getElementById('senhaAtual').value = ''; document.getElementById('senhaAtual').focus(); return false; }
 if (nova.length < 4) { UI.showToast('warning', 'Atenção', 'A nova senha deve ter no mínimo 4 caracteres'); return false; }
-if (nova !== confirma) { UI.showToast('error', 'Erro', 'A confirmação não confere com a nova senha'); document.getElementById('confirmaSenha').value = ''; document.getElementById('confirmaSenha').focus(); return false; }
+if (nova !== confirma) { UI.showToast('error', 'Erro', 'A confirmação não confere'); document.getElementById('confirmaSenha').value = ''; document.getElementById('confirmaSenha').focus(); return false; }
 if (nova === atual) { UI.showToast('warning', 'Atenção', 'A nova senha deve ser diferente da atual'); return false; }
-
 State.data.senhaAdmin = nova;
 Storage.salvarLocal();
-
 try {
-  await Storage.salvarApi('config', { key: 'senhaAdmin', value: nova });
-  UI.showToast('success', 'Senha alterada', 'A nova senha foi salva no navegador e na planilha com sucesso');
-} catch(e) {
-  console.error('Erro ao salvar senha na API:', e);
-  UI.showToast('warning', 'Atenção', 'Senha salva no navegador, mas falhou ao salvar na planilha. Tente novamente.');
-}
-
+await Storage.salvarApi('config', { key: 'senhaAdmin', value: nova });
+UI.showToast('success', 'Senha alterada', 'A nova senha foi salva no navegador e na planilha');
+} catch(e) { console.error('Erro ao salvar senha na API:', e); UI.showToast('warning', 'Atenção', 'Senha salva no navegador, mas falhou na planilha.'); }
 document.getElementById('formSenha').reset();
 document.getElementById('pwdStrength').textContent = '';
 return false;
@@ -1288,155 +1289,105 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 // ADMINISTRAÇÃO
 // ==========================================
 const Admin = {
-focarLeitorEtiqueta() {
-const input = document.getElementById('leitorEtiquetaInput');
-input.value = '';
-input.focus();
-UI.showToast('info', 'Scanner USB ativo', 'Posicione o cursor e use o scanner conectado');
-},
 async abrirCamera() {
-  try {
-    const video = document.getElementById('cameraVideo');
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        facingMode: 'environment', // Usa câmera traseira em dispositivos móveis
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      } 
-    });
-    
-    State.cameraStream = stream;
-    video.srcObject = stream;
-    
-    document.getElementById('cameraSection').style.display = 'block';
-    document.getElementById('scannerSection').style.display = 'none';
-    
-    // Inicia scanning automático
-    this.iniciarScanning();
-    
-    UI.showToast('success', 'Câmera ativada', 'Posicione a etiqueta na frente da câmera');
-  } catch (error) {
-    console.error('Erro ao acessar câmera:', error);
-    UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera. Verifique as permissões.');
-  }
+try {
+const video = document.getElementById('cameraVideo');
+const stream = await navigator.mediaDevices.getUserMedia({ 
+video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
+});
+State.cameraStream = stream;
+video.srcObject = stream;
+document.getElementById('cameraSection').style.display = 'block';
+this.iniciarScanning();
+UI.showToast('success', 'Câmera ativada', 'Posicione o QR Code da etiqueta');
+} catch (error) {
+console.error('Erro ao acessar câmera:', error);
+UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera. Verifique as permissões.');
+}
 },
 fecharCamera() {
-  if (State.cameraStream) {
-    State.cameraStream.getTracks().forEach(track => track.stop());
-    State.cameraStream = null;
-  }
-  if (State.cameraInterval) {
-    clearInterval(State.cameraInterval);
-    State.cameraInterval = null;
-  }
-  
-  document.getElementById('cameraSection').style.display = 'none';
-  document.getElementById('scannerSection').style.display = 'block';
-  document.getElementById('cameraStatus').className = 'camera-status scanning';
-  document.getElementById('cameraStatus').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posicione a etiqueta na frente da câmera...';
+if (State.cameraStream) {
+State.cameraStream.getTracks().forEach(track => track.stop());
+State.cameraStream = null;
+}
+if (State.cameraInterval) {
+clearInterval(State.cameraInterval);
+State.cameraInterval = null;
+}
+document.getElementById('cameraSection').style.display = 'none';
+document.getElementById('cameraStatus').className = 'camera-status scanning';
+document.getElementById('cameraStatus').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posicione o QR Code da etiqueta na frente da câmera...';
 },
 iniciarScanning() {
-  const video = document.getElementById('cameraVideo');
-  const canvas = document.getElementById('cameraCanvas');
-  const context = canvas.getContext('2d');
-  
-  State.cameraInterval = setInterval(() => {
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      
-      // Tenta ler QR Code
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      
-      if (code) {
-        console.log('QR Code detectado:', code.data);
-        this.processarImagemEtiqueta(code.data);
-      } else {
-        // Se não encontrou QR Code, tenta OCR simples (captura texto da imagem)
-        // Por enquanto, vamos apenas capturar manualmente
-        console.log('Nenhum QR Code detectado');
-      }
-    }
-  }, 500); // Verifica a cada 500ms
-},
-capturarManual() {
-  const video = document.getElementById('cameraVideo');
-  const canvas = document.getElementById('cameraCanvas');
-  const context = canvas.getContext('2d');
-  
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Captura a imagem como base64
-    const imageData = canvas.toDataURL('image/png');
-    
-    // Por enquanto, vamos simular a extração
-    // Em uma implementação real, você enviaria essa imagem para um serviço OCR
-    UI.showToast('info', 'Captura manual', 'Funcionalidade OCR em desenvolvimento. Use o scanner USB ou digite manualmente.');
-    
-    // Simula dados extraídos (remover em produção)
-    const dadosSimulados = '7S' + Math.floor(Math.random()*900000+100000) + ' ORDEM' + Math.floor(Math.random()*900+100);
-    this.processarImagemEtiqueta(dadosSimulados);
-  }
-},
-processarImagemEtiqueta(texto) {
-  const dados = Utils.extrairDadosEtiqueta(texto);
-  
-  if (dados.pep || dados.diagrama) {
-    if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
-    if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
-    
-    const statusEl = document.getElementById('cameraStatus');
-    statusEl.className = 'camera-status success';
-    statusEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> Dados capturados com sucesso! PEP: ${dados.pep || 'N/A'} | Diagrama: ${dados.diagrama || 'N/A'}`;
-    
-    UI.showToast('success', 'Etiqueta lida', 'PEP e Diagrama/Ordem preenchidos automaticamente');
-    
-    // Para o scanning após sucesso
-    if (State.cameraInterval) {
-      clearInterval(State.cameraInterval);
-      State.cameraInterval = null;
-    }
-    
-    // Foca no próximo campo (Placa)
-    setTimeout(() => {
-      document.getElementById('cad-placa').focus();
-    }, 500);
-  } else {
-    const statusEl = document.getElementById('cameraStatus');
-    statusEl.className = 'camera-status error';
-    statusEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Não foi possível extrair os dados. Tente novamente ou use o scanner USB.';
-    
-    UI.showToast('warning', 'Atenção', 'Não foi possível ler a etiqueta. Tente posicionar melhor ou use o scanner USB.');
-  }
-},
-processarLeituraEtiqueta() {
-const codigo = document.getElementById('leitorEtiquetaInput').value.trim();
-if (!codigo) { UI.showToast('warning', 'Código vazio', 'Nenhum código foi lido'); return; }
+const video = document.getElementById('cameraVideo');
+const canvas = document.getElementById('cameraCanvas');
+const context = canvas.getContext('2d');
+let ultimoCodigo = '';
+let contadorRepeticoes = 0;
 
-const dados = Utils.extrairDadosEtiqueta(codigo);
+State.cameraInterval = setInterval(() => {
+if (video.readyState === video.HAVE_ENOUGH_DATA) {
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
-if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
-
-UI.showToast('success', 'Etiqueta lida', 'Dados preenchidos automaticamente');
-document.getElementById('leitorEtiquetaInput').value = '';
-
-// Foca no próximo campo (Placa)
-setTimeout(() => {
-  document.getElementById('cad-placa').focus();
+if (code && code.data) {
+// Evita leituras duplicadas
+if (code.data === ultimoCodigo) {
+contadorRepeticoes++;
+if (contadorRepeticoes >= 3) {
+// Leitura confirmada (3 leituras iguais)
+this.processarImagemEtiqueta(code.data);
+}
+} else {
+ultimoCodigo = code.data;
+contadorRepeticoes = 1;
+}
+} else {
+ultimoCodigo = '';
+contadorRepeticoes = 0;
+}
+}
 }, 300);
 },
+capturarManual() {
+const video = document.getElementById('cameraVideo');
+const canvas = document.getElementById('cameraCanvas');
+const context = canvas.getContext('2d');
+if (video.readyState === video.HAVE_ENOUGH_DATA) {
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+UI.showToast('info', 'Captura manual', 'Tente reposicionar o QR Code para melhor leitura.');
+}
+},
+processarImagemEtiqueta(texto) {
+const dados = Utils.extrairDadosEtiqueta(texto);
+if (dados.pep || dados.diagrama) {
+if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
+if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
+const statusEl = document.getElementById('cameraStatus');
+statusEl.className = 'camera-status success';
+statusEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> PEP: <strong>${dados.pep || 'N/A'}</strong> | Diagrama: <strong>${dados.diagrama || 'N/A'}</strong>`;
+UI.showToast('success', 'Etiqueta lida', 'PEP e Diagrama preenchidos. Complete os demais campos.');
+this.fecharCamera();
+setTimeout(() => {
+if (!dados.pep) document.getElementById('cad-pep').focus();
+else if (!dados.diagrama) document.getElementById('cad-diagrama').focus();
+else document.getElementById('cad-placa').focus();
+}, 500);
+} else {
+const statusEl = document.getElementById('cameraStatus');
+statusEl.className = 'camera-status error';
+statusEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Não foi possível extrair PEP e Diagrama. Tente reposicionar o QR Code ou digite manualmente.';
+UI.showToast('warning', 'Atenção', 'Não foi possível ler a etiqueta. Digite manualmente.');
+}
+},
 limparFormulario() {
-  document.getElementById('formCadastro').reset();
-  document.getElementById('cad-pep').removeAttribute('readonly');
-  document.getElementById('cad-diagrama').removeAttribute('readonly');
-  UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
+document.getElementById('formCadastro').reset();
+UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
 },
 toggleVolumesCadastro() {
 const processo = document.getElementById('cad-processo').value;
@@ -1576,17 +1527,15 @@ State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
 if (Utils.ehFimDeSemana()) {
-  const agora = Date.now();
-  const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
-  
-  if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
-    const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-    document.getElementById('postoTurno').value = turnoSalvo;
-    console.log(`Turno do fim de semana (cooldown ativo): ${turnoSalvo}`);
-  } else {
-    State.turnoFimSemanaPendente = true;
-    UI.openModal('modalTurnoFimSemana');
-  }
+const agora = Date.now();
+const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
+if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+document.getElementById('postoTurno').value = turnoSalvo;
+} else {
+State.turnoFimSemanaPendente = true;
+UI.openModal('modalTurnoFimSemana');
+}
 } else {
 const turnoDetectado = Utils.detectarTurnoAutomatico();
 State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
@@ -1625,8 +1574,12 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 } else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
 } else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
 let tempoDisplay = '-';
-if (p.status === 'Em Processo' && p.dataHoraInicio) { tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`; } 
-else if (p.dataHoraInicio && p.dataHoraFim) { tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`; }
+// CORREÇÃO: Verifica dataHoraInicio corretamente
+if (p.status === 'Em Processo' && p.dataHoraInicio) { 
+tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`; 
+} else if (p.dataHoraInicio && p.dataHoraFim) { 
+tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`; 
+}
 let botoesAcao = '';
 if (p.status === 'Aguardando' || p.status === 'Parcial') { botoesAcao = `<button class="icon-action-lg warning" title="Iniciar Atividade" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Confirmar Conclusão" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; } 
 else if (p.status === 'Em Processo') { botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Confirmar Conclusão" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
@@ -1650,7 +1603,10 @@ if (!p) return;
 p.status = 'Em Processo';
 p.dataHoraInicio = Date.now();
 p.dataHoraFim = null;
+p.tempoReal = null;
 p.atualizadoEm = Date.now();
+// CORREÇÃO: Salva localmente PRIMEIRO para garantir que o tempo apareça imediatamente
+Storage.salvarLocal();
 await Storage.salvarApi('update', p);
 this.renderTable();
 UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new Date().toLocaleTimeString('pt-BR'));
@@ -1884,22 +1840,22 @@ UI.showToast('success', 'Excluído', 'Registro removido do histórico');
 // ==========================================
 const Turno = {
 confirmarFimSemana(turno) { 
-  State.data.turnosPorPosto[State.currentPosto] = turno; 
-  State.data.ultimaSelecaoTurno = Date.now();
-  Storage.salvarLocal(); 
-  document.getElementById('postoTurno').value = turno; 
-  UI.closeModal('modalTurnoFimSemana'); 
-  State.turnoFimSemanaPendente = false; 
-  UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno + '. O modal só aparecerá novamente após 2 horas.'); 
+State.data.turnosPorPosto[State.currentPosto] = turno; 
+State.data.ultimaSelecaoTurno = Date.now();
+Storage.salvarLocal(); 
+document.getElementById('postoTurno').value = turno; 
+UI.closeModal('modalTurnoFimSemana'); 
+State.turnoFimSemanaPendente = false; 
+UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno + '. O modal só aparecerá novamente após 2 horas.'); 
 },
 cancelarSelecao() { 
-  const turnoDetectado = Utils.detectarTurnoAutomatico(); 
-  State.data.turnosPorPosto[State.currentPosto] = turnoDetectado; 
-  State.data.ultimaSelecaoTurno = Date.now();
-  Storage.salvarLocal(); 
-  document.getElementById('postoTurno').value = turnoDetectado; 
-  UI.closeModal('modalTurnoFimSemana'); 
-  State.turnoFimSemanaPendente = false; 
+const turnoDetectado = Utils.detectarTurnoAutomatico(); 
+State.data.turnosPorPosto[State.currentPosto] = turnoDetectado; 
+State.data.ultimaSelecaoTurno = Date.now();
+Storage.salvarLocal(); 
+document.getElementById('postoTurno').value = turnoDetectado; 
+UI.closeModal('modalTurnoFimSemana'); 
+State.turnoFimSemanaPendente = false; 
 }
 };
 const VirtualKeyboard = {
@@ -1988,13 +1944,8 @@ State.data = Object.assign(State.data, obj);
 if (!State.data.historicoPostos) State.data.historicoPostos = [];
 Storage.salvarLocal();
 Storage.migrarTurnosAntigos();
-Admin.renderTable();
-Posto.render();
-Historico.renderGeral();
-Historico.renderPostos();
-Charts.render();
-UI.aplicarEstadoCursor();
-Config.applyDeviceConfig();
+Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Charts.render();
+UI.aplicarEstadoCursor(); Config.applyDeviceConfig();
 UI.showToast('success', 'Restaurado', 'Dados restaurados com sucesso');
 } catch(err) { UI.showToast('error', 'Erro', 'Arquivo inválido'); }
 };
@@ -2019,11 +1970,20 @@ if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) { State.data.projetos.push(projLocal); } 
-else {
+if (index === -1) { 
+State.data.projetos.push(projLocal); 
+} else {
 const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
 const remoteAtualizado = projLocal.atualizadoEm || 0;
-if (remoteAtualizado > localAtualizado) State.data.projetos[index] = projLocal;
+if (remoteAtualizado > localAtualizado) {
+// CORREÇÃO: Mescla preservando campos locais importantes
+State.data.projetos[index] = {
+...State.data.projetos[index],
+...projLocal,
+dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
+};
+}
 }
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
@@ -2044,7 +2004,16 @@ API.on('project:updated', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
 if (index !== -1) {
-State.data.projetos[index] = projLocal;
+// CORREÇÃO: Mescla preservando dataHoraInicio e dataHoraFim
+State.data.projetos[index] = {
+...State.data.projetos[index],
+...projLocal,
+dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
+tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
+concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
+observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
+};
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
@@ -2059,7 +2028,7 @@ if (State.currentPosto) Posto.render();
 Charts.render();
 });
 API.on('sync:complete', (data) => { console.log(`Sync completo: ${data.count} alterações`); });
-API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar. Verifique sua conexão.'); });
+API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
 }
 
 window.addEventListener('online', () => {
