@@ -3,180 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner Industrial - Leitura Vertical</title>
+    <title>Scanner de Etiqueta - Zonas Fixas</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-        :root { --main: #2196F3; --bg: #121212; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        :root { --accent: #2196F3; --bg: #000; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        #video-wrap { position: relative; flex: 1; background: #000; }
+        #video-container { position: relative; flex: 1; background: #000; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; }
         
-        .ui-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; }
-        .focus-area { flex: 1; display: flex; align-items: center; justify-content: center; }
-        .box { width: 280px; height: 280px; border: 2px solid var(--main); border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); position: relative; }
-        .box::after { content: "CENTRALIZE O PEP OU ORDEM"; position: absolute; top: -30px; width: 100%; text-align: center; color: var(--main); font-size: 12px; font-weight: bold; }
+        /* Gabarito da Etiqueta */
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; justify-content: center; align-items: center; }
+        .etiqueta-guide { 
+            width: 300px; height: 450px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-radius: 10px; 
+            position: relative; 
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
+        }
         
-        .data-panel { background: #1e1e1e; padding: 20px; border-radius: 20px 20px 0 0; pointer-events: auto; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 11px; color: #aaa; margin-bottom: 5px; }
-        input { width: 100%; background: #2d2d2d; border: 1px solid #444; padding: 12px; border-radius: 8px; color: #00E676; font-size: 1.2rem; font-weight: bold; box-sizing: border-box; }
+        /* Zonas Fixas de Recorte (Baseadas na imagem do usuário) */
+        .zone { position: absolute; border: 1px solid var(--accent); border-radius: 4px; background: rgba(33, 150, 243, 0.1); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--accent); }
         
-        #status { font-size: 10px; text-align: center; margin-bottom: 10px; color: var(--main); height: 12px; }
-        .flash-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; padding: 15px; border-radius: 50%; pointer-events: auto; color: white; font-size: 20px; }
+        /* Posição PEP: Lado direito, vertical */
+        .zone-pep { top: 10%; right: 10px; width: 40px; height: 300px; writing-mode: vertical-rl; text-orientation: mixed; }
+        /* Posição Ordem: Centro-Direita, vertical */
+        .zone-ordem { top: 35%; right: 80px; width: 40px; height: 200px; writing-mode: vertical-rl; text-orientation: mixed; }
+
+        .controls { background: #121212; padding: 15px; border-radius: 20px 20px 0 0; z-index: 10; }
+        .result-field { margin-bottom: 10px; }
+        .result-field label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
+        .result-field input { width: 100%; background: #1e1e1e; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #4CAF50; font-size: 1.1rem; font-weight: bold; box-sizing: border-box; }
+        
+        #status { font-size: 11px; text-align: center; margin-bottom: 10px; color: var(--accent); height: 15px; }
+        .btn-reset { width: 100%; padding: 10px; background: #333; border: none; color: #fff; border-radius: 8px; font-size: 12px; }
         
         canvas { display: none; }
     </style>
 </head>
 <body>
 
-<div id="video-wrap">
+<div id="video-container">
     <video id="video" autoplay playsinline></video>
-    <div class="ui-overlay">
-        <button class="flash-btn" id="torch">🔦</button>
-        <div class="focus-area">
-            <div class="box"></div>
-        </div>
-        <div class="data-panel">
-            <div id="status">Iniciando motor de leitura...</div>
-            <div class="input-group">
-                <label>PEP (AUTOMÁTICO)</label>
-                <input type="text" id="pep" readonly placeholder="---">
-            </div>
-            <div class="input-group">
-                <label>DIAGRAMA / ORDEM (AUTOMÁTICO)</label>
-                <input type="text" id="ordem" readonly placeholder="---">
-            </div>
-            <button onclick="reset()" style="width:100%; padding:12px; background:#333; border:none; color:white; border-radius:8px; font-weight:bold;">LIMPAR CAMPOS</button>
+    <div class="overlay">
+        <div class="etiqueta-guide">
+            <div class="zone zone-pep">ÁREA PEP</div>
+            <div class="zone zone-ordem">ÁREA ORDEM</div>
         </div>
     </div>
 </div>
 
-<canvas id="canvas"></canvas>
+<div class="controls">
+    <div id="status">Iniciando câmera...</div>
+    <div class="result-field">
+        <label>PEP DETECTADO</label>
+        <input type="text" id="pep" readonly placeholder="Alinhe a etiqueta...">
+    </div>
+    <div class="result-field">
+        <label>DIAGRAMA / ORDEM DETECTADO</label>
+        <input type="text" id="ordem" readonly placeholder="Alinhe a etiqueta...">
+    </div>
+    <button class="btn-reset" onclick="reset()">LIMPAR CAMPOS</button>
+</div>
+
+<canvas id="canvas-pep"></canvas>
+<canvas id="canvas-ordem"></canvas>
 
 <script>
     const video = document.getElementById('video');
     const status = document.getElementById('status');
     const pepIn = document.getElementById('pep');
     const ordemIn = document.getElementById('ordem');
+    
     let worker;
     let isProcessing = false;
-    let torchOn = false;
 
     async function init() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
             });
             video.srcObject = stream;
 
+            status.innerText = "Carregando OCR...";
             worker = await Tesseract.createWorker('por');
             await worker.setParameters({
                 tessedit_char_whitelist: '0123456789-./',
-                tessedit_pageseg_mode: '1', // Detecção automática de orientação
+                tessedit_pageseg_mode: '1', 
             });
 
-            status.innerText = "Scanner Pronto - Suporta leitura vertical";
-            loop();
+            status.innerText = "Scanner Ativo. Alinhe a etiqueta no gabarito.";
+            scanLoop();
         } catch (e) {
             status.innerText = "Erro: " + e.message;
         }
     }
 
-    async function loop() {
+    function preprocess(ctx, w, h) {
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+            const val = avg < 120 ? 0 : 255; // Limiar para destacar o texto
+            data[i] = data[i+1] = data[i+2] = val;
+        }
+        ctx.putImageData(imgData, 0, 0);
+    }
+
+    async function scanLoop() {
         if (isProcessing) {
-            setTimeout(loop, 100);
+            setTimeout(scanLoop, 100);
             return;
         }
 
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             isProcessing = true;
-            await processFrame();
+            
+            const vW = video.videoWidth;
+            const vH = video.videoHeight;
+
+            // Recorte PEP (Vertical no lado direito)
+            if (!pepIn.value) {
+                await processZone('pep', vW, vH, 0.75, 0.1, 0.15, 0.6); 
+            }
+
+            // Recorte Ordem (Vertical no centro-direita)
+            if (!ordemIn.value) {
+                await processZone('ordem', vW, vH, 0.55, 0.3, 0.15, 0.4);
+            }
+
             isProcessing = false;
         }
-        setTimeout(loop, 300);
+        setTimeout(scanLoop, 500);
     }
 
-    async function processFrame() {
-        const canvas = document.getElementById('canvas');
+    async function processZone(type, vW, vH, xPct, yPct, wPct, hPct) {
+        const canvas = document.getElementById(`canvas-${type}`);
         const ctx = canvas.getContext('2d');
         
-        // Capturar área central
-        const size = Math.min(video.videoWidth, video.videoHeight) * 0.7;
-        const x = (video.videoWidth - size) / 2;
-        const y = (video.videoHeight - size) / 2;
-        
-        canvas.width = size;
-        canvas.height = size;
-        ctx.drawImage(video, x, y, size, size, 0, 0, size, size);
+        const sX = vW * xPct;
+        const sY = vH * yPct;
+        const sW = vW * wPct;
+        const sH = vH * hPct;
 
-        // APLICAR FILTROS DE NITIDEZ E CONTRASTE (Crucial para impressão falhada)
-        const imgData = ctx.getImageData(0, 0, size, size);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-            // Filtro de limiar dinâmico
-            const val = avg < 130 ? 0 : 255; 
-            data[i] = data[i+1] = data[i+2] = val;
-        }
-        ctx.putImageData(imgData, 0, 0);
+        canvas.width = sW;
+        canvas.height = sH;
+        ctx.drawImage(video, sX, sY, sW, sH, 0, 0, sW, sH);
+        
+        // Como o texto está na vertical, rotacionar o recorte para horizontal para o Tesseract ler melhor
+        const rotCanvas = document.createElement('canvas');
+        rotCanvas.width = sH;
+        rotCanvas.height = sW;
+        const rotCtx = rotCanvas.getContext('2d');
+        rotCtx.translate(sH/2, sW/2);
+        rotCtx.rotate(Math.PI / 2);
+        rotCtx.drawImage(canvas, -sW/2, -sH/2);
+        
+        preprocess(rotCtx, sH, sW);
 
         try {
-            // Tentar ler na orientação normal
-            let result = await worker.recognize(canvas);
-            parse(result.data.text);
-
-            // Se não encontrou PEP ou Ordem, rotacionar o canvas em 90 graus e tentar novamente
-            if (!pepIn.value || !ordemIn.value) {
-                const rotCanvas = document.createElement('canvas');
-                rotCanvas.width = size;
-                rotCanvas.height = size;
-                const rotCtx = rotCanvas.getContext('2d');
-                rotCtx.translate(size/2, size/2);
-                rotCtx.rotate(Math.PI / 2);
-                rotCtx.drawImage(canvas, -size/2, -size/2);
-                
-                result = await worker.recognize(rotCanvas);
-                parse(result.data.text);
+            const { data: { text } } = await worker.recognize(rotCanvas);
+            const clean = text.replace(/\s/g, '').toUpperCase();
+            
+            if (type === 'pep') {
+                const match = clean.match(/\d{3}-\d{7}-\d{3}/);
+                if (match) {
+                    pepIn.value = match[0];
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
+            } else {
+                const match = clean.match(/\b\d{9}\b/);
+                if (match) {
+                    ordemIn.value = match[0];
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
             }
         } catch (e) {}
-    }
-
-    function parse(text) {
-        const clean = text.replace(/\s/g, '').toUpperCase();
-        
-        // PEP: XXX-XXXXXXX-XXX (Permite pequenas falhas no separador)
-        const pepMatch = clean.match(/(\d{3})[-.\s/]?(\d{7})[-.\s/]?(\d{3})/);
-        if (pepMatch && !pepIn.value) {
-            pepIn.value = `${pepMatch[1]}-${pepMatch[2]}-${pepMatch[3]}`;
-            vibrate();
-        }
-
-        // Ordem: 9 dígitos exatos
-        const ordemMatch = clean.match(/\b\d{9}\b/);
-        if (ordemMatch && !ordemIn.value) {
-            ordemIn.value = ordemMatch[0];
-            vibrate();
-        }
-    }
-
-    function vibrate() {
-        if (navigator.vibrate) navigator.vibrate(100);
     }
 
     function reset() {
         pepIn.value = "";
         ordemIn.value = "";
-        status.innerText = "Scanner Reiniciado";
+        status.innerText = "Campos limpos. Alinhe novamente.";
     }
-
-    document.getElementById('torch').onclick = async () => {
-        const track = video.srcObject.getVideoTracks()[0];
-        if (track.getCapabilities().torch) {
-            torchOn = !torchOn;
-            await track.applyConstraints({ advanced: [{ torch: torchOn }] });
-        }
-    };
 
     window.onload = init;
 </script>
