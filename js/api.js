@@ -7,7 +7,7 @@ const API_CONFIG = {
   URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
   
   // A senha que você definiu no Apps Script (const API_SECRET)
-  SECRET: "Weg2025!Seguro", // ⚠️ Substitua pela sua senha real
+  SECRET: "16101961", // ⚠️ Substitua pela sua senha real
   
   // Intervalo de polling em milissegundos
   POLLING_INTERVAL: 5000
