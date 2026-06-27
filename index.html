@@ -1,193 +1,167 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner de Etiqueta - Zonas Fixas</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <style>
-        :root { --accent: #2196F3; --bg: #000; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        #video-container { position: relative; flex: 1; background: #000; overflow: hidden; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Gabarito da Etiqueta */
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; justify-content: center; align-items: center; }
-        .etiqueta-guide { 
-            width: 300px; height: 450px; 
-            border: 2px solid rgba(255,255,255,0.3); 
-            border-radius: 10px; 
-            position: relative; 
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.7);
-        }
-        
-        /* Zonas Fixas de Recorte (Baseadas na imagem do usuário) */
-        .zone { position: absolute; border: 1px solid var(--accent); border-radius: 4px; background: rgba(33, 150, 243, 0.1); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--accent); }
-        
-        /* Posição PEP: Lado direito, vertical */
-        .zone-pep { top: 10%; right: 10px; width: 40px; height: 300px; writing-mode: vertical-rl; text-orientation: mixed; }
-        /* Posição Ordem: Centro-Direita, vertical */
-        .zone-ordem { top: 35%; right: 80px; width: 40px; height: 200px; writing-mode: vertical-rl; text-orientation: mixed; }
 
-        .controls { background: #121212; padding: 15px; border-radius: 20px 20px 0 0; z-index: 10; }
-        .result-field { margin-bottom: 10px; }
-        .result-field label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
-        .result-field input { width: 100%; background: #1e1e1e; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #4CAF50; font-size: 1.1rem; font-weight: bold; box-sizing: border-box; }
-        
-        #status { font-size: 11px; text-align: center; margin-bottom: 10px; color: var(--accent); height: 15px; }
-        .btn-reset { width: 100%; padding: 10px; background: #333; border: none; color: #fff; border-radius: 8px; font-size: 12px; }
-        
-        canvas { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Leitor de Etiquetas WEG</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f2f2f2;
+    text-align:center;
+    margin:20px;
+}
+
+video{
+    width:100%;
+    max-width:500px;
+    border-radius:10px;
+    border:2px solid #333;
+}
+
+canvas{
+    display:none;
+}
+
+button{
+    margin-top:15px;
+    padding:15px;
+    font-size:18px;
+}
+
+input{
+    width:90%;
+    max-width:500px;
+    padding:12px;
+    font-size:20px;
+    margin:10px;
+}
+
+#status{
+    margin-top:15px;
+    font-weight:bold;
+}
+
+</style>
+
 </head>
 <body>
 
-<div id="video-container">
-    <video id="video" autoplay playsinline></video>
-    <div class="overlay">
-        <div class="etiqueta-guide">
-            <div class="zone zone-pep">ÁREA PEP</div>
-            <div class="zone zone-ordem">ÁREA ORDEM</div>
-        </div>
-    </div>
-</div>
+<h2>Leitor de Etiqueta</h2>
 
-<div class="controls">
-    <div id="status">Iniciando câmera...</div>
-    <div class="result-field">
-        <label>PEP DETECTADO</label>
-        <input type="text" id="pep" readonly placeholder="Alinhe a etiqueta...">
-    </div>
-    <div class="result-field">
-        <label>DIAGRAMA / ORDEM DETECTADO</label>
-        <input type="text" id="ordem" readonly placeholder="Alinhe a etiqueta...">
-    </div>
-    <button class="btn-reset" onclick="reset()">LIMPAR CAMPOS</button>
-</div>
+<video id="video" autoplay playsinline></video>
 
-<canvas id="canvas-pep"></canvas>
-<canvas id="canvas-ordem"></canvas>
+<canvas id="canvas"></canvas>
+
+<br>
+
+<button onclick="capturar()">
+Ler Etiqueta
+</button>
+
+<br><br>
+
+<label>PEP</label><br>
+
+<input id="pep">
+
+<br>
+
+<label>Diagrama / Ordem</label><br>
+
+<input id="diagrama">
+
+<div id="status"></div>
 
 <script>
-    const video = document.getElementById('video');
-    const status = document.getElementById('status');
-    const pepIn = document.getElementById('pep');
-    const ordemIn = document.getElementById('ordem');
-    
-    let worker;
-    let isProcessing = false;
 
-    async function init() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-            });
-            video.srcObject = stream;
+const video=document.getElementById("video");
 
-            status.innerText = "Carregando OCR...";
-            worker = await Tesseract.createWorker('por');
-            await worker.setParameters({
-                tessedit_char_whitelist: '0123456789-./',
-                tessedit_pageseg_mode: '1', 
-            });
+navigator.mediaDevices.getUserMedia({
+video:{
+facingMode:"environment"
+}
+})
+.then(stream=>{
+video.srcObject=stream;
+});
 
-            status.innerText = "Scanner Ativo. Alinhe a etiqueta no gabarito.";
-            scanLoop();
-        } catch (e) {
-            status.innerText = "Erro: " + e.message;
-        }
-    }
+async function capturar(){
 
-    function preprocess(ctx, w, h) {
-        const imgData = ctx.getImageData(0, 0, w, h);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-            const val = avg < 120 ? 0 : 255; // Limiar para destacar o texto
-            data[i] = data[i+1] = data[i+2] = val;
-        }
-        ctx.putImageData(imgData, 0, 0);
-    }
+status.innerHTML="Capturando...";
 
-    async function scanLoop() {
-        if (isProcessing) {
-            setTimeout(scanLoop, 100);
-            return;
-        }
+const canvas=document.getElementById("canvas");
 
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            isProcessing = true;
-            
-            const vW = video.videoWidth;
-            const vH = video.videoHeight;
+canvas.width=video.videoWidth;
+canvas.height=video.videoHeight;
 
-            // Recorte PEP (Vertical no lado direito)
-            if (!pepIn.value) {
-                await processZone('pep', vW, vH, 0.75, 0.1, 0.15, 0.6); 
-            }
+const ctx=canvas.getContext("2d");
 
-            // Recorte Ordem (Vertical no centro-direita)
-            if (!ordemIn.value) {
-                await processZone('ordem', vW, vH, 0.55, 0.3, 0.15, 0.4);
-            }
+ctx.drawImage(video,0,0);
 
-            isProcessing = false;
-        }
-        setTimeout(scanLoop, 500);
-    }
+status.innerHTML="Lendo OCR...";
 
-    async function processZone(type, vW, vH, xPct, yPct, wPct, hPct) {
-        const canvas = document.getElementById(`canvas-${type}`);
-        const ctx = canvas.getContext('2d');
-        
-        const sX = vW * xPct;
-        const sY = vH * yPct;
-        const sW = vW * wPct;
-        const sH = vH * hPct;
+const resultado=await Tesseract.recognize(
+canvas,
+'por'
+);
 
-        canvas.width = sW;
-        canvas.height = sH;
-        ctx.drawImage(video, sX, sY, sW, sH, 0, 0, sW, sH);
-        
-        // Como o texto está na vertical, rotacionar o recorte para horizontal para o Tesseract ler melhor
-        const rotCanvas = document.createElement('canvas');
-        rotCanvas.width = sH;
-        rotCanvas.height = sW;
-        const rotCtx = rotCanvas.getContext('2d');
-        rotCtx.translate(sH/2, sW/2);
-        rotCtx.rotate(Math.PI / 2);
-        rotCtx.drawImage(canvas, -sW/2, -sH/2);
-        
-        preprocess(rotCtx, sH, sW);
+const texto=resultado.data.text;
 
-        try {
-            const { data: { text } } = await worker.recognize(rotCanvas);
-            const clean = text.replace(/\s/g, '').toUpperCase();
-            
-            if (type === 'pep') {
-                const match = clean.match(/\d{3}-\d{7}-\d{3}/);
-                if (match) {
-                    pepIn.value = match[0];
-                    if (navigator.vibrate) navigator.vibrate(100);
-                }
-            } else {
-                const match = clean.match(/\b\d{9}\b/);
-                if (match) {
-                    ordemIn.value = match[0];
-                    if (navigator.vibrate) navigator.vibrate(100);
-                }
-            }
-        } catch (e) {}
-    }
+console.log(texto);
 
-    function reset() {
-        pepIn.value = "";
-        ordemIn.value = "";
-        status.innerText = "Campos limpos. Alinhe novamente.";
-    }
+extrair(texto);
 
-    window.onload = init;
+}
+
+function extrair(texto){
+
+texto=texto.replace(/\n/g," ");
+
+//
+// PEP
+//
+
+let pep=texto.match(/(\d{3}-\d{7}-\d{3})/);
+
+if(pep){
+
+document.getElementById("pep").value=pep[1];
+
+}
+
+//
+// DIAGRAMA
+//
+
+let diag=texto.match(/Ord.*?Diagr.*?(\d{9})/i);
+
+if(diag){
+
+document.getElementById("diagrama").value=diag[1];
+
+}else{
+
+let numero=texto.match(/\b\d{9}\b/);
+
+if(numero){
+
+document.getElementById("diagrama").value=numero[0];
+
+}
+
+}
+
+status.innerHTML="Leitura concluída.";
+
+}
+
 </script>
 
 </body>
