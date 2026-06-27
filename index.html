@@ -1719,6 +1719,139 @@ font-size: 16px;
 <button class="vk-key" data-key="-">-</button>
 </div>
 </div>
+
+<!-- CLIENTE DA API (Integrado e Corrigido) -->
+<script>
+const API_CONFIG = {
+  URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
+  SECRET: "16101961",
+  POLLING_INTERVAL: 5000
+};
+
+let lastSyncTimestamp = 0;
+let syncInProgress = false;
+const eventListeners = {};
+
+async function apiRequest(action, payload = {}, method = 'POST') {
+  try {
+    const url = new URL(API_CONFIG.URL);
+    url.searchParams.append('action', action);
+    
+    const options = {
+      method: method,
+      mode: 'cors',
+      redirect: 'follow'
+    };
+
+    if (method === 'POST') {
+      options.body = JSON.stringify({ 
+        action, 
+        secret: API_CONFIG.SECRET,
+        ...payload 
+      });
+    } else if (method === 'GET') {
+      if (payload.since) url.searchParams.append('since', payload.since);
+      if (payload.key) url.searchParams.append('key', payload.key);
+      url.searchParams.append('secret', API_CONFIG.SECRET);
+    }
+    
+    const response = await fetch(url.toString(), options);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error || 'Erro na API');
+    return result;
+  } catch (error) {
+    console.error('API Request failed:', error);
+    throw error;
+  }
+}
+
+async function createProject(projectData) {
+  const result = await apiRequest('create', { data: projectData });
+  triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
+  return result;
+}
+
+async function updateProject(projectData) {
+  const result = await apiRequest('update', { data: projectData });
+  triggerEvent('project:updated', { ...projectData, AtualizadoEm: Date.now() });
+  return result;
+}
+
+async function deleteProject(projectId) {
+  const result = await apiRequest('delete', { id: projectId });
+  triggerEvent('project:deleted', projectId);
+  return result;
+}
+
+async function updateConfig(key, value) {
+  return await apiRequest('updateConfig', { key, value });
+}
+
+async function getConfig(key) {
+  const result = await apiRequest('getConfig', { key }, 'GET');
+  return result.value;
+}
+
+async function syncData() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  try {
+    const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
+    if (result.success && result.data) {
+      result.data.forEach(remoteProj => {
+        triggerEvent('project:synced', remoteProj);
+      });
+      lastSyncTimestamp = result.timestamp;
+      triggerEvent('sync:complete', { count: result.data.length });
+    }
+  } catch (error) {
+    console.error('Sync failed:', error);
+    triggerEvent('sync:error', error);
+  } finally {
+    syncInProgress = false;
+  }
+}
+
+function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
+  syncData();
+  const timer = setInterval(syncData, interval);
+  console.log(`Polling iniciado: ${interval}ms`);
+  return timer;
+}
+
+function on(event, callback) {
+  if (!eventListeners[event]) eventListeners[event] = [];
+  eventListeners[event].push(callback);
+}
+
+function off(event, callback) {
+  if (eventListeners[event]) {
+    eventListeners[event] = eventListeners[event].filter(cb => cb !== callback);
+  }
+}
+
+function triggerEvent(event, data) {
+  if (eventListeners[event]) {
+    eventListeners[event].forEach(callback => {
+      try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); }
+    });
+  }
+}
+
+window.API = {
+  createProject,
+  updateProject,
+  deleteProject,
+  updateConfig,
+  getConfig,
+  syncData,
+  startPolling,
+  on,
+  off
+};
+</script>
+
 <script>
 // ==========================================
 // CONFIGURAÇÕES GLOBAIS
@@ -1730,7 +1863,6 @@ TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
 FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null }
 };
-
 // ==========================================
 // ESTADO DA APLICAÇÃO
 // ==========================================
@@ -1764,7 +1896,6 @@ lastSync: 0,
 syncQueue: [],
 apiAvailable: false
 };
-
 // ==========================================
 // UTILITÁRIOS
 // ==========================================
@@ -1842,7 +1973,6 @@ atualizadoEm: apiProj.AtualizadoEm
 };
 }
 };
-
 // ==========================================
 // ARMAZENAMENTO HÍBRIDO (API + LocalStorage)
 // ==========================================
@@ -1877,7 +2007,7 @@ this.salvarLocal();
 }
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
-this.iniciarSync();
+API.startPolling(API_CONFIG.POLLING_INTERVAL);
 } else {
 State.apiAvailable = false;
 UI.showToast('info', 'Modo Offline', 'Sistema funcionando sem sincronização com a nuvem');
@@ -1908,7 +2038,7 @@ else if (acao === 'delete') result = await API.deleteProject(dados.id);
 else if (acao === 'config') result = await API.updateConfig(dados.key, dados.value);
 if (result && result.success) {
 this.salvarLocal();
-State.syncQueue = State.syncQueue.filter(item => 
+State.syncQueue = State.syncQueue.filter(item =>
 !(item.acao === acao && item.dados.id === dados.id)
 );
 return { success: true, offline: false };
@@ -1925,45 +2055,10 @@ return { success: true, offline: true, error: error.message };
 }
 },
 iniciarSync() {
-this.sincronizar();
-setInterval(() => this.sincronizar(), 5000);
-window.addEventListener('online', () => {
-State.isOnline = true;
-State.apiAvailable = (typeof API !== 'undefined');
-UI.showToast('success', 'Online', 'Conexão restaurada. Sincronizando...');
-this.sincronizar();
-this.processarFila();
-});
-window.addEventListener('offline', () => {
-State.isOnline = false;
-State.apiAvailable = false;
-UI.showToast('warning', 'Offline', 'Sem conexão. Alterações serão salvas localmente.');
-});
+// Sincronização é controlada pelo API.startPolling()
 },
 async sincronizar() {
-if (!State.apiAvailable || !State.isOnline || typeof API === 'undefined') return;
-try {
-const projetosRemotos = API.getLocalProjects();
-if (projetosRemotos && projetosRemotos.length > 0) {
-projetosRemotos.forEach(projApi => {
-const projLocal = Utils.fromApiFormat(projApi);
-const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) {
-State.data.projetos.push(projLocal);
-} else {
-const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
-const remoteAtualizado = projLocal.atualizadoEm || 0;
-if (remoteAtualizado > localAtualizado) {
-State.data.projetos[index] = projLocal;
-}
-}
-});
-State.lastSync = Date.now();
-this.salvarLocal();
-}
-} catch (error) {
-console.error('Erro na sincronização:', error);
-}
+// Sincronização é controlada pelo API.startPolling()
 },
 async processarFila() {
 if (!State.apiAvailable || !State.isOnline || State.syncQueue.length === 0) return;
@@ -2001,7 +2096,6 @@ if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno = CONFIG.TURNO_LEGADO[p.turno]; mudo
 if (mudou) this.salvarLocal();
 }
 };
-
 // ==========================================
 // INTERFACE (UI)
 // ==========================================
@@ -2159,7 +2253,6 @@ UI.scrollParaElemento(State.vkTarget);
 });
 }
 };
-
 // ==========================================
 // NAVEGAÇÃO
 // ==========================================
@@ -2181,7 +2274,6 @@ if (page === 'historico-posto') Historico.renderPostoAtual();
 if (page === 'config') Config.loadUI();
 }
 };
-
 // ==========================================
 // AUTENTICAÇÃO
 // ==========================================
@@ -2325,7 +2417,6 @@ Charts.render();
 UI.showToast('success', 'Dados apagados', 'Todos os projetos e o histórico foram removidos');
 }
 };
-
 // ==========================================
 // CONFIGURAÇÕES
 // ==========================================
@@ -2395,7 +2486,6 @@ else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'pas
 else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 };
-
 // ==========================================
 // DASHBOARD
 // ==========================================
@@ -2528,7 +2618,6 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 }
 };
-
 // ==========================================
 // ADMINISTRAÇÃO
 // ==========================================
@@ -2756,7 +2845,6 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
 }
 };
-
 // ==========================================
 // POSTO DE TRABALHO
 // ==========================================
@@ -2900,7 +2988,6 @@ this.renderTable();
 UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
 }
 };
-
 // ==========================================
 // CONCLUSÃO DE PROJETOS
 // ==========================================
@@ -3051,7 +3138,6 @@ UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo total: ' 
 }
 }
 };
-
 // ==========================================
 // HISTÓRICO
 // ==========================================
@@ -3213,7 +3299,6 @@ Charts.render();
 UI.showToast('success', 'Excluído', 'Registro removido do histórico');
 }
 };
-
 // ==========================================
 // TURNO, TECLADO, GRÁFICOS, EXPORT
 // ==========================================
@@ -3383,7 +3468,6 @@ reader.readAsText(file);
 e.target.value = '';
 }
 };
-
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
@@ -3397,13 +3481,47 @@ UI.setupVirtualKeyboard();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
 if (typeof API !== 'undefined' && State.apiAvailable) {
+API.on('project:synced', (proj) => {
+const projLocal = Utils.fromApiFormat(proj);
+const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+if (index === -1) {
+State.data.projetos.push(projLocal);
+} else {
+const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
+const remoteAtualizado = projLocal.atualizadoEm || 0;
+if (remoteAtualizado > localAtualizado) {
+State.data.projetos[index] = projLocal;
+}
+}
+Storage.salvarLocal();
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) Posto.render();
+Charts.render();
+});
 API.on('project:created', (proj) => {
-console.log('Novo projeto via sync:', proj);
+const projLocal = Utils.fromApiFormat(proj);
+const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+if (index === -1) {
+State.data.projetos.push(projLocal);
+Storage.salvarLocal();
+}
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 });
 API.on('project:updated', (proj) => {
-console.log('Projeto atualizado via sync:', proj);
+const projLocal = Utils.fromApiFormat(proj);
+const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+if (index !== -1) {
+State.data.projetos[index] = projLocal;
+Storage.salvarLocal();
+}
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) Posto.render();
+Charts.render();
+});
+API.on('project:deleted', (projectId) => {
+State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
+Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
@@ -3416,6 +3534,17 @@ console.error('Erro de sync:', err);
 UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar. Verifique sua conexão.');
 });
 }
+window.addEventListener('online', () => {
+State.isOnline = true;
+State.apiAvailable = (typeof API !== 'undefined');
+UI.showToast('success', 'Online', 'Conexão restaurada. Sincronizando...');
+Storage.processarFila();
+});
+window.addEventListener('offline', () => {
+State.isOnline = false;
+State.apiAvailable = false;
+UI.showToast('warning', 'Offline', 'Sem conexão. Alterações serão salvas localmente.');
+});
 }
 };
 App.init();
