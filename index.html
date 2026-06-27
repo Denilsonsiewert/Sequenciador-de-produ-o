@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leitor de Etiqueta · PEP & Diagrama</title>
-    <!-- QuaggaJS para leitura de código de barras -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <title>Leitor de Etiquetas WEG · PEP + Diagrama</title>
+    <!-- Tesseract.js para OCR (leitura de texto da imagem) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
+    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -21,6 +22,7 @@
             align-items: center;
             justify-content: center;
             padding: 16px;
+            margin: 0;
         }
 
         .card {
@@ -40,7 +42,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .subhead {
@@ -48,7 +50,7 @@
             font-size: 0.95rem;
             border-left: 4px solid #3b82f6;
             padding-left: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             font-weight: 400;
         }
 
@@ -57,7 +59,7 @@
             border-radius: 24px;
             overflow: hidden;
             position: relative;
-            margin-bottom: 24px;
+            margin-bottom: 18px;
             aspect-ratio: 4 / 3;
             display: flex;
             align-items: center;
@@ -65,16 +67,16 @@
             border: 1px solid #dbe1ec;
         }
 
-        #interactive {
+        #video {
             width: 100%;
             height: 100%;
-            position: relative;
+            object-fit: cover;
+            display: block;
+            background: #1a1f2e;
         }
 
-        #interactive video, #interactive canvas {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover;
+        canvas {
+            display: none;
         }
 
         .scan-overlay {
@@ -93,32 +95,40 @@
             height: 2px;
             background: #3b82f6;
             top: 45%;
-            opacity: 0.6;
+            opacity: 0.5;
             box-shadow: 0 0 12px #3b82f6;
-            animation: pulse-scan 2.2s ease-in-out infinite;
+            animation: pulse-scan 2.4s ease-in-out infinite;
         }
 
         @keyframes pulse-scan {
-            0% { top: 25%; opacity: 0.2; }
-            50% { top: 70%; opacity: 0.7; }
-            100% { top: 25%; opacity: 0.2; }
+            0% {
+                top: 20%;
+                opacity: 0.2;
+            }
+            50% {
+                top: 75%;
+                opacity: 0.7;
+            }
+            100% {
+                top: 20%;
+                opacity: 0.2;
+            }
         }
 
         .controls {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .btn {
             background: white;
             border: 1px solid #d0d9e8;
-            padding: 10px 18px;
+            padding: 12px 20px;
             border-radius: 40px;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #1f2a44;
             display: inline-flex;
             align-items: center;
@@ -136,8 +146,12 @@
             color: white;
         }
 
-        .btn-primary:active { background: #0f172a; }
-        .btn:active { background: #e9eef6; }
+        .btn-primary:active {
+            background: #0f172a;
+        }
+        .btn:active {
+            background: #e9eef6;
+        }
 
         .btn-icon {
             font-size: 1.2rem;
@@ -147,16 +161,16 @@
         .field-group {
             background: #f8faff;
             border-radius: 20px;
-            padding: 16px 18px;
-            margin-top: 12px;
+            padding: 8px 18px 16px;
             border: 1px solid #e9eefa;
+            margin-top: 4px;
         }
 
         .field-row {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eef3fc;
         }
 
@@ -165,7 +179,7 @@
         }
 
         .field-label {
-            width: 90px;
+            width: 100px;
             font-weight: 500;
             color: #1f2a44;
             font-size: 0.9rem;
@@ -181,11 +195,11 @@
             font-size: 0.95rem;
             font-weight: 500;
             color: #0b1b33;
-            transition: 0.1s;
-            word-break: break-all;
             min-height: 44px;
             display: flex;
             align-items: center;
+            word-break: break-all;
+            transition: 0.1s;
         }
 
         .field-value.populated {
@@ -208,19 +222,18 @@
             color: #1f2a44;
             letter-spacing: 0.3px;
             margin-left: auto;
+            white-space: nowrap;
         }
 
-        .hint {
-            font-size: 0.8rem;
-            color: #5e6f8d;
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-top: 16px;
-            text-align: center;
             background: #f2f6fe;
-            padding: 12px;
+            padding: 8px 18px;
             border-radius: 40px;
-        }
-
-        .hint strong {
+            font-size: 0.85rem;
             color: #1f2a44;
         }
 
@@ -229,8 +242,9 @@
             width: 10px;
             height: 10px;
             border-radius: 20px;
-            margin-right: 6px;
+            margin-right: 8px;
             background: #a0b3d0;
+            transition: 0.2s;
         }
 
         .status-led.active {
@@ -238,286 +252,335 @@
             box-shadow: 0 0 8px #22c55e80;
         }
 
+        .status-led.error {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef444480;
+        }
+
         .flex {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+        }
+
+        .hint-text {
+            font-size: 0.75rem;
+            color: #5e6f8d;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .hint-text strong {
+            color: #1f2a44;
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>
-        <span>📋 Leitor</span>
-        <span style="font-size: 0.8rem; background: #eef3fc; padding: 2px 12px; border-radius: 40px; font-weight: 400;">PEP · Diagrama</span>
-    </h1>
-    <div class="subhead">Aponte a câmera para o código de barras da etiqueta</div>
+    <div class="card">
+        <h1>
+            <span>📋 Leitor</span>
+            <span style="font-size:0.7rem;background:#eef3fc;padding:2px 14px;border-radius:40px;font-weight:400;">PEP + Diagrama</span>
+        </h1>
+        <div class="subhead">Aponte para a etiqueta e clique em "Ler Etiqueta"</div>
 
-    <!-- CÂMERA / SCANNER -->
-    <div class="cam-wrapper">
-        <div id="interactive"></div>
-        <div class="scan-overlay"></div>
-        <div class="scan-line"></div>
-    </div>
-
-    <!-- CONTROLES -->
-    <div class="controls">
-        <button class="btn" id="btn-start"><span class="btn-icon">▶</span> Iniciar</button>
-        <button class="btn" id="btn-stop"><span class="btn-icon">⏹</span> Parar</button>
-        <button class="btn btn-primary" id="btn-simulate"><span class="btn-icon">📄</span> Simular Etiqueta</button>
-    </div>
-
-    <!-- CAMPOS EXTRAÍDOS -->
-    <div class="field-group">
-        <div class="field-row">
-            <span class="field-label">🔖 PEP</span>
-            <span class="field-value empty" id="pep-value">Aguardando...</span>
-            <span class="badge">170-2500343-121</span>
+        <!-- CÂMERA + OVERLAY -->
+        <div class="cam-wrapper">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="scan-overlay"></div>
+            <div class="scan-line"></div>
         </div>
-        <div class="field-row">
-            <span class="field-label">📐 Diagrama</span>
-            <span class="field-value empty" id="diagram-value">Aguardando...</span>
-            <span class="badge">450890224</span>
+
+        <!-- CONTROLES -->
+        <div class="controls">
+            <button class="btn btn-primary" id="btn-capture">
+                <span class="btn-icon">📸</span> Ler Etiqueta
+            </button>
+            <button class="btn" id="btn-simulate">
+                <span class="btn-icon">📄</span> Simular
+            </button>
         </div>
-        <div class="field-row" style="border-bottom: none; padding-top: 2px;">
-            <span class="field-label" style="width: auto; font-size: 0.75rem; color: #5e6f8d;">Última leitura</span>
-            <span style="font-size: 0.7rem; color: #5e6f8d;" id="last-scan">—</span>
+
+        <!-- CAMPOS -->
+        <div class="field-group">
+            <div class="field-row">
+                <span class="field-label">🔖 PEP</span>
+                <span class="field-value empty" id="pep-value">Aguardando...</span>
+                <span class="badge">170-2500343-121</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">📐 Diagrama</span>
+                <span class="field-value empty" id="diagram-value">Aguardando...</span>
+                <span class="badge">450890224</span>
+            </div>
+            <div class="field-row" style="border-bottom:none; padding-top:2px;">
+                <span class="field-label" style="width:auto; font-size:0.75rem; color:#5e6f8d;">Última leitura</span>
+                <span style="font-size:0.7rem; color:#5e6f8d;" id="last-scan">—</span>
+            </div>
+        </div>
+
+        <!-- STATUS -->
+        <div class="status-bar">
+            <span class="flex">
+                <span class="status-led" id="led-status"></span>
+                <span id="status-text"><strong>Pronto</strong> · clique em "Ler"</span>
+            </span>
+            <span id="timer-badge" style="font-size:0.7rem;color:#5e6f8d;">OCR</span>
+        </div>
+        <div class="hint-text">
+            <strong>Dica:</strong> O PEP aparece como <em>170-2500343-121</em> e o Diagrama como <em>450890224</em>.
         </div>
     </div>
 
-    <div class="hint">
-        <span class="status-led" id="led-status"></span> 
-        <span id="status-text"><strong>Pronto</strong> · clique em "Iniciar"</span>
-    </div>
-</div>
+    <script>
+        (function() {
+            // ----- ELEMENTOS -----
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
 
-<script>
-    (function() {
-        // --------------------- ELEMENTOS ---------------------
-        const pepField = document.getElementById('pep-value');
-        const diagramField = document.getElementById('diagram-value');
-        const lastScanSpan = document.getElementById('last-scan');
-        const statusText = document.getElementById('status-text');
-        const ledStatus = document.getElementById('led-status');
+            const pepField = document.getElementById('pep-value');
+            const diagramField = document.getElementById('diagram-value');
+            const lastScanSpan = document.getElementById('last-scan');
+            const statusText = document.getElementById('status-text');
+            const ledStatus = document.getElementById('led-status');
+            const timerBadge = document.getElementById('timer-badge');
 
-        const btnStart = document.getElementById('btn-start');
-        const btnStop = document.getElementById('btn-stop');
-        const btnSimulate = document.getElementById('btn-simulate');
+            const btnCapture = document.getElementById('btn-capture');
+            const btnSimulate = document.getElementById('btn-simulate');
 
-        // Estado
-        let scannerActive = false;
-        let lastDecoded = '';
+            // ----- ESTADO -----
+            let stream = null;
+            let isProcessing = false;
 
-        // --------------------- FUNÇÕES AUXILIARES ---------------------
-        function setStatus(msg, isActive = false) {
-            statusText.innerHTML = msg;
-            if (isActive) {
-                ledStatus.className = 'status-led active';
-            } else {
+            // ----- INICIALIZAR CÂMERA -----
+            async function startCamera() {
+                try {
+                    if (stream) {
+                        stream.getTracks().forEach(t => t.stop());
+                        stream = null;
+                    }
+                    const mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'environment',
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        }
+                    });
+                    stream = mediaStream;
+                    video.srcObject = mediaStream;
+                    await video.play();
+                    setStatus('📷 Câmera ativa', 'active');
+                } catch (err) {
+                    console.error('Erro ao acessar câmera:', err);
+                    setStatus('❌ Câmera indisponível', 'error');
+                }
+            }
+
+            // ----- FUNÇÃO DE STATUS -----
+            function setStatus(msg, state = 'idle') {
+                statusText.innerHTML = msg;
                 ledStatus.className = 'status-led';
+                if (state === 'active') ledStatus.classList.add('active');
+                else if (state === 'error') ledStatus.classList.add('error');
+                // idle: sem classe extra
             }
-        }
 
-        // Extrai PEP (formato 170-2500343-121) e Diagrama (450890224) a partir do texto bruto
-        function extractFields(rawText) {
-            const result = { pep: null, diagram: null };
+            // ----- EXTRAÇÃO INTELIGENTE (PEP + DIAGRAMA) -----
+            function extractFields(text) {
+                // limpa quebras de linha e espaços excessivos
+                let clean = text.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
-            if (!rawText) return result;
+                const result = { pep: null, diagram: null };
 
-            // 1) PEP: padrão "170-2500343-121" (ou variações com números)
-            //    Procuramos algo como "170-2500343-121" ou "170 - 2500343 - 121"
-            const pepRegex = /\b(170\s*[-–]\s*2500343\s*[-–]\s*121)\b/i;
-            const pepMatch = rawText.match(pepRegex);
-            if (pepMatch) {
-                result.pep = pepMatch[1].replace(/\s/g, ''); // remove espaços
-            } else {
-                // Fallback: qualquer padrão com 3 grupos separados por traço, ex: 123-456789-78
-                // mas mantemos prioridade para o padrão exato.
-                const fallbackPep = rawText.match(/\b(\d{3}\s*[-–]\s*\d{7}\s*[-–]\s*\d{3})\b/i);
-                if (fallbackPep) {
-                    result.pep = fallbackPep[1].replace(/\s/g, '');
+                // 1. PEP: padrão 170-2500343-121 (prioridade)
+                //    Aceita hífen, travessão, en dash
+                const pepRegex = /\b(170\s*[-–—]\s*2500343\s*[-–—]\s*121)\b/i;
+                let pepMatch = clean.match(pepRegex);
+                if (pepMatch) {
+                    result.pep = pepMatch[1].replace(/\s/g, '').replace(/[–—]/g, '-');
+                } else {
+                    // fallback: qualquer 3-7-3 com hífen
+                    const genericPep = clean.match(/\b(\d{3}\s*[-–—]\s*\d{7}\s*[-–—]\s*\d{3})\b/);
+                    if (genericPep) {
+                        result.pep = genericPep[1].replace(/\s/g, '').replace(/[–—]/g, '-');
+                    } else {
+                        // último recurso: 13 dígitos consecutivos
+                        const digits13 = clean.match(/\b(\d{13})\b/);
+                        if (digits13) {
+                            const n = digits13[1];
+                            result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
+                        }
+                    }
+                }
+
+                // 2. DIAGRAMA: 450890224 (prioridade)
+                //    Procuramos exatamente o número 450890224
+                const diagramExact = clean.match(/\b450890224\b/);
+                if (diagramExact) {
+                    result.diagram = '450890224';
+                } else {
+                    // fallback: qualquer número de 9 dígitos (evitando pegar o pep)
+                    const nineDigits = clean.match(/\b(\d{9})\b/g);
+                    if (nineDigits) {
+                        // escolhe o primeiro que não seja parte do PEP
+                        for (let d of nineDigits) {
+                            // se for igual ao pep (sem hífen) ou parecer com o padrão, ignoramos
+                            const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
+                            if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
+                                result.diagram = d;
+                                break;
+                            }
+                        }
+                        // se ainda não encontrou, pega o primeiro
+                        if (!result.diagram && nineDigits.length > 0) {
+                            result.diagram = nineDigits[0];
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            // ----- ATUALIZA UI COM OS CAMPOS -----
+            function updateUI(pep, diagram, rawText) {
+                // PEP
+                if (pep) {
+                    pepField.textContent = pep;
+                    pepField.className = 'field-value populated';
+                } else {
+                    pepField.textContent = 'não encontrado';
+                    pepField.className = 'field-value empty';
+                }
+
+                // Diagrama
+                if (diagram) {
+                    diagramField.textContent = diagram;
+                    diagramField.className = 'field-value populated';
+                } else {
+                    diagramField.textContent = 'não encontrado';
+                    diagramField.className = 'field-value empty';
+                }
+
+                // Última leitura (prévia)
+                if (rawText && rawText.length > 0) {
+                    const preview = rawText.length > 45 ? rawText.substring(0, 45) + '…' : rawText;
+                    lastScanSpan.textContent = preview;
+                } else {
+                    lastScanSpan.textContent = '—';
                 }
             }
 
-            // 2) Diagrama: "450890224" (9 dígitos) – procuramos exatamente esse número ou qualquer sequência de 9 dígitos
-            //    mas damos prioridade ao "450890224" fixo.
-            const diagramExact = rawText.match(/\b450890224\b/);
-            if (diagramExact) {
-                result.diagram = '450890224';
-            } else {
-                // fallback: qualquer sequência de 9 dígitos (mas evitamos pegar o PEP)
-                const nineDigits = rawText.match(/\b(\d{9})\b/);
-                if (nineDigits) {
-                    // Se for igual ao pep, ignoramos (pois pep tem formato diferente)
-                    const candidate = nineDigits[1];
-                    if (candidate !== '2500343' && !candidate.includes('170')) {
-                        result.diagram = candidate;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        // Atualiza a UI com os campos extraídos
-        function updateFieldsFromText(rawText) {
-            const { pep, diagram } = extractFields(rawText);
-
-            // PEP
-            if (pep) {
-                pepField.textContent = pep;
-                pepField.className = 'field-value populated';
-            } else {
-                pepField.textContent = 'não encontrado';
-                pepField.className = 'field-value empty';
-            }
-
-            // Diagrama
-            if (diagram) {
-                diagramField.textContent = diagram;
-                diagramField.className = 'field-value populated';
-            } else {
-                diagramField.textContent = 'não encontrado';
-                diagramField.className = 'field-value empty';
-            }
-
-            // Atualiza última leitura
-            if (rawText && rawText.length > 0) {
-                const preview = rawText.length > 40 ? rawText.substring(0, 40) + '…' : rawText;
-                lastScanSpan.textContent = preview;
-            } else {
-                lastScanSpan.textContent = '—';
-            }
-        }
-
-        // --------------------- SIMULAÇÃO (etiqueta de exemplo) ---------------------
-        function simulateLabel() {
-            const mockData = 
-`SIPORTE SUST BMWI-C 55X30X27
-Lite: IB03
-Dep: 132302
-Fesp: Ord. Inviol. ID tag: 450890224
-Ord. Inviol. ID tag: 450890224
-Ord. Inviol. ID Tag: 450890224
-Ord. Inviol. ID Tag: 450890224
-PEP: 170 - 2500343 - 121
-Ord. Inviol. ID Tag: 450890224
-Ord. Inviol. ID Tag: 450890224
-Ord. Inviol. Tag: 450890224
-Ord. Inviol. Tag: 450890224
-1 / C: 28
-3,7658973 Wabie: 12936533`;
-
-            updateFieldsFromText(mockData);
-            setStatus('📥 Simulação carregada', true);
-            lastScanSpan.textContent = 'Simulação (etiqueta exemplo)';
-        }
-
-        // --------------------- QUAGGA (leitor de código de barras) ---------------------
-        function initScanner() {
-            if (scannerActive) {
-                stopScanner();
-            }
-
-            const target = document.getElementById('interactive');
-            target.innerHTML = ''; // limpa
-
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: target,
-                    constraints: {
-                        facingMode: "environment",
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    }
-                },
-                decoder: {
-                    readers: [
-                        "code_128_reader",
-                        "ean_reader",
-                        "ean_8_reader",
-                        "code_39_reader",
-                        "code_93_reader",
-                        "codabar_reader",
-                        "upc_reader",
-                        "upc_e_reader",
-                        "i2of5_reader",
-                        "code_39_vin_reader"
-                    ]
-                },
-                locate: true,
-                numOfWorkers: 2
-            }, function(err) {
-                if (err) {
-                    console.error("Erro ao iniciar Quagga:", err);
-                    setStatus('❌ Erro: ' + (err.message || 'câmera indisponível'), false);
-                    scannerActive = false;
+            // ----- PROCESSAMENTO PRINCIPAL (CAPTURA + OCR) -----
+            async function captureAndRead() {
+                if (isProcessing) {
+                    setStatus('⏳ Processando... aguarde', 'active');
                     return;
                 }
-                Quagga.start();
-                scannerActive = true;
-                setStatus('📷 Câmera ativa · aguardando código', true);
-            });
 
-            // Evento de detecção
-            Quagga.onDetected(function(result) {
-                if (!result || !result.codeResult) return;
-                const code = result.codeResult.code;
-                if (!code) return;
+                // Verifica se a câmera está pronta
+                if (!video.videoWidth || !video.videoHeight) {
+                    setStatus('⚠️ Aguarde a câmera iniciar', 'error');
+                    return;
+                }
 
-                // Evita processar o mesmo código múltiplas vezes seguidas
-                if (code === lastDecoded) return;
-                lastDecoded = code;
+                isProcessing = true;
+                setStatus('📸 Capturando...', 'active');
+                timerBadge.textContent = 'OCR ⏳';
 
-                // Atualiza campos com o texto decodificado
-                updateFieldsFromText(code);
-                setStatus(`✅ Código lido: ${code.substring(0, 20)}...`, true);
-            });
-        }
+                try {
+                    // Desenha o frame no canvas
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        function stopScanner() {
-            if (scannerActive) {
-                Quagga.stop();
-                scannerActive = false;
-                const target = document.getElementById('interactive');
-                if (target) target.innerHTML = '';
-                setStatus('⏹ Câmera desligada', false);
-                lastDecoded = '';
+                    setStatus('🔍 Lendo OCR...', 'active');
+
+                    // Executa OCR com Tesseract
+                    const result = await Tesseract.recognize(canvas, 'por', {
+                        logger: (m) => {
+                            if (m.status === 'recognizing text') {
+                                timerBadge.textContent = `OCR ${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    });
+
+                    const texto = result.data.text;
+                    console.log('📄 OCR completo:', texto);
+
+                    // Extrai campos
+                    const { pep, diagram } = extractFields(texto);
+                    updateUI(pep, diagram, texto);
+
+                    setStatus('✅ Leitura concluída!', 'active');
+                    timerBadge.textContent = 'OK ✓';
+
+                } catch (err) {
+                    console.error('Erro no OCR:', err);
+                    setStatus('❌ Erro na leitura', 'error');
+                    timerBadge.textContent = 'Erro';
+                } finally {
+                    isProcessing = false;
+                    // reset do timer após 3s
+                    setTimeout(() => {
+                        if (!isProcessing) timerBadge.textContent = 'OCR';
+                    }, 3000);
+                }
             }
-        }
 
-        // --------------------- EVENTOS DOS BOTÕES ---------------------
-        btnStart.addEventListener('click', function() {
-            initScanner();
-        });
+            // ----- SIMULAÇÃO (etiqueta exemplo) -----
+            function simulateLabel() {
+                if (isProcessing) return;
 
-        btnStop.addEventListener('click', function() {
-            stopScanner();
-        });
+                const mockData =
+                    `SIPORTE SUST BMWI-C 55X30X27
+        Lite: IB03
+        Dep: 132302
+        Fesp: Ord. Inviol. ID tag: 450890224
+        Ord. Inviol. ID tag: 450890224
+        Ord. Inviol. ID Tag: 450890224
+        Ord. Inviol. ID Tag: 450890224
+        PEP: 170 - 2500343 - 121
+        Ord. Inviol. ID Tag: 450890224
+        Ord. Inviol. ID Tag: 450890224
+        Ord. Inviol. Tag: 450890224
+        Ord. Inviol. Tag: 450890224
+        1 / C: 28
+        3,7658973 Wabie: 12936533`;
 
-        btnSimulate.addEventListener('click', function() {
-            if (scannerActive) {
-                stopScanner(); // para não conflitar
+                const { pep, diagram } = extractFields(mockData);
+                updateUI(pep, diagram, mockData);
+                setStatus('📥 Simulação carregada', 'active');
+                lastScanSpan.textContent = 'Simulação (exemplo)';
+                timerBadge.textContent = 'SIM';
+                setTimeout(() => { timerBadge.textContent = 'OCR'; }, 2500);
             }
-            simulateLabel();
-        });
 
-        // Inicializa com estado vazio
-        setStatus('📱 Clique em "Iniciar" para usar a câmera', false);
-        pepField.textContent = '—';
-        diagramField.textContent = '—';
-        pepField.className = 'field-value empty';
-        diagramField.className = 'field-value empty';
+            // ----- EVENTOS DOS BOTÕES -----
+            btnCapture.addEventListener('click', captureAndRead);
+            btnSimulate.addEventListener('click', simulateLabel);
 
-        // Prevenir que o Quagga seja carregado sem interação (alguns navegadores)
-        // mas já está OK.
+            // ----- INICIALIZAÇÃO -----
+            startCamera();
 
-        console.log('📋 Leitor de etiquetas pronto.');
-        console.log('🔹 PEP: posição fixa "170-2500343-121"');
-        console.log('🔹 Diagrama: posição fixa "450890224"');
-    })();
-</script>
+            // Estado inicial
+            pepField.textContent = '—';
+            diagramField.textContent = '—';
+            pepField.className = 'field-value empty';
+            diagramField.className = 'field-value empty';
+            setStatus('📱 Câmera pronta', 'active');
+
+            // Fallback: se a câmera demorar, avisa
+            setTimeout(() => {
+                if (!video.videoWidth) {
+                    setStatus('⚠️ Toque em "Ler" após câmera iniciar', 'idle');
+                }
+            }, 4000);
+
+            console.log('📋 Leitor WEG · PEP + Diagrama');
+            console.log('🔹 PEP: 170-2500343-121');
+            console.log('🔹 Diagrama: 450890224');
+        })();
+    </script>
 </body>
 </html>
