@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor de Etiquetas - OCR</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #1a73e8;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(26, 115, 232, 0.5);
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #1a73e8;
+            box-shadow: 0 0 8px #1a73e8;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        #status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Leitor de Etiqueta</h1>
+
+    <div id="video-container">
+        <video id="video" autoplay playsinline></video>
+        <div class="overlay">
+            <div class="scan-line"></div>
+        </div>
+    </div>
+
+    <button id="capture-btn">Capturar e Ler Etiqueta</button>
+    <div id="status">Aguardando câmera...</div>
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+    <div class="form-group">
+        <label for="pep">PEP:</label>
+        <input type="text" id="pep" placeholder="O campo PEP aparecerá aqui">
+    </div>
+
+    <div class="form-group">
+        <label for="diagrama">Diagrama / Ordem:</label>
+        <input type="text" id="diagrama" placeholder="O campo Diagrama/Ordem aparecerá aqui">
+    </div>
+
+    <canvas id="canvas"></canvas>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const statusDiv = document.getElementById('status');
+    const pepInput = document.getElementById('pep');
+    const diagramaInput = document.getElementById('diagrama');
+
+    // Iniciar Câmera
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' },
+                audio: false
+            });
+            video.srcObject = stream;
+            statusDiv.innerText = "Câmera pronta. Posicione a etiqueta.";
+        } catch (err) {
+            console.error("Erro ao acessar câmera: ", err);
+            statusDiv.innerText = "Erro ao acessar a câmera. Verifique as permissões.";
+        }
+    }
+
+    startCamera();
+
+    captureBtn.addEventListener('click', async () => {
+        captureBtn.disabled = true;
+        statusDiv.innerText = "Processando imagem... Por favor, aguarde.";
+        
+        // Desenhar frame do vídeo no canvas
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Realizar OCR usando Tesseract.js
+        try {
+            const result = await Tesseract.recognize(
+                canvas.toDataURL('image/png'),
+                'por', // Idioma Português
+                { logger: m => console.log(m) }
+            );
+
+            const text = result.data.text;
+            console.log("Texto Extraído:", text);
+            processText(text);
+            
+            statusDiv.innerText = "Leitura concluída!";
+        } catch (err) {
+            console.error("Erro no OCR:", err);
+            statusDiv.innerText = "Erro ao ler a etiqueta. Tente novamente.";
+        } finally {
+            captureBtn.disabled = false;
+        }
+    });
+
+    function processText(text) {
+        // Normalizar o texto (remover espaços extras, converter para maiúsculas para facilitar busca)
+        const lines = text.split('\n').map(line => line.trim());
+        
+        let foundPep = "";
+        let foundDiagrama = "";
+
+        // Regex para o padrão PEP (ex: 170-2500343-121)
+        // O padrão parece ser XXX-XXXXXXX-XXX
+        const pepRegex = /\d{3}-\d{7}-\d{3}/;
+        
+        // Regex para o padrão Diagrama/Ordem (ex: 450890224)
+        // Geralmente uma sequência numérica de 9 dígitos
+        const diagramaRegex = /\b\d{9}\b/;
+
+        for (let line of lines) {
+            // Tentar encontrar PEP
+            if (!foundPep) {
+                const matchPep = line.match(pepRegex);
+                if (matchPep) foundPep = matchPep[0];
+            }
+
+            // Tentar encontrar Diagrama/Ordem
+            // Como o diagrama costuma vir após o texto "Ord. Invól./Diagr.:"
+            if (!foundDiagrama) {
+                const matchDiag = line.match(diagramaRegex);
+                if (matchDiag) foundDiagrama = matchDiag[0];
+            }
+        }
+
+        // Se não encontrou pelo regex exato, tenta buscar por palavras-chave
+        if (!foundPep || !foundDiagrama) {
+            lines.forEach((line, index) => {
+                const upperLine = line.toUpperCase();
+                
+                if (!foundPep && upperLine.includes("PEP")) {
+                    // Tenta pegar o número na mesma linha ou na próxima
+                    const match = line.match(/\d{3}-\d{7}-\d{3}/) || (lines[index+1] && lines[index+1].match(/\d{3}-\d{7}-\d{3}/));
+                    if (match) foundPep = match[0];
+                }
+                
+                if (!foundDiagrama && (upperLine.includes("DIAGR") || upperLine.includes("ORD"))) {
+                    const match = line.match(/\d{9}/) || (lines[index+1] && lines[index+1].match(/\d{9}/));
+                    if (match) foundDiagrama = match[0];
+                }
+            });
+        }
+
+        if (foundPep) pepInput.value = foundPep;
+        if (foundDiagrama) diagramaInput.value = foundDiagrama;
+        
+        if (!foundPep && !foundDiagrama) {
+            statusDiv.innerText = "Não foi possível identificar os campos. Tente focar melhor.";
+        }
+    }
+</script>
+
+</body>
+</html>
