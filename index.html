@@ -394,7 +394,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2>
 <button class="btn btn-sm btn-success" onclick="Admin.abrirCamera()"><i class="fa-solid fa-camera"></i> Ler Etiqueta (Câmera)</button>
 </div>
-
 <div id="cameraSection" class="camera-container">
 <video id="cameraVideo" autoplay playsinline></video>
 <canvas id="cameraCanvas"></canvas>
@@ -404,7 +403,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="camera-controls" id="cameraControls" style="display:none;">
 <button class="btn btn-danger" onclick="Admin.fecharCamera()"><i class="fa-solid fa-times"></i> Fechar Câmera</button>
 </div>
-
 <form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
 <div class="form-grid">
 <div class="form-group"><label>PEP</label><input type="text" id="cad-pep" placeholder="Ex: 170-2500343-121 (opcional)" data-vk></div>
@@ -497,7 +495,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 </div>
 </div>
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você será redirecionado para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
-<div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno está processando os materiais?</div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
+<div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno está processando os materiais?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Esta pergunta será feita novamente a cada 2 horas.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
 <div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha do administrador para acessar o perfil de <strong>Coordenação</strong>.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha do Administrador <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}" onfocus="UI.scrollParaElemento(this)"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação de Segurança</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Esta ação é irreversível. Digite a senha do administrador para continuar.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha do administrador incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha do Administrador <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}" onfocus="UI.scrollParaElemento(this)"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid">
@@ -531,8 +529,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear" title="Limpar"><i class="fa-solid fa-eraser"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close" title="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
-
-<!-- CLIENTE DA API -->
 <script>
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
@@ -609,22 +605,16 @@ if (eventListeners[event]) eventListeners[event].forEach(callback => { try { cal
 }
 window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, startPolling, on, off };
 </script>
-
 <script>
-// ==========================================
-// CONFIGURAÇÕES GLOBAIS
-// ==========================================
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v29',
+STORAGE_KEY: 'weg_fluxo_produtivo_v30',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
-FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null }
+FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
+TURNO_COOLDOWN: 2 * 60 * 60 * 1000 // 2 horas em milissegundos
 };
 
-// ==========================================
-// ESTADO DA APLICAÇÃO
-// ==========================================
 const State = {
 data: {
 projetos: [],
@@ -632,7 +622,8 @@ historico: [],
 historicoPostos: [],
 config: { dispositivo: 'tablet' },
 turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' },
-senhaAdmin: CONFIG.SENHA_PADRAO
+senhaAdmin: CONFIG.SENHA_PADRAO,
+ultimaSelecaoTurno: 0
 },
 currentUser: null,
 currentPosto: null,
@@ -649,6 +640,7 @@ pendingAdminLogin: false,
 acaoPendenteSenha: null,
 charts: {},
 turnoFimSemanaPendente: false,
+turnoFimSemanaModalAberto: false, // NOVA FLAG: evita abrir modal múltiplas vezes
 timerInterval: null,
 isOnline: navigator.onLine,
 lastSync: 0,
@@ -660,9 +652,6 @@ lastPepFound: null,
 lastDiagramaFound: null
 };
 
-// ==========================================
-// UTILITÁRIOS
-// ==========================================
 const Utils = {
 genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); },
 formatarTempo(ms) {
@@ -818,9 +807,6 @@ return result;
 }
 };
 
-// ==========================================
-// ARMAZENAMENTO HÍBRIDO
-// ==========================================
 const Storage = {
 async carregar() {
 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -833,6 +819,7 @@ if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '
 if (!State.data.config) State.data.config = { dispositivo: 'tablet' };
 if (!State.data.config.dispositivo) State.data.config.dispositivo = 'tablet';
 if (!State.data.historicoPostos) State.data.historicoPostos = [];
+if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
 this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
@@ -908,9 +895,6 @@ if (mudou) this.salvarLocal();
 }
 };
 
-// ==========================================
-// INTERFACE (UI)
-// ==========================================
 const UI = {
 aplicarEstadoCursor() {
 if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor');
@@ -926,7 +910,13 @@ window.scrollTo({ top: targetPosition, behavior: 'smooth' });
 }, 300);
 },
 openModal(id) { document.getElementById(id).classList.add('active'); },
-closeModal(id) { document.getElementById(id).classList.remove('active'); },
+closeModal(id) { 
+document.getElementById(id).classList.remove('active'); 
+// CORREÇÃO: Se fechar o modal de turno fim de semana, reseta a flag
+if (id === 'modalTurnoFimSemana') {
+State.turnoFimSemanaModalAberto = false;
+}
+},
 toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
 togglePwdVisibility(inputId, btn) {
 const input = document.getElementById(inputId);
@@ -1027,9 +1017,6 @@ UI.scrollParaElemento(State.vkTarget);
 }
 };
 
-// ==========================================
-// NAVEGAÇÃO
-// ==========================================
 const Navigation = {
 navigate(page) {
 document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
@@ -1049,9 +1036,6 @@ if (page === 'config') Config.loadUI();
 }
 };
 
-// ==========================================
-// AUTENTICAÇÃO
-// ==========================================
 const Auth = {
 login(role) {
 if (role === 'admin') {
@@ -1152,15 +1136,13 @@ State.data.projetos = [];
 State.data.historico = [];
 State.data.historicoPostos = [];
 State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
+State.data.ultimaSelecaoTurno = 0;
 Storage.salvarLocal();
 Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
 UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos. Senha resetada para o padrão.');
 }
 };
 
-// ==========================================
-// CONFIGURAÇÕES
-// ==========================================
 const Config = {
 loadUI() {
 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
@@ -1210,9 +1192,6 @@ else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength st
 }
 };
 
-// ==========================================
-// DASHBOARD
-// ==========================================
 const Dashboard = {
 switchTab(tab, el) {
 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
@@ -1324,9 +1303,6 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 }
 };
 
-// ==========================================
-// ADMINISTRAÇÃO (COM CÂMARA CONTÍNUA)
-// ==========================================
 const Admin = {
 async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
@@ -1600,7 +1576,7 @@ UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
 };
 
 // ==========================================
-// POSTO DE TRABALHO
+// POSTO DE TRABALHO - CORREÇÃO DO TURNO FIM DE SEMANA
 // ==========================================
 const Posto = {
 render() {
@@ -1615,21 +1591,55 @@ this.renderTable();
 if (State.timerInterval) clearInterval(State.timerInterval);
 State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 },
+
+// CORREÇÃO PRINCIPAL: Modal de turno só abre a cada 2 horas no fim de semana
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
+
 if (Utils.ehFimDeSemana()) {
-State.turnoFimSemanaPendente = true;
-UI.openModal('modalTurnoFimSemana');
+    const agora = Date.now();
+    const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
+    const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
+    const horasRestantes = Math.max(0, Math.ceil((CONFIG.TURNO_COOLDOWN - tempoDesdeUltimaSelecao) / (60 * 60 * 1000)));
+
+    // Só abre o modal se:
+    // 1. Passaram 2 horas desde a última seleção
+    // 2. O modal NÃO está aberto atualmente
+    // 3. Não há outro modal aberto
+    const modalAberto = document.querySelector('.modal-overlay.active');
+    
+    if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
+        console.log(`🕐 Fim de semana: Abrindo modal de seleção de turno (última seleção foi há ${Math.floor(tempoDesdeUltimaSelecao / (60*60*1000))}h)`);
+        State.turnoFimSemanaModalAberto = true;
+        State.turnoFimSemanaPendente = true;
+        UI.openModal('modalTurnoFimSemana');
+    } else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+        // Dentro das 2 horas: usa o turno salvo sem perguntar
+        const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+        document.getElementById('postoTurno').value = turnoSalvo;
+        console.log(`✓ Fim de semana: Usando turno salvo "${turnoSalvo}" (faltam ${horasRestantes}h para próxima pergunta)`);
+    }
 } else {
-const turnoDetectado = Utils.detectarTurnoAutomatico();
-State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
-Storage.salvarLocal();
-document.getElementById('postoTurno').value = turnoDetectado;
-UI.showToast('info', 'Turno atualizado', 'Turno definido automaticamente como ' + turnoDetectado);
+    // Dia de semana: detecta automaticamente
+    const turnoDetectado = Utils.detectarTurnoAutomatico();
+    State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+    Storage.salvarLocal();
+    document.getElementById('postoTurno').value = turnoDetectado;
+    UI.showToast('info', 'Turno atualizado', 'Turno definido automaticamente como ' + turnoDetectado);
 }
 },
-salvarTurno() { const turno = document.getElementById('postoTurno').value; State.data.turnosPorPosto[State.currentPosto] = turno; Storage.salvarLocal(); UI.showToast('info', 'Turno atualizado', 'Turno do posto definido como ' + turno); },
+
+salvarTurno() { 
+    const turno = document.getElementById('postoTurno').value; 
+    State.data.turnosPorPosto[State.currentPosto] = turno; 
+    // CORREÇÃO: Ao mudar manualmente, também atualiza o timestamp
+    State.data.ultimaSelecaoTurno = Date.now();
+    Storage.salvarLocal(); 
+    UI.showToast('info', 'Turno atualizado', 'Turno do posto definido como ' + turno + '. Próxima pergunta em 2h (se for fim de semana).'); 
+},
+
 setFilter(f, el) { State.postoFilter = f; document.querySelectorAll('#page-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
+
 renderTable() {
 const tbody = document.getElementById('postoTableBody');
 const search = (document.getElementById('postoSearch').value || '').toLowerCase();
@@ -1699,9 +1709,6 @@ UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
 }
 };
 
-// ==========================================
-// CONCLUSÃO DE PROJETOS
-// ==========================================
 const Conclusao = {
 solicitar(id) {
 const p = State.data.projetos.find(x => x.id === id);
@@ -1823,9 +1830,6 @@ UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo total: ' 
 }
 };
 
-// ==========================================
-// HISTÓRICO
-// ==========================================
 const Historico = {
 switchTab(tab, el) {
 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
@@ -1916,24 +1920,29 @@ UI.showToast('success', 'Excluído', 'Registro removido do histórico');
 };
 
 // ==========================================
-// TURNO, TECLADO, GRÁFICOS, EXPORT
+// TURNO - CORREÇÃO: salva timestamp corretamente
 // ==========================================
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
+State.data.ultimaSelecaoTurno = Date.now(); // CORREÇÃO CRÍTICA: salva timestamp
 Storage.salvarLocal();
 document.getElementById('postoTurno').value = turno;
 UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
-UI.showToast('info', 'Turno selecionado', 'Turno definido como ' + turno);
+State.turnoFimSemanaModalAberto = false; // CORREÇÃO: reseta flag
+UI.showToast('success', 'Turno selecionado', `${turno} definido. Próxima pergunta em 2 horas.`);
 },
 cancelarSelecao() {
 const turnoDetectado = Utils.detectarTurnoAutomatico();
 State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+State.data.ultimaSelecaoTurno = Date.now(); // CORREÇÃO CRÍTICA: salva timestamp mesmo ao cancelar
 Storage.salvarLocal();
 document.getElementById('postoTurno').value = turnoDetectado;
 UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
+State.turnoFimSemanaModalAberto = false; // CORREÇÃO: reseta flag
+UI.showToast('info', 'Turno automático', `${turnoDetectado} definido. Próxima pergunta em 2 horas.`);
 }
 };
 
@@ -2035,9 +2044,6 @@ e.target.value = '';
 }
 };
 
-// ==========================================
-// INICIALIZAÇÃO
-// ==========================================
 const App = {
 async init() {
 await Storage.carregar();
