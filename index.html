@@ -127,17 +127,39 @@ function extrair(texto){
     // Mantém as quebras de linha e remove espaços extras
     texto = texto.replace(/\r/g,"");
 
-    //====================
-    // PEP
-    //====================
+//====================
+// PEP
+//====================
 
-    let pep = texto.match(/\d{3}-\d{7}-\d{3}/);
+let pep = "";
 
-    if(pep){
-        document.getElementById("pep").value = pep[0];
-    }else{
-        document.getElementById("pep").value = "";
+// Formato normal
+let m = texto.match(/\d{3}[-–—]\d{7}[-–—]\d{3}/);
+
+if(m){
+
+    pep = m[0]
+        .replace(/–/g,"-")
+        .replace(/—/g,"-");
+
+}else{
+
+    // Caso o OCR remova os hífens
+    m = texto.match(/\b\d{13}\b/);
+
+    if(m){
+
+        let n = m[0];
+
+        pep = n.substring(0,3) + "-" +
+              n.substring(3,10) + "-" +
+              n.substring(10,13);
+
     }
+
+}
+
+document.getElementById("pep").value = pep;
 
     //====================
     // DIAGRAMA / ORDEM
