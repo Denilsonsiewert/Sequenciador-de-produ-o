@@ -1,4 +1,4 @@
-// js/api.js - Cliente da API Google Apps Script (Corrigido para CORS e Redirecionamento)
+// js/api.js - Cliente da API Google Apps Script (Versão Corrigida e Otimizada)
 
 const API_CONFIG = {
   // URL da sua API do Google Apps Script
@@ -11,13 +11,9 @@ const API_CONFIG = {
   POLLING_INTERVAL: 5000
 };
 
-// Estado local
+// Estado local (Removido o localCache duplicado para evitar conflitos com o State.data do HTML)
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
-let localCache = {
-  projetos: [],
-  config: {}
-};
 
 // Sistema de eventos
 const eventListeners = {};
@@ -40,19 +36,15 @@ async function apiRequest(action, payload = {}, method = 'POST') {
     };
 
     if (method === 'POST') {
-      // NOTA: Não incluímos headers customizados como 'Authorization' ou 'Content-Type: application/json'
-      // para evitar que o navegador envie uma requisição OPTIONS (Preflight), que o GAS não lida bem.
-      // O GAS aceita o corpo da requisição mesmo sem o Content-Type explícito.
+      // Não incluímos headers customizados para evitar requisições OPTIONS (Preflight)
       options.body = JSON.stringify({ 
         action, 
-        secret: API_CONFIG.SECRET, // Enviamos o segredo no corpo para validação
+        secret: API_CONFIG.SECRET,
         ...payload 
       });
     } else if (method === 'GET') {
-      // Para GET, adicionamos todos os parâmetros na URL
       if (payload.since) url.searchParams.append('since', payload.since);
       if (payload.key) url.searchParams.append('key', payload.key);
-      // Adicionamos o segredo na URL para GET
       url.searchParams.append('secret', API_CONFIG.SECRET);
     }
     
@@ -73,45 +65,35 @@ async function apiRequest(action, payload = {}, method = 'POST') {
   }
 }
 
-// Operações CRUD
+// Operações CRUD (Agora apenas disparam eventos, sem manter cache próprio)
 async function createProject(projectData) {
   const result = await apiRequest('create', { data: projectData });
-  const newProject = { ...projectData, ID: result.id, AtualizadoEm: Date.now() };
-  localCache.projetos.push(newProject);
-  triggerEvent('project:created', newProject);
+  triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
   return result;
 }
 
 async function updateProject(projectData) {
   const result = await apiRequest('update', { data: projectData });
-  const index = localCache.projetos.findIndex(p => p.ID === projectData.ID);
-  if (index !== -1) {
-    localCache.projetos[index] = { ...localCache.projetos[index], ...projectData, AtualizadoEm: Date.now() };
-    triggerEvent('project:updated', localCache.projetos[index]);
-  }
+  triggerEvent('project:updated', { ...projectData, AtualizadoEm: Date.now() });
   return result;
 }
 
 async function deleteProject(projectId) {
   const result = await apiRequest('delete', { id: projectId });
-  localCache.projetos = localCache.projetos.filter(p => p.ID !== projectId);
   triggerEvent('project:deleted', projectId);
   return result;
 }
 
 async function updateConfig(key, value) {
-  const result = await apiRequest('updateConfig', { key, value });
-  localCache.config[key] = { value, updatedAt: Date.now() };
-  return result;
+  return await apiRequest('updateConfig', { key, value });
 }
 
 async function getConfig(key) {
   const result = await apiRequest('getConfig', { key }, 'GET');
-  localCache.config[key] = { value: result.value, updatedAt: Date.now() };
   return result.value;
 }
 
-// Sincronização
+// Sincronização (Agora apenas dispara eventos para o HTML processar)
 async function syncData() {
   if (syncInProgress) return;
   syncInProgress = true;
@@ -121,21 +103,8 @@ async function syncData() {
     
     if (result.success && result.data) {
       result.data.forEach(remoteProj => {
-        const localIndex = localCache.projetos.findIndex(p => p.ID === remoteProj.ID);
-        
-        if (localIndex === -1) {
-          localCache.projetos.push(remoteProj);
-          triggerEvent('project:created', remoteProj);
-        } else {
-          const localProj = localCache.projetos[localIndex];
-          const remoteTime = new Date(remoteProj.AtualizadoEm).getTime();
-          const localTime = new Date(localProj.AtualizadoEm).getTime();
-          
-          if (remoteTime > localTime) {
-            localCache.projetos[localIndex] = remoteProj;
-            triggerEvent('project:updated', remoteProj);
-          }
-        }
+        // Dispara um evento genérico de sync para cada projeto
+        triggerEvent('project:synced', remoteProj);
       });
       
       lastSyncTimestamp = result.timestamp;
@@ -181,20 +150,6 @@ function triggerEvent(event, data) {
   }
 }
 
-// Utilitários
-function getLocalProjects() {
-  return [...localCache.projetos];
-}
-
-function getLocalConfig(key) {
-  return localCache.config[key]?.value;
-}
-
-function clearCache() {
-  localCache = { projetos: [], config: {} };
-  lastSyncTimestamp = 0;
-}
-
 // Exportar API globalmente
 window.API = {
   createProject,
@@ -204,16 +159,9 @@ window.API = {
   getConfig,
   syncData,
   startPolling,
-  getLocalProjects,
-  getLocalConfig,
   on,
-  off,
-  clearCache
+  off
 };
 
-// Iniciar polling automaticamente após o carregamento da página
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => startPolling());
-} else {
-  startPolling();
-}
+// NOTA: Removido o startPolling() automático do final do script.
+// O HTML principal (index.html) agora controla quando iniciar o polling.
