@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leitor de Etiquetas · PEP + Diagrama</title>
+    <title>Leitor Automático · PEP + Diagrama</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
     </script>
     <style>
@@ -140,11 +140,13 @@
             color: white;
         }
 
-        .btn-primary:active {
-            background: #0f172a;
+        .btn-primary.active {
+            background: #dc2626;
+            border-color: #dc2626;
         }
-        .btn:active {
-            background: #e9eef6;
+
+        .btn-primary:active {
+            transform: scale(0.95);
         }
 
         .btn-icon {
@@ -192,12 +194,20 @@
             display: flex;
             align-items: center;
             word-break: break-all;
+            transition: all 0.3s;
         }
 
         .field-value.populated {
             background: #ecf7ef;
             border-color: #2b8f5c;
             color: #0f422b;
+            animation: highlight-pop 0.5s ease;
+        }
+
+        @keyframes highlight-pop {
+            0% { transform: scale(1); background: #bbf7d0; }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
 
         .field-value.empty {
@@ -236,11 +246,23 @@
             border-radius: 20px;
             margin-right: 8px;
             background: #a0b3d0;
+            transition: 0.3s;
         }
 
         .status-led.active {
             background: #22c55e;
             box-shadow: 0 0 8px #22c55e80;
+        }
+
+        .status-led.scanning {
+            background: #f59e0b;
+            box-shadow: 0 0 8px #f59e0b80;
+            animation: pulse-yellow 0.8s infinite;
+        }
+
+        @keyframes pulse-yellow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
         .status-led.error {
@@ -264,12 +286,20 @@
         .hint-text strong {
             color: #1f2a44;
         }
+
+        .counter-badge {
+            background: #dce3f2;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>📋 Leitor WEG</h1>
-        <div class="subhead">PEP + Diagrama · Aponte e clique em "Ler"</div>
+        <h1>📷 Leitor Automático</h1>
+        <div class="subhead">PEP + Diagrama · Captura contínua</div>
 
         <div class="cam-wrapper">
             <video id="video" autoplay playsinline></video>
@@ -279,8 +309,8 @@
         </div>
 
         <div class="controls">
-            <button class="btn btn-primary" id="btn-capture">
-                <span class="btn-icon">📸</span> Ler Etiqueta
+            <button class="btn btn-primary" id="btn-toggle">
+                <span class="btn-icon">▶</span> Iniciar Leitura
             </button>
             <button class="btn" id="btn-simulate">
                 <span class="btn-icon">📄</span> Simular
@@ -307,12 +337,12 @@
         <div class="status-bar">
             <span class="flex">
                 <span class="status-led" id="led-status"></span>
-                <span id="status-text"><strong>Pronto</strong> · clique em "Ler"</span>
+                <span id="status-text"><strong>Pronto</strong> · inicie a leitura</span>
             </span>
-            <span id="timer-badge" style="font-size:0.7rem;color:#5e6f8d;">OCR</span>
+            <span class="counter-badge" id="scan-counter">0 leituras</span>
         </div>
         <div class="hint-text">
-            <strong>Dica:</strong> Posicione a etiqueta e clique em "Ler Etiqueta" para capturar PEP e Diagrama.
+            <strong>Dica:</strong> Aponte para a etiqueta e a leitura será automática a cada 2 segundos.
         </div>
     </div>
 
@@ -328,13 +358,17 @@
             const lastScanSpan = document.getElementById('last-scan');
             const statusText = document.getElementById('status-text');
             const ledStatus = document.getElementById('led-status');
-            const timerBadge = document.getElementById('timer-badge');
+            const scanCounter = document.getElementById('scan-counter');
 
-            const btnCapture = document.getElementById('btn-capture');
+            const btnToggle = document.getElementById('btn-toggle');
             const btnSimulate = document.getElementById('btn-simulate');
 
             let stream = null;
-            let isProcessing = false;
+            let isReading = false;
+            let scanInterval = null;
+            let scanCount = 0;
+            let lastPep = null;
+            let lastDiagram = null;
 
             // Iniciar câmera
             async function startCamera() {
@@ -353,7 +387,7 @@
                     stream = mediaStream;
                     video.srcObject = mediaStream;
                     await video.play();
-                    setStatus('📷 Câmera ativa', 'active');
+                    setStatus('📷 Câmera pronta', 'active');
                 } catch (err) {
                     console.error('Erro ao acessar câmera:', err);
                     setStatus('❌ Câmera indisponível', 'error');
@@ -364,217 +398,246 @@
                 statusText.innerHTML = msg;
                 ledStatus.className = 'status-led';
                 if (state === 'active') ledStatus.classList.add('active');
+                else if (state === 'scanning') ledStatus.classList.add('scanning');
                 else if (state === 'error') ledStatus.classList.add('error');
             }
 
             // ============================================
-            // FUNÇÃO CORRIGIDA PARA EXTRAIR PEP E DIAGRAMA
+            // EXTRAÇÃO MELHORADA DO PEP E DIAGRAMA
             // ============================================
             function extractFields(text) {
-                console.log('🔍 Texto OCR completo:', text);
+                console.log('🔍 OCR:', text.substring(0, 200) + '...');
 
-                // Limpa e normaliza o texto
                 let clean = text.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
                 const result = { pep: null, diagram: null };
 
-                // ----- 1. EXTRAIR PEP (MUITO MAIS ROBUSTO) -----
-                // Busca por "PEP:" seguido do número
-                const pepWithLabel = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
-                if (pepWithLabel) {
-                    let pepRaw = pepWithLabel[1].trim();
-                    // Remove espaços e normaliza traços
-                    pepRaw = pepRaw.replace(/\s/g, '').replace(/[–—]/g, '-');
-                    // Verifica se está no formato correto (3-7-3)
-                    const pepMatch = pepRaw.match(/^(\d{3})-(\d{7})-(\d{3})$/);
-                    if (pepMatch) {
-                        result.pep = pepMatch[0];
-                        console.log('✅ PEP encontrado via label:', result.pep);
+                // ----- 1. PEP - MÚLTIPLAS ESTRATÉGIAS -----
+                // Estratégia 1: Busca "PEP:" exato
+                const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
+                if (pepLabelMatch) {
+                    let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
+                    if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) {
+                        result.pep = pepRaw;
+                        console.log('✅ PEP via label:', result.pep);
                     }
                 }
 
-                // Se não encontrou com label, busca padrão 170-2500343-121
+                // Estratégia 2: Busca padrão exato 170-2500343-121
                 if (!result.pep) {
-                    const pepRegex = /\b(170\s*[-–—]\s*2500343\s*[-–—]\s*121)\b/i;
-                    const match = clean.match(pepRegex);
-                    if (match) {
-                        result.pep = match[1].replace(/\s/g, '').replace(/[–—]/g, '-');
-                        console.log('✅ PEP encontrado via padrão:', result.pep);
+                    const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
+                    if (exactMatch) {
+                        result.pep = '170-2500343-121';
+                        console.log('✅ PEP via exato:', result.pep);
                     }
                 }
 
-                // Terceira tentativa: qualquer 3-7-3 com hífen
+                // Estratégia 3: Qualquer 3-7-3 com hífen
                 if (!result.pep) {
-                    const genericPep = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
-                    if (genericPep) {
-                        result.pep = genericPep[1] + '-' + genericPep[2] + '-' + genericPep[3];
-                        console.log('✅ PEP encontrado via genérico:', result.pep);
+                    const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
+                    if (generic) {
+                        result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
+                        console.log('✅ PEP via genérico:', result.pep);
                     }
                 }
 
-                // Quarta tentativa: 13 dígitos consecutivos
+                // Estratégia 4: 13 dígitos consecutivos (sem hífen)
                 if (!result.pep) {
                     const digits13 = clean.match(/\b(\d{13})\b/);
                     if (digits13) {
                         const n = digits13[1];
                         result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
-                        console.log('✅ PEP encontrado via 13 dígitos:', result.pep);
+                        console.log('✅ PEP via 13 dígitos:', result.pep);
                     }
                 }
 
-                // Última tentativa: busca qualquer padrão que pareça PEP (3-7-3 mesmo com erros)
+                // Estratégia 5: Busca por "PEP" em qualquer lugar com números próximos
                 if (!result.pep) {
-                    // Busca números separados por espaços ou hífens
-                    const parts = clean.match(/\b(\d{3})\s*[-–—\s]\s*(\d{7})\s*[-–—\s]\s*(\d{3})\b/);
-                    if (parts) {
-                        result.pep = parts[1] + '-' + parts[2] + '-' + parts[3];
-                        console.log('✅ PEP encontrado via partes:', result.pep);
+                    const pepIndex = clean.toUpperCase().indexOf('PEP');
+                    if (pepIndex !== -1) {
+                        const substring = clean.substring(pepIndex, pepIndex + 50);
+                        const nums = substring.match(/\b(\d{3})\b.*?\b(\d{7})\b.*?\b(\d{3})\b/);
+                        if (nums) {
+                            result.pep = nums[1] + '-' + nums[2] + '-' + nums[3];
+                            console.log('✅ PEP via contexto:', result.pep);
+                        }
                     }
                 }
 
-                // ----- 2. EXTRAIR DIAGRAMA -----
-                // Busca por "DIAGRAMA" ou "DIAGR" seguido de número
-                const diagramLines = text.split('\n');
-                for (let line of diagramLines) {
-                    if (line.toUpperCase().includes('DIAGR') || line.toUpperCase().includes('ORD')) {
+                // Estratégia 6: Busca números no formato 3-7-3 com hífen (mais flexível)
+                if (!result.pep) {
+                    const flexible = clean.match(/(\d{3})[^\d]*(\d{7})[^\d]*(\d{3})/);
+                    if (flexible) {
+                        const candidate = flexible[1] + '-' + flexible[2] + '-' + flexible[3];
+                        // Verifica se não é outro número
+                        if (candidate !== '250-0343-121' && !candidate.includes('450')) {
+                            result.pep = candidate;
+                            console.log('✅ PEP via flexível:', result.pep);
+                        }
+                    }
+                }
+
+                // ----- 2. DIAGRAMA -----
+                // Busca por DIAGRAMA ou ORDEM
+                const lines = text.split('\n');
+                for (let line of lines) {
+                    const upper = line.toUpperCase();
+                    if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
                         const num = line.match(/\b(\d{9,10})\b/);
                         if (num) {
                             result.diagram = num[1];
-                            console.log('✅ Diagrama encontrado via label:', result.diagram);
+                            console.log('✅ Diagrama via label:', result.diagram);
                             break;
                         }
                     }
                 }
 
-                // Se não encontrou via label, busca 450890224 específico
+                // Busca exato 450890224
                 if (!result.diagram) {
-                    const exactMatch = clean.match(/\b450890224\b/);
-                    if (exactMatch) {
+                    const exact = clean.match(/\b450890224\b/);
+                    if (exact) {
                         result.diagram = '450890224';
-                        console.log('✅ Diagrama encontrado via exato:', result.diagram);
+                        console.log('✅ Diagrama via exato:', result.diagram);
                     }
                 }
 
-                // Fallback: qualquer número de 9 dígitos
+                // Qualquer 9 dígitos (evitando PEP)
                 if (!result.diagram) {
                     const nineDigits = clean.match(/\b(\d{9})\b/g);
                     if (nineDigits) {
                         for (let d of nineDigits) {
-                            // Evita pegar o PEP
                             const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
                             if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
                                 result.diagram = d;
-                                console.log('✅ Diagrama encontrado via 9 dígitos:', result.diagram);
+                                console.log('✅ Diagrama via 9 dígitos:', result.diagram);
                                 break;
                             }
                         }
                     }
                 }
 
-                // Se ainda não tem diagrama, tenta 10 dígitos
-                if (!result.diagram) {
-                    const tenDigits = clean.match(/\b(\d{10})\b/);
-                    if (tenDigits) {
-                        result.diagram = tenDigits[1];
-                        console.log('✅ Diagrama encontrado via 10 dígitos:', result.diagram);
-                    }
-                }
-
-                console.log('📊 Resultado final:', result);
+                console.log('📊 Resultado:', result);
                 return result;
             }
 
             // Atualiza UI
             function updateUI(pep, diagram, rawText) {
-                if (pep) {
+                let changed = false;
+
+                if (pep && pep !== lastPep) {
+                    lastPep = pep;
                     pepField.textContent = pep;
                     pepField.className = 'field-value populated';
-                } else {
-                    pepField.textContent = 'não encontrado';
+                    changed = true;
+                } else if (!pep && !lastPep) {
+                    pepField.textContent = '—';
                     pepField.className = 'field-value empty';
                 }
 
-                if (diagram) {
+                if (diagram && diagram !== lastDiagram) {
+                    lastDiagram = diagram;
                     diagramField.textContent = diagram;
                     diagramField.className = 'field-value populated';
-                } else {
-                    diagramField.textContent = 'não encontrado';
+                    changed = true;
+                } else if (!diagram && !lastDiagram) {
+                    diagramField.textContent = '—';
                     diagramField.className = 'field-value empty';
                 }
 
                 if (rawText && rawText.length > 0) {
-                    const preview = rawText.length > 45 ? rawText.substring(0, 45) + '…' : rawText;
+                    const preview = rawText.length > 40 ? rawText.substring(0, 40) + '…' : rawText;
                     lastScanSpan.textContent = preview;
+                }
+
+                if (changed) {
+                    scanCount++;
+                    scanCounter.textContent = scanCount + ' leituras';
+                }
+
+                // Atualiza status
+                if (pep && diagram) {
+                    setStatus('✅ PEP + Diagrama encontrados!', 'active');
+                } else if (pep) {
+                    setStatus('✅ PEP encontrado!', 'active');
+                } else if (diagram) {
+                    setStatus('✅ Diagrama encontrado!', 'active');
                 } else {
-                    lastScanSpan.textContent = '—';
+                    setStatus('⏳ Aguardando dados...', 'scanning');
                 }
             }
 
-            // Captura e processa
-            async function captureAndRead() {
-                if (isProcessing) {
-                    setStatus('⏳ Processando...', 'active');
-                    return;
-                }
-
+            // ============================================
+            // LEITURA AUTOMÁTICA (A CADA 2 SEGUNDOS)
+            // ============================================
+            async function performScan() {
                 if (!video.videoWidth || !video.videoHeight) {
-                    setStatus('⚠️ Aguarde a câmera iniciar', 'error');
                     return;
                 }
-
-                isProcessing = true;
-                setStatus('📸 Capturando...', 'active');
-                timerBadge.textContent = 'OCR ⏳';
 
                 try {
+                    // Captura frame
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                    setStatus('🔍 Lendo OCR...', 'active');
-
+                    // OCR
                     const result = await Tesseract.recognize(canvas, 'por', {
                         logger: (m) => {
                             if (m.status === 'recognizing text') {
-                                timerBadge.textContent = `OCR ${Math.round(m.progress * 100)}%`;
+                                // Mostra progresso sutil
                             }
                         }
                     });
 
                     const texto = result.data.text;
-                    console.log('📄 OCR completo');
-
-                    const { pep, diagram } = extractFields(texto);
-                    updateUI(pep, diagram, texto);
-
-                    // Mostra status baseado no que foi encontrado
-                    if (pep && diagram) {
-                        setStatus('✅ PEP e Diagrama encontrados!', 'active');
-                    } else if (pep) {
-                        setStatus('⚠️ PEP encontrado, Diagrama não localizado', 'active');
-                    } else if (diagram) {
-                        setStatus('⚠️ Diagrama encontrado, PEP não localizado', 'active');
-                    } else {
-                        setStatus('❌ Nenhum campo encontrado', 'error');
+                    if (texto && texto.trim().length > 5) {
+                        const { pep, diagram } = extractFields(texto);
+                        updateUI(pep, diagram, texto);
                     }
 
-                    timerBadge.textContent = 'OK ✓';
-
                 } catch (err) {
-                    console.error('Erro no OCR:', err);
-                    setStatus('❌ Erro na leitura', 'error');
-                    timerBadge.textContent = 'Erro';
-                } finally {
-                    isProcessing = false;
-                    setTimeout(() => {
-                        if (!isProcessing) timerBadge.textContent = 'OCR';
-                    }, 3000);
+                    console.error('Erro no scan:', err);
+                }
+            }
+
+            // ============================================
+            // CONTROLES
+            // ============================================
+            function toggleReading() {
+                if (isReading) {
+                    // Parar
+                    if (scanInterval) {
+                        clearInterval(scanInterval);
+                        scanInterval = null;
+                    }
+                    isReading = false;
+                    btnToggle.innerHTML = '<span class="btn-icon">▶</span> Iniciar Leitura';
+                    btnToggle.className = 'btn btn-primary';
+                    setStatus('⏹ Leitura pausada', 'active');
+                } else {
+                    // Iniciar
+                    isReading = true;
+                    btnToggle.innerHTML = '<span class="btn-icon">⏹</span> Parar Leitura';
+                    btnToggle.className = 'btn btn-primary active';
+                    setStatus('📡 Lendo automaticamente...', 'scanning');
+
+                    // Limpa campos anteriores
+                    lastPep = null;
+                    lastDiagram = null;
+
+                    // Primeira leitura imediata
+                    performScan();
+
+                    // Depois a cada 2 segundos
+                    scanInterval = setInterval(performScan, 2000);
                 }
             }
 
             // Simulação
             function simulateLabel() {
-                if (isProcessing) return;
+                if (isReading) {
+                    toggleReading();
+                }
 
                 const mockData = `SIPORTE SUST BMWI-C 55X30X27
         Lite: IB03
@@ -589,24 +652,25 @@
                 updateUI(pep, diagram, mockData);
                 setStatus('📥 Simulação carregada', 'active');
                 lastScanSpan.textContent = 'Simulação (exemplo)';
-                timerBadge.textContent = 'SIM';
-                setTimeout(() => { timerBadge.textContent = 'OCR'; }, 2500);
             }
 
             // Eventos
-            btnCapture.addEventListener('click', captureAndRead);
+            btnToggle.addEventListener('click', toggleReading);
             btnSimulate.addEventListener('click', simulateLabel);
 
             // Inicialização
             startCamera();
 
+            // Estado inicial
             pepField.textContent = '—';
             diagramField.textContent = '—';
             pepField.className = 'field-value empty';
             diagramField.className = 'field-value empty';
-            setStatus('📱 Câmera pronta', 'active');
+            setStatus('📱 Clique em "Iniciar"', 'active');
 
-            console.log('📋 Leitor WEG · PEP + Diagrama (CORRIGIDO)');
+            console.log('📋 Leitor Automático WEG');
+            console.log('🔹 PEP: 170-2500343-121');
+            console.log('🔹 Diagrama: 450890224');
         })();
     </script>
 </body>
