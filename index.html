@@ -6,7 +6,7 @@
 <title>WEG - Centro de Fluxo Produtivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
 :root {
 --weg-blue: #005BAC;
@@ -63,6 +63,11 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .user-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 .user-name i { font-size: 14px; opacity: .8; }
 .user-date { font-size: 12px; opacity: .85; margin-top: 2px; }
+.sync-indicator { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 8px; border-radius: 10px; background: rgba(255,255,255,.15); margin-top: 3px; }
+.sync-indicator.syncing { background: rgba(255,176,0,.3); }
+.sync-indicator.synced { background: rgba(0,166,81,.3); }
+.sync-indicator.error { background: rgba(211,47,47,.3); }
+.sync-indicator i { font-size: 10px; }
 .btn-logout { background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.3); color: white; width: 52px; height: 52px; border-radius: 50%; cursor: pointer !important; display: inline-flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 22px; backdrop-filter: blur(10px); padding: 0; }
 .btn-logout:hover { background: rgba(255,255,255,.3); border-color: rgba(255,255,255,.5); transform: scale(1.1); }
 .btn-logout:active { transform: scale(.95); }
@@ -183,8 +188,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .modal-logout p { color: var(--text-light); font-size: 15px; margin-bottom: 25px; }
 .modal-logout .modal-actions { display: flex; gap: 12px; justify-content: center; }
 .modal-logout .btn { min-width: 140px; justify-content: center; }
-.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; display: none; }
-.camera-container.active { display: block; }
+.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; }
 .camera-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .camera-container canvas { display: none; }
 .camera-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; border: 3px solid var(--weg-blue); border-radius: 12px; }
@@ -195,10 +199,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .camera-status.scanning { background: var(--weg-light); color: var(--weg-blue); }
 .camera-status.success { background: rgba(0,166,81,.1); color: var(--success); }
 .camera-status.error { background: rgba(211,47,47,.1); color: var(--danger); }
-.camera-found-items { margin-top: 10px; padding: 10px; background: var(--bg); border-radius: 8px; font-size: 12px; text-align: left; }
-.camera-found-items .found-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
-.camera-found-items .found-item i { color: var(--success); }
-.camera-found-items .found-item.missing i { color: var(--text-light); }
 .virtual-keyboard { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.15); z-index: 7000; display: none; max-width: 380px; width: 95%; }
 .virtual-keyboard.active { display: block; animation: slideUp .3s ease; }
 .vk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
@@ -303,6 +303,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="user-info">
 <div class="user-name"><i class="fa-solid fa-user"></i> <span id="userLabel">Operador</span></div>
 <div class="user-date" id="currentDate"></div>
+<div class="sync-indicator" id="syncIndicator"><i class="fa-solid fa-cloud"></i> <span id="syncStatus">Online</span></div>
 </div>
 <button class="btn-logout" title="Sair" onclick="Auth.confirmarLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
 </div>
@@ -389,14 +390,19 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2>
 <button class="btn btn-sm btn-success" onclick="Admin.abrirCamera()"><i class="fa-solid fa-camera"></i> Ler Etiqueta (Câmera)</button>
 </div>
-<div id="cameraSection" class="camera-container">
+<div id="cameraSection" style="display:none;">
+<div class="camera-container">
 <video id="cameraVideo" autoplay playsinline></video>
 <canvas id="cameraCanvas"></canvas>
 <div class="camera-overlay"><div class="scan-line"></div></div>
 </div>
-<div id="cameraStatus" class="camera-status" style="display:none;"></div>
-<div class="camera-controls" id="cameraControls" style="display:none;">
+<div id="cameraStatus" class="camera-status scanning">
+<i class="fa-solid fa-spinner fa-spin"></i> Posicione o QR Code da etiqueta na frente da câmera...
+</div>
+<div class="camera-controls">
 <button class="btn btn-danger" onclick="Admin.fecharCamera()"><i class="fa-solid fa-times"></i> Fechar Câmera</button>
+<button class="btn btn-secondary" onclick="Admin.capturarManual()"><i class="fa-solid fa-camera"></i> Capturar Manualmente</button>
+</div>
 </div>
 <form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
 <div class="form-grid">
@@ -483,16 +489,16 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet">Tablet / Touchscreen</option><option value="computador">💻 Computador (cursor oculto)</option></select></div>
 <div class="form-group full" id="cfgVkInfo" style="display:none;"><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador ativado:</strong> Cursor oculto + teclado virtual.</div></div></div></div></div>
 <div class="card"><h2><i class="fa-solid fa-database"></i> Gerenciar Dados</h2>
-<div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados.</div></div>
+<div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados em TODOS os dispositivos conectados.</div></div>
 <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;"><button class="btn btn-secondary" onclick="Export.backup()"><i class="fa-solid fa-download"></i> Backup</button><button class="btn btn-secondary" onclick="document.getElementById('restoreFile').click()"><i class="fa-solid fa-upload"></i> Restaurar</button><input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="Export.restaurar(event)"><button class="btn btn-danger" onclick="Auth.solicitarLimpeza()"><i class="fa-solid fa-trash"></i> Limpar Tudo</button></div></div>
 </section>
 </main>
 </div>
 </div>
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você será redirecionado para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
-<div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno está processando?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Esta pergunta será feita novamente a cada 2 horas.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
-<div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha do administrador.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha do Administrador <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
-<div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha do administrador.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+<div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno está processando?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Pergunta repetida a cada 2 horas.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
+<div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha do administrador.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
+<div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid">
 <div class="form-group"><label>PEP</label><input type="text" id="edit-pep" data-vk></div>
 <div class="form-group"><label>Diagrama / Ordem</label><input type="text" id="edit-diagrama" data-vk></div>
@@ -523,15 +529,18 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
 
+<!-- CLIENTE DA API COM SINCRONIZAÇÃO CORRIGIDA -->
 <script>
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
 SECRET: "16101961",
-POLLING_INTERVAL: 5000
+POLLING_INTERVAL: 5000,        // Sync incremental a cada 5s
+FULL_SYNC_INTERVAL: 30000      // Sync completo a cada 30s (detecta VBA)
 };
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
+
 async function apiRequest(action, payload = {}, method = 'POST') {
 try {
 const url = new URL(API_CONFIG.URL);
@@ -554,6 +563,7 @@ console.error('API Request failed:', error);
 throw error;
 }
 }
+
 async function createProject(projectData) {
 const result = await apiRequest('create', { data: projectData });
 triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
@@ -572,37 +582,84 @@ return result;
 async function updateConfig(key, value) { return await apiRequest('updateConfig', { key, value }); }
 async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
 async function clearAllData() { return await apiRequest('clearAll', {}); }
-async function syncData() {
+
+// CORREÇÃO CRÍTICA: Sync incremental (só mudanças recentes)
+async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
+UI.setSyncStatus('syncing');
 try {
 const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
 if (result.success && result.data) {
+// CORREÇÃO: Detecta se houve limpeza completa (timestamp resetado)
+if (result.timestamp < lastSyncTimestamp && lastSyncTimestamp > 0) {
+console.log('🔄 Detectada limpeza remota - fazendo sync completo');
+await syncDataCompleto();
+} else {
 result.data.forEach(remoteProj => triggerEvent('project:synced', remoteProj));
 lastSyncTimestamp = result.timestamp;
+localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
 triggerEvent('sync:complete', { count: result.data.length });
 }
+UI.setSyncStatus('synced');
+}
 } catch (error) {
-console.error('Sync failed:', error);
+console.error('Sync incremental failed:', error);
+UI.setSyncStatus('error');
 triggerEvent('sync:error', error);
 } finally { syncInProgress = false; }
 }
-function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
-syncData();
-const timer = setInterval(syncData, interval);
-return timer;
+
+// CORREÇÃO CRÍTICA: Sync completo (busca TUDO - detecta VBA e limpeza)
+async function syncDataCompleto() {
+if (syncInProgress) return;
+syncInProgress = true;
+UI.setSyncStatus('syncing');
+try {
+// Busca sem filtro de tempo - pega TUDO da planilha
+const result = await apiRequest('sync', { since: 0 }, 'GET');
+if (result.success && result.data) {
+console.log(`🔄 Sync completo: ${result.data.length} projetos recebidos`);
+triggerEvent('sync:full', result.data);
+lastSyncTimestamp = result.timestamp;
+localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+triggerEvent('sync:complete', { count: result.data.length, full: true });
+UI.setSyncStatus('synced');
 }
+} catch (error) {
+console.error('Sync completo failed:', error);
+UI.setSyncStatus('error');
+triggerEvent('sync:error', error);
+} finally { syncInProgress = false; }
+}
+
+// CORREÇÃO: Wrapper para compatibilidade
+async function syncData() {
+await syncDataIncremental();
+}
+
+function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
+// Primeiro faz um sync completo na inicialização
+syncDataCompleto().then(() => {
+// Depois inicia o polling incremental
+syncData();
+setInterval(syncData, interval);
+// E um sync completo periódico para detectar VBA e limpezas
+setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
+});
+}
+
 function on(event, callback) { if (!eventListeners[event]) eventListeners[event] = []; eventListeners[event].push(callback); }
 function off(event, callback) { if (eventListeners[event]) eventListeners[event] = eventListeners[event].filter(cb => cb !== callback); }
 function triggerEvent(event, data) {
 if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); } });
 }
-window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, startPolling, on, off };
+window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, syncDataCompleto, startPolling, on, off };
 </script>
 
 <script>
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v32',
+STORAGE_KEY: 'weg_fluxo_produtivo_v33',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
@@ -642,9 +699,7 @@ lastSync: 0,
 syncQueue: [],
 apiAvailable: false,
 cameraStream: null,
-scanInterval: null,
-lastPepFound: null,
-lastDiagramaFound: null
+cameraInterval: null
 };
 
 const Utils = {
@@ -724,81 +779,29 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta(texto) {
-console.log('🔍 OCR:', texto.substring(0, 200) + '...');
-let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-const result = { pep: null, diagrama: null };
-
-const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
-if (pepLabelMatch) {
-let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
-if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) {
-result.pep = pepRaw;
-console.log('✅ PEP via label:', result.pep);
+const dados = { pep: null, diagrama: null };
+if (!texto) return dados;
+const linhas = texto.split(/[\n\r]+/);
+for (const linha of linhas) {
+const linhaLimpa = linha.trim();
+if (!dados.pep) {
+const pepMatch = linhaLimpa.match(/PEP[:\s]+([0-9\-]+)/i);
+if (pepMatch) dados.pep = pepMatch[1].trim();
+}
+if (!dados.diagrama) {
+const diagMatch = linhaLimpa.match(/(?:Ord\.?\s*Invol\.?\/?Diagr\.?|Diagr\.?)[:\s]+(\d+)/i);
+if (diagMatch) dados.diagrama = diagMatch[1].trim();
 }
 }
-
-if (!result.pep) {
-const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
-if (exactMatch) {
-result.pep = '170-2500343-121';
-console.log('✅ PEP via exato:', result.pep);
+if (!dados.pep) {
+const pepFallback = texto.match(/(?:^|\s)(\d{3}-\d{7}-\d{3})(?:\s|$)/);
+if (pepFallback) dados.pep = pepFallback[1];
 }
+if (!dados.diagrama) {
+const diagFallback = texto.match(/(?:^|\s)(\d{8})(?:\s|$)/);
+if (diagFallback) dados.diagrama = diagFallback[1];
 }
-
-if (!result.pep) {
-const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
-if (generic) {
-result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
-console.log('✅ PEP via genérico:', result.pep);
-}
-}
-
-if (!result.pep) {
-const digits13 = clean.match(/\b(\d{13})\b/);
-if (digits13) {
-const n = digits13[1];
-result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
-console.log('✅ PEP via 13 dígitos:', result.pep);
-}
-}
-
-const lines = texto.split('\n');
-for (let line of lines) {
-const upper = line.toUpperCase();
-if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
-const num = line.match(/\b(\d{9,10})\b/);
-if (num) {
-result.diagrama = num[1];
-console.log('✅ Diagrama via label:', result.diagrama);
-break;
-}
-}
-}
-
-if (!result.diagrama) {
-const exact = clean.match(/\b450890224\b/);
-if (exact) {
-result.diagrama = '450890224';
-console.log('✅ Diagrama via exato:', result.diagrama);
-}
-}
-
-if (!result.diagrama) {
-const nineDigits = clean.match(/\b(\d{9})\b/g);
-if (nineDigits) {
-for (let d of nineDigits) {
-const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
-if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
-result.diagrama = d;
-console.log('✅ Diagrama via 9 dígitos:', result.diagrama);
-break;
-}
-}
-}
-}
-
-console.log('📊 Resultado:', result);
-return result;
+return dados;
 }
 };
 
@@ -817,6 +820,13 @@ if (!State.data.historicoPostos) State.data.historicoPostos = [];
 if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
 this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
+}
+
+// CORREÇÃO: Restaurar timestamp de sincronização persistido
+const savedTs = localStorage.getItem('weg_last_sync_ts');
+if (savedTs) {
+lastSyncTimestamp = parseInt(savedTs);
+console.log('📅 Timestamp de sync restaurado:', lastSyncTimestamp);
 }
 
 if (typeof API !== 'undefined' && State.isOnline) {
@@ -854,6 +864,9 @@ else if (acao === 'config') result = await API.updateConfig(dados.key, dados.val
 if (result && result.success) {
 this.salvarLocal();
 State.syncQueue = State.syncQueue.filter(item => !(item.acao === acao && item.dados.id === dados.id));
+// CORREÇÃO: Atualiza timestamp após salvar com sucesso
+lastSyncTimestamp = Date.now();
+localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
 return { success: true, offline: false };
 }
 throw new Error(result ? result.error : 'Erro na API');
@@ -904,7 +917,10 @@ window.scrollTo({ top: targetPosition, behavior: 'smooth' });
 }
 }, 300);
 },
-openModal(id) { document.getElementById(id).classList.add('active'); },
+openModal(id) { 
+document.getElementById(id).classList.add('active'); 
+if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
+},
 closeModal(id) { 
 document.getElementById(id).classList.remove('active'); 
 if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
@@ -937,6 +953,27 @@ updateDate() {
 const now = new Date();
 const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
 document.getElementById('currentDate').textContent = now.toLocaleString('pt-BR', opts);
+},
+// NOVO: Indicador visual de sincronização
+setSyncStatus(status) {
+const indicator = document.getElementById('syncIndicator');
+const statusEl = document.getElementById('syncStatus');
+if (!indicator || !statusEl) return;
+indicator.classList.remove('syncing', 'synced', 'error');
+if (status === 'syncing') {
+indicator.classList.add('syncing');
+statusEl.textContent = 'Sincronizando...';
+indicator.querySelector('i').className = 'fa-solid fa-spinner fa-spin';
+} else if (status === 'synced') {
+indicator.classList.add('synced');
+const agora = new Date();
+statusEl.textContent = 'Sincronizado ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+indicator.querySelector('i').className = 'fa-solid fa-cloud';
+} else if (status === 'error') {
+indicator.classList.add('error');
+statusEl.textContent = 'Erro de sync';
+indicator.querySelector('i').className = 'fa-solid fa-cloud-bolt';
+}
 },
 buildMenu() {
 const menu = document.getElementById('mainMenu');
@@ -1116,14 +1153,22 @@ setTimeout(() => { input.style.borderColor = ''; }, 1500);
 },
 cancelarConfirmacaoSenha() { State.acaoPendenteSenha = null; UI.closeModal('modalConfirmarSenha'); },
 solicitarLimpeza() {
-this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</strong> Esta ação apagará PERMANENTEMENTE todos os dados.<br><br>Digite a senha do administrador.', this.executarLimpeza);
+this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</strong> Esta ação apagará PERMANENTEMENTE todos os dados em TODOS os dispositivos conectados.<br><br>Digite a senha do administrador.', this.executarLimpeza);
 },
 async executarLimpeza() {
-UI.showToast('info', 'Limpando', 'Apagando dados...');
+UI.showToast('info', 'Limpando', 'Apagando dados em todos os dispositivos...');
+// CORREÇÃO CRÍTICA: Limpa na nuvem PRIMEIRO
 if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
-try { await API.clearAllData(); UI.showToast('success', 'Nuvem limpa', 'Dados apagados'); }
+try { 
+await API.clearAllData(); 
+UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha'); 
+// CORREÇÃO: Reseta timestamp para forçar outros dispositivos a detectarem a limpeza
+lastSyncTimestamp = 0;
+localStorage.setItem('weg_last_sync_ts', '0');
+}
 catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
 }
+// Limpa localmente
 State.data.projetos = [];
 State.data.historico = [];
 State.data.historicoPostos = [];
@@ -1131,7 +1176,11 @@ State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
 State.data.ultimaSelecaoTurno = 0;
 Storage.salvarLocal();
 Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
-UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos.');
+UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos em todos os dispositivos.');
+// CORREÇÃO: Força sync completo após limpeza para atualizar outros dispositivos
+setTimeout(() => {
+if (State.apiAvailable) API.syncDataCompleto();
+}, 2000);
 }
 };
 
@@ -1297,143 +1346,113 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 
 const Admin = {
 async abrirCamera() {
-const cameraSection = document.getElementById('cameraSection');
-const cameraStatus = document.getElementById('cameraStatus');
-const cameraControls = document.getElementById('cameraControls');
-
-State.lastPepFound = null;
-State.lastDiagramaFound = null;
-
-cameraSection.classList.add('active');
-cameraStatus.style.display = 'block';
-cameraControls.style.display = 'flex';
-cameraStatus.className = 'camera-status scanning';
-cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando câmera...';
-
 try {
 const video = document.getElementById('cameraVideo');
-const canvas = document.getElementById('cameraCanvas');
-
-State.cameraStream = await navigator.mediaDevices.getUserMedia({
-video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+const stream = await navigator.mediaDevices.getUserMedia({
+video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
 });
-
-video.srcObject = State.cameraStream;
-await video.play();
-
-cameraStatus.className = 'camera-status scanning';
-cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Escaneando a cada 2 segundos...';
-
-await this.performScan();
-State.scanInterval = setInterval(() => this.performScan(), 2000);
-
-} catch (err) {
-console.error('Erro ao acessar câmera:', err);
-cameraStatus.className = 'camera-status error';
-cameraStatus.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Erro ao acessar câmera.';
-UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera');
+State.cameraStream = stream;
+video.srcObject = stream;
+document.getElementById('cameraSection').style.display = 'block';
+this.iniciarScanning();
+UI.showToast('success', 'Câmera ativada', 'Posicione o QR Code da etiqueta');
+} catch (error) {
+console.error('Erro ao acessar câmera:', error);
+UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera.');
 }
 },
-
-async performScan() {
-const video = document.getElementById('cameraVideo');
-const canvas = document.getElementById('cameraCanvas');
-const ctx = canvas.getContext('2d');
-const cameraStatus = document.getElementById('cameraStatus');
-
-if (!video.videoWidth || !video.videoHeight) return;
-
-try {
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
-ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-const result = await Tesseract.recognize(canvas, 'por', { logger: () => {} });
-const texto = result.data.text;
-
-if (texto && texto.trim().length > 5) {
-const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
-
-let atualizouAlgo = false;
-
-if (pep && pep !== State.lastPepFound) {
-document.getElementById('cad-pep').value = pep;
-State.lastPepFound = pep;
-atualizouAlgo = true;
-}
-
-if (diagrama && diagrama !== State.lastDiagramaFound) {
-document.getElementById('cad-diagrama').value = diagrama;
-State.lastDiagramaFound = diagrama;
-atualizouAlgo = true;
-}
-
-const pepStatus = State.lastPepFound 
-    ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
-    : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
-
-const diagramaStatus = State.lastDiagramaFound 
-    ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
-    : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
-
-if (State.lastPepFound || State.lastDiagramaFound) {
-    cameraStatus.className = 'camera-status success';
-    cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
-    <div class="camera-found-items">${pepStatus}${diagramaStatus}</div>
-    <small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
-} else {
-    cameraStatus.className = 'camera-status scanning';
-    cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
-}
-
-if (atualizouAlgo) {
-    UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
-}
-}
-} catch (err) {
-console.error('Erro no OCR:', err);
-}
-},
-
 fecharCamera() {
 if (State.cameraStream) {
 State.cameraStream.getTracks().forEach(track => track.stop());
 State.cameraStream = null;
 }
-if (State.scanInterval) {
-clearInterval(State.scanInterval);
-State.scanInterval = null;
+if (State.cameraInterval) {
+clearInterval(State.cameraInterval);
+State.cameraInterval = null;
 }
-
-State.lastPepFound = null;
-State.lastDiagramaFound = null;
-
-document.getElementById('cameraSection').classList.remove('active');
-document.getElementById('cameraStatus').style.display = 'none';
-document.getElementById('cameraControls').style.display = 'none';
-
-UI.showToast('info', 'Câmera fechada', 'Verifique os dados preenchidos');
+document.getElementById('cameraSection').style.display = 'none';
+document.getElementById('cameraStatus').className = 'camera-status scanning';
+document.getElementById('cameraStatus').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posicione o QR Code da etiqueta na frente da câmera...';
 },
-
+iniciarScanning() {
+const video = document.getElementById('cameraVideo');
+const canvas = document.getElementById('cameraCanvas');
+const context = canvas.getContext('2d');
+let ultimoCodigo = '';
+let contadorRepeticoes = 0;
+State.cameraInterval = setInterval(() => {
+if (video.readyState === video.HAVE_ENOUGH_DATA) {
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+const code = jsQR(imageData.data, imageData.width, imageData.height);
+if (code && code.data) {
+if (code.data === ultimoCodigo) {
+contadorRepeticoes++;
+if (contadorRepeticoes >= 3) {
+this.processarImagemEtiqueta(code.data);
+}
+} else {
+ultimoCodigo = code.data;
+contadorRepeticoes = 1;
+}
+} else {
+ultimoCodigo = '';
+contadorRepeticoes = 0;
+}
+}
+}, 300);
+},
+capturarManual() {
+const video = document.getElementById('cameraVideo');
+const canvas = document.getElementById('cameraCanvas');
+const context = canvas.getContext('2d');
+if (video.readyState === video.HAVE_ENOUGH_DATA) {
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+UI.showToast('info', 'Captura manual', 'Tente reposicionar o QR Code.');
+}
+},
+processarImagemEtiqueta(texto) {
+const dados = Utils.extrairDadosEtiqueta(texto);
+if (dados.pep || dados.diagrama) {
+if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
+if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
+const statusEl = document.getElementById('cameraStatus');
+statusEl.className = 'camera-status success';
+statusEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> PEP: <strong>${dados.pep || 'N/A'}</strong> | Diagrama: <strong>${dados.diagrama || 'N/A'}</strong>`;
+UI.showToast('success', 'Etiqueta lida', 'PEP e Diagrama preenchidos.');
+this.fecharCamera();
+setTimeout(() => {
+if (!dados.pep) document.getElementById('cad-pep').focus();
+else if (!dados.diagrama) document.getElementById('cad-diagrama').focus();
+else document.getElementById('cad-placa').focus();
+}, 500);
+} else {
+const statusEl = document.getElementById('cameraStatus');
+statusEl.className = 'camera-status error';
+statusEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Não foi possível extrair dados. Digite manualmente.';
+UI.showToast('warning', 'Atenção', 'Não foi possível ler a etiqueta.');
+}
+},
 limparFormulario() {
 document.getElementById('formCadastro').reset();
 UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
 },
-
 toggleVolumesCadastro() {
 const processo = document.getElementById('cad-processo').value;
 const groupVolumes = document.getElementById('group-cad-volumes');
 if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
 else { groupVolumes.style.display = 'block'; }
 },
-
 toggleVolumesEdicao() {
 const processo = document.getElementById('edit-processo').value;
 const groupVolumes = document.getElementById('group-edit-volumes');
 if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
 else { groupVolumes.style.display = 'block'; }
 },
-
 async cadastrarProjeto(e) {
 e.preventDefault();
 const pep = document.getElementById('cad-pep').value.trim();
@@ -1458,39 +1477,15 @@ if (diagrama) {
 
 let volumesTotal = null;
 if (processo === 'Nanocerâmico' && volumes) { const match = volumes.match(/\d+/); if (match) volumesTotal = parseInt(match[0]); }
-
-const novo = { 
-    id: Utils.genId(), 
-    pep: pep || null, 
-    diagrama, 
-    placa: placa || null, 
-    descricao, 
-    volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''), 
-    volumesTotal: volumesTotal, 
-    volumesProcessados: 0, 
-    processo, 
-    prioridade, 
-    status: 'Aguardando', 
-    turno: State.data.turnosPorPosto[processo] || '1º Turno', 
-    obs, 
-    criadoEm: Date.now(), 
-    atualizadoEm: Date.now() 
-};
-
+const novo = { id: Utils.genId(), pep: pep || null, diagrama, placa: placa || null, descricao, volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''), volumesTotal: volumesTotal, volumesProcessados: 0, processo, prioridade, status: 'Aguardando', turno: State.data.turnosPorPosto[processo] || '1º Turno', obs, criadoEm: Date.now(), atualizadoEm: Date.now() };
 const result = await Storage.salvarApi('create', novo);
-if (result.offline) { 
-    State.data.projetos.push(novo); 
-    Storage.salvarLocal(); 
-}
-
+if (result.offline) { State.data.projetos.push(novo); Storage.salvarLocal(); }
 document.getElementById('formCadastro').reset();
 this.renderTable();
 UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
 return false;
 },
-
 setFilter(f, el) { State.admFilter = f; document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
-
 renderTable() {
 const tbody = document.getElementById('admTableBody');
 const search = (document.getElementById('admSearch').value || '').toLowerCase();
@@ -1498,9 +1493,7 @@ let data = [...State.data.projetos];
 if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
 data = Utils.ordenarPorPrioridade(data);
-
 if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>`; return; }
-
 tbody.innerHTML = data.map(p => {
 const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':p.status==='Concluído'?'concluido':'parcial';
 const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
@@ -1517,7 +1510,6 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto('${p.id}')"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
 }).join('');
 },
-
 abrirEdicao(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
@@ -1535,7 +1527,6 @@ this.toggleVolumesEdicao();
 UI.openModal('modalEditar');
 setTimeout(() => { const firstInput = document.querySelector('#modalEditar input:not([type="hidden"])'); if (firstInput) { firstInput.focus(); UI.scrollParaElemento(firstInput); } }, 100);
 },
-
 async salvarEdicao(e) {
 e.preventDefault();
 const id = document.getElementById('edit-id').value;
@@ -1563,7 +1554,6 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado');
 return false;
 },
-
 async excluirProjeto(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
@@ -1594,43 +1584,36 @@ this.renderTable();
 if (State.timerInterval) clearInterval(State.timerInterval);
 State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 },
-
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
-
 if (Utils.ehFimDeSemana()) {
-    const agora = Date.now();
-    const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
-    const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
-
-    const modalAberto = document.querySelector('.modal-overlay.active');
-    
-    if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
-        State.turnoFimSemanaModalAberto = true;
-        State.turnoFimSemanaPendente = true;
-        UI.openModal('modalTurnoFimSemana');
-    } else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
-        const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-        document.getElementById('postoTurno').value = turnoSalvo;
-    }
+const agora = Date.now();
+const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
+if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+document.getElementById('postoTurno').value = turnoSalvo;
 } else {
-    const turnoDetectado = Utils.detectarTurnoAutomatico();
-    State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
-    Storage.salvarLocal();
-    document.getElementById('postoTurno').value = turnoDetectado;
+const modalAberto = document.querySelector('.modal-overlay.active');
+if (!State.turnoFimSemanaModalAberto && !modalAberto) {
+State.turnoFimSemanaPendente = true;
+UI.openModal('modalTurnoFimSemana');
+}
+}
+} else {
+const turnoDetectado = Utils.detectarTurnoAutomatico();
+State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+Storage.salvarLocal();
+document.getElementById('postoTurno').value = turnoDetectado;
 }
 },
-
 salvarTurno() { 
-    const turno = document.getElementById('postoTurno').value; 
-    State.data.turnosPorPosto[State.currentPosto] = turno; 
-    State.data.ultimaSelecaoTurno = Date.now();
-    Storage.salvarLocal(); 
-    UI.showToast('info', 'Turno atualizado', 'Turno definido como ' + turno); 
+const turno = document.getElementById('postoTurno').value; 
+State.data.turnosPorPosto[State.currentPosto] = turno; 
+State.data.ultimaSelecaoTurno = Date.now();
+Storage.salvarLocal(); 
+UI.showToast('info', 'Turno atualizado', 'Turno definido como ' + turno); 
 },
-
 setFilter(f, el) { State.postoFilter = f; document.querySelectorAll('#page-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
-
 renderTable() {
 const tbody = document.getElementById('postoTableBody');
 const search = (document.getElementById('postoSearch').value || '').toLowerCase();
@@ -1659,8 +1642,11 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 } else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
 } else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
 let tempoDisplay = '-';
-if (p.status === 'Em Processo' && p.dataHoraInicio) { tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`; }
-else if (p.dataHoraInicio && p.dataHoraFim) { tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`; }
+if (p.status === 'Em Processo' && p.dataHoraInicio) {
+tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
+} else if (p.dataHoraInicio && p.dataHoraFim) {
+tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
+}
 let botoesAcao = '';
 if (p.status === 'Aguardando' || p.status === 'Parcial') { botoesAcao = `<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
 else if (p.status === 'Em Processo') { botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
@@ -1684,6 +1670,7 @@ if (!p) return;
 p.status = 'Em Processo';
 p.dataHoraInicio = Date.now();
 p.dataHoraFim = null;
+p.tempoReal = null;
 p.atualizadoEm = Date.now();
 Storage.salvarLocal();
 await Storage.salvarApi('update', p);
@@ -1840,7 +1827,7 @@ if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.his
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
 if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 data.sort((a,b) => b.concluidoEm - a.concluidoEm);
-if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3><p>Nenhum projeto concluído ainda.</p></div></td></tr>`; return; }
+if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
 tbody.innerHTML = data.map(p => {
 const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
 const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
@@ -1919,8 +1906,7 @@ Storage.salvarLocal();
 document.getElementById('postoTurno').value = turno;
 UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
-State.turnoFimSemanaModalAberto = false;
-UI.showToast('success', 'Turno selecionado', `${turno} definido. Próxima pergunta em 2 horas.`);
+UI.showToast('info', 'Turno selecionado', `${turno} definido. Próxima pergunta em 2h.`);
 },
 cancelarSelecao() {
 const turnoDetectado = Utils.detectarTurnoAutomatico();
@@ -1930,8 +1916,6 @@ Storage.salvarLocal();
 document.getElementById('postoTurno').value = turnoDetectado;
 UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
-State.turnoFimSemanaModalAberto = false;
-UI.showToast('info', 'Turno automático', `${turnoDetectado} definido. Próxima pergunta em 2 horas.`);
 }
 };
 
@@ -2044,11 +2028,14 @@ setInterval(UI.updateDate, 1000);
 UI.updateDate();
 
 if (typeof API !== 'undefined' && State.apiAvailable) {
+// CORREÇÃO CRÍTICA: Evento de sync incremental
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) { State.data.projetos.push(projLocal); }
-else {
+if (index === -1) {
+State.data.projetos.push(projLocal);
+console.log('➕ Projeto adicionado via sync:', projLocal.diagrama);
+} else {
 const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
 const remoteAtualizado = projLocal.atualizadoEm || 0;
 if (remoteAtualizado > localAtualizado) {
@@ -2058,6 +2045,7 @@ State.data.projetos[index] = {
 dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
 dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
 };
+console.log('🔄 Projeto atualizado via sync:', projLocal.diagrama);
 }
 }
 Storage.salvarLocal();
@@ -2065,6 +2053,55 @@ if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
 });
+
+// CORREÇÃO CRÍTICA: NOVO evento de sync completo (detecta VBA e limpeza)
+API.on('sync:full', (remoteProjects) => {
+console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
+const remoteMap = new Map();
+remoteProjects.forEach(p => {
+const local = Utils.fromApiFormat(p);
+remoteMap.set(local.id, local);
+});
+
+// Remove projetos que não existem mais na nuvem (detecta limpeza)
+const idsRemotos = new Set(remoteMap.keys());
+const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
+if (removidos.length > 0) {
+console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
+}
+State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
+
+// Adiciona/atualiza projetos da nuvem
+remoteMap.forEach((remoteProj, id) => {
+const index = State.data.projetos.findIndex(p => p.id === id);
+if (index === -1) {
+State.data.projetos.push(remoteProj);
+} else {
+const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
+const remoteAtualizado = remoteProj.atualizadoEm || 0;
+if (remoteAtualizado > localAtualizado) {
+State.data.projetos[index] = {
+...State.data.projetos[index],
+...remoteProj,
+dataHoraInicio: State.data.projetos[index].dataHoraInicio || remoteProj.dataHoraInicio,
+dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim,
+tempoReal: State.data.projetos[index].tempoReal || remoteProj.tempoReal,
+concluidoEm: State.data.projetos[index].concluidoEm || remoteProj.concluidoEm,
+observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.observacaoPintura
+};
+}
+}
+});
+
+Storage.salvarLocal();
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) Posto.render();
+Dashboard.render();
+Historico.renderGeral();
+Historico.renderPostos();
+Charts.render();
+});
+
 API.on('project:created', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
@@ -2101,7 +2138,9 @@ if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
 });
-API.on('sync:complete', (data) => { console.log(`Sync completo: ${data.count}`); });
+API.on('sync:complete', (data) => { 
+console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`); 
+});
 API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
 }
 
@@ -2109,8 +2148,10 @@ window.addEventListener('online', () => {
 State.isOnline = true;
 State.apiAvailable = (typeof API !== 'undefined');
 UI.showToast('success', 'Online', 'Conexão restaurada.');
-if (State.apiAvailable) API.startPolling(API_CONFIG.POLLING_INTERVAL);
+if (State.apiAvailable) {
+API.startPolling(API_CONFIG.POLLING_INTERVAL);
 Storage.processarFila();
+}
 });
 window.addEventListener('offline', () => {
 State.isOnline = false;
