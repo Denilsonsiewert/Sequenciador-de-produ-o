@@ -540,7 +540,6 @@ FULL_SYNC_INTERVAL: 30000
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
-
 async function apiRequest(action, payload = {}, method = 'POST') {
 try {
 const url = new URL(API_CONFIG.URL);
@@ -581,7 +580,6 @@ return result;
 async function updateConfig(key, value) { return await apiRequest('updateConfig', { key, value }); }
 async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
 async function clearAllData() { return await apiRequest('clearAll', {}); }
-
 async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -606,7 +604,6 @@ if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
 triggerEvent('sync:error', error);
 } finally { syncInProgress = false; }
 }
-
 async function syncDataCompleto() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -627,11 +624,9 @@ if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
 triggerEvent('sync:error', error);
 } finally { syncInProgress = false; }
 }
-
 async function syncData() {
 await syncDataIncremental();
 }
-
 function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
 syncDataCompleto().then(() => {
 syncData();
@@ -639,7 +634,6 @@ setInterval(syncData, interval);
 setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
 });
 }
-
 function on(event, callback) { if (!eventListeners[event]) eventListeners[event] = []; eventListeners[event].push(callback); }
 function off(event, callback) { if (eventListeners[event]) eventListeners[event] = eventListeners[event].filter(cb => cb !== callback); }
 function triggerEvent(event, data) {
@@ -647,17 +641,15 @@ if (eventListeners[event]) eventListeners[event].forEach(callback => { try { cal
 }
 window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, syncDataCompleto, startPolling, on, off };
 </script>
-
 <script>
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v36',
+STORAGE_KEY: 'weg_fluxo_produtivo_v35',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
 FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
 TURNO_COOLDOWN: 2 * 60 * 60 * 1000
 };
-
 const State = {
 data: {
 projetos: [],
@@ -694,7 +686,6 @@ scanInterval: null,
 lastPepFound: null,
 lastDiagramaFound: null
 };
-
 const Utils = {
 genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); },
 formatarTempo(ms) {
@@ -775,7 +766,6 @@ extrairDadosEtiqueta(texto) {
 console.log('🔍 OCR:', texto.substring(0, 200) + '...');
 let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 const result = { pep: null, diagrama: null };
-
 const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
 if (pepLabelMatch) {
 let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
@@ -784,7 +774,6 @@ result.pep = pepRaw;
 console.log('✅ PEP via label:', result.pep);
 }
 }
-
 if (!result.pep) {
 const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
 if (exactMatch) {
@@ -792,7 +781,6 @@ result.pep = '170-2500343-121';
 console.log('✅ PEP via exato:', result.pep);
 }
 }
-
 if (!result.pep) {
 const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
 if (generic) {
@@ -800,7 +788,6 @@ result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
 console.log('✅ PEP via genérico:', result.pep);
 }
 }
-
 if (!result.pep) {
 const digits13 = clean.match(/\b(\d{13})\b/);
 if (digits13) {
@@ -809,7 +796,6 @@ result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10
 console.log('✅ PEP via 13 dígitos:', result.pep);
 }
 }
-
 const lines = texto.split('\n');
 for (let line of lines) {
 const upper = line.toUpperCase();
@@ -822,7 +808,6 @@ break;
 }
 }
 }
-
 if (!result.diagrama) {
 const exact = clean.match(/\b450890224\b/);
 if (exact) {
@@ -830,7 +815,6 @@ result.diagrama = '450890224';
 console.log('✅ Diagrama via exato:', result.diagrama);
 }
 }
-
 if (!result.diagrama) {
 const nineDigits = clean.match(/\b(\d{9})\b/g);
 if (nineDigits) {
@@ -844,12 +828,10 @@ break;
 }
 }
 }
-
 console.log('📊 Resultado:', result);
 return result;
 }
 };
-
 const Storage = {
 async carregar() {
 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -866,13 +848,11 @@ if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
 this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
-
 const savedTs = localStorage.getItem('weg_last_sync_ts');
 if (savedTs) {
 lastSyncTimestamp = parseInt(savedTs);
 console.log('📅 Timestamp de sync restaurado:', lastSyncTimestamp);
 }
-
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
 try {
@@ -945,7 +925,6 @@ State.data.historico.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno 
 if (mudou) this.salvarLocal();
 }
 };
-
 const UI = {
 aplicarEstadoCursor() {
 if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor');
@@ -960,12 +939,12 @@ window.scrollTo({ top: targetPosition, behavior: 'smooth' });
 }
 }, 300);
 },
-openModal(id) { 
-document.getElementById(id).classList.add('active'); 
+openModal(id) {
+document.getElementById(id).classList.add('active');
 if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
 },
-closeModal(id) { 
-document.getElementById(id).classList.remove('active'); 
+closeModal(id) {
+document.getElementById(id).classList.remove('active');
 if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
 },
 toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
@@ -1087,7 +1066,6 @@ UI.scrollParaElemento(State.vkTarget);
 });
 }
 };
-
 const Navigation = {
 navigate(page) {
 document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
@@ -1106,7 +1084,6 @@ if (page === 'historico-posto') Historico.renderPostoAtual();
 if (page === 'config') Config.loadUI();
 }
 };
-
 const Auth = {
 login(role) {
 if (role === 'admin') {
@@ -1200,9 +1177,9 @@ this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</str
 async executarLimpeza() {
 UI.showToast('info', 'Limpando', 'Apagando dados em todos os dispositivos...');
 if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
-try { 
-await API.clearAllData(); 
-UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha'); 
+try {
+await API.clearAllData();
+UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha');
 lastSyncTimestamp = 0;
 localStorage.setItem('weg_last_sync_ts', '0');
 }
@@ -1221,7 +1198,6 @@ if (State.apiAvailable) API.syncDataCompleto();
 }, 2000);
 }
 };
-
 const Config = {
 loadUI() {
 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
@@ -1270,7 +1246,6 @@ else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'pas
 else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 };
-
 const Dashboard = {
 switchTab(tab, el) {
 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
@@ -1381,39 +1356,30 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 } else { document.getElementById('posto-ultimo-projeto').textContent = '-'; document.getElementById('posto-ultimo-data').textContent = '-'; }
 }
 };
-
 const Admin = {
 async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
 const cameraStatus = document.getElementById('cameraStatus');
 const cameraControls = document.getElementById('cameraControls');
-
 State.lastPepFound = null;
 State.lastDiagramaFound = null;
-
 cameraSection.classList.add('active');
 cameraStatus.style.display = 'block';
 cameraControls.style.display = 'flex';
 cameraStatus.className = 'camera-status scanning';
 cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando câmera... Busca contínua ativada.<br><small>Posicione a etiqueta. Os campos serão atualizados automaticamente.</small>';
-
 try {
 const video = document.getElementById('cameraVideo');
 const canvas = document.getElementById('cameraCanvas');
-
 State.cameraStream = await navigator.mediaDevices.getUserMedia({
 video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
 });
-
 video.srcObject = State.cameraStream;
 await video.play();
-
 cameraStatus.className = 'camera-status scanning';
 cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Escaneando a cada 2 segundos... Clique em "Fechar" quando os dados estiverem corretos.';
-
 await this.performScan();
 State.scanInterval = setInterval(() => this.performScan(), 2000);
-
 } catch (err) {
 console.error('Erro ao acessar câmera:', err);
 cameraStatus.className = 'camera-status error';
@@ -1421,67 +1387,54 @@ cameraStatus.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Erro 
 UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera');
 }
 },
-
 async performScan() {
 const video = document.getElementById('cameraVideo');
 const canvas = document.getElementById('cameraCanvas');
 const ctx = canvas.getContext('2d');
 const cameraStatus = document.getElementById('cameraStatus');
-
 if (!video.videoWidth || !video.videoHeight) return;
-
 try {
 canvas.width = video.videoWidth;
 canvas.height = video.videoHeight;
 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
 const result = await Tesseract.recognize(canvas, 'por', { logger: () => {} });
 const texto = result.data.text;
-
 if (texto && texto.trim().length > 5) {
 const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
-
 let atualizouAlgo = false;
-
 if (pep && pep !== State.lastPepFound) {
 document.getElementById('cad-pep').value = pep;
 State.lastPepFound = pep;
 atualizouAlgo = true;
 }
-
 if (diagrama && diagrama !== State.lastDiagramaFound) {
 document.getElementById('cad-diagrama').value = diagrama;
 State.lastDiagramaFound = diagrama;
 atualizouAlgo = true;
 }
-
-const pepStatus = State.lastPepFound 
-    ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
-    : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
-
-const diagramaStatus = State.lastDiagramaFound 
-    ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
-    : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
-
+const pepStatus = State.lastPepFound
+? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
+: `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
+const diagramaStatus = State.lastDiagramaFound
+? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
+: `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
 if (State.lastPepFound || State.lastDiagramaFound) {
-    cameraStatus.className = 'camera-status success';
-    cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
-    <div class="camera-found-items">${pepStatus}${diagramaStatus}</div>
-    <small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
+cameraStatus.className = 'camera-status success';
+cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
+<div class="camera-found-items">${pepStatus}${diagramaStatus}</div>
+<small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
 } else {
-    cameraStatus.className = 'camera-status scanning';
-    cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
+cameraStatus.className = 'camera-status scanning';
+cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
 }
-
 if (atualizouAlgo) {
-    UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
+UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
 }
 }
 } catch (err) {
 console.error('Erro no OCR:', err);
 }
 },
-
 fecharCamera() {
 if (State.cameraStream) {
 State.cameraStream.getTracks().forEach(track => track.stop());
@@ -1491,36 +1444,29 @@ if (State.scanInterval) {
 clearInterval(State.scanInterval);
 State.scanInterval = null;
 }
-
 State.lastPepFound = null;
 State.lastDiagramaFound = null;
-
 document.getElementById('cameraSection').classList.remove('active');
 document.getElementById('cameraStatus').style.display = 'none';
 document.getElementById('cameraControls').style.display = 'none';
-
 UI.showToast('info', 'Câmera fechada', 'Verifique os dados preenchidos');
 },
-
 limparFormulario() {
 document.getElementById('formCadastro').reset();
 UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
 },
-
 toggleVolumesCadastro() {
 const processo = document.getElementById('cad-processo').value;
 const groupVolumes = document.getElementById('group-cad-volumes');
 if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
 else { groupVolumes.style.display = 'block'; }
 },
-
 toggleVolumesEdicao() {
 const processo = document.getElementById('edit-processo').value;
 const groupVolumes = document.getElementById('group-edit-volumes');
 if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
 else { groupVolumes.style.display = 'block'; }
 },
-
 async cadastrarProjeto(e) {
 e.preventDefault();
 const pep = document.getElementById('cad-pep').value.trim();
@@ -1531,69 +1477,58 @@ const volumes = document.getElementById('cad-volumes').value.trim();
 const processo = document.getElementById('cad-processo').value;
 const prioridade = document.getElementById('cad-prioridade').value;
 const obs = document.getElementById('cad-obs').value.trim();
-
-// Validação: Diagrama é obrigatório
 if (!diagrama) {
-    UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
-    document.getElementById('cad-diagrama').focus();
-    return false;
+UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
+document.getElementById('cad-diagrama').focus();
+return false;
 }
-
-// Verifica duplicidade APENAS no Diagrama/Ordem (PEP pode repetir)
-const existeDiagrama = State.data.projetos.some(p => 
-    p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
+const existeDiagrama = State.data.projetos.some(p =>
+p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
 );
-if (existeDiagrama) { 
-    UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama); 
-    return false; 
+if (existeDiagrama) {
+UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
+return false;
 }
-
 let volumesTotal = null;
-if (processo === 'Nanocerâmico' && volumes) { 
-    const match = volumes.match(/\d+/); 
-    if (match) volumesTotal = parseInt(match[0]); 
+if (processo === 'Nanocerâmico' && volumes) {
+const match = volumes.match(/\d+/);
+if (match) volumesTotal = parseInt(match[0]);
 }
-
-const novo = { 
-    id: Utils.genId(), 
-    pep: pep || null, 
-    diagrama, 
-    placa: placa || null, 
-    descricao, 
-    volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''), 
-    volumesTotal: volumesTotal, 
-    volumesProcessados: 0, 
-    processo, 
-    prioridade, 
-    status: 'Aguardando', 
-    turno: State.data.turnosPorPosto[processo] || '1º Turno', 
-    obs, 
-    criadoEm: Date.now(), 
-    atualizadoEm: Date.now() 
+const novo = {
+id: Utils.genId(),
+pep: pep || null,
+diagrama,
+placa: placa || null,
+descricao,
+volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''),
+volumesTotal: volumesTotal,
+volumesProcessados: 0,
+processo,
+prioridade,
+status: 'Aguardando',
+turno: State.data.turnosPorPosto[processo] || '1º Turno',
+obs,
+criadoEm: Date.now(),
+atualizadoEm: Date.now()
 };
-
 console.log('📝 Cadastrando projeto:', novo);
-
 try {
-    const result = await Storage.salvarApi('create', novo);
-    if (result.offline) { 
-        State.data.projetos.push(novo); 
-        Storage.salvarLocal(); 
-    }
-    
-    document.getElementById('formCadastro').reset();
-    this.renderTable();
-    UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
-    return false;
+const result = await Storage.salvarApi('create', novo);
+if (result.offline) {
+State.data.projetos.push(novo);
+Storage.salvarLocal();
+}
+document.getElementById('formCadastro').reset();
+this.renderTable();
+UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
+return false;
 } catch (error) {
-    console.error('❌ Erro ao cadastrar:', error);
-    UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique o console para mais detalhes');
-    return false;
+console.error('❌ Erro ao cadastrar:', error);
+UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique o console para mais detalhes');
+return false;
 }
 },
-
 setFilter(f, el) { State.admFilter = f; document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
-
 renderTable() {
 const tbody = document.getElementById('admTableBody');
 const search = (document.getElementById('admSearch').value || '').toLowerCase();
@@ -1618,7 +1553,6 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto('${p.id}')"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
 }).join('');
 },
-
 abrirEdicao(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
@@ -1636,7 +1570,6 @@ this.toggleVolumesEdicao();
 UI.openModal('modalEditar');
 setTimeout(() => { const firstInput = document.querySelector('#modalEditar input:not([type="hidden"])'); if (firstInput) { firstInput.focus(); UI.scrollParaElemento(firstInput); } }, 100);
 },
-
 async salvarEdicao(e) {
 e.preventDefault();
 const id = document.getElementById('edit-id').value;
@@ -1664,7 +1597,6 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado');
 return false;
 },
-
 async excluirProjeto(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
@@ -1681,7 +1613,6 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
 }
 };
-
 const Posto = {
 render() {
 if (!State.currentPosto) return;
@@ -1698,33 +1629,31 @@ State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
 if (Utils.ehFimDeSemana()) {
-    const agora = Date.now();
-    const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
-    const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
-
-    const modalAberto = document.querySelector('.modal-overlay.active');
-    
-    if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
-        State.turnoFimSemanaModalAberto = true;
-        State.turnoFimSemanaPendente = true;
-        UI.openModal('modalTurnoFimSemana');
-    } else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
-        const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-        document.getElementById('postoTurno').value = turnoSalvo;
-    }
+const agora = Date.now();
+const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
+const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
+const modalAberto = document.querySelector('.modal-overlay.active');
+if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
+State.turnoFimSemanaModalAberto = true;
+State.turnoFimSemanaPendente = true;
+UI.openModal('modalTurnoFimSemana');
+} else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+document.getElementById('postoTurno').value = turnoSalvo;
+}
 } else {
-    const turnoDetectado = Utils.detectarTurnoAutomatico();
-    State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
-    Storage.salvarLocal();
-    document.getElementById('postoTurno').value = turnoDetectado;
+const turnoDetectado = Utils.detectarTurnoAutomatico();
+State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+Storage.salvarLocal();
+document.getElementById('postoTurno').value = turnoDetectado;
 }
 },
-salvarTurno() { 
-const turno = document.getElementById('postoTurno').value; 
-State.data.turnosPorPosto[State.currentPosto] = turno; 
+salvarTurno() {
+const turno = document.getElementById('postoTurno').value;
+State.data.turnosPorPosto[State.currentPosto] = turno;
 State.data.ultimaSelecaoTurno = Date.now();
-Storage.salvarLocal(); 
-UI.showToast('info', 'Turno atualizado', 'Turno definido como ' + turno); 
+Storage.salvarLocal();
+UI.showToast('info', 'Turno atualizado', 'Turno definido como ' + turno);
 },
 setFilter(f, el) { State.postoFilter = f; document.querySelectorAll('#page-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
 renderTable() {
@@ -1800,7 +1729,6 @@ this.renderTable();
 UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
 }
 };
-
 const Conclusao = {
 solicitar(id) {
 const p = State.data.projetos.find(x => x.id === id);
@@ -1921,7 +1849,6 @@ UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Util
 }
 }
 };
-
 const Historico = {
 switchTab(tab, el) {
 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
@@ -1936,13 +1863,7 @@ renderGeral() {
 const tbody = document.getElementById('histTableBody');
 const search = (document.getElementById('histSearch').value || '').toLowerCase();
 let data = [...State.data.historico];
-// CORREÇÃO: Remover filtro que impedia visualização de projetos do Nanocerâmico
-// if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
-// if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-// Agora aplica apenas o filtro de processo se estiver selecionado
-if (State.histFilter !== 'all') {
-    data = data.filter(p => p.processo === State.histFilter);
-}
+if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
 data.sort((a,b) => b.concluidoEm - a.concluidoEm);
 if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
@@ -1960,7 +1881,6 @@ const search = (document.getElementById('histPostoSearch').value || '').toLowerC
 let data = [...State.data.historicoPostos];
 if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
 if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>`; return; }
 const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
@@ -2015,7 +1935,6 @@ Charts.render();
 UI.showToast('success', 'Excluído', 'Registro removido');
 }
 };
-
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
@@ -2036,13 +1955,11 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
 }
 };
-
 const VirtualKeyboard = {
 show() { document.getElementById('virtualKeyboard').classList.add('active'); State.vkActive = true; if (State.vkTarget) UI.scrollParaElemento(State.vkTarget); },
 hide() { document.getElementById('virtualKeyboard').classList.remove('active'); State.vkActive = false; State.vkTarget = null; },
 toggle() { if (State.vkActive) this.hide(); else this.show(); }
 };
-
 const Charts = {
 render() {
 const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
@@ -2076,7 +1993,6 @@ State.charts.eficiencia = new Chart(ctx4, { type: 'pie', data: { labels: Object.
 }
 }
 };
-
 const Export = {
 downloadFile(name, content, type) { const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); },
 csv() {
@@ -2088,7 +2004,6 @@ UI.showToast('success', 'Exportado', 'Arquivo CSV gerado');
 },
 historicoCSV() {
 let data = State.data.historico;
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 const headers = ['PEP','Diagrama/Ordem','Placa','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
 const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
 const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
@@ -2097,7 +2012,6 @@ UI.showToast('success', 'Exportado', 'Histórico exportado');
 },
 historicoPostosCSV() {
 let data = State.data.historicoPostos;
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 const headers = ['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
 const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
 const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
@@ -2134,7 +2048,6 @@ reader.readAsText(file);
 e.target.value = '';
 }
 };
-
 const App = {
 async init() {
 await Storage.carregar();
@@ -2144,7 +2057,6 @@ UI.setupSidebarClickHandler();
 UI.setupVirtualKeyboard();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
-
 if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
@@ -2170,7 +2082,6 @@ if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
 });
-
 API.on('sync:full', (remoteProjects) => {
 console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
 const remoteMap = new Map();
@@ -2178,14 +2089,12 @@ remoteProjects.forEach(p => {
 const local = Utils.fromApiFormat(p);
 remoteMap.set(local.id, local);
 });
-
 const idsRemotos = new Set(remoteMap.keys());
 const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
 if (removidos.length > 0) {
 console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
 }
 State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
-
 remoteMap.forEach((remoteProj, id) => {
 const index = State.data.projetos.findIndex(p => p.id === id);
 if (index === -1) {
@@ -2206,7 +2115,6 @@ observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.ob
 }
 }
 });
-
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
@@ -2215,7 +2123,6 @@ Historico.renderGeral();
 Historico.renderPostos();
 Charts.render();
 });
-
 API.on('project:created', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
@@ -2252,12 +2159,11 @@ if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
 });
-API.on('sync:complete', (data) => { 
-console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`); 
+API.on('sync:complete', (data) => {
+console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`);
 });
 API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
 }
-
 window.addEventListener('online', () => {
 State.isOnline = true;
 State.apiAvailable = (typeof API !== 'undefined');
