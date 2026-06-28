@@ -528,7 +528,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
-
 <!-- CLIENTE DA API COM SINCRONIZAÇÃO CORRIGIDA -->
 <script>
 const API_CONFIG = {
@@ -643,7 +642,7 @@ window.API = { createProject, updateProject, deleteProject, updateConfig, getCon
 </script>
 <script>
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v35',
+STORAGE_KEY: 'weg_fluxo_produtivo_v36',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
@@ -686,6 +685,33 @@ scanInterval: null,
 lastPepFound: null,
 lastDiagramaFound: null
 };
+
+// ✅ NOVO: Normalizador de dados para garantir consistência entre Excel, Manual e Sync
+function sanitizarProjeto(p) {
+if (!p || typeof p !== 'object') return null;
+return {
+id: p.id || `p_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+pep: p.pep || null,
+diagrama: p.diagrama || '',
+placa: p.placa || null,
+descricao: p.descricao || '',
+volumesTotal: isNaN(p.volumesTotal) ? 0 : Number(p.volumesTotal),
+volumesProcessados: isNaN(p.volumesProcessados) ? 0 : Number(p.volumesProcessados),
+processo: p.processo || 'Nanocerâmico',
+prioridade: p.prioridade || 'Normal',
+status: p.status || 'Aguardando',
+turno: p.turno || '1º Turno',
+obs: p.obs || '',
+criadoEm: p.criadoEm ? Number(p.criadoEm) : Date.now(),
+atualizadoEm: p.atualizadoEm ? Number(p.atualizadoEm) : Date.now(),
+dataHoraInicio: p.dataHoraInicio ? Number(p.dataHoraInicio) : null,
+dataHoraFim: p.dataHoraFim ? Number(p.dataHoraFim) : null,
+tempoReal: p.tempoReal ? Number(p.tempoReal) : null,
+concluidoEm: p.concluidoEm ? Number(p.concluidoEm) : null,
+observacaoPintura: p.observacaoPintura || null
+};
+}
+
 const Utils = {
 genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); },
 formatarTempo(ms) {
@@ -740,7 +766,8 @@ ObservacaoPintura: projeto.observacaoPintura || null
 };
 },
 fromApiFormat(apiProj) {
-return {
+// ✅ CORREÇÃO: Converte tudo para o formato local com valores padrão seguros
+return sanitizarProjeto({
 id: apiProj.ID,
 pep: apiProj.PEP,
 diagrama: apiProj.Diagrama,
@@ -755,12 +782,12 @@ turno: apiProj.Turno,
 obs: apiProj.Obs,
 criadoEm: apiProj.CriadoEm,
 atualizadoEm: apiProj.AtualizadoEm,
-dataHoraInicio: apiProj.DataHoraInicio || null,
-dataHoraFim: apiProj.DataHoraFim || null,
-tempoReal: apiProj.TempoReal || null,
-concluidoEm: apiProj.ConcluidoEm || null,
-observacaoPintura: apiProj.ObservacaoPintura || null
-};
+dataHoraInicio: apiProj.DataHoraInicio,
+dataHoraFim: apiProj.DataHoraFim,
+tempoReal: apiProj.TempoReal,
+concluidoEm: apiProj.ConcluidoEm,
+observacaoPintura: apiProj.ObservacaoPintura
+});
 },
 extrairDadosEtiqueta(texto) {
 console.log('🔍 OCR:', texto.substring(0, 200) + '...');
@@ -832,6 +859,7 @@ console.log('📊 Resultado:', result);
 return result;
 }
 };
+
 const Storage = {
 async carregar() {
 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -839,6 +867,8 @@ if (raw) {
 try {
 const obj = JSON.parse(raw);
 State.data = Object.assign(State.data, obj);
+// ✅ CORREÇÃO: Sanitiza todos os projetos carregados do localStorage
+State.data.projetos = State.data.projetos.map(sanitizarProjeto).filter(Boolean);
 if (!State.data.senhaAdmin) State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
 if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' };
 if (!State.data.config) State.data.config = { dispositivo: 'tablet' };
@@ -851,7 +881,7 @@ this.migrarTurnosAntigos();
 const savedTs = localStorage.getItem('weg_last_sync_ts');
 if (savedTs) {
 lastSyncTimestamp = parseInt(savedTs);
-console.log('📅 Timestamp de sync restaurado:', lastSyncTimestamp);
+console.log(' Timestamp de sync restaurado:', lastSyncTimestamp);
 }
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
@@ -925,6 +955,7 @@ State.data.historico.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno 
 if (mudou) this.salvarLocal();
 }
 };
+
 const UI = {
 aplicarEstadoCursor() {
 if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor');
@@ -1066,6 +1097,7 @@ UI.scrollParaElemento(State.vkTarget);
 });
 }
 };
+
 const Navigation = {
 navigate(page) {
 document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
@@ -1084,6 +1116,7 @@ if (page === 'historico-posto') Historico.renderPostoAtual();
 if (page === 'config') Config.loadUI();
 }
 };
+
 const Auth = {
 login(role) {
 if (role === 'admin') {
@@ -1198,6 +1231,7 @@ if (State.apiAvailable) API.syncDataCompleto();
 }, 2000);
 }
 };
+
 const Config = {
 loadUI() {
 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
@@ -1246,6 +1280,7 @@ else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'pas
 else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
 }
 };
+
 const Dashboard = {
 switchTab(tab, el) {
 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
@@ -1356,6 +1391,7 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 } else { document.getElementById('posto-ultimo-projeto').textContent = '-'; document.getElementById('posto-ultimo-data').textContent = '-'; }
 }
 };
+
 const Admin = {
 async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
@@ -1477,31 +1513,36 @@ const volumes = document.getElementById('cad-volumes').value.trim();
 const processo = document.getElementById('cad-processo').value;
 const prioridade = document.getElementById('cad-prioridade').value;
 const obs = document.getElementById('cad-obs').value.trim();
+
 if (!diagrama) {
 UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
 document.getElementById('cad-diagrama').focus();
 return false;
 }
-const existeDiagrama = State.data.projetos.some(p =>
+
+// ✅ CORREÇÃO: Verificação segura que não quebra com dados do Excel
+const existeDiagrama = State.data.projetos.some(p => 
 p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
 );
 if (existeDiagrama) {
 UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
 return false;
 }
-let volumesTotal = null;
+
+let volumesTotal = 0;
 if (processo === 'Nanocerâmico' && volumes) {
 const match = volumes.match(/\d+/);
 if (match) volumesTotal = parseInt(match[0]);
 }
-const novo = {
+
+const novo = sanitizarProjeto({
 id: Utils.genId(),
 pep: pep || null,
 diagrama,
 placa: placa || null,
 descricao,
-volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''),
-volumesTotal: volumesTotal,
+volumes,
+volumesTotal,
 volumesProcessados: 0,
 processo,
 prioridade,
@@ -1510,7 +1551,8 @@ turno: State.data.turnosPorPosto[processo] || '1º Turno',
 obs,
 criadoEm: Date.now(),
 atualizadoEm: Date.now()
-};
+});
+
 console.log('📝 Cadastrando projeto:', novo);
 try {
 const result = await Storage.salvarApi('create', novo);
@@ -1613,6 +1655,7 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
 }
 };
+
 const Posto = {
 render() {
 if (!State.currentPosto) return;
@@ -1729,6 +1772,7 @@ this.renderTable();
 UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
 }
 };
+
 const Conclusao = {
 solicitar(id) {
 const p = State.data.projetos.find(x => x.id === id);
@@ -1849,6 +1893,7 @@ UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Util
 }
 }
 };
+
 const Historico = {
 switchTab(tab, el) {
 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
@@ -1865,6 +1910,7 @@ const search = (document.getElementById('histSearch').value || '').toLowerCase()
 let data = [...State.data.historico];
 if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
+if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 data.sort((a,b) => b.concluidoEm - a.concluidoEm);
 if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
 tbody.innerHTML = data.map(p => {
@@ -1881,6 +1927,7 @@ const search = (document.getElementById('histPostoSearch').value || '').toLowerC
 let data = [...State.data.historicoPostos];
 if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
+if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
 if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>`; return; }
 const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
@@ -1935,6 +1982,7 @@ Charts.render();
 UI.showToast('success', 'Excluído', 'Registro removido');
 }
 };
+
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
@@ -1955,11 +2003,13 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
 }
 };
+
 const VirtualKeyboard = {
 show() { document.getElementById('virtualKeyboard').classList.add('active'); State.vkActive = true; if (State.vkTarget) UI.scrollParaElemento(State.vkTarget); },
 hide() { document.getElementById('virtualKeyboard').classList.remove('active'); State.vkActive = false; State.vkTarget = null; },
 toggle() { if (State.vkActive) this.hide(); else this.show(); }
 };
+
 const Charts = {
 render() {
 const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
@@ -1993,6 +2043,7 @@ State.charts.eficiencia = new Chart(ctx4, { type: 'pie', data: { labels: Object.
 }
 }
 };
+
 const Export = {
 downloadFile(name, content, type) { const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); },
 csv() {
@@ -2004,6 +2055,7 @@ UI.showToast('success', 'Exportado', 'Arquivo CSV gerado');
 },
 historicoCSV() {
 let data = State.data.historico;
+if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 const headers = ['PEP','Diagrama/Ordem','Placa','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
 const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
 const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
@@ -2012,6 +2064,7 @@ UI.showToast('success', 'Exportado', 'Histórico exportado');
 },
 historicoPostosCSV() {
 let data = State.data.historicoPostos;
+if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 const headers = ['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
 const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
 const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
@@ -2048,6 +2101,7 @@ reader.readAsText(file);
 e.target.value = '';
 }
 };
+
 const App = {
 async init() {
 await Storage.carregar();
@@ -2092,29 +2146,10 @@ remoteMap.set(local.id, local);
 const idsRemotos = new Set(remoteMap.keys());
 const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
 if (removidos.length > 0) {
-console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
+console.log(`️ ${removidos.length} projetos removidos (limpeza detectada)`);
 }
-State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
-remoteMap.forEach((remoteProj, id) => {
-const index = State.data.projetos.findIndex(p => p.id === id);
-if (index === -1) {
-State.data.projetos.push(remoteProj);
-} else {
-const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
-const remoteAtualizado = remoteProj.atualizadoEm || 0;
-if (remoteAtualizado > localAtualizado) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...remoteProj,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || remoteProj.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim,
-tempoReal: State.data.projetos[index].tempoReal || remoteProj.tempoReal,
-concluidoEm: State.data.projetos[index].concluidoEm || remoteProj.concluidoEm,
-observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.observacaoPintura
-};
-}
-}
-});
+// ✅ CORREÇÃO: Substitui e sanitiza a lista inteira para evitar corrupção
+State.data.projetos = Array.from(remoteMap.values()).map(sanitizarProjeto).filter(Boolean);
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
