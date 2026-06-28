@@ -650,7 +650,7 @@ window.API = { createProject, updateProject, deleteProject, updateConfig, getCon
 
 <script>
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v35',
+STORAGE_KEY: 'weg_fluxo_produtivo_v36',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
@@ -1936,9 +1936,14 @@ renderGeral() {
 const tbody = document.getElementById('histTableBody');
 const search = (document.getElementById('histSearch').value || '').toLowerCase();
 let data = [...State.data.historico];
-if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
+// CORREÇÃO: Remover filtro que impedia visualização de projetos do Nanocerâmico
+// if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
+// if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
+// Agora aplica apenas o filtro de processo se estiver selecionado
+if (State.histFilter !== 'all') {
+    data = data.filter(p => p.processo === State.histFilter);
+}
 if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
 data.sort((a,b) => b.concluidoEm - a.concluidoEm);
 if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
 tbody.innerHTML = data.map(p => {
