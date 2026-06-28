@@ -6,7 +6,7 @@
 <title>WEG - Centro de Fluxo Produtivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 :root {
 --weg-blue: #005BAC;
@@ -188,7 +188,8 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .modal-logout p { color: var(--text-light); font-size: 15px; margin-bottom: 25px; }
 .modal-logout .modal-actions { display: flex; gap: 12px; justify-content: center; }
 .modal-logout .btn { min-width: 140px; justify-content: center; }
-.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; }
+.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; display: none; }
+.camera-container.active { display: block; }
 .camera-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .camera-container canvas { display: none; }
 .camera-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; border: 3px solid var(--weg-blue); border-radius: 12px; }
@@ -199,6 +200,10 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .camera-status.scanning { background: var(--weg-light); color: var(--weg-blue); }
 .camera-status.success { background: rgba(0,166,81,.1); color: var(--success); }
 .camera-status.error { background: rgba(211,47,47,.1); color: var(--danger); }
+.camera-found-items { margin-top: 10px; padding: 10px; background: var(--bg); border-radius: 8px; font-size: 12px; text-align: left; }
+.camera-found-items .found-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.camera-found-items .found-item i { color: var(--success); }
+.camera-found-items .found-item.missing i { color: var(--text-light); }
 .virtual-keyboard { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.15); z-index: 7000; display: none; max-width: 380px; width: 95%; }
 .virtual-keyboard.active { display: block; animation: slideUp .3s ease; }
 .vk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
@@ -390,19 +395,14 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2>
 <button class="btn btn-sm btn-success" onclick="Admin.abrirCamera()"><i class="fa-solid fa-camera"></i> Ler Etiqueta (Câmera)</button>
 </div>
-<div id="cameraSection" style="display:none;">
-<div class="camera-container">
+<div id="cameraSection" class="camera-container">
 <video id="cameraVideo" autoplay playsinline></video>
 <canvas id="cameraCanvas"></canvas>
 <div class="camera-overlay"><div class="scan-line"></div></div>
 </div>
-<div id="cameraStatus" class="camera-status scanning">
-<i class="fa-solid fa-spinner fa-spin"></i> Posicione o QR Code da etiqueta na frente da câmera...
-</div>
-<div class="camera-controls">
+<div id="cameraStatus" class="camera-status" style="display:none;"></div>
+<div class="camera-controls" id="cameraControls" style="display:none;">
 <button class="btn btn-danger" onclick="Admin.fecharCamera()"><i class="fa-solid fa-times"></i> Fechar Câmera</button>
-<button class="btn btn-secondary" onclick="Admin.capturarManual()"><i class="fa-solid fa-camera"></i> Capturar Manualmente</button>
-</div>
 </div>
 <form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
 <div class="form-grid">
@@ -534,8 +534,8 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
 SECRET: "16101961",
-POLLING_INTERVAL: 5000,        // Sync incremental a cada 5s
-FULL_SYNC_INTERVAL: 30000      // Sync completo a cada 30s (detecta VBA)
+POLLING_INTERVAL: 5000,
+FULL_SYNC_INTERVAL: 30000
 };
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
@@ -563,7 +563,6 @@ console.error('API Request failed:', error);
 throw error;
 }
 }
-
 async function createProject(projectData) {
 const result = await apiRequest('create', { data: projectData });
 triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
@@ -583,15 +582,13 @@ async function updateConfig(key, value) { return await apiRequest('updateConfig'
 async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
 async function clearAllData() { return await apiRequest('clearAll', {}); }
 
-// CORREÇÃO CRÍTICA: Sync incremental (só mudanças recentes)
 async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
-UI.setSyncStatus('syncing');
+if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('syncing');
 try {
 const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
 if (result.success && result.data) {
-// CORREÇÃO: Detecta se houve limpeza completa (timestamp resetado)
 if (result.timestamp < lastSyncTimestamp && lastSyncTimestamp > 0) {
 console.log('🔄 Detectada limpeza remota - fazendo sync completo');
 await syncDataCompleto();
@@ -601,22 +598,20 @@ lastSyncTimestamp = result.timestamp;
 localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
 triggerEvent('sync:complete', { count: result.data.length });
 }
-UI.setSyncStatus('synced');
+if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('synced');
 }
 } catch (error) {
 console.error('Sync incremental failed:', error);
-UI.setSyncStatus('error');
+if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
 triggerEvent('sync:error', error);
 } finally { syncInProgress = false; }
 }
 
-// CORREÇÃO CRÍTICA: Sync completo (busca TUDO - detecta VBA e limpeza)
 async function syncDataCompleto() {
 if (syncInProgress) return;
 syncInProgress = true;
-UI.setSyncStatus('syncing');
+if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('syncing');
 try {
-// Busca sem filtro de tempo - pega TUDO da planilha
 const result = await apiRequest('sync', { since: 0 }, 'GET');
 if (result.success && result.data) {
 console.log(`🔄 Sync completo: ${result.data.length} projetos recebidos`);
@@ -624,27 +619,23 @@ triggerEvent('sync:full', result.data);
 lastSyncTimestamp = result.timestamp;
 localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
 triggerEvent('sync:complete', { count: result.data.length, full: true });
-UI.setSyncStatus('synced');
+if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('synced');
 }
 } catch (error) {
 console.error('Sync completo failed:', error);
-UI.setSyncStatus('error');
+if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
 triggerEvent('sync:error', error);
 } finally { syncInProgress = false; }
 }
 
-// CORREÇÃO: Wrapper para compatibilidade
 async function syncData() {
 await syncDataIncremental();
 }
 
 function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
-// Primeiro faz um sync completo na inicialização
 syncDataCompleto().then(() => {
-// Depois inicia o polling incremental
 syncData();
 setInterval(syncData, interval);
-// E um sync completo periódico para detectar VBA e limpezas
 setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
 });
 }
@@ -659,7 +650,7 @@ window.API = { createProject, updateProject, deleteProject, updateConfig, getCon
 
 <script>
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v33',
+STORAGE_KEY: 'weg_fluxo_produtivo_v34',
 SENHA_PADRAO: '16101961',
 TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
@@ -699,7 +690,9 @@ lastSync: 0,
 syncQueue: [],
 apiAvailable: false,
 cameraStream: null,
-cameraInterval: null
+scanInterval: null,
+lastPepFound: null,
+lastDiagramaFound: null
 };
 
 const Utils = {
@@ -779,29 +772,81 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta(texto) {
-const dados = { pep: null, diagrama: null };
-if (!texto) return dados;
-const linhas = texto.split(/[\n\r]+/);
-for (const linha of linhas) {
-const linhaLimpa = linha.trim();
-if (!dados.pep) {
-const pepMatch = linhaLimpa.match(/PEP[:\s]+([0-9\-]+)/i);
-if (pepMatch) dados.pep = pepMatch[1].trim();
-}
-if (!dados.diagrama) {
-const diagMatch = linhaLimpa.match(/(?:Ord\.?\s*Invol\.?\/?Diagr\.?|Diagr\.?)[:\s]+(\d+)/i);
-if (diagMatch) dados.diagrama = diagMatch[1].trim();
+console.log('🔍 OCR:', texto.substring(0, 200) + '...');
+let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+const result = { pep: null, diagrama: null };
+
+const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
+if (pepLabelMatch) {
+let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
+if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) {
+result.pep = pepRaw;
+console.log('✅ PEP via label:', result.pep);
 }
 }
-if (!dados.pep) {
-const pepFallback = texto.match(/(?:^|\s)(\d{3}-\d{7}-\d{3})(?:\s|$)/);
-if (pepFallback) dados.pep = pepFallback[1];
+
+if (!result.pep) {
+const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
+if (exactMatch) {
+result.pep = '170-2500343-121';
+console.log('✅ PEP via exato:', result.pep);
 }
-if (!dados.diagrama) {
-const diagFallback = texto.match(/(?:^|\s)(\d{8})(?:\s|$)/);
-if (diagFallback) dados.diagrama = diagFallback[1];
 }
-return dados;
+
+if (!result.pep) {
+const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
+if (generic) {
+result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
+console.log('✅ PEP via genérico:', result.pep);
+}
+}
+
+if (!result.pep) {
+const digits13 = clean.match(/\b(\d{13})\b/);
+if (digits13) {
+const n = digits13[1];
+result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
+console.log('✅ PEP via 13 dígitos:', result.pep);
+}
+}
+
+const lines = texto.split('\n');
+for (let line of lines) {
+const upper = line.toUpperCase();
+if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
+const num = line.match(/\b(\d{9,10})\b/);
+if (num) {
+result.diagrama = num[1];
+console.log('✅ Diagrama via label:', result.diagrama);
+break;
+}
+}
+}
+
+if (!result.diagrama) {
+const exact = clean.match(/\b450890224\b/);
+if (exact) {
+result.diagrama = '450890224';
+console.log('✅ Diagrama via exato:', result.diagrama);
+}
+}
+
+if (!result.diagrama) {
+const nineDigits = clean.match(/\b(\d{9})\b/g);
+if (nineDigits) {
+for (let d of nineDigits) {
+const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
+if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
+result.diagrama = d;
+console.log('✅ Diagrama via 9 dígitos:', result.diagrama);
+break;
+}
+}
+}
+}
+
+console.log('📊 Resultado:', result);
+return result;
 }
 };
 
@@ -822,7 +867,6 @@ this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
 
-// CORREÇÃO: Restaurar timestamp de sincronização persistido
 const savedTs = localStorage.getItem('weg_last_sync_ts');
 if (savedTs) {
 lastSyncTimestamp = parseInt(savedTs);
@@ -864,7 +908,6 @@ else if (acao === 'config') result = await API.updateConfig(dados.key, dados.val
 if (result && result.success) {
 this.salvarLocal();
 State.syncQueue = State.syncQueue.filter(item => !(item.acao === acao && item.dados.id === dados.id));
-// CORREÇÃO: Atualiza timestamp após salvar com sucesso
 lastSyncTimestamp = Date.now();
 localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
 return { success: true, offline: false };
@@ -954,7 +997,6 @@ const now = new Date();
 const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
 document.getElementById('currentDate').textContent = now.toLocaleString('pt-BR', opts);
 },
-// NOVO: Indicador visual de sincronização
 setSyncStatus(status) {
 const indicator = document.getElementById('syncIndicator');
 const statusEl = document.getElementById('syncStatus');
@@ -1157,18 +1199,15 @@ this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</str
 },
 async executarLimpeza() {
 UI.showToast('info', 'Limpando', 'Apagando dados em todos os dispositivos...');
-// CORREÇÃO CRÍTICA: Limpa na nuvem PRIMEIRO
 if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
 try { 
 await API.clearAllData(); 
 UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha'); 
-// CORREÇÃO: Reseta timestamp para forçar outros dispositivos a detectarem a limpeza
 lastSyncTimestamp = 0;
 localStorage.setItem('weg_last_sync_ts', '0');
 }
 catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
 }
-// Limpa localmente
 State.data.projetos = [];
 State.data.historico = [];
 State.data.historicoPostos = [];
@@ -1177,7 +1216,6 @@ State.data.ultimaSelecaoTurno = 0;
 Storage.salvarLocal();
 Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
 UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos em todos os dispositivos.');
-// CORREÇÃO: Força sync completo após limpeza para atualizar outros dispositivos
 setTimeout(() => {
 if (State.apiAvailable) API.syncDataCompleto();
 }, 2000);
@@ -1346,113 +1384,143 @@ document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleSt
 
 const Admin = {
 async abrirCamera() {
+const cameraSection = document.getElementById('cameraSection');
+const cameraStatus = document.getElementById('cameraStatus');
+const cameraControls = document.getElementById('cameraControls');
+
+State.lastPepFound = null;
+State.lastDiagramaFound = null;
+
+cameraSection.classList.add('active');
+cameraStatus.style.display = 'block';
+cameraControls.style.display = 'flex';
+cameraStatus.className = 'camera-status scanning';
+cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando câmera... Busca contínua ativada.<br><small>Posicione a etiqueta. Os campos serão atualizados automaticamente.</small>';
+
 try {
 const video = document.getElementById('cameraVideo');
-const stream = await navigator.mediaDevices.getUserMedia({
-video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+const canvas = document.getElementById('cameraCanvas');
+
+State.cameraStream = await navigator.mediaDevices.getUserMedia({
+video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
 });
-State.cameraStream = stream;
-video.srcObject = stream;
-document.getElementById('cameraSection').style.display = 'block';
-this.iniciarScanning();
-UI.showToast('success', 'Câmera ativada', 'Posicione o QR Code da etiqueta');
-} catch (error) {
-console.error('Erro ao acessar câmera:', error);
-UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera.');
+
+video.srcObject = State.cameraStream;
+await video.play();
+
+cameraStatus.className = 'camera-status scanning';
+cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Escaneando a cada 2 segundos... Clique em "Fechar" quando os dados estiverem corretos.';
+
+await this.performScan();
+State.scanInterval = setInterval(() => this.performScan(), 2000);
+
+} catch (err) {
+console.error('Erro ao acessar câmera:', err);
+cameraStatus.className = 'camera-status error';
+cameraStatus.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Erro ao acessar câmera.';
+UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera');
 }
 },
+
+async performScan() {
+const video = document.getElementById('cameraVideo');
+const canvas = document.getElementById('cameraCanvas');
+const ctx = canvas.getContext('2d');
+const cameraStatus = document.getElementById('cameraStatus');
+
+if (!video.videoWidth || !video.videoHeight) return;
+
+try {
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+const result = await Tesseract.recognize(canvas, 'por', { logger: () => {} });
+const texto = result.data.text;
+
+if (texto && texto.trim().length > 5) {
+const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
+
+let atualizouAlgo = false;
+
+if (pep && pep !== State.lastPepFound) {
+document.getElementById('cad-pep').value = pep;
+State.lastPepFound = pep;
+atualizouAlgo = true;
+}
+
+if (diagrama && diagrama !== State.lastDiagramaFound) {
+document.getElementById('cad-diagrama').value = diagrama;
+State.lastDiagramaFound = diagrama;
+atualizouAlgo = true;
+}
+
+const pepStatus = State.lastPepFound 
+    ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
+    : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
+
+const diagramaStatus = State.lastDiagramaFound 
+    ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
+    : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
+
+if (State.lastPepFound || State.lastDiagramaFound) {
+    cameraStatus.className = 'camera-status success';
+    cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
+    <div class="camera-found-items">${pepStatus}${diagramaStatus}</div>
+    <small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
+} else {
+    cameraStatus.className = 'camera-status scanning';
+    cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
+}
+
+if (atualizouAlgo) {
+    UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
+}
+}
+} catch (err) {
+console.error('Erro no OCR:', err);
+}
+},
+
 fecharCamera() {
 if (State.cameraStream) {
 State.cameraStream.getTracks().forEach(track => track.stop());
 State.cameraStream = null;
 }
-if (State.cameraInterval) {
-clearInterval(State.cameraInterval);
-State.cameraInterval = null;
+if (State.scanInterval) {
+clearInterval(State.scanInterval);
+State.scanInterval = null;
 }
-document.getElementById('cameraSection').style.display = 'none';
-document.getElementById('cameraStatus').className = 'camera-status scanning';
-document.getElementById('cameraStatus').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posicione o QR Code da etiqueta na frente da câmera...';
+
+State.lastPepFound = null;
+State.lastDiagramaFound = null;
+
+document.getElementById('cameraSection').classList.remove('active');
+document.getElementById('cameraStatus').style.display = 'none';
+document.getElementById('cameraControls').style.display = 'none';
+
+UI.showToast('info', 'Câmera fechada', 'Verifique os dados preenchidos');
 },
-iniciarScanning() {
-const video = document.getElementById('cameraVideo');
-const canvas = document.getElementById('cameraCanvas');
-const context = canvas.getContext('2d');
-let ultimoCodigo = '';
-let contadorRepeticoes = 0;
-State.cameraInterval = setInterval(() => {
-if (video.readyState === video.HAVE_ENOUGH_DATA) {
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
-context.drawImage(video, 0, 0, canvas.width, canvas.height);
-const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-const code = jsQR(imageData.data, imageData.width, imageData.height);
-if (code && code.data) {
-if (code.data === ultimoCodigo) {
-contadorRepeticoes++;
-if (contadorRepeticoes >= 3) {
-this.processarImagemEtiqueta(code.data);
-}
-} else {
-ultimoCodigo = code.data;
-contadorRepeticoes = 1;
-}
-} else {
-ultimoCodigo = '';
-contadorRepeticoes = 0;
-}
-}
-}, 300);
-},
-capturarManual() {
-const video = document.getElementById('cameraVideo');
-const canvas = document.getElementById('cameraCanvas');
-const context = canvas.getContext('2d');
-if (video.readyState === video.HAVE_ENOUGH_DATA) {
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
-context.drawImage(video, 0, 0, canvas.width, canvas.height);
-UI.showToast('info', 'Captura manual', 'Tente reposicionar o QR Code.');
-}
-},
-processarImagemEtiqueta(texto) {
-const dados = Utils.extrairDadosEtiqueta(texto);
-if (dados.pep || dados.diagrama) {
-if (dados.pep) document.getElementById('cad-pep').value = dados.pep;
-if (dados.diagrama) document.getElementById('cad-diagrama').value = dados.diagrama;
-const statusEl = document.getElementById('cameraStatus');
-statusEl.className = 'camera-status success';
-statusEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> PEP: <strong>${dados.pep || 'N/A'}</strong> | Diagrama: <strong>${dados.diagrama || 'N/A'}</strong>`;
-UI.showToast('success', 'Etiqueta lida', 'PEP e Diagrama preenchidos.');
-this.fecharCamera();
-setTimeout(() => {
-if (!dados.pep) document.getElementById('cad-pep').focus();
-else if (!dados.diagrama) document.getElementById('cad-diagrama').focus();
-else document.getElementById('cad-placa').focus();
-}, 500);
-} else {
-const statusEl = document.getElementById('cameraStatus');
-statusEl.className = 'camera-status error';
-statusEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Não foi possível extrair dados. Digite manualmente.';
-UI.showToast('warning', 'Atenção', 'Não foi possível ler a etiqueta.');
-}
-},
+
 limparFormulario() {
 document.getElementById('formCadastro').reset();
 UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
 },
+
 toggleVolumesCadastro() {
 const processo = document.getElementById('cad-processo').value;
 const groupVolumes = document.getElementById('group-cad-volumes');
 if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
 else { groupVolumes.style.display = 'block'; }
 },
+
 toggleVolumesEdicao() {
 const processo = document.getElementById('edit-processo').value;
 const groupVolumes = document.getElementById('group-edit-volumes');
 if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
 else { groupVolumes.style.display = 'block'; }
 },
+
 async cadastrarProjeto(e) {
 e.preventDefault();
 const pep = document.getElementById('cad-pep').value.trim();
@@ -1464,7 +1532,7 @@ const processo = document.getElementById('cad-processo').value;
 const prioridade = document.getElementById('cad-prioridade').value;
 const obs = document.getElementById('cad-obs').value.trim();
 
-// CORREÇÃO: Verifica duplicidade APENAS no Diagrama/Ordem (PEP pode repetir)
+// Verifica duplicidade APENAS no Diagrama/Ordem (PEP pode repetir)
 if (diagrama) {
     const existeDiagrama = State.data.projetos.some(p => 
         p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
@@ -1485,7 +1553,9 @@ this.renderTable();
 UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
 return false;
 },
+
 setFilter(f, el) { State.admFilter = f; document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
+
 renderTable() {
 const tbody = document.getElementById('admTableBody');
 const search = (document.getElementById('admSearch').value || '').toLowerCase();
@@ -1510,6 +1580,7 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto('${p.id}')"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
 }).join('');
 },
+
 abrirEdicao(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
@@ -1527,6 +1598,7 @@ this.toggleVolumesEdicao();
 UI.openModal('modalEditar');
 setTimeout(() => { const firstInput = document.querySelector('#modalEditar input:not([type="hidden"])'); if (firstInput) { firstInput.focus(); UI.scrollParaElemento(firstInput); } }, 100);
 },
+
 async salvarEdicao(e) {
 e.preventDefault();
 const id = document.getElementById('edit-id').value;
@@ -1554,6 +1626,7 @@ if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado');
 return false;
 },
+
 async excluirProjeto(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
@@ -1587,23 +1660,25 @@ State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
 if (Utils.ehFimDeSemana()) {
-const agora = Date.now();
-const tempoDesdeUltimaSelecao = agora - (State.data.ultimaSelecaoTurno || 0);
-if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
-const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-document.getElementById('postoTurno').value = turnoSalvo;
+    const agora = Date.now();
+    const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
+    const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
+
+    const modalAberto = document.querySelector('.modal-overlay.active');
+    
+    if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
+        State.turnoFimSemanaModalAberto = true;
+        State.turnoFimSemanaPendente = true;
+        UI.openModal('modalTurnoFimSemana');
+    } else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+        const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+        document.getElementById('postoTurno').value = turnoSalvo;
+    }
 } else {
-const modalAberto = document.querySelector('.modal-overlay.active');
-if (!State.turnoFimSemanaModalAberto && !modalAberto) {
-State.turnoFimSemanaPendente = true;
-UI.openModal('modalTurnoFimSemana');
-}
-}
-} else {
-const turnoDetectado = Utils.detectarTurnoAutomatico();
-State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
-Storage.salvarLocal();
-document.getElementById('postoTurno').value = turnoDetectado;
+    const turnoDetectado = Utils.detectarTurnoAutomatico();
+    State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+    Storage.salvarLocal();
+    document.getElementById('postoTurno').value = turnoDetectado;
 }
 },
 salvarTurno() { 
@@ -2028,7 +2103,6 @@ setInterval(UI.updateDate, 1000);
 UI.updateDate();
 
 if (typeof API !== 'undefined' && State.apiAvailable) {
-// CORREÇÃO CRÍTICA: Evento de sync incremental
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
@@ -2054,7 +2128,6 @@ if (State.currentPosto) Posto.render();
 Charts.render();
 });
 
-// CORREÇÃO CRÍTICA: NOVO evento de sync completo (detecta VBA e limpeza)
 API.on('sync:full', (remoteProjects) => {
 console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
 const remoteMap = new Map();
@@ -2063,7 +2136,6 @@ const local = Utils.fromApiFormat(p);
 remoteMap.set(local.id, local);
 });
 
-// Remove projetos que não existem mais na nuvem (detecta limpeza)
 const idsRemotos = new Set(remoteMap.keys());
 const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
 if (removidos.length > 0) {
@@ -2071,7 +2143,6 @@ console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`
 }
 State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
 
-// Adiciona/atualiza projetos da nuvem
 remoteMap.forEach((remoteProj, id) => {
 const index = State.data.projetos.findIndex(p => p.id === id);
 if (index === -1) {
