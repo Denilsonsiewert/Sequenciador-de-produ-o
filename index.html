@@ -762,7 +762,7 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta(texto) {
-console.log('🔍 OCR:', texto.substring(0, 200) + '...');
+console.log(' OCR:', texto.substring(0, 200) + '...');
 let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 const result = { pep: null, diagrama: null };
 const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
@@ -850,7 +850,7 @@ this.migrarTurnosAntigos();
 const savedTs = localStorage.getItem('weg_last_sync_ts');
 if (savedTs) {
 lastSyncTimestamp = parseInt(savedTs);
-console.log('📅 Timestamp de sync restaurado:', lastSyncTimestamp);
+console.log(' Timestamp de sync restaurado:', lastSyncTimestamp);
 }
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
@@ -1836,13 +1836,19 @@ const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferênc
 UI.showToast('success', 'Fluxo atualizado', `${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
 } else {
 p.dataHoraFim = Date.now();
+// Create concluded object
 const concluido = Object.assign({}, p, { status: 'Concluído', turno: turno || p.turno || '1º Turno', concluidoEm: Date.now(), tempoReal: tempoReal });
+
+// CRITICAL FIX: Sync the conclusion to the API so other devices see it
+await Storage.salvarApi('update', concluido);
+
+// Update Local State
 State.data.historico.unshift(concluido);
 State.data.projetos.splice(idx, 1);
 Storage.salvarLocal();
 Admin.renderTable();
 Posto.renderTable();
-Historico.renderGeral();
+Historico.renderGeral(); // Update history view
 Charts.render();
 UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Utils.formatarTempo(tempoReal));
 }
@@ -2062,9 +2068,24 @@ if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+
+// Handle Conclusion Sync
+if (projLocal.status === 'Concluído') {
+// If concluded, ensure it's in history
+if (!State.data.historico.some(h => h.id === projLocal.id)) {
+State.data.historico.unshift(projLocal);
+}
+// Remove from active projects
+State.data.projetos = State.data.projetos.filter(p => p.id !== projLocal.id);
+Storage.salvarLocal();
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) Posto.render();
+Historico.renderGeral();
+Charts.render();
+} else {
+// Normal Sync Update
 if (index === -1) {
 State.data.projetos.push(projLocal);
-console.log('➕ Projeto adicionado via sync:', projLocal.diagrama);
 } else {
 const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
 const remoteAtualizado = projLocal.atualizadoEm || 0;
@@ -2075,14 +2096,15 @@ State.data.projetos[index] = {
 dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
 dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
 };
-console.log('🔄 Projeto atualizado via sync:', projLocal.diagrama);
 }
 }
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
+}
 });
+
 API.on('sync:full', (remoteProjects) => {
 console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
 const remoteMap = new Map();
@@ -2090,13 +2112,18 @@ remoteProjects.forEach(p => {
 const local = Utils.fromApiFormat(p);
 remoteMap.set(local.id, local);
 });
-const idsRemotos = new Set(remoteMap.keys());
-const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
-if (removidos.length > 0) {
-console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
-}
-State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
+
+// Update Projects and Handle Conclusions
+State.data.projetos = State.data.projetos.filter(p => remoteMap.has(p.id)); // Keep only synced projects
+
 remoteMap.forEach((remoteProj, id) => {
+if (remoteProj.status === 'Concluído') {
+// Move to history
+if (!State.data.historico.some(h => h.id === remoteProj.id)) {
+State.data.historico.unshift(remoteProj);
+}
+} else {
+// Update active project
 const index = State.data.projetos.findIndex(p => p.id === id);
 if (index === -1) {
 State.data.projetos.push(remoteProj);
@@ -2108,22 +2135,21 @@ State.data.projetos[index] = {
 ...State.data.projetos[index],
 ...remoteProj,
 dataHoraInicio: State.data.projetos[index].dataHoraInicio || remoteProj.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim,
-tempoReal: State.data.projetos[index].tempoReal || remoteProj.tempoReal,
-concluidoEm: State.data.projetos[index].concluidoEm || remoteProj.concluidoEm,
-observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.observacaoPintura
+dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim
 };
 }
 }
+}
 });
+
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
-Dashboard.render();
 Historico.renderGeral();
-Historico.renderPostos();
+Dashboard.render();
 Charts.render();
 });
+
 API.on('project:created', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
@@ -2134,9 +2160,22 @@ if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 }
 });
+
 API.on('project:updated', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+
+if (projLocal.status === 'Concluído') {
+if (!State.data.historico.some(h => h.id === projLocal.id)) {
+State.data.historico.unshift(projLocal);
+}
+State.data.projetos = State.data.projetos.filter(p => p.id !== projLocal.id);
+Storage.salvarLocal();
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) Posto.render();
+Historico.renderGeral();
+Charts.render();
+} else {
 if (index !== -1) {
 State.data.projetos[index] = {
 ...State.data.projetos[index],
@@ -2152,7 +2191,9 @@ if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
 Charts.render();
 }
+}
 });
+
 API.on('project:deleted', (projectId) => {
 State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
 Storage.salvarLocal();
