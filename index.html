@@ -528,7 +528,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
-
 <!-- CLIENTE DA API COM SINCRONIZAÇÃO CORRIGIDA -->
 <script>
 const API_CONFIG = {
@@ -1906,14 +1905,17 @@ const Conclusao = {
     UI.closeModal('modalConcluir');
     State.projetoParaConcluir = null;
   },
-  registrarHistoricoPosto(p, turno, tempoReal) {
+  registrarHistoricoPosto(p, turno, tempoReal, processoOverride = null) {
+    // ✅ Usa o processo override se fornecido, senão usa o do projeto
+    const processoRegistro = processoOverride || p.processo;
+    
     const registro = { 
       id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), 
       projetoId: p.id, 
       pep: p.pep, 
       diagrama: p.diagrama, 
       placa: p.placa, 
-      processo: p.processo, 
+      processo: processoRegistro, // ✅ Usa o processo correto
       turno: turno, 
       tempoReal: tempoReal, 
       observacao: p.observacaoPintura || null, 
@@ -1935,13 +1937,19 @@ const Conclusao = {
     const idx = State.data.projetos.findIndex(x => x.id === id);
     if (idx < 0) return;
     const p = State.data.projetos[idx];
+    
+    // ✅ SALVA O PROCESSO ATUAL ANTES DE QUALQUER ALTERAÇÃO
+    const processoConcluido = p.processo;
+    
     const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
     
-    // ✅ Registra no histórico de postos (local + API)
-    this.registrarHistoricoPosto(p, turno, tempoReal);
-    
     const proximoProcesso = CONFIG.FLUXO_PROCESSOS[p.processo];
+    
     if (proximoProcesso) {
+      // ✅ REGISTRA NO HISTÓRICO COM O PROCESSO QUE FOI REALMENTE CONCLUÍDO
+      this.registrarHistoricoPosto(p, turno, tempoReal, processoConcluido);
+      
+      // Só depois atualiza para o próximo processo
       p.processo = proximoProcesso;
       p.status = 'Aguardando';
       p.turno = State.data.turnosPorPosto[proximoProcesso] || turno;
@@ -1951,12 +1959,17 @@ const Conclusao = {
       p.dataHoraInicio = null;
       p.observacaoPintura = null;
       p.atualizadoEm = Date.now();
+      
       await Storage.salvarApi('update', p);
       Posto.renderTable();
       Admin.renderTable();
+      
       const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
       UI.showToast('success', 'Fluxo atualizado', `${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
     } else {
+      // Projeto finalizado - registra com o processo atual
+      this.registrarHistoricoPosto(p, turno, tempoReal, processoConcluido);
+      
       p.dataHoraFim = Date.now();
       const concluido = Object.assign({}, p, { status: 'Concluído', turno: turno || p.turno || '1º Turno', concluidoEm: Date.now(), tempoReal: tempoReal });
       State.data.historico.unshift(concluido);
