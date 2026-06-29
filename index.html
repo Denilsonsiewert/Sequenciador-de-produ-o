@@ -528,1664 +528,1799 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
+
 <!-- CLIENTE DA API COM SINCRONIZAÇÃO CORRIGIDA -->
 <script>
 const API_CONFIG = {
-URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
-SECRET: "16101961",
-POLLING_INTERVAL: 5000,
-FULL_SYNC_INTERVAL: 30000
+  URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
+  SECRET: "16101961",
+  POLLING_INTERVAL: 5000,
+  FULL_SYNC_INTERVAL: 30000
 };
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
+
 async function apiRequest(action, payload = {}, method = 'POST') {
-try {
-const url = new URL(API_CONFIG.URL);
-url.searchParams.append('action', action);
-const options = { method: method, mode: 'cors', redirect: 'follow' };
-if (method === 'POST') {
-options.body = JSON.stringify({ action, secret: API_CONFIG.SECRET, ...payload });
-} else if (method === 'GET') {
-if (payload.since) url.searchParams.append('since', payload.since);
-if (payload.key) url.searchParams.append('key', payload.key);
-url.searchParams.append('secret', API_CONFIG.SECRET);
+  try {
+    const url = new URL(API_CONFIG.URL);
+    url.searchParams.append('action', action);
+    const options = { method: method, mode: 'cors', redirect: 'follow' };
+    
+    if (method === 'POST') {
+      options.body = JSON.stringify({ action, secret: API_CONFIG.SECRET, ...payload });
+    } else if (method === 'GET') {
+      if (payload.since) url.searchParams.append('since', payload.since);
+      if (payload.key) url.searchParams.append('key', payload.key);
+      url.searchParams.append('secret', API_CONFIG.SECRET);
+    }
+    
+    const response = await fetch(url.toString(), options);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error || 'Erro na API');
+    return result;
+  } catch (error) {
+    console.error('API Request failed:', error);
+    throw error;
+  }
 }
-const response = await fetch(url.toString(), options);
-if (!response.ok) throw new Error(`HTTP ${response.status}`);
-const result = await response.json();
-if (!result.success) throw new Error(result.error || 'Erro na API');
-return result;
-} catch (error) {
-console.error('API Request failed:', error);
-throw error;
-}
-}
+
 async function createProject(projectData) {
-const result = await apiRequest('create', { data: projectData });
-triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
-return result;
+  const result = await apiRequest('create', { data: projectData });
+  triggerEvent('project:created', { ...projectData, ID: result.id, AtualizadoEm: Date.now() });
+  return result;
 }
+
 async function updateProject(projectData) {
-const result = await apiRequest('update', { data: projectData });
-triggerEvent('project:updated', { ...projectData, AtualizadoEm: Date.now() });
-return result;
+  const result = await apiRequest('update', { data: projectData });
+  triggerEvent('project:updated', { ...projectData, AtualizadoEm: Date.now() });
+  return result;
 }
+
 async function deleteProject(projectId) {
-const result = await apiRequest('delete', { id: projectId });
-triggerEvent('project:deleted', projectId);
-return result;
+  const result = await apiRequest('delete', { id: projectId });
+  triggerEvent('project:deleted', projectId);
+  return result;
 }
+
+// ✅ NOVA FUNÇÃO: Registrar histórico de posto via API
+async function registerPostoHistory(data) {
+  const result = await apiRequest('registerPostoHistory', { data: data });
+  return result;
+}
+
 async function updateConfig(key, value) { return await apiRequest('updateConfig', { key, value }); }
 async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
 async function clearAllData() { return await apiRequest('clearAll', {}); }
+
 async function syncDataIncremental() {
-if (syncInProgress) return;
-syncInProgress = true;
-if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('syncing');
-try {
-const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
-if (result.success && result.data) {
-if (result.timestamp < lastSyncTimestamp && lastSyncTimestamp > 0) {
-console.log('🔄 Detectada limpeza remota - fazendo sync completo');
-await syncDataCompleto();
-} else {
-result.data.forEach(remoteProj => triggerEvent('project:synced', remoteProj));
-lastSyncTimestamp = result.timestamp;
-localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
-triggerEvent('sync:complete', { count: result.data.length });
+  if (syncInProgress) return;
+  syncInProgress = true;
+  if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('syncing');
+  
+  try {
+    const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
+    if (result.success && result.data) {
+      if (result.timestamp < lastSyncTimestamp && lastSyncTimestamp > 0) {
+        console.log('🔄 Detectada limpeza remota - fazendo sync completo');
+        await syncDataCompleto();
+      } else {
+        result.data.forEach(remoteProj => triggerEvent('project:synced', remoteProj));
+        lastSyncTimestamp = result.timestamp;
+        localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+        triggerEvent('sync:complete', { count: result.data.length });
+      }
+      if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('synced');
+    }
+  } catch (error) {
+    console.error('Sync incremental failed:', error);
+    if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
+    triggerEvent('sync:error', error);
+  } finally { syncInProgress = false; }
 }
-if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('synced');
-}
-} catch (error) {
-console.error('Sync incremental failed:', error);
-if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
-triggerEvent('sync:error', error);
-} finally { syncInProgress = false; }
-}
+
 async function syncDataCompleto() {
-if (syncInProgress) return;
-syncInProgress = true;
-if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('syncing');
-try {
-const result = await apiRequest('sync', { since: 0 }, 'GET');
-if (result.success && result.data) {
-console.log(`🔄 Sync completo: ${result.data.length} projetos recebidos`);
-triggerEvent('sync:full', result.data);
-lastSyncTimestamp = result.timestamp;
-localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
-triggerEvent('sync:complete', { count: result.data.length, full: true });
-if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('synced');
+  if (syncInProgress) return;
+  syncInProgress = true;
+  if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('syncing');
+  
+  try {
+    const result = await apiRequest('sync', { since: 0 }, 'GET');
+    if (result.success && result.data) {
+      console.log(`🔄 Sync completo: ${result.data.length} projetos recebidos`);
+      triggerEvent('sync:full', result.data);
+      lastSyncTimestamp = result.timestamp;
+      localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+      triggerEvent('sync:complete', { count: result.data.length, full: true });
+      if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('synced');
+    }
+  } catch (error) {
+    console.error('Sync completo failed:', error);
+    if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
+    triggerEvent('sync:error', error);
+  } finally { syncInProgress = false; }
 }
-} catch (error) {
-console.error('Sync completo failed:', error);
-if (typeof UI !== 'undefined' && UI.setSyncStatus) UI.setSyncStatus('error');
-triggerEvent('sync:error', error);
-} finally { syncInProgress = false; }
-}
+
 async function syncData() {
-await syncDataIncremental();
+  await syncDataIncremental();
 }
+
 function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
-syncDataCompleto().then(() => {
-syncData();
-setInterval(syncData, interval);
-setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
-});
+  syncDataCompleto().then(() => {
+    syncData();
+    setInterval(syncData, interval);
+    setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
+  });
 }
+
 function on(event, callback) { if (!eventListeners[event]) eventListeners[event] = []; eventListeners[event].push(callback); }
 function off(event, callback) { if (eventListeners[event]) eventListeners[event] = eventListeners[event].filter(cb => cb !== callback); }
+
 function triggerEvent(event, data) {
-if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); } });
+  if (eventListeners[event]) eventListeners[event].forEach(callback => {
+    try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); }
+  });
 }
-window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, syncDataCompleto, startPolling, on, off };
+
+// ✅ EXPORTA registerPostoHistory na API
+window.API = { 
+  createProject, updateProject, deleteProject, 
+  updateConfig, getConfig, clearAllData, 
+  syncData, syncDataCompleto, startPolling, 
+  on, off, registerPostoHistory 
+};
 </script>
+
 <script>
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v36',
-SENHA_PADRAO: '16101961',
-TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
-PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
-FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
-TURNO_COOLDOWN: 2 * 60 * 60 * 1000
+  STORAGE_KEY: 'weg_fluxo_produtivo_v36',
+  SENHA_PADRAO: '16101961',
+  TURNO_LEGADO: { 'Manhã': '1º Turno', 'Tarde': '2º Turno', 'Noite': '3º Turno' },
+  PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
+  FLUXO_PROCESSOS: { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null },
+  TURNO_COOLDOWN: 2 * 60 * 60 * 1000
 };
+
 const State = {
-data: {
-projetos: [],
-historico: [],
-historicoPostos: [],
-config: { dispositivo: 'tablet' },
-turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' },
-senhaAdmin: CONFIG.SENHA_PADRAO,
-ultimaSelecaoTurno: 0
-},
-currentUser: null,
-currentPosto: null,
-dashboardPostoAtual: 'Nanocerâmico',
-postoFilter: 'all',
-historicoPostoFilter: 'all',
-admFilter: 'all',
-histFilter: 'all',
-histPostoFilter: 'all',
-vkActive: false,
-vkTarget: null,
-projetoParaConcluir: null,
-pendingAdminLogin: false,
-acaoPendenteSenha: null,
-charts: {},
-turnoFimSemanaPendente: false,
-turnoFimSemanaModalAberto: false,
-timerInterval: null,
-isOnline: navigator.onLine,
-lastSync: 0,
-syncQueue: [],
-apiAvailable: false,
-cameraStream: null,
-scanInterval: null,
-lastPepFound: null,
-lastDiagramaFound: null
+  data: {
+    projetos: [],
+    historico: [],
+    historicoPostos: [],
+    config: { dispositivo: 'tablet' },
+    turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' },
+    senhaAdmin: CONFIG.SENHA_PADRAO,
+    ultimaSelecaoTurno: 0
+  },
+  currentUser: null,
+  currentPosto: null,
+  dashboardPostoAtual: 'Nanocerâmico',
+  postoFilter: 'all',
+  historicoPostoFilter: 'all',
+  admFilter: 'all',
+  histFilter: 'all',
+  histPostoFilter: 'all',
+  vkActive: false,
+  vkTarget: null,
+  projetoParaConcluir: null,
+  pendingAdminLogin: false,
+  acaoPendenteSenha: null,
+  charts: {},
+  turnoFimSemanaPendente: false,
+  turnoFimSemanaModalAberto: false,
+  timerInterval: null,
+  isOnline: navigator.onLine,
+  lastSync: 0,
+  syncQueue: [],
+  apiAvailable: false,
+  cameraStream: null,
+  scanInterval: null,
+  lastPepFound: null,
+  lastDiagramaFound: null
 };
+
+// ✅ FUNÇÃO CRÍTICA: Normaliza qualquer projeto para garantir consistência
+function sanitizarProjeto(p) {
+  if (!p || typeof p !== 'object') return null;
+  return {
+    id: p.id || `p_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+    pep: (p.pep || '').toString().trim() || null,
+    diagrama: (p.diagrama || '').toString().trim(),
+    placa: (p.placa || '').toString().trim() || null,
+    descricao: (p.descricao || '').toString().trim(),
+    volumesTotal: isNaN(p.volumesTotal) ? 0 : Number(p.volumesTotal),
+    volumesProcessados: isNaN(p.volumesProcessados) ? 0 : Number(p.volumesProcessados),
+    processo: p.processo || 'Nanocerâmico',
+    prioridade: p.prioridade || 'Normal',
+    status: p.status || 'Aguardando',
+    turno: p.turno || '1º Turno',
+    obs: (p.obs || '').toString().trim(),
+    criadoEm: p.criadoEm ? Number(p.criadoEm) : Date.now(),
+    atualizadoEm: p.atualizadoEm ? Number(p.atualizadoEm) : Date.now(),
+    dataHoraInicio: p.dataHoraInicio ? Number(p.dataHoraInicio) : null,
+    dataHoraFim: p.dataHoraFim ? Number(p.dataHoraFim) : null,
+    tempoReal: p.tempoReal ? Number(p.tempoReal) : null,
+    concluidoEm: p.concluidoEm ? Number(p.concluidoEm) : null,
+    observacaoPintura: p.observacaoPintura || null
+  };
+}
+
 const Utils = {
-genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); },
-formatarTempo(ms) {
-if (!ms || ms < 0) return '00:00:00';
-const segundos = Math.floor(ms / 1000);
-const dias = Math.floor(segundos / 86400);
-const horas = Math.floor((segundos % 86400) / 3600);
-const minutos = Math.floor((segundos % 3600) / 60);
-const segs = segundos % 60;
-const pad = n => String(n).padStart(2, '0');
-if (dias > 0) return `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
-return `${pad(horas)}:${pad(minutos)}:${pad(segs)}`;
-},
-dateStamp() { return new Date().toISOString().slice(0,10); },
-detectarTurnoAutomatico() {
-const agora = new Date();
-const tempoAtual = agora.getHours() * 60 + agora.getMinutes();
-if (tempoAtual >= 300 && tempoAtual < 858) return '1º Turno';
-if (tempoAtual >= 858 && tempoAtual < 1404) return '2º Turno';
-return '3º Turno';
-},
-ehFimDeSemana() { const diaSemana = new Date().getDay(); return diaSemana === 0 || diaSemana === 6; },
-ordenarPorPrioridade(data) {
-return data.sort((a,b) => {
-const prioA = CONFIG.PRIORIDADE_ORDEM[a.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[a.prioridade] : 9;
-const prioB = CONFIG.PRIORIDADE_ORDEM[b.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[b.prioridade] : 9;
-if (prioA !== prioB) return prioA - prioB;
-return b.criadoEm - a.criadoEm;
-});
-},
-toApiFormat(projeto) {
-return {
-ID: projeto.id,
-PEP: projeto.pep,
-Diagrama: projeto.diagrama,
-Placa: projeto.placa,
-Descricao: projeto.descricao,
-VolumesTotal: projeto.volumesTotal,
-VolumesProcessados: projeto.volumesProcessados,
-Processo: projeto.processo,
-Prioridade: projeto.prioridade,
-Status: projeto.status,
-Turno: projeto.turno,
-Obs: projeto.obs,
-CriadoEm: projeto.criadoEm,
-AtualizadoEm: projeto.atualizadoEm || Date.now(),
-DataHoraInicio: projeto.dataHoraInicio || null,
-DataHoraFim: projeto.dataHoraFim || null,
-TempoReal: projeto.tempoReal || null,
-ConcluidoEm: projeto.concluidoEm || null,
-ObservacaoPintura: projeto.observacaoPintura || null
+  genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); },
+  formatarTempo(ms) {
+    if (!ms || ms < 0) return '00:00:00';
+    const segundos = Math.floor(ms / 1000);
+    const dias = Math.floor(segundos / 86400);
+    const horas = Math.floor((segundos % 86400) / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segs = segundos % 60;
+    const pad = n => String(n).padStart(2, '0');
+    if (dias > 0) return `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
+    return `${pad(horas)}:${pad(minutos)}:${pad(segs)}`;
+  },
+  dateStamp() { return new Date().toISOString().slice(0,10); },
+  detectarTurnoAutomatico() {
+    const agora = new Date();
+    const tempoAtual = agora.getHours() * 60 + agora.getMinutes();
+    if (tempoAtual >= 300 && tempoAtual < 858) return '1º Turno';
+    if (tempoAtual >= 858 && tempoAtual < 1404) return '2º Turno';
+    return '3º Turno';
+  },
+  ehFimDeSemana() { const diaSemana = new Date().getDay(); return diaSemana === 0 || diaSemana === 6; },
+  ordenarPorPrioridade(data) {
+    return data.sort((a,b) => {
+      const prioA = CONFIG.PRIORIDADE_ORDEM[a.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[a.prioridade] : 9;
+      const prioB = CONFIG.PRIORIDADE_ORDEM[b.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[b.prioridade] : 9;
+      if (prioA !== prioB) return prioA - prioB;
+      return b.criadoEm - a.criadoEm;
+    });
+  },
+  toApiFormat(projeto) {
+    return {
+      ID: projeto.id,
+      PEP: projeto.pep,
+      Diagrama: projeto.diagrama,
+      Placa: projeto.placa,
+      Descricao: projeto.descricao,
+      VolumesTotal: projeto.volumesTotal,
+      VolumesProcessados: projeto.volumesProcessados,
+      Processo: projeto.processo,
+      Prioridade: projeto.prioridade,
+      Status: projeto.status,
+      Turno: projeto.turno,
+      Obs: projeto.obs,
+      CriadoEm: projeto.criadoEm,
+      AtualizadoEm: projeto.atualizadoEm || Date.now(),
+      DataHoraInicio: projeto.dataHoraInicio || null,
+      DataHoraFim: projeto.dataHoraFim || null,
+      TempoReal: projeto.tempoReal || null,
+      ConcluidoEm: projeto.concluidoEm || null,
+      ObservacaoPintura: projeto.observacaoPintura || null
+    };
+  },
+  fromApiFormat(apiProj) {
+    return sanitizarProjeto({
+      id: apiProj.ID,
+      pep: apiProj.PEP,
+      diagrama: apiProj.Diagrama,
+      placa: apiProj.Placa,
+      descricao: apiProj.Descricao,
+      volumesTotal: apiProj.VolumesTotal,
+      volumesProcessados: apiProj.VolumesProcessados,
+      processo: apiProj.Processo,
+      prioridade: apiProj.Prioridade,
+      status: apiProj.Status,
+      turno: apiProj.Turno,
+      obs: apiProj.Obs,
+      criadoEm: apiProj.CriadoEm,
+      atualizadoEm: apiProj.AtualizadoEm,
+      dataHoraInicio: apiProj.DataHoraInicio,
+      dataHoraFim: apiProj.DataHoraFim,
+      tempoReal: apiProj.TempoReal,
+      concluidoEm: apiProj.ConcluidoEm,
+      observacaoPintura: apiProj.ObservacaoPintura
+    });
+  },
+  extrairDadosEtiqueta(texto) {
+    console.log('🔍 OCR:', texto.substring(0, 200) + '...');
+    let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+    const result = { pep: null, diagrama: null };
+    
+    const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
+    if (pepLabelMatch) {
+      let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
+      if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) {
+        result.pep = pepRaw;
+        console.log('✅ PEP via label:', result.pep);
+      }
+    }
+    
+    if (!result.pep) {
+      const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
+      if (exactMatch) {
+        result.pep = '170-2500343-121';
+        console.log('✅ PEP via exato:', result.pep);
+      }
+    }
+    
+    if (!result.pep) {
+      const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
+      if (generic) {
+        result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
+        console.log('✅ PEP via genérico:', result.pep);
+      }
+    }
+    
+    if (!result.pep) {
+      const digits13 = clean.match(/\b(\d{13})\b/);
+      if (digits13) {
+        const n = digits13[1];
+        result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
+        console.log('✅ PEP via 13 dígitos:', result.pep);
+      }
+    }
+    
+    const lines = texto.split('\n');
+    for (let line of lines) {
+      const upper = line.toUpperCase();
+      if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
+        const num = line.match(/\b(\d{9,10})\b/);
+        if (num) {
+          result.diagrama = num[1];
+          console.log('✅ Diagrama via label:', result.diagrama);
+          break;
+        }
+      }
+    }
+    
+    if (!result.diagrama) {
+      const exact = clean.match(/\b450890224\b/);
+      if (exact) {
+        result.diagrama = '450890224';
+        console.log('✅ Diagrama via exato:', result.diagrama);
+      }
+    }
+    
+    if (!result.diagrama) {
+      const nineDigits = clean.match(/\b(\d{9})\b/g);
+      if (nineDigits) {
+        for (let d of nineDigits) {
+          const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
+          if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
+            result.diagrama = d;
+            console.log('✅ Diagrama via 9 dígitos:', result.diagrama);
+            break;
+          }
+        }
+      }
+    }
+    
+    console.log('📊 Resultado:', result);
+    return result;
+  }
 };
-},
-fromApiFormat(apiProj) {
-return {
-id: apiProj.ID,
-pep: apiProj.PEP,
-diagrama: apiProj.Diagrama,
-placa: apiProj.Placa,
-descricao: apiProj.Descricao,
-volumesTotal: apiProj.VolumesTotal,
-volumesProcessados: apiProj.VolumesProcessados,
-processo: apiProj.Processo,
-prioridade: apiProj.Prioridade,
-status: apiProj.Status,
-turno: apiProj.Turno,
-obs: apiProj.Obs,
-criadoEm: apiProj.CriadoEm,
-atualizadoEm: apiProj.AtualizadoEm,
-dataHoraInicio: apiProj.DataHoraInicio || null,
-dataHoraFim: apiProj.DataHoraFim || null,
-tempoReal: apiProj.TempoReal || null,
-concluidoEm: apiProj.ConcluidoEm || null,
-observacaoPintura: apiProj.ObservacaoPintura || null
-};
-},
-extrairDadosEtiqueta(texto) {
-console.log('🔍 OCR:', texto.substring(0, 200) + '...');
-let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-const result = { pep: null, diagrama: null };
-const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
-if (pepLabelMatch) {
-let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
-if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) {
-result.pep = pepRaw;
-console.log('✅ PEP via label:', result.pep);
-}
-}
-if (!result.pep) {
-const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
-if (exactMatch) {
-result.pep = '170-2500343-121';
-console.log('✅ PEP via exato:', result.pep);
-}
-}
-if (!result.pep) {
-const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
-if (generic) {
-result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
-console.log('✅ PEP via genérico:', result.pep);
-}
-}
-if (!result.pep) {
-const digits13 = clean.match(/\b(\d{13})\b/);
-if (digits13) {
-const n = digits13[1];
-result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
-console.log('✅ PEP via 13 dígitos:', result.pep);
-}
-}
-const lines = texto.split('\n');
-for (let line of lines) {
-const upper = line.toUpperCase();
-if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
-const num = line.match(/\b(\d{9,10})\b/);
-if (num) {
-result.diagrama = num[1];
-console.log('✅ Diagrama via label:', result.diagrama);
-break;
-}
-}
-}
-if (!result.diagrama) {
-const exact = clean.match(/\b450890224\b/);
-if (exact) {
-result.diagrama = '450890224';
-console.log('✅ Diagrama via exato:', result.diagrama);
-}
-}
-if (!result.diagrama) {
-const nineDigits = clean.match(/\b(\d{9})\b/g);
-if (nineDigits) {
-for (let d of nineDigits) {
-const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
-if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
-result.diagrama = d;
-console.log('✅ Diagrama via 9 dígitos:', result.diagrama);
-break;
-}
-}
-}
-}
-console.log('📊 Resultado:', result);
-return result;
-}
-};
+
 const Storage = {
-async carregar() {
-const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
-if (raw) {
-try {
-const obj = JSON.parse(raw);
-State.data = Object.assign(State.data, obj);
-if (!State.data.senhaAdmin) State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
-if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' };
-if (!State.data.config) State.data.config = { dispositivo: 'tablet' };
-if (!State.data.config.dispositivo) State.data.config.dispositivo = 'tablet';
-if (!State.data.historicoPostos) State.data.historicoPostos = [];
-if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
-this.migrarTurnosAntigos();
-} catch(e) { console.error('Erro ao carregar localStorage:', e); }
-}
-const savedTs = localStorage.getItem('weg_last_sync_ts');
-if (savedTs) {
-lastSyncTimestamp = parseInt(savedTs);
-console.log('📅 Timestamp de sync restaurado:', lastSyncTimestamp);
-}
-if (typeof API !== 'undefined' && State.isOnline) {
-State.apiAvailable = true;
-try {
-const senhaApi = await API.getConfig('senhaAdmin');
-if (senhaApi && senhaApi !== 'null' && senhaApi !== 'undefined') {
-State.data.senhaAdmin = senhaApi;
-this.salvarLocal();
-}
-} catch(e) { console.log('Senha não encontrada na planilha'); }
-API.startPolling(API_CONFIG.POLLING_INTERVAL);
-} else {
-State.apiAvailable = false;
-UI.showToast('info', 'Modo Offline', 'Sistema funcionando sem sincronização');
-}
-},
-salvarLocal() {
-try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(State.data)); }
-catch(e) { console.error('Erro ao salvar localStorage:', e); UI.showToast('error', 'Erro', 'Não foi possível salvar localmente'); }
-},
-async salvarApi(acao, dados) {
-if (!State.apiAvailable || !State.isOnline || typeof API === 'undefined') {
-this.salvarLocal();
-State.syncQueue.push({ acao, dados, timestamp: Date.now() });
-if (State.syncQueue.length === 1) UI.showToast('warning', 'Offline', 'Alteração salva localmente.');
-return { success: true, offline: true };
-}
-try {
-let result;
-if (acao === 'create') result = await API.createProject(Utils.toApiFormat(dados));
-else if (acao === 'update') result = await API.updateProject(Utils.toApiFormat(dados));
-else if (acao === 'delete') result = await API.deleteProject(dados.id);
-else if (acao === 'config') result = await API.updateConfig(dados.key, dados.value);
-if (result && result.success) {
-this.salvarLocal();
-State.syncQueue = State.syncQueue.filter(item => !(item.acao === acao && item.dados.id === dados.id));
-lastSyncTimestamp = Date.now();
-localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
-return { success: true, offline: false };
-}
-throw new Error(result ? result.error : 'Erro na API');
-} catch (error) {
-console.error('Erro ao salvar na API:', error);
-this.salvarLocal();
-State.syncQueue.push({ acao, dados, timestamp: Date.now() });
-if (State.syncQueue.length === 1) UI.showToast('warning', 'Sincronização', 'Salvo localmente.');
-return { success: true, offline: true, error: error.message };
-}
-},
-async processarFila() {
-if (!State.apiAvailable || !State.isOnline || State.syncQueue.length === 0) return;
-const fila = [...State.syncQueue];
-State.syncQueue = [];
-let successCount = 0;
-for (const item of fila) {
-try {
-const result = await this.salvarApi(item.acao, item.dados);
-if (!result.offline) successCount++;
-} catch(e) { console.error('Erro ao processar fila:', e); State.syncQueue.push(item); }
-}
-if (successCount > 0) UI.showToast('success', 'Sincronizado', `${successCount} alteração(ões) sincronizada(s)`);
-},
-migrarTurnosAntigos() {
-let mudou = false;
-for (const posto in State.data.turnosPorPosto) {
-const t = State.data.turnosPorPosto[posto];
-if (CONFIG.TURNO_LEGADO[t]) { State.data.turnosPorPosto[posto] = CONFIG.TURNO_LEGADO[t]; mudou = true; }
-}
-State.data.projetos.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno = CONFIG.TURNO_LEGADO[p.turno]; mudou = true; } });
-State.data.historico.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno = CONFIG.TURNO_LEGADO[p.turno]; mudou = true; } });
-if (mudou) this.salvarLocal();
-}
+  async carregar() {
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if (raw) {
+      try {
+        const obj = JSON.parse(raw);
+        State.data = Object.assign(State.data, obj);
+        State.data.projetos = State.data.projetos.map(sanitizarProjeto).filter(Boolean);
+        if (!State.data.senhaAdmin) State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
+        if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' };
+        if (!State.data.config) State.data.config = { dispositivo: 'tablet' };
+        if (!State.data.config.dispositivo) State.data.config.dispositivo = 'tablet';
+        if (!State.data.historicoPostos) State.data.historicoPostos = [];
+        if (!State.data.ultimaSelecaoTurno) State.data.ultimaSelecaoTurno = 0;
+        this.migrarTurnosAntigos();
+      } catch(e) { console.error('Erro ao carregar localStorage:', e); }
+    }
+    const savedTs = localStorage.getItem('weg_last_sync_ts');
+    if (savedTs) {
+      lastSyncTimestamp = parseInt(savedTs);
+      console.log('📅 Timestamp de sync restaurado:', lastSyncTimestamp);
+    }
+    if (typeof API !== 'undefined' && State.isOnline) {
+      State.apiAvailable = true;
+      try {
+        const senhaApi = await API.getConfig('senhaAdmin');
+        if (senhaApi && senhaApi !== 'null' && senhaApi !== 'undefined') {
+          State.data.senhaAdmin = senhaApi;
+          this.salvarLocal();
+        }
+      } catch(e) { console.log('Senha não encontrada na planilha'); }
+      API.startPolling(API_CONFIG.POLLING_INTERVAL);
+    } else {
+      State.apiAvailable = false;
+      UI.showToast('info', 'Modo Offline', 'Sistema funcionando sem sincronização');
+    }
+  },
+  salvarLocal() {
+    try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(State.data)); }
+    catch(e) { console.error('Erro ao salvar localStorage:', e); UI.showToast('error', 'Erro', 'Não foi possível salvar localmente'); }
+  },
+  async salvarApi(acao, dados) {
+    if (!State.apiAvailable || !State.isOnline || typeof API === 'undefined') {
+      this.salvarLocal();
+      State.syncQueue.push({ acao, dados, timestamp: Date.now() });
+      if (State.syncQueue.length === 1) UI.showToast('warning', 'Offline', 'Alteração salva localmente.');
+      return { success: true, offline: true };
+    }
+    try {
+      let result;
+      if (acao === 'create') result = await API.createProject(Utils.toApiFormat(dados));
+      else if (acao === 'update') result = await API.updateProject(Utils.toApiFormat(dados));
+      else if (acao === 'delete') result = await API.deleteProject(dados.id);
+      else if (acao === 'config') result = await API.updateConfig(dados.key, dados.value);
+      if (result && result.success) {
+        this.salvarLocal();
+        State.syncQueue = State.syncQueue.filter(item => !(item.acao === acao && item.dados.id === dados.id));
+        lastSyncTimestamp = Date.now();
+        localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+        return { success: true, offline: false };
+      }
+      throw new Error(result ? result.error : 'Erro na API');
+    } catch (error) {
+      console.error('Erro ao salvar na API:', error);
+      this.salvarLocal();
+      State.syncQueue.push({ acao, dados, timestamp: Date.now() });
+      if (State.syncQueue.length === 1) UI.showToast('warning', 'Sincronização', 'Salvo localmente.');
+      return { success: true, offline: true, error: error.message };
+    }
+  },
+  async processarFila() {
+    if (!State.apiAvailable || !State.isOnline || State.syncQueue.length === 0) return;
+    const fila = [...State.syncQueue];
+    State.syncQueue = [];
+    let successCount = 0;
+    for (const item of fila) {
+      try {
+        const result = await this.salvarApi(item.acao, item.dados);
+        if (!result.offline) successCount++;
+      } catch(e) { console.error('Erro ao processar fila:', e); State.syncQueue.push(item); }
+    }
+    if (successCount > 0) UI.showToast('success', 'Sincronizado', `${successCount} alteração(ões) sincronizada(s)`);
+  },
+  migrarTurnosAntigos() {
+    let mudou = false;
+    for (const posto in State.data.turnosPorPosto) {
+      const t = State.data.turnosPorPosto[posto];
+      if (CONFIG.TURNO_LEGADO[t]) { State.data.turnosPorPosto[posto] = CONFIG.TURNO_LEGADO[t]; mudou = true; }
+    }
+    State.data.projetos.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno = CONFIG.TURNO_LEGADO[p.turno]; mudou = true; } });
+    State.data.historico.forEach(p => { if (CONFIG.TURNO_LEGADO[p.turno]) { p.turno = CONFIG.TURNO_LEGADO[p.turno]; mudou = true; } });
+    if (mudou) this.salvarLocal();
+  }
 };
+
 const UI = {
-aplicarEstadoCursor() {
-if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor');
-else document.body.classList.remove('hide-cursor');
-},
-scrollParaElemento(elemento) {
-setTimeout(() => {
-if (State.vkActive && State.data.config.dispositivo === 'computador') {
-const elementRect = elemento.getBoundingClientRect();
-const targetPosition = elementRect.top + window.scrollY - 100;
-window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-}
-}, 300);
-},
-openModal(id) {
-document.getElementById(id).classList.add('active');
-if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
-},
-closeModal(id) {
-document.getElementById(id).classList.remove('active');
-if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
-},
-toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
-togglePwdVisibility(inputId, btn) {
-const input = document.getElementById(inputId);
-const icon = btn.querySelector('i');
-if (input.type === 'password') { input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
-else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
-},
-atualizarHeaderTitle(page) {
-const titleEl = document.getElementById('headerTitle');
-const badgeEl = document.getElementById('headerBadge');
-const titles = { 'dashboard': 'Dashboard de Produção', 'admin': 'Administração', 'posto': State.currentPosto ? 'Posto - ' + State.currentPosto : 'Posto de Trabalho', 'historico': 'Histórico', 'historico-posto': State.currentPosto ? 'Histórico - ' + State.currentPosto : 'Histórico do Posto', 'config': 'Configurações' };
-titleEl.textContent = titles[page] || 'WEG';
-if ((page === 'posto' || page === 'historico-posto') && State.currentPosto) { badgeEl.textContent = State.currentPosto; badgeEl.style.display = 'inline-block'; }
-else { badgeEl.style.display = 'none'; }
-},
-showToast(type, title, message) {
-const icons = {success:'check-circle',error:'circle-xmark',warning:'triangle-exclamation',info:'circle-info'};
-const container = document.getElementById('toastContainer');
-const toast = document.createElement('div');
-toast.className = 'toast ' + type;
-toast.innerHTML = `<i class="fa-solid fa-${icons[type]}"></i><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
-container.appendChild(toast);
-setTimeout(() => { toast.style.animation = 'slideIn .3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3500);
-},
-updateDate() {
-const now = new Date();
-const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
-document.getElementById('currentDate').textContent = now.toLocaleString('pt-BR', opts);
-},
-setSyncStatus(status) {
-const indicator = document.getElementById('syncIndicator');
-const statusEl = document.getElementById('syncStatus');
-if (!indicator || !statusEl) return;
-indicator.classList.remove('syncing', 'synced', 'error');
-if (status === 'syncing') {
-indicator.classList.add('syncing');
-statusEl.textContent = 'Sincronizando...';
-indicator.querySelector('i').className = 'fa-solid fa-spinner fa-spin';
-} else if (status === 'synced') {
-indicator.classList.add('synced');
-const agora = new Date();
-statusEl.textContent = 'Sincronizado ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-indicator.querySelector('i').className = 'fa-solid fa-cloud';
-} else if (status === 'error') {
-indicator.classList.add('error');
-statusEl.textContent = 'Erro de sync';
-indicator.querySelector('i').className = 'fa-solid fa-cloud-bolt';
-}
-},
-buildMenu() {
-const menu = document.getElementById('mainMenu');
-let html = '';
-if (State.currentUser === 'admin') {
-html = `<a data-page="dashboard" class="active" data-tooltip="Dashboard"><i class="fa-solid fa-chart-line"></i></a><a data-page="admin" data-tooltip="Administração"><i class="fa-solid fa-user-shield"></i></a><a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a><a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>`;
-} else {
-const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
-html = `<a data-page="posto" class="active" data-tooltip="${State.currentPosto}"><i class="fa-solid ${iconMap[State.currentPosto]}"></i></a><a data-page="historico-posto" data-tooltip="Histórico do ${State.currentPosto}"><i class="fa-solid fa-clock-rotate-left"></i></a><a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>`;
-}
-menu.innerHTML = html;
-menu.querySelectorAll('a').forEach(a => {
-a.addEventListener('click', e => {
-e.preventDefault();
-Navigation.navigate(a.dataset.page);
-if (window.innerWidth <= 1000) document.getElementById('sidebar').classList.remove('open');
-});
-});
-},
-setupModalClickHandlers() {
-document.querySelectorAll('.modal-overlay').forEach(m => {
-m.addEventListener('click', e => {
-if (e.target === m) {
-if (m.id === 'modalSenhaAdmin') Auth.cancelarLoginAdmin();
-else if (m.id === 'modalConfirmarSenha') Auth.cancelarConfirmacaoSenha();
-else if (m.id === 'modalTurnoFimSemana') Turno.cancelarSelecao();
-else if (m.id === 'modalLogout') UI.closeModal('modalLogout');
-else UI.closeModal(m.id);
-}
-});
-});
-},
-setupSidebarClickHandler() {
-document.addEventListener('click', e => {
-const sb = document.getElementById('sidebar');
-if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e.target) && !e.target.closest('.menu-toggle')) sb.classList.remove('open');
-});
-},
-setupVirtualKeyboard() {
-document.addEventListener('focusin', e => {
-if (State.data.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea') && !e.target.readOnly) {
-State.vkTarget = e.target;
-if (!State.vkActive) VirtualKeyboard.show();
-}
-});
-document.addEventListener('click', e => {
-const key = e.target.closest('.vk-key');
-if (!key) return;
-e.preventDefault();
-const k = key.dataset.key;
-const action = key.dataset.action;
-if (!State.vkTarget) { UI.showToast('warning', 'Teclado virtual', 'Clique em um campo de texto primeiro'); return; }
-if (action === 'backspace') {
-const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
-const end = State.vkTarget.selectionEnd ?? start;
-State.vkTarget.value = State.vkTarget.value.slice(0, start-1) + State.vkTarget.value.slice(end);
-State.vkTarget.setSelectionRange(Math.max(0, start-1), Math.max(0, start-1));
-} else if (action === 'clear') { State.vkTarget.value = ''; }
-else if (action === 'close') { VirtualKeyboard.hide(); return; }
-else if (k !== undefined) {
-const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
-const end = State.vkTarget.selectionEnd ?? start;
-State.vkTarget.value = State.vkTarget.value.slice(0, start) + k + State.vkTarget.value.slice(end);
-State.vkTarget.setSelectionRange(start+1, start+1);
-}
-State.vkTarget.dispatchEvent(new Event('input', {bubbles:true}));
-State.vkTarget.focus();
-UI.scrollParaElemento(State.vkTarget);
-});
-}
+  aplicarEstadoCursor() {
+    if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor');
+    else document.body.classList.remove('hide-cursor');
+  },
+  scrollParaElemento(elemento) {
+    setTimeout(() => {
+      if (State.vkActive && State.data.config.dispositivo === 'computador') {
+        const elementRect = elemento.getBoundingClientRect();
+        const targetPosition = elementRect.top + window.scrollY - 100;
+        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+      }
+    }, 300);
+  },
+  openModal(id) {
+    document.getElementById(id).classList.add('active');
+    if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
+  },
+  closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
+  },
+  toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
+  togglePwdVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') { input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
+    else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+  },
+  atualizarHeaderTitle(page) {
+    const titleEl = document.getElementById('headerTitle');
+    const badgeEl = document.getElementById('headerBadge');
+    const titles = { 'dashboard': 'Dashboard de Produção', 'admin': 'Administração', 'posto': State.currentPosto ? 'Posto - ' + State.currentPosto : 'Posto de Trabalho', 'historico': 'Histórico', 'historico-posto': State.currentPosto ? 'Histórico - ' + State.currentPosto : 'Histórico do Posto', 'config': 'Configurações' };
+    titleEl.textContent = titles[page] || 'WEG';
+    if ((page === 'posto' || page === 'historico-posto') && State.currentPosto) { badgeEl.textContent = State.currentPosto; badgeEl.style.display = 'inline-block'; }
+    else { badgeEl.style.display = 'none'; }
+  },
+  showToast(type, title, message) {
+    const icons = {success:'check-circle',error:'circle-xmark',warning:'triangle-exclamation',info:'circle-info'};
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = `<i class="fa-solid fa-${icons[type]}"></i><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.animation = 'slideIn .3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3500);
+  },
+  updateDate() {
+    const now = new Date();
+    const opts = {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};
+    document.getElementById('currentDate').textContent = now.toLocaleString('pt-BR', opts);
+  },
+  setSyncStatus(status) {
+    const indicator = document.getElementById('syncIndicator');
+    const statusEl = document.getElementById('syncStatus');
+    if (!indicator || !statusEl) return;
+    indicator.classList.remove('syncing', 'synced', 'error');
+    if (status === 'syncing') {
+      indicator.classList.add('syncing');
+      statusEl.textContent = 'Sincronizando...';
+      indicator.querySelector('i').className = 'fa-solid fa-spinner fa-spin';
+    } else if (status === 'synced') {
+      indicator.classList.add('synced');
+      const agora = new Date();
+      statusEl.textContent = 'Sincronizado ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+      indicator.querySelector('i').className = 'fa-solid fa-cloud';
+    } else if (status === 'error') {
+      indicator.classList.add('error');
+      statusEl.textContent = 'Erro de sync';
+      indicator.querySelector('i').className = 'fa-solid fa-cloud-bolt';
+    }
+  },
+  buildMenu() {
+    const menu = document.getElementById('mainMenu');
+    let html = '';
+    if (State.currentUser === 'admin') {
+      html = `<a data-page="dashboard" class="active" data-tooltip="Dashboard"><i class="fa-solid fa-chart-line"></i></a><a data-page="admin" data-tooltip="Administração"><i class="fa-solid fa-user-shield"></i></a><a data-page="historico" data-tooltip="Histórico"><i class="fa-solid fa-clock-rotate-left"></i></a><a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>`;
+    } else {
+      const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
+      html = `<a data-page="posto" class="active" data-tooltip="${State.currentPosto}"><i class="fa-solid ${iconMap[State.currentPosto]}"></i></a><a data-page="historico-posto" data-tooltip="Histórico do ${State.currentPosto}"><i class="fa-solid fa-clock-rotate-left"></i></a><a data-page="config" data-tooltip="Configurações"><i class="fa-solid fa-gear"></i></a>`;
+    }
+    menu.innerHTML = html;
+    menu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        Navigation.navigate(a.dataset.page);
+        if (window.innerWidth <= 1000) document.getElementById('sidebar').classList.remove('open');
+      });
+    });
+  },
+  setupModalClickHandlers() {
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+      m.addEventListener('click', e => {
+        if (e.target === m) {
+          if (m.id === 'modalSenhaAdmin') Auth.cancelarLoginAdmin();
+          else if (m.id === 'modalConfirmarSenha') Auth.cancelarConfirmacaoSenha();
+          else if (m.id === 'modalTurnoFimSemana') Turno.cancelarSelecao();
+          else if (m.id === 'modalLogout') UI.closeModal('modalLogout');
+          else UI.closeModal(m.id);
+        }
+      });
+    });
+  },
+  setupSidebarClickHandler() {
+    document.addEventListener('click', e => {
+      const sb = document.getElementById('sidebar');
+      if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e.target) && !e.target.closest('.menu-toggle')) sb.classList.remove('open');
+    });
+  },
+  setupVirtualKeyboard() {
+    document.addEventListener('focusin', e => {
+      if (State.data.config.dispositivo === 'computador' && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]), textarea') && !e.target.readOnly) {
+        State.vkTarget = e.target;
+        if (!State.vkActive) VirtualKeyboard.show();
+      }
+    });
+    document.addEventListener('click', e => {
+      const key = e.target.closest('.vk-key');
+      if (!key) return;
+      e.preventDefault();
+      const k = key.dataset.key;
+      const action = key.dataset.action;
+      if (!State.vkTarget) { UI.showToast('warning', 'Teclado virtual', 'Clique em um campo de texto primeiro'); return; }
+      if (action === 'backspace') {
+        const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
+        const end = State.vkTarget.selectionEnd ?? start;
+        State.vkTarget.value = State.vkTarget.value.slice(0, start-1) + State.vkTarget.value.slice(end);
+        State.vkTarget.setSelectionRange(Math.max(0, start-1), Math.max(0, start-1));
+      } else if (action === 'clear') { State.vkTarget.value = ''; }
+      else if (action === 'close') { VirtualKeyboard.hide(); return; }
+      else if (k !== undefined) {
+        const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
+        const end = State.vkTarget.selectionEnd ?? start;
+        State.vkTarget.value = State.vkTarget.value.slice(0, start) + k + State.vkTarget.value.slice(end);
+        State.vkTarget.setSelectionRange(start+1, start+1);
+      }
+      State.vkTarget.dispatchEvent(new Event('input', {bubbles:true}));
+      State.vkTarget.focus();
+      UI.scrollParaElemento(State.vkTarget);
+    });
+  }
 };
+
 const Navigation = {
-navigate(page) {
-document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
-const link = document.querySelector(`.menu a[data-page="${page}"]`);
-if (link) link.classList.add('active');
-document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-const el = document.getElementById('page-' + page);
-if (el) el.classList.add('active');
-UI.aplicarEstadoCursor();
-UI.atualizarHeaderTitle(page);
-if (page === 'dashboard') Dashboard.render();
-if (page === 'admin') Admin.renderTable();
-if (page === 'posto') Posto.render();
-if (page === 'historico') { Historico.renderGeral(); Historico.renderPostos(); }
-if (page === 'historico-posto') Historico.renderPostoAtual();
-if (page === 'config') Config.loadUI();
-}
+  navigate(page) {
+    document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
+    const link = document.querySelector(`.menu a[data-page="${page}"]`);
+    if (link) link.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById('page-' + page);
+    if (el) el.classList.add('active');
+    UI.aplicarEstadoCursor();
+    UI.atualizarHeaderTitle(page);
+    if (page === 'dashboard') Dashboard.render();
+    if (page === 'admin') Admin.renderTable();
+    if (page === 'posto') Posto.render();
+    if (page === 'historico') { Historico.renderGeral(); Historico.renderPostos(); }
+    if (page === 'historico-posto') Historico.renderPostoAtual();
+    if (page === 'config') Config.loadUI();
+  }
 };
+
 const Auth = {
-login(role) {
-if (role === 'admin') {
-State.pendingAdminLogin = true;
-document.getElementById('inputSenhaAdmin').value = '';
-document.getElementById('senhaAdminErro').style.display = 'none';
-setTimeout(() => {
-UI.openModal('modalSenhaAdmin');
-setTimeout(() => { document.getElementById('inputSenhaAdmin').focus(); }, 300);
-}, 50);
-return;
-}
-this.efetivarLogin(role);
-},
-confirmarLoginAdmin() {
-const senha = document.getElementById('inputSenhaAdmin').value;
-if (senha === State.data.senhaAdmin) {
-document.getElementById('senhaAdminErro').style.display = 'none';
-UI.closeModal('modalSenhaAdmin');
-State.pendingAdminLogin = false;
-this.efetivarLogin('admin');
-} else {
-const erro = document.getElementById('senhaAdminErro');
-erro.style.display = 'flex';
-document.getElementById('senhaAdminErroMsg').textContent = 'Senha incorreta.';
-const input = document.getElementById('inputSenhaAdmin');
-input.value = '';
-input.focus();
-input.style.borderColor = 'var(--danger)';
-setTimeout(() => { input.style.borderColor = ''; }, 1500);
-}
-},
-cancelarLoginAdmin() { State.pendingAdminLogin = false; UI.closeModal('modalSenhaAdmin'); },
-efetivarLogin(role) {
-State.currentUser = role;
-document.getElementById('loginScreen').style.display = 'none';
-document.getElementById('app').style.display = 'block';
-const labels = { admin: 'Administrador', nano: 'Operador - Nanocerâmico', pintura: 'Operador - Pintura', conferencia: 'Operador - Conferência' };
-const processos = { nano: 'Nanocerâmico', pintura: 'Pintura', conferencia: 'Conferência' };
-document.getElementById('userLabel').textContent = labels[role];
-if (role !== 'admin') State.currentPosto = processos[role];
-UI.buildMenu();
-Config.applyDeviceConfig();
-UI.aplicarEstadoCursor();
-if (role === 'admin') { Navigation.navigate('dashboard'); document.getElementById('cardSeguranca').style.display = 'block'; }
-else { Navigation.navigate('posto'); document.getElementById('cardSeguranca').style.display = 'none'; }
-UI.showToast('success', 'Bem-vindo', 'Login efetuado como ' + labels[role]);
-},
-confirmarLogout() { UI.openModal('modalLogout'); },
-efetivarLogout() {
-UI.closeModal('modalLogout');
-State.currentUser = null;
-State.currentPosto = null;
-document.getElementById('app').style.display = 'none';
-document.getElementById('loginScreen').style.display = 'flex';
-VirtualKeyboard.hide();
-document.body.classList.remove('hide-cursor');
-if (State.timerInterval) clearInterval(State.timerInterval);
-UI.showToast('info', 'Sessão encerrada', 'Você voltou para a tela de seleção de perfis');
-},
-solicitarConfirmacaoSenha(titulo, aviso, callback) {
-State.acaoPendenteSenha = callback;
-document.getElementById('modalConfirmarTitulo').textContent = titulo || 'Confirmação';
-document.getElementById('modalConfirmarAviso').innerHTML = aviso || 'Digite a senha.';
-document.getElementById('inputConfirmarSenha').value = '';
-document.getElementById('confirmarSenhaErro').style.display = 'none';
-UI.openModal('modalConfirmarSenha');
-setTimeout(() => { document.getElementById('inputConfirmarSenha').focus(); }, 200);
-},
-confirmarAcaoSenha() {
-const senha = document.getElementById('inputConfirmarSenha').value;
-if (senha === State.data.senhaAdmin) {
-document.getElementById('confirmarSenhaErro').style.display = 'none';
-UI.closeModal('modalConfirmarSenha');
-const cb = State.acaoPendenteSenha;
-State.acaoPendenteSenha = null;
-if (typeof cb === 'function') cb();
-} else {
-document.getElementById('confirmarSenhaErro').style.display = 'flex';
-const input = document.getElementById('inputConfirmarSenha');
-input.value = '';
-input.focus();
-input.style.borderColor = 'var(--danger)';
-setTimeout(() => { input.style.borderColor = ''; }, 1500);
-}
-},
-cancelarConfirmacaoSenha() { State.acaoPendenteSenha = null; UI.closeModal('modalConfirmarSenha'); },
-solicitarLimpeza() {
-this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</strong> Esta ação apagará PERMANENTEMENTE todos os dados em TODOS os dispositivos conectados.<br><br>Digite a senha do administrador.', this.executarLimpeza);
-},
-async executarLimpeza() {
-UI.showToast('info', 'Limpando', 'Apagando dados em todos os dispositivos...');
-if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
-try {
-await API.clearAllData();
-UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha');
-lastSyncTimestamp = 0;
-localStorage.setItem('weg_last_sync_ts', '0');
-}
-catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
-}
-State.data.projetos = [];
-State.data.historico = [];
-State.data.historicoPostos = [];
-State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
-State.data.ultimaSelecaoTurno = 0;
-Storage.salvarLocal();
-Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
-UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos em todos os dispositivos.');
-setTimeout(() => {
-if (State.apiAvailable) API.syncDataCompleto();
-}, 2000);
-}
+  login(role) {
+    if (role === 'admin') {
+      State.pendingAdminLogin = true;
+      document.getElementById('inputSenhaAdmin').value = '';
+      document.getElementById('senhaAdminErro').style.display = 'none';
+      setTimeout(() => {
+        UI.openModal('modalSenhaAdmin');
+        setTimeout(() => { document.getElementById('inputSenhaAdmin').focus(); }, 300);
+      }, 50);
+      return;
+    }
+    this.efetivarLogin(role);
+  },
+  confirmarLoginAdmin() {
+    const senha = document.getElementById('inputSenhaAdmin').value;
+    if (senha === State.data.senhaAdmin) {
+      document.getElementById('senhaAdminErro').style.display = 'none';
+      UI.closeModal('modalSenhaAdmin');
+      State.pendingAdminLogin = false;
+      this.efetivarLogin('admin');
+    } else {
+      const erro = document.getElementById('senhaAdminErro');
+      erro.style.display = 'flex';
+      document.getElementById('senhaAdminErroMsg').textContent = 'Senha incorreta.';
+      const input = document.getElementById('inputSenhaAdmin');
+      input.value = '';
+      input.focus();
+      input.style.borderColor = 'var(--danger)';
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    }
+  },
+  cancelarLoginAdmin() { State.pendingAdminLogin = false; UI.closeModal('modalSenhaAdmin'); },
+  efetivarLogin(role) {
+    State.currentUser = role;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    const labels = { admin: 'Administrador', nano: 'Operador - Nanocerâmico', pintura: 'Operador - Pintura', conferencia: 'Operador - Conferência' };
+    const processos = { nano: 'Nanocerâmico', pintura: 'Pintura', conferencia: 'Conferência' };
+    document.getElementById('userLabel').textContent = labels[role];
+    if (role !== 'admin') State.currentPosto = processos[role];
+    UI.buildMenu();
+    Config.applyDeviceConfig();
+    UI.aplicarEstadoCursor();
+    if (role === 'admin') { Navigation.navigate('dashboard'); document.getElementById('cardSeguranca').style.display = 'block'; }
+    else { Navigation.navigate('posto'); document.getElementById('cardSeguranca').style.display = 'none'; }
+    UI.showToast('success', 'Bem-vindo', 'Login efetuado como ' + labels[role]);
+  },
+  confirmarLogout() { UI.openModal('modalLogout'); },
+  efetivarLogout() {
+    UI.closeModal('modalLogout');
+    State.currentUser = null;
+    State.currentPosto = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    VirtualKeyboard.hide();
+    document.body.classList.remove('hide-cursor');
+    if (State.timerInterval) clearInterval(State.timerInterval);
+    UI.showToast('info', 'Sessão encerrada', 'Você voltou para a tela de seleção de perfis');
+  },
+  solicitarConfirmacaoSenha(titulo, aviso, callback) {
+    State.acaoPendenteSenha = callback;
+    document.getElementById('modalConfirmarTitulo').textContent = titulo || 'Confirmação';
+    document.getElementById('modalConfirmarAviso').innerHTML = aviso || 'Digite a senha.';
+    document.getElementById('inputConfirmarSenha').value = '';
+    document.getElementById('confirmarSenhaErro').style.display = 'none';
+    UI.openModal('modalConfirmarSenha');
+    setTimeout(() => { document.getElementById('inputConfirmarSenha').focus(); }, 200);
+  },
+  confirmarAcaoSenha() {
+    const senha = document.getElementById('inputConfirmarSenha').value;
+    if (senha === State.data.senhaAdmin) {
+      document.getElementById('confirmarSenhaErro').style.display = 'none';
+      UI.closeModal('modalConfirmarSenha');
+      const cb = State.acaoPendenteSenha;
+      State.acaoPendenteSenha = null;
+      if (typeof cb === 'function') cb();
+    } else {
+      document.getElementById('confirmarSenhaErro').style.display = 'flex';
+      const input = document.getElementById('inputConfirmarSenha');
+      input.value = '';
+      input.focus();
+      input.style.borderColor = 'var(--danger)';
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    }
+  },
+  cancelarConfirmacaoSenha() { State.acaoPendenteSenha = null; UI.closeModal('modalConfirmarSenha'); },
+  solicitarLimpeza() {
+    this.solicitarConfirmacaoSenha('Limpar Todos os Dados', '<strong>Atenção:</strong> Esta ação apagará PERMANENTEMENTE todos os dados em TODOS os dispositivos conectados.<br><br>Digite a senha do administrador.', this.executarLimpeza);
+  },
+  async executarLimpeza() {
+    UI.showToast('info', 'Limpando', 'Apagando dados em todos os dispositivos...');
+    if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
+      try {
+        await API.clearAllData();
+        UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha');
+        lastSyncTimestamp = 0;
+        localStorage.setItem('weg_last_sync_ts', '0');
+      }
+      catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
+    }
+    State.data.projetos = [];
+    State.data.historico = [];
+    State.data.historicoPostos = [];
+    State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
+    State.data.ultimaSelecaoTurno = 0;
+    Storage.salvarLocal();
+    Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
+    UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos em todos os dispositivos.');
+    setTimeout(() => {
+      if (State.apiAvailable) API.syncDataCompleto();
+    }, 2000);
+  }
 };
+
 const Config = {
-loadUI() {
-document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
-document.getElementById('cfgVkInfo').style.display = State.data.config.dispositivo === 'computador' ? 'block' : 'none';
-document.getElementById('cardSeguranca').style.display = (State.currentUser === 'admin') ? 'block' : 'none';
-},
-async salvarDispositivo() {
-State.data.config.dispositivo = document.getElementById('cfgDevice').value;
-await Storage.salvarApi('config', { key: 'dispositivo', value: State.data.config.dispositivo });
-this.applyDeviceConfig(); UI.aplicarEstadoCursor();
-const modo = State.data.config.dispositivo === 'computador' ? 'Computador (cursor oculto)' : 'Tablet (cursor visível)';
-UI.showToast('success', 'Configuração salva', 'Modo: ' + modo);
-},
-applyDeviceConfig() { const isComputer = State.data.config.dispositivo === 'computador'; if (isComputer) VirtualKeyboard.hide(); },
-async alterarSenha(e) {
-e.preventDefault();
-const atual = document.getElementById('senhaAtual').value;
-const nova = document.getElementById('novaSenha').value;
-const confirma = document.getElementById('confirmaSenha').value;
-if (atual !== State.data.senhaAdmin) { UI.showToast('error', 'Erro', 'Senha atual incorreta'); document.getElementById('senhaAtual').value = ''; document.getElementById('senhaAtual').focus(); return false; }
-if (nova.length < 4) { UI.showToast('warning', 'Atenção', 'A nova senha deve ter no mínimo 4 caracteres'); return false; }
-if (nova !== confirma) { UI.showToast('error', 'Erro', 'A confirmação não confere'); document.getElementById('confirmaSenha').value = ''; document.getElementById('confirmaSenha').focus(); return false; }
-if (nova === atual) { UI.showToast('warning', 'Atenção', 'A nova senha deve ser diferente da atual'); return false; }
-State.data.senhaAdmin = nova;
-Storage.salvarLocal();
-try {
-await Storage.salvarApi('config', { key: 'senhaAdmin', value: nova });
-UI.showToast('success', 'Senha alterada', 'A nova senha foi salva');
-} catch(e) { console.error('Erro ao salvar senha na API:', e); UI.showToast('warning', 'Atenção', 'Senha salva localmente.'); }
-document.getElementById('formSenha').reset();
-document.getElementById('pwdStrength').textContent = '';
-return false;
-},
-avaliarForcaSenha() {
-const senha = document.getElementById('novaSenha').value;
-const el = document.getElementById('pwdStrength');
-if (!senha) { el.textContent = ''; return; }
-let score = 0;
-if (senha.length >= 4) score++;
-if (senha.length >= 8) score++;
-if (/[A-Z]/.test(senha) && /[a-z]/.test(senha)) score++;
-if (/\d/.test(senha)) score++;
-if (/[^A-Za-z0-9]/.test(senha)) score++;
-if (score <= 2) { el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
-else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
-else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
-}
+  loadUI() {
+    document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
+    document.getElementById('cfgVkInfo').style.display = State.data.config.dispositivo === 'computador' ? 'block' : 'none';
+    document.getElementById('cardSeguranca').style.display = (State.currentUser === 'admin') ? 'block' : 'none';
+  },
+  async salvarDispositivo() {
+    State.data.config.dispositivo = document.getElementById('cfgDevice').value;
+    await Storage.salvarApi('config', { key: 'dispositivo', value: State.data.config.dispositivo });
+    this.applyDeviceConfig(); UI.aplicarEstadoCursor();
+    const modo = State.data.config.dispositivo === 'computador' ? 'Computador (cursor oculto)' : 'Tablet (cursor visível)';
+    UI.showToast('success', 'Configuração salva', 'Modo: ' + modo);
+  },
+  applyDeviceConfig() { const isComputer = State.data.config.dispositivo === 'computador'; if (isComputer) VirtualKeyboard.hide(); },
+  async alterarSenha(e) {
+    e.preventDefault();
+    const atual = document.getElementById('senhaAtual').value;
+    const nova = document.getElementById('novaSenha').value;
+    const confirma = document.getElementById('confirmaSenha').value;
+    if (atual !== State.data.senhaAdmin) { UI.showToast('error', 'Erro', 'Senha atual incorreta'); document.getElementById('senhaAtual').value = ''; document.getElementById('senhaAtual').focus(); return false; }
+    if (nova.length < 4) { UI.showToast('warning', 'Atenção', 'A nova senha deve ter no mínimo 4 caracteres'); return false; }
+    if (nova !== confirma) { UI.showToast('error', 'Erro', 'A confirmação não confere'); document.getElementById('confirmaSenha').value = ''; document.getElementById('confirmaSenha').focus(); return false; }
+    if (nova === atual) { UI.showToast('warning', 'Atenção', 'A nova senha deve ser diferente da atual'); return false; }
+    State.data.senhaAdmin = nova;
+    Storage.salvarLocal();
+    try {
+      await Storage.salvarApi('config', { key: 'senhaAdmin', value: nova });
+      UI.showToast('success', 'Senha alterada', 'A nova senha foi salva');
+    } catch(e) { console.error('Erro ao salvar senha na API:', e); UI.showToast('warning', 'Atenção', 'Senha salva localmente.'); }
+    document.getElementById('formSenha').reset();
+    document.getElementById('pwdStrength').textContent = '';
+    return false;
+  },
+  avaliarForcaSenha() {
+    const senha = document.getElementById('novaSenha').value;
+    const el = document.getElementById('pwdStrength');
+    if (!senha) { el.textContent = ''; return; }
+    let score = 0;
+    if (senha.length >= 4) score++;
+    if (senha.length >= 8) score++;
+    if (/[A-Z]/.test(senha) && /[a-z]/.test(senha)) score++;
+    if (/\d/.test(senha)) score++;
+    if (/[^A-Za-z0-9]/.test(senha)) score++;
+    if (score <= 2) { el.textContent = '🔴 Senha fraca'; el.className = 'password-strength strength-weak'; }
+    else if (score <= 3) { el.textContent = '🟡 Senha média'; el.className = 'password-strength strength-medium'; }
+    else { el.textContent = '🟢 Senha forte'; el.className = 'password-strength strength-strong'; }
+  }
 };
+
 const Dashboard = {
-switchTab(tab, el) {
-document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
-el.classList.add('active');
-if (tab === 'geral') { document.getElementById('dashboardGeralSection').style.display = 'block'; document.getElementById('dashboardPostoSection').style.display = 'none'; this.render(); }
-else {
-document.getElementById('dashboardGeralSection').style.display = 'none';
-document.getElementById('dashboardPostoSection').style.display = 'block';
-const postoMap = { 'nano': 'Nanocerâmico', 'pintura': 'Pintura', 'conferencia': 'Conferência' };
-State.dashboardPostoAtual = postoMap[tab];
-document.getElementById('dash-posto-nome').textContent = State.dashboardPostoAtual;
-this.renderPosto();
-}
-},
-render() {
-const hoje = new Date(); hoje.setHours(0,0,0,0);
-const hojeCount = State.data.projetos.filter(p => p.criadoEm >= hoje.getTime()).length;
-document.getElementById('dash-total').textContent = State.data.projetos.length;
-document.getElementById('dash-total-trend').textContent = hojeCount;
-document.getElementById('dash-nano').textContent = State.data.projetos.filter(p => p.processo === 'Nanocerâmico').length;
-document.getElementById('dash-pint').textContent = State.data.projetos.filter(p => p.processo === 'Pintura').length;
-document.getElementById('dash-conf').textContent = State.data.projetos.filter(p => p.processo === 'Conferência').length;
-this.atualizarEstatisticas();
-Charts.render();
-},
-atualizarEstatisticas() {
-const historico = State.data.historico;
-document.getElementById('totalConcluidos').textContent = historico.length;
-const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
-historico.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
-document.getElementById('turno1-concluidos').textContent = turnos['1º Turno'];
-document.getElementById('turno2-concluidos').textContent = turnos['2º Turno'];
-document.getElementById('turno3-concluidos').textContent = turnos['3º Turno'];
-const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
-State.data.projetos.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
-historico.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
-['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
-const d = turnosAtivos[turno];
-const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
-document.getElementById(`turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
-});
-const tempos = historico.filter(p => p.tempoReal).map(p => p.tempoReal);
-if (tempos.length > 0) {
-const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
-const minutos = Math.floor(media / 60000);
-const segundos = Math.floor((media % 60000) / 1000);
-document.getElementById('tempoMedioGeral').textContent = `${minutos}:${String(segundos).padStart(2,'0')}`;
-} else { document.getElementById('tempoMedioGeral').textContent = '00:00'; }
-if (tempos.length > 0) {
-const maisRapido = Math.min(...tempos);
-const projetoRapido = historico.find(p => p.tempoReal === maisRapido);
-const minutosRapido = Math.floor(maisRapido / 60000);
-const segundosRapido = Math.floor((maisRapido % 60000) / 1000);
-document.getElementById('projetoMaisRapido').textContent = projetoRapido ? projetoRapido.diagrama : '-';
-document.getElementById('projetoMaisRapidoTempo').textContent = `${minutosRapido}:${String(segundosRapido).padStart(2,'0')} min`;
-} else { document.getElementById('projetoMaisRapido').textContent = '-'; document.getElementById('projetoMaisRapidoTempo').textContent = '00:00 min'; }
-if (historico.length > 0) {
-const ultimo = historico[0];
-document.getElementById('ultimoProjeto').textContent = ultimo.diagrama;
-const dataUltimo = new Date(ultimo.concluidoEm);
-document.getElementById('ultimoProjetoData').textContent = dataUltimo.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-} else { document.getElementById('ultimoProjeto').textContent = '-'; document.getElementById('ultimoProjetoData').textContent = '-'; }
-},
-renderPosto() {
-const posto = State.dashboardPostoAtual;
-const hoje = new Date(); hoje.setHours(0,0,0,0);
-const projetosNoPosto = State.data.projetos.filter(p => p.processo === posto);
-const concluidosNoPosto = State.data.historicoPostos.filter(p => p.processo === posto);
-const concluidosHoje = concluidosNoPosto.filter(p => p.dataHoraConclusao >= hoje.getTime());
-document.getElementById('dash-posto-total').textContent = projetosNoPosto.length;
-document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
-document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
-document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
-const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
-concluidosNoPosto.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
-document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
-document.getElementById('posto-turno2-concluidos').textContent = turnos['2º Turno'];
-document.getElementById('posto-turno3-concluidos').textContent = turnos['3º Turno'];
-const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
-projetosNoPosto.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
-concluidosNoPosto.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
-['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
-const d = turnosAtivos[turno];
-const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
-document.getElementById(`posto-turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
-});
-document.getElementById('posto-total-concluidos').textContent = concluidosNoPosto.length;
-const tempos = concluidosNoPosto.filter(p => p.tempoReal).map(p => p.tempoReal);
-if (tempos.length > 0) {
-const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
-const minutos = Math.floor(media / 60000);
-const segundos = Math.floor((media % 60000) / 1000);
-document.getElementById('posto-tempo-medio').textContent = `${minutos}:${String(segundos).padStart(2,'0')}`;
-} else { document.getElementById('posto-tempo-medio').textContent = '00:00'; }
-if (tempos.length > 0) {
-const maisRapido = Math.min(...tempos);
-const projetoRapido = concluidosNoPosto.find(p => p.tempoReal === maisRapido);
-const minutosRapido = Math.floor(maisRapido / 60000);
-const segundosRapido = Math.floor((maisRapido % 60000) / 1000);
-document.getElementById('posto-mais-rapido').textContent = projetoRapido ? projetoRapido.diagrama : '-';
-document.getElementById('posto-mais-rapido-tempo').textContent = `${minutosRapido}:${String(segundosRapido).padStart(2,'0')} min`;
-} else { document.getElementById('posto-mais-rapido').textContent = '-'; document.getElementById('posto-mais-rapido-tempo').textContent = '00:00 min'; }
-if (concluidosNoPosto.length > 0) {
-const ultimo = concluidosNoPosto[0];
-document.getElementById('posto-ultimo-projeto').textContent = ultimo.diagrama;
-const dataUltimo = new Date(ultimo.dataHoraConclusao);
-document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-} else { document.getElementById('posto-ultimo-projeto').textContent = '-'; document.getElementById('posto-ultimo-data').textContent = '-'; }
-}
+  switchTab(tab, el) {
+    document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    if (tab === 'geral') { document.getElementById('dashboardGeralSection').style.display = 'block'; document.getElementById('dashboardPostoSection').style.display = 'none'; this.render(); }
+    else {
+      document.getElementById('dashboardGeralSection').style.display = 'none';
+      document.getElementById('dashboardPostoSection').style.display = 'block';
+      const postoMap = { 'nano': 'Nanocerâmico', 'pintura': 'Pintura', 'conferencia': 'Conferência' };
+      State.dashboardPostoAtual = postoMap[tab];
+      document.getElementById('dash-posto-nome').textContent = State.dashboardPostoAtual;
+      this.renderPosto();
+    }
+  },
+  render() {
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const hojeCount = State.data.projetos.filter(p => p.criadoEm >= hoje.getTime()).length;
+    document.getElementById('dash-total').textContent = State.data.projetos.length;
+    document.getElementById('dash-total-trend').textContent = hojeCount;
+    document.getElementById('dash-nano').textContent = State.data.projetos.filter(p => p.processo === 'Nanocerâmico').length;
+    document.getElementById('dash-pint').textContent = State.data.projetos.filter(p => p.processo === 'Pintura').length;
+    document.getElementById('dash-conf').textContent = State.data.projetos.filter(p => p.processo === 'Conferência').length;
+    this.atualizarEstatisticas();
+    Charts.render();
+  },
+  atualizarEstatisticas() {
+    const historico = State.data.historico;
+    document.getElementById('totalConcluidos').textContent = historico.length;
+    const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
+    historico.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
+    document.getElementById('turno1-concluidos').textContent = turnos['1º Turno'];
+    document.getElementById('turno2-concluidos').textContent = turnos['2º Turno'];
+    document.getElementById('turno3-concluidos').textContent = turnos['3º Turno'];
+    const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
+    State.data.projetos.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
+    historico.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
+    ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
+      const d = turnosAtivos[turno];
+      const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
+      document.getElementById(`turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
+    });
+    const tempos = historico.filter(p => p.tempoReal).map(p => p.tempoReal);
+    if (tempos.length > 0) {
+      const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
+      const minutos = Math.floor(media / 60000);
+      const segundos = Math.floor((media % 60000) / 1000);
+      document.getElementById('tempoMedioGeral').textContent = `${minutos}:${String(segundos).padStart(2,'0')}`;
+    } else { document.getElementById('tempoMedioGeral').textContent = '00:00'; }
+    if (tempos.length > 0) {
+      const maisRapido = Math.min(...tempos);
+      const projetoRapido = historico.find(p => p.tempoReal === maisRapido);
+      const minutosRapido = Math.floor(maisRapido / 60000);
+      const segundosRapido = Math.floor((maisRapido % 60000) / 1000);
+      document.getElementById('projetoMaisRapido').textContent = projetoRapido ? projetoRapido.diagrama : '-';
+      document.getElementById('projetoMaisRapidoTempo').textContent = `${minutosRapido}:${String(segundosRapido).padStart(2,'0')} min`;
+    } else { document.getElementById('projetoMaisRapido').textContent = '-'; document.getElementById('projetoMaisRapidoTempo').textContent = '00:00 min'; }
+    if (historico.length > 0) {
+      const ultimo = historico[0];
+      document.getElementById('ultimoProjeto').textContent = ultimo.diagrama;
+      const dataUltimo = new Date(ultimo.concluidoEm);
+      document.getElementById('ultimoProjetoData').textContent = dataUltimo.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    } else { document.getElementById('ultimoProjeto').textContent = '-'; document.getElementById('ultimoProjetoData').textContent = '-'; }
+  },
+  renderPosto() {
+    const posto = State.dashboardPostoAtual;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const projetosNoPosto = State.data.projetos.filter(p => p.processo === posto);
+    const concluidosNoPosto = State.data.historicoPostos.filter(p => p.processo === posto);
+    const concluidosHoje = concluidosNoPosto.filter(p => p.dataHoraConclusao >= hoje.getTime());
+    document.getElementById('dash-posto-total').textContent = projetosNoPosto.length;
+    document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
+    document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
+    document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
+    const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
+    concluidosNoPosto.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
+    document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
+    document.getElementById('posto-turno2-concluidos').textContent = turnos['2º Turno'];
+    document.getElementById('posto-turno3-concluidos').textContent = turnos['3º Turno'];
+    const turnosAtivos = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
+    projetosNoPosto.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].total++; });
+    concluidosNoPosto.forEach(p => { if (turnosAtivos[p.turno]) turnosAtivos[p.turno].concluidos++; });
+    ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
+      const d = turnosAtivos[turno];
+      const eficiencia = d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0;
+      document.getElementById(`posto-turno${idx+1}-eficiencia`).textContent = eficiencia + '%';
+    });
+    document.getElementById('posto-total-concluidos').textContent = concluidosNoPosto.length;
+    const tempos = concluidosNoPosto.filter(p => p.tempoReal).map(p => p.tempoReal);
+    if (tempos.length > 0) {
+      const media = tempos.reduce((a,b) => a+b, 0) / tempos.length;
+      const minutos = Math.floor(media / 60000);
+      const segundos = Math.floor((media % 60000) / 1000);
+      document.getElementById('posto-tempo-medio').textContent = `${minutos}:${String(segundos).padStart(2,'0')}`;
+    } else { document.getElementById('posto-tempo-medio').textContent = '00:00'; }
+    if (tempos.length > 0) {
+      const maisRapido = Math.min(...tempos);
+      const projetoRapido = concluidosNoPosto.find(p => p.tempoReal === maisRapido);
+      const minutosRapido = Math.floor(maisRapido / 60000);
+      const segundosRapido = Math.floor((maisRapido % 60000) / 1000);
+      document.getElementById('posto-mais-rapido').textContent = projetoRapido ? projetoRapido.diagrama : '-';
+      document.getElementById('posto-mais-rapido-tempo').textContent = `${minutosRapido}:${String(segundosRapido).padStart(2,'0')} min`;
+    } else { document.getElementById('posto-mais-rapido').textContent = '-'; document.getElementById('posto-mais-rapido-tempo').textContent = '00:00 min'; }
+    if (concluidosNoPosto.length > 0) {
+      const ultimo = concluidosNoPosto[0];
+      document.getElementById('posto-ultimo-projeto').textContent = ultimo.diagrama;
+      const dataUltimo = new Date(ultimo.dataHoraConclusao);
+      document.getElementById('posto-ultimo-data').textContent = dataUltimo.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    } else { document.getElementById('posto-ultimo-projeto').textContent = '-'; document.getElementById('posto-ultimo-data').textContent = '-'; }
+  }
 };
+
 const Admin = {
-async abrirCamera() {
-const cameraSection = document.getElementById('cameraSection');
-const cameraStatus = document.getElementById('cameraStatus');
-const cameraControls = document.getElementById('cameraControls');
-State.lastPepFound = null;
-State.lastDiagramaFound = null;
-cameraSection.classList.add('active');
-cameraStatus.style.display = 'block';
-cameraControls.style.display = 'flex';
-cameraStatus.className = 'camera-status scanning';
-cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando câmera... Busca contínua ativada.<br><small>Posicione a etiqueta. Os campos serão atualizados automaticamente.</small>';
-try {
-const video = document.getElementById('cameraVideo');
-const canvas = document.getElementById('cameraCanvas');
-State.cameraStream = await navigator.mediaDevices.getUserMedia({
-video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-});
-video.srcObject = State.cameraStream;
-await video.play();
-cameraStatus.className = 'camera-status scanning';
-cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Escaneando a cada 2 segundos... Clique em "Fechar" quando os dados estiverem corretos.';
-await this.performScan();
-State.scanInterval = setInterval(() => this.performScan(), 2000);
-} catch (err) {
-console.error('Erro ao acessar câmera:', err);
-cameraStatus.className = 'camera-status error';
-cameraStatus.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Erro ao acessar câmera.';
-UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera');
-}
-},
-async performScan() {
-const video = document.getElementById('cameraVideo');
-const canvas = document.getElementById('cameraCanvas');
-const ctx = canvas.getContext('2d');
-const cameraStatus = document.getElementById('cameraStatus');
-if (!video.videoWidth || !video.videoHeight) return;
-try {
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
-ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-const result = await Tesseract.recognize(canvas, 'por', { logger: () => {} });
-const texto = result.data.text;
-if (texto && texto.trim().length > 5) {
-const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
-let atualizouAlgo = false;
-if (pep && pep !== State.lastPepFound) {
-document.getElementById('cad-pep').value = pep;
-State.lastPepFound = pep;
-atualizouAlgo = true;
-}
-if (diagrama && diagrama !== State.lastDiagramaFound) {
-document.getElementById('cad-diagrama').value = diagrama;
-State.lastDiagramaFound = diagrama;
-atualizouAlgo = true;
-}
-const pepStatus = State.lastPepFound
-? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
-: `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
-const diagramaStatus = State.lastDiagramaFound
-? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
-: `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
-if (State.lastPepFound || State.lastDiagramaFound) {
-cameraStatus.className = 'camera-status success';
-cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
+  async abrirCamera() {
+    const cameraSection = document.getElementById('cameraSection');
+    const cameraStatus = document.getElementById('cameraStatus');
+    const cameraControls = document.getElementById('cameraControls');
+    State.lastPepFound = null;
+    State.lastDiagramaFound = null;
+    cameraSection.classList.add('active');
+    cameraStatus.style.display = 'block';
+    cameraControls.style.display = 'flex';
+    cameraStatus.className = 'camera-status scanning';
+    cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando câmera... Busca contínua ativada.<br><small>Posicione a etiqueta. Os campos serão atualizados automaticamente.</small>';
+    try {
+      const video = document.getElementById('cameraVideo');
+      const canvas = document.getElementById('cameraCanvas');
+      State.cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+      });
+      video.srcObject = State.cameraStream;
+      await video.play();
+      cameraStatus.className = 'camera-status scanning';
+      cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Escaneando a cada 2 segundos... Clique em "Fechar" quando os dados estiverem corretos.';
+      await this.performScan();
+      State.scanInterval = setInterval(() => this.performScan(), 2000);
+    } catch (err) {
+      console.error('Erro ao acessar câmera:', err);
+      cameraStatus.className = 'camera-status error';
+      cameraStatus.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Erro ao acessar câmera.';
+      UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera');
+    }
+  },
+  async performScan() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('cameraCanvas');
+    const ctx = canvas.getContext('2d');
+    const cameraStatus = document.getElementById('cameraStatus');
+    if (!video.videoWidth || !video.videoHeight) return;
+    try {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const result = await Tesseract.recognize(canvas, 'por', { logger: () => {} });
+      const texto = result.data.text;
+      if (texto && texto.trim().length > 5) {
+        const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
+        let atualizouAlgo = false;
+        if (pep && pep !== State.lastPepFound) {
+          document.getElementById('cad-pep').value = pep;
+          State.lastPepFound = pep;
+          atualizouAlgo = true;
+        }
+        if (diagrama && diagrama !== State.lastDiagramaFound) {
+          document.getElementById('cad-diagrama').value = diagrama;
+          State.lastDiagramaFound = diagrama;
+          atualizouAlgo = true;
+        }
+        const pepStatus = State.lastPepFound
+          ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
+          : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
+        const diagramaStatus = State.lastDiagramaFound
+          ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
+          : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
+        if (State.lastPepFound || State.lastDiagramaFound) {
+          cameraStatus.className = 'camera-status success';
+          cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
 <div class="camera-found-items">${pepStatus}${diagramaStatus}</div>
 <small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
-} else {
-cameraStatus.className = 'camera-status scanning';
-cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
-}
-if (atualizouAlgo) {
-UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
-}
-}
-} catch (err) {
-console.error('Erro no OCR:', err);
-}
-},
-fecharCamera() {
-if (State.cameraStream) {
-State.cameraStream.getTracks().forEach(track => track.stop());
-State.cameraStream = null;
-}
-if (State.scanInterval) {
-clearInterval(State.scanInterval);
-State.scanInterval = null;
-}
-State.lastPepFound = null;
-State.lastDiagramaFound = null;
-document.getElementById('cameraSection').classList.remove('active');
-document.getElementById('cameraStatus').style.display = 'none';
-document.getElementById('cameraControls').style.display = 'none';
-UI.showToast('info', 'Câmera fechada', 'Verifique os dados preenchidos');
-},
-limparFormulario() {
-document.getElementById('formCadastro').reset();
-UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
-},
-toggleVolumesCadastro() {
-const processo = document.getElementById('cad-processo').value;
-const groupVolumes = document.getElementById('group-cad-volumes');
-if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
-else { groupVolumes.style.display = 'block'; }
-},
-toggleVolumesEdicao() {
-const processo = document.getElementById('edit-processo').value;
-const groupVolumes = document.getElementById('group-edit-volumes');
-if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
-else { groupVolumes.style.display = 'block'; }
-},
-async cadastrarProjeto(e) {
-e.preventDefault();
-const pep = document.getElementById('cad-pep').value.trim();
-const diagrama = document.getElementById('cad-diagrama').value.trim();
-const placa = document.getElementById('cad-placa').value.trim();
-const descricao = document.getElementById('cad-descricao').value.trim();
-const volumes = document.getElementById('cad-volumes').value.trim();
-const processo = document.getElementById('cad-processo').value;
-const prioridade = document.getElementById('cad-prioridade').value;
-const obs = document.getElementById('cad-obs').value.trim();
-// Validação: Diagrama é obrigatório
-if (!diagrama) {
-UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
-document.getElementById('cad-diagrama').focus();
-return false;
-}
-// Verifica duplicidade APENAS no Diagrama/Ordem (PEP pode repetir)
-const existeDiagrama = State.data.projetos.some(p =>
-p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
-);
-if (existeDiagrama) {
-UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
-return false;
-}
-let volumesTotal = null;
-if (processo === 'Nanocerâmico' && volumes) {
-const match = volumes.match(/\d+/);
-if (match) volumesTotal = parseInt(match[0]);
-}
-const novo = {
-id: Utils.genId(),
-pep: pep || null,
-diagrama,
-placa: placa || null,
-descricao,
-volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''),
-volumesTotal: volumesTotal,
-volumesProcessados: 0,
-processo,
-prioridade,
-status: 'Aguardando',
-turno: State.data.turnosPorPosto[processo] || '1º Turno',
-obs,
-criadoEm: Date.now(),
-atualizadoEm: Date.now()
+        } else {
+          cameraStatus.className = 'camera-status scanning';
+          cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
+        }
+        if (atualizouAlgo) {
+          UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
+        }
+      }
+    } catch (err) {
+      console.error('Erro no OCR:', err);
+    }
+  },
+  fecharCamera() {
+    if (State.cameraStream) {
+      State.cameraStream.getTracks().forEach(track => track.stop());
+      State.cameraStream = null;
+    }
+    if (State.scanInterval) {
+      clearInterval(State.scanInterval);
+      State.scanInterval = null;
+    }
+    State.lastPepFound = null;
+    State.lastDiagramaFound = null;
+    document.getElementById('cameraSection').classList.remove('active');
+    document.getElementById('cameraStatus').style.display = 'none';
+    document.getElementById('cameraControls').style.display = 'none';
+    UI.showToast('info', 'Câmera fechada', 'Verifique os dados preenchidos');
+  },
+  limparFormulario() {
+    document.getElementById('formCadastro').reset();
+    UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
+  },
+  toggleVolumesCadastro() {
+    const processo = document.getElementById('cad-processo').value;
+    const groupVolumes = document.getElementById('group-cad-volumes');
+    if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('cad-volumes').value = ''; }
+    else { groupVolumes.style.display = 'block'; }
+  },
+  toggleVolumesEdicao() {
+    const processo = document.getElementById('edit-processo').value;
+    const groupVolumes = document.getElementById('group-edit-volumes');
+    if (processo === 'Pintura' || processo === 'Conferência') { groupVolumes.style.display = 'none'; document.getElementById('edit-volumes').value = ''; }
+    else { groupVolumes.style.display = 'block'; }
+  },
+  async cadastrarProjeto(e) {
+    e.preventDefault();
+    const pep = document.getElementById('cad-pep').value.trim();
+    const diagrama = document.getElementById('cad-diagrama').value.trim();
+    const placa = document.getElementById('cad-placa').value.trim();
+    const descricao = document.getElementById('cad-descricao').value.trim();
+    const volumes = document.getElementById('cad-volumes').value.trim();
+    const processo = document.getElementById('cad-processo').value;
+    const prioridade = document.getElementById('cad-prioridade').value;
+    const obs = document.getElementById('cad-obs').value.trim();
+    
+    if (!diagrama) {
+      UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
+      document.getElementById('cad-diagrama').focus();
+      return false;
+    }
+    
+    const existeDiagrama = State.data.projetos.some(p =>
+      p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
+    );
+    if (existeDiagrama) {
+      UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
+      return false;
+    }
+    
+    let volumesTotal = null;
+    if (processo === 'Nanocerâmico' && volumes) {
+      const match = volumes.match(/\d+/);
+      if (match) volumesTotal = parseInt(match[0]);
+    }
+    
+    const novo = sanitizarProjeto({
+      id: Utils.genId(),
+      pep: pep || null,
+      diagrama,
+      placa: placa || null,
+      descricao,
+      volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''),
+      volumesTotal,
+      volumesProcessados: 0,
+      processo,
+      prioridade,
+      status: 'Aguardando',
+      turno: State.data.turnosPorPosto[processo] || '1º Turno',
+      obs,
+      criadoEm: Date.now(),
+      atualizadoEm: Date.now()
+    });
+    
+    console.log('📝 Cadastrando projeto:', novo);
+    try {
+      const result = await Storage.salvarApi('create', novo);
+      if (result.offline) {
+        State.data.projetos.push(novo);
+        Storage.salvarLocal();
+      }
+      document.getElementById('formCadastro').reset();
+      this.renderTable();
+      UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
+      return false;
+    } catch (error) {
+      console.error('❌ Erro ao cadastrar:', error);
+      UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique o console para mais detalhes');
+      return false;
+    }
+  },
+  setFilter(f, el) { State.admFilter = f; document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
+  renderTable() {
+    const tbody = document.getElementById('admTableBody');
+    const search = (document.getElementById('admSearch').value || '').toLowerCase();
+    let data = [...State.data.projetos];
+    if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
+    if (search) {
+      data = data.filter(p => {
+        const pepStr = (p.pep || '').toLowerCase();
+        const diagStr = (p.diagrama || '').toLowerCase();
+        const placaStr = (p.placa || '').toLowerCase();
+        const descStr = (p.descricao || '').toLowerCase();
+        return pepStr.includes(search) || diagStr.includes(search) || placaStr.includes(search) || descStr.includes(search);
+      });
+    }
+    data = Utils.ordenarPorPrioridade(data);
+    if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(p => {
+      const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':p.status==='Concluído'?'concluido':'parcial';
+      const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
+      let volumesDisplay = '';
+      if (p.volumesTotal && p.volumesTotal > 0) {
+        if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
+          const restantes = p.volumesTotal - p.volumesProcessados;
+          const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
+          volumesDisplay = `<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">${p.volumesProcessados}</span><span class="volumes-divider">/</span><span class="volumes-total">${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ${porcentagem}%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>${restantes} restante${restantes !== 1 ? 's' : ''}</span></div></div>`;
+        } else if (p.volumesProcessados >= p.volumesTotal) {
+          volumesDisplay = `<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>${p.volumesTotal}/${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>`;
+        } else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
+      } else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
+      return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto('${p.id}')"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
+    }).join('');
+  },
+  abrirEdicao(id) {
+    const p = State.data.projetos.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('edit-id').value = p.id;
+    document.getElementById('edit-pep').value = p.pep||'';
+    document.getElementById('edit-diagrama').value = p.diagrama;
+    document.getElementById('edit-placa').value = p.placa||'';
+    document.getElementById('edit-processo').value = p.processo;
+    document.getElementById('edit-descricao').value = p.descricao||'';
+    document.getElementById('edit-volumes').value = p.volumes;
+    document.getElementById('edit-prioridade').value = p.prioridade;
+    document.getElementById('edit-status').value = p.status === 'Bloqueado' ? 'Aguardando' : p.status;
+    document.getElementById('edit-obs').value = p.obs||'';
+    this.toggleVolumesEdicao();
+    UI.openModal('modalEditar');
+    setTimeout(() => { const firstInput = document.querySelector('#modalEditar input:not([type="hidden"])'); if (firstInput) { firstInput.focus(); UI.scrollParaElemento(firstInput); } }, 100);
+  },
+  async salvarEdicao(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    const p = State.data.projetos.find(x => x.id === id);
+    if (!p) return false;
+    const novoStatus = document.getElementById('edit-status').value;
+    const novoProcesso = document.getElementById('edit-processo').value;
+    p.pep = document.getElementById('edit-pep').value.trim() || null;
+    p.diagrama = document.getElementById('edit-diagrama').value.trim();
+    p.placa = document.getElementById('edit-placa').value.trim() || null;
+    p.processo = novoProcesso;
+    p.descricao = document.getElementById('edit-descricao').value.trim();
+    p.volumes = document.getElementById('edit-volumes').value.trim();
+    p.prioridade = document.getElementById('edit-prioridade').value;
+    p.obs = document.getElementById('edit-obs').value.trim();
+    p.atualizadoEm = Date.now();
+    if (novoProcesso === 'Nanocerâmico' && p.volumes) { const match = p.volumes.match(/\d+/); if (match) p.volumesTotal = parseInt(match[0]); } else { p.volumesTotal = null; }
+    if (novoStatus === 'Concluído' && p.status !== 'Concluído') { await Conclusao.concluirDireto(p.id, p.turno || '1º Turno'); UI.closeModal('modalEditar'); return false; }
+    p.status = novoStatus;
+    await Storage.salvarApi('update', p);
+    UI.closeModal('modalEditar');
+    this.renderTable();
+    Charts.render();
+    if (State.currentPosto) Posto.render();
+    UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado');
+    return false;
+  },
+  async excluirProjeto(id) {
+    const p = State.data.projetos.find(x => x.id === id);
+    if (!p) return;
+    if (!confirm('Deseja realmente excluir o projeto ' + p.diagrama + '?')) return;
+    State.data.projetos = State.data.projetos.filter(x => x.id !== id);
+    Storage.salvarLocal();
+    if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
+      try { await API.deleteProject(id); }
+      catch(e) { console.error('Erro ao excluir na API:', e); State.data.projetos.push(p); Storage.salvarLocal(); UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem'); return; }
+    }
+    this.renderTable();
+    Charts.render();
+    if (State.currentPosto) Posto.render();
+    UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
+  }
 };
-console.log('📝 Cadastrando projeto:', novo);
-try {
-const result = await Storage.salvarApi('create', novo);
-if (result.offline) {
-State.data.projetos.push(novo);
-Storage.salvarLocal();
-}
-document.getElementById('formCadastro').reset();
-this.renderTable();
-UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
-return false;
-} catch (error) {
-console.error('❌ Erro ao cadastrar:', error);
-UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique o console para mais detalhes');
-return false;
-}
-},
-setFilter(f, el) { State.admFilter = f; document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
-renderTable() {
-const tbody = document.getElementById('admTableBody');
-const search = (document.getElementById('admSearch').value || '').toLowerCase();
-let data = [...State.data.projetos];
-if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
-if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
-data = Utils.ordenarPorPrioridade(data);
-if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>`; return; }
-tbody.innerHTML = data.map(p => {
-const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':p.status==='Concluído'?'concluido':'parcial';
-const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
-let volumesDisplay = '';
-if (p.volumesTotal && p.volumesTotal > 0) {
-if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
-const restantes = p.volumesTotal - p.volumesProcessados;
-const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
-volumesDisplay = `<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">${p.volumesProcessados}</span><span class="volumes-divider">/</span><span class="volumes-total">${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ${porcentagem}%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>${restantes} restante${restantes !== 1 ? 's' : ''}</span></div></div>`;
-} else if (p.volumesProcessados >= p.volumesTotal) {
-volumesDisplay = `<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>${p.volumesTotal}/${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>`;
-} else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
-} else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
-return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto('${p.id}')"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
-}).join('');
-},
-abrirEdicao(id) {
-const p = State.data.projetos.find(x => x.id === id);
-if (!p) return;
-document.getElementById('edit-id').value = p.id;
-document.getElementById('edit-pep').value = p.pep||'';
-document.getElementById('edit-diagrama').value = p.diagrama;
-document.getElementById('edit-placa').value = p.placa||'';
-document.getElementById('edit-processo').value = p.processo;
-document.getElementById('edit-descricao').value = p.descricao||'';
-document.getElementById('edit-volumes').value = p.volumes;
-document.getElementById('edit-prioridade').value = p.prioridade;
-document.getElementById('edit-status').value = p.status === 'Bloqueado' ? 'Aguardando' : p.status;
-document.getElementById('edit-obs').value = p.obs||'';
-this.toggleVolumesEdicao();
-UI.openModal('modalEditar');
-setTimeout(() => { const firstInput = document.querySelector('#modalEditar input:not([type="hidden"])'); if (firstInput) { firstInput.focus(); UI.scrollParaElemento(firstInput); } }, 100);
-},
-async salvarEdicao(e) {
-e.preventDefault();
-const id = document.getElementById('edit-id').value;
-const p = State.data.projetos.find(x => x.id === id);
-if (!p) return false;
-const novoStatus = document.getElementById('edit-status').value;
-const novoProcesso = document.getElementById('edit-processo').value;
-p.pep = document.getElementById('edit-pep').value.trim() || null;
-p.diagrama = document.getElementById('edit-diagrama').value.trim();
-p.placa = document.getElementById('edit-placa').value.trim() || null;
-p.processo = novoProcesso;
-p.descricao = document.getElementById('edit-descricao').value.trim();
-p.volumes = document.getElementById('edit-volumes').value.trim();
-p.prioridade = document.getElementById('edit-prioridade').value;
-p.obs = document.getElementById('edit-obs').value.trim();
-p.atualizadoEm = Date.now();
-if (novoProcesso === 'Nanocerâmico' && p.volumes) { const match = p.volumes.match(/\d+/); if (match) p.volumesTotal = parseInt(match[0]); } else { p.volumesTotal = null; }
-if (novoStatus === 'Concluído' && p.status !== 'Concluído') { await Conclusao.concluirDireto(p.id, p.turno || '1º Turno'); UI.closeModal('modalEditar'); return false; }
-p.status = novoStatus;
-await Storage.salvarApi('update', p);
-UI.closeModal('modalEditar');
-this.renderTable();
-Charts.render();
-if (State.currentPosto) Posto.render();
-UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado');
-return false;
-},
-async excluirProjeto(id) {
-const p = State.data.projetos.find(x => x.id === id);
-if (!p) return;
-if (!confirm('Deseja realmente excluir o projeto ' + p.diagrama + '?')) return;
-State.data.projetos = State.data.projetos.filter(x => x.id !== id);
-Storage.salvarLocal();
-if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
-try { await API.deleteProject(id); }
-catch(e) { console.error('Erro ao excluir na API:', e); State.data.projetos.push(p); Storage.salvarLocal(); UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem'); return; }
-}
-this.renderTable();
-Charts.render();
-if (State.currentPosto) Posto.render();
-UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido');
-}
-};
+
 const Posto = {
-render() {
-if (!State.currentPosto) return;
-const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
-document.getElementById('postoIcon').className = 'fa-solid ' + iconMap[State.currentPosto];
-document.getElementById('postoTitulo').textContent = 'Posto - ' + State.currentPosto;
-document.getElementById('postoBadge').textContent = State.currentPosto;
-document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-this.aplicarTurnoAutomatico();
-this.renderTable();
-if (State.timerInterval) clearInterval(State.timerInterval);
-State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
-},
-aplicarTurnoAutomatico() {
-if (!State.currentPosto) return;
-if (Utils.ehFimDeSemana()) {
-const agora = Date.now();
-const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
-const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
-const modalAberto = document.querySelector('.modal-overlay.active');
-if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
-State.turnoFimSemanaModalAberto = true;
-State.turnoFimSemanaPendente = true;
-UI.openModal('modalTurnoFimSemana');
-} else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
-const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
-document.getElementById('postoTurno').value = turnoSalvo;
-}
-} else {
-const turnoDetectado = Utils.detectarTurnoAutomatico();
-State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
-Storage.salvarLocal();
-document.getElementById('postoTurno').value = turnoDetectado;
-}
-},
-salvarTurno() {
-const turno = document.getElementById('postoTurno').value;
-State.data.turnosPorPosto[State.currentPosto] = turno;
-State.data.ultimaSelecaoTurno = Date.now();
-Storage.salvarLocal();
-UI.showToast('info', 'Turno atualizado', 'Turno definido como ' + turno);
-},
-setFilter(f, el) { State.postoFilter = f; document.querySelectorAll('#page-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
-renderTable() {
-const tbody = document.getElementById('postoTableBody');
-const search = (document.getElementById('postoSearch').value || '').toLowerCase();
-let data = State.data.projetos.filter(p => p.processo === State.currentPosto && p.status !== 'Concluído');
-if (State.postoFilter !== 'all') data = data.filter(p => p.status === State.postoFilter);
-if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
-data = Utils.ordenarPorPrioridade(data);
-const todosPosto = State.data.projetos.filter(p => p.processo === State.currentPosto);
-document.getElementById('posto-aguardando').textContent = todosPosto.filter(p => p.status === 'Aguardando').length;
-document.getElementById('posto-processo').textContent = todosPosto.filter(p => p.status === 'Em Processo').length;
-const hoje = new Date(); hoje.setHours(0,0,0,0);
-const concluidosHoje = State.data.historicoPostos.filter(p => p.processo === State.currentPosto && p.dataHoraConclusao >= hoje.getTime()).length;
-document.getElementById('posto-concluidos').textContent = concluidosHoje;
-if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para ${State.currentPosto}.</p></div></td></tr>`; return; }
-tbody.innerHTML = data.map(p => {
-const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
-const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
-let volumesDisplay = '';
-if (p.volumesTotal && p.volumesTotal > 0) {
-if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
-const restantes = p.volumesTotal - p.volumesProcessados;
-const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
-volumesDisplay = `<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">${p.volumesProcessados}</span><span class="volumes-divider">/</span><span class="volumes-total">${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ${porcentagem}%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>${restantes} restante${restantes !== 1 ? 's' : ''}</span></div></div>`;
-} else if (p.volumesProcessados >= p.volumesTotal) {
-volumesDisplay = `<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>${p.volumesTotal}/${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>`;
-} else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
-} else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
-let tempoDisplay = '-';
-if (p.status === 'Em Processo' && p.dataHoraInicio) {
-tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
-} else if (p.dataHoraInicio && p.dataHoraFim) {
-tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
-}
-let botoesAcao = '';
-if (p.status === 'Aguardando' || p.status === 'Parcial') { botoesAcao = `<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
-else if (p.status === 'Em Processo') { botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
-return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;">${tempoDisplay}</td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="action-main">${botoesAcao}</div></td></tr>`;
-}).join('');
-setTimeout(this.atualizarTemposEmTempoReal, 100);
-},
-atualizarTemposEmTempoReal() {
-const agora = Date.now();
-State.data.projetos.forEach(p => {
-if (p.status === 'Em Processo' && p.dataHoraInicio) {
-const tempoDecorrido = agora - p.dataHoraInicio;
-const el = document.getElementById(`tempo-${p.id}`);
-if (el) { el.textContent = Utils.formatarTempo(tempoDecorrido); el.classList.add('ativo'); }
-}
-});
-},
-async iniciarProcesso(id) {
-const p = State.data.projetos.find(x => x.id === id);
-if (!p) return;
-p.status = 'Em Processo';
-p.dataHoraInicio = Date.now();
-p.dataHoraFim = null;
-p.tempoReal = null;
-p.atualizadoEm = Date.now();
-Storage.salvarLocal();
-await Storage.salvarApi('update', p);
-this.renderTable();
-UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new Date().toLocaleTimeString('pt-BR'));
-},
-async pausarProcesso(id) {
-const p = State.data.projetos.find(x => x.id === id);
-if (!p) return;
-p.status = 'Aguardando';
-p.atualizadoEm = Date.now();
-await Storage.salvarApi('update', p);
-this.renderTable();
-UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
-}
+  render() {
+    if (!State.currentPosto) return;
+    const iconMap = { 'Nanocerâmico':'fa-flask', 'Pintura':'fa-paint-roller', 'Conferência':'fa-clipboard-check' };
+    document.getElementById('postoIcon').className = 'fa-solid ' + iconMap[State.currentPosto];
+    document.getElementById('postoTitulo').textContent = 'Posto - ' + State.currentPosto;
+    document.getElementById('postoBadge').textContent = State.currentPosto;
+    document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+    this.aplicarTurnoAutomatico();
+    this.renderTable();
+    if (State.timerInterval) clearInterval(State.timerInterval);
+    State.timerInterval = setInterval(this.atualizarTemposEmTempoReal, 1000);
+  },
+  aplicarTurnoAutomatico() {
+    if (!State.currentPosto) return;
+    if (Utils.ehFimDeSemana()) {
+      const agora = Date.now();
+      const ultimaSelecao = State.data.ultimaSelecaoTurno || 0;
+      const tempoDesdeUltimaSelecao = agora - ultimaSelecao;
+      const modalAberto = document.querySelector('.modal-overlay.active');
+      if (tempoDesdeUltimaSelecao >= CONFIG.TURNO_COOLDOWN && !State.turnoFimSemanaModalAberto && !modalAberto) {
+        State.turnoFimSemanaModalAberto = true;
+        State.turnoFimSemanaPendente = true;
+        UI.openModal('modalTurnoFimSemana');
+      } else if (tempoDesdeUltimaSelecao < CONFIG.TURNO_COOLDOWN) {
+        const turnoSalvo = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
+        document.getElementById('postoTurno').value = turnoSalvo;
+      }
+    } else {
+      const turnoDetectado = Utils.detectarTurnoAutomatico();
+      State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+      Storage.salvarLocal();
+      document.getElementById('postoTurno').value = turnoDetectado;
+    }
+  },
+  salvarTurno() {
+    const turno = document.getElementById('postoTurno').value;
+    State.data.turnosPorPosto[State.currentPosto] = turno;
+    State.data.ultimaSelecaoTurno = Date.now();
+    Storage.salvarLocal();
+    UI.showToast('info', 'Turno atualizado', 'Turno definido como ' + turno);
+  },
+  setFilter(f, el) { State.postoFilter = f; document.querySelectorAll('#page-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
+  renderTable() {
+    const tbody = document.getElementById('postoTableBody');
+    const search = (document.getElementById('postoSearch').value || '').toLowerCase();
+    let data = State.data.projetos.filter(p => p.processo === State.currentPosto && p.status !== 'Concluído');
+    if (State.postoFilter !== 'all') data = data.filter(p => p.status === State.postoFilter);
+    if (search) {
+      data = data.filter(p => {
+        const pepStr = (p.pep || '').toLowerCase();
+        const diagStr = (p.diagrama || '').toLowerCase();
+        const placaStr = (p.placa || '').toLowerCase();
+        const descStr = (p.descricao || '').toLowerCase();
+        return pepStr.includes(search) || diagStr.includes(search) || placaStr.includes(search) || descStr.includes(search);
+      });
+    }
+    data = Utils.ordenarPorPrioridade(data);
+    const todosPosto = State.data.projetos.filter(p => p.processo === State.currentPosto);
+    document.getElementById('posto-aguardando').textContent = todosPosto.filter(p => p.status === 'Aguardando').length;
+    document.getElementById('posto-processo').textContent = todosPosto.filter(p => p.status === 'Em Processo').length;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const concluidosHoje = State.data.historicoPostos.filter(p => p.processo === State.currentPosto && p.dataHoraConclusao >= hoje.getTime()).length;
+    document.getElementById('posto-concluidos').textContent = concluidosHoje;
+    if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para ${State.currentPosto}.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(p => {
+      const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
+      const prioColor = p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
+      let volumesDisplay = '';
+      if (p.volumesTotal && p.volumesTotal > 0) {
+        if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
+          const restantes = p.volumesTotal - p.volumesProcessados;
+          const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
+          volumesDisplay = `<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">${p.volumesProcessados}</span><span class="volumes-divider">/</span><span class="volumes-total">${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ${porcentagem}%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>${restantes} restante${restantes !== 1 ? 's' : ''}</span></div></div>`;
+        } else if (p.volumesProcessados >= p.volumesTotal) {
+          volumesDisplay = `<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>${p.volumesTotal}/${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>`;
+        } else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
+      } else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
+      let tempoDisplay = '-';
+      if (p.status === 'Em Processo' && p.dataHoraInicio) {
+        tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
+      } else if (p.dataHoraInicio && p.dataHoraFim) {
+        tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
+      }
+      let botoesAcao = '';
+      if (p.status === 'Aguardando' || p.status === 'Parcial') { botoesAcao = `<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
+      else if (p.status === 'Em Processo') { botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
+      return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade}</span></td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;">${tempoDisplay}</td><td style="text-align:center;"><span class="status ${statusClass}">${p.status}</span></td><td style="text-align:center;"><div class="action-main">${botoesAcao}</div></td></tr>`;
+    }).join('');
+    setTimeout(this.atualizarTemposEmTempoReal, 100);
+  },
+  atualizarTemposEmTempoReal() {
+    const agora = Date.now();
+    State.data.projetos.forEach(p => {
+      if (p.status === 'Em Processo' && p.dataHoraInicio) {
+        const tempoDecorrido = agora - p.dataHoraInicio;
+        const el = document.getElementById(`tempo-${p.id}`);
+        if (el) { el.textContent = Utils.formatarTempo(tempoDecorrido); el.classList.add('ativo'); }
+      }
+    });
+  },
+  async iniciarProcesso(id) {
+    const p = State.data.projetos.find(x => x.id === id);
+    if (!p) return;
+    p.status = 'Em Processo';
+    p.dataHoraInicio = Date.now();
+    p.dataHoraFim = null;
+    p.tempoReal = null;
+    p.atualizadoEm = Date.now();
+    Storage.salvarLocal();
+    await Storage.salvarApi('update', p);
+    this.renderTable();
+    UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new Date().toLocaleTimeString('pt-BR'));
+  },
+  async pausarProcesso(id) {
+    const p = State.data.projetos.find(x => x.id === id);
+    if (!p) return;
+    p.status = 'Aguardando';
+    p.atualizadoEm = Date.now();
+    await Storage.salvarApi('update', p);
+    this.renderTable();
+    UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
+  }
 };
+
 const Conclusao = {
-solicitar(id) {
-const p = State.data.projetos.find(x => x.id === id);
-if (!p) return;
-State.projetoParaConcluir = id;
-document.getElementById('concluirCodigo').textContent = p.diagrama;
-document.getElementById('concluirVolumesSection').style.display = 'none';
-document.getElementById('concluirPinturaSection').style.display = 'none';
-document.getElementById('concluirTurnoNormal').style.display = 'block';
-if (p.processo === 'Nanocerâmico') {
-document.getElementById('concluirVolumesSection').style.display = 'block';
-document.getElementById('concluirTurnoNormal').style.display = 'none';
-document.getElementById('concluirTurnoNano').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
-const total = p.volumesTotal || 0;
-const jaProcessados = p.volumesProcessados || 0;
-const faltam = total - jaProcessados;
-document.getElementById('concluirTotalVolumes').textContent = total;
-document.getElementById('concluirJaProcessados').textContent = jaProcessados;
-document.getElementById('concluirFaltam').textContent = faltam;
-document.getElementById('concluirVolumesProcessados').value = '';
-document.getElementById('concluirVolumesProcessados').max = faltam;
-document.getElementById('concluirVolumesRestantes').textContent = faltam;
-document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
-document.getElementById('concluirVolumesProcessados').oninput = this.atualizarVolumesRestantes;
-} else if (p.processo === 'Pintura') {
-document.getElementById('concluirPinturaSection').style.display = 'block';
-document.getElementById('concluirTurnoNormal').style.display = 'none';
-document.getElementById('concluirTurnoPintura').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
-document.getElementById('concluirObservacaoPintura').value = '';
-} else { document.getElementById('concluirTurno').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno'; }
-UI.openModal('modalConcluir');
-setTimeout(() => {
-if (p.processo === 'Nanocerâmico') { document.getElementById('concluirVolumesProcessados').focus(); }
-else if (p.processo === 'Pintura') { document.getElementById('concluirObservacaoPintura').focus(); }
-}, 100);
-},
-atualizarVolumesRestantes() {
-const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
-if (!p) return;
-const processadosAgora = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
-const total = p.volumesTotal || 0;
-const jaProcessados = p.volumesProcessados || 0;
-const restantes = total - jaProcessados - processadosAgora;
-document.getElementById('concluirVolumesRestantes').textContent = restantes;
-document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
-},
-async confirmar() {
-if (!State.projetoParaConcluir) return;
-const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
-if (!p) return;
-if (p.processo === 'Nanocerâmico') {
-const turno = document.getElementById('concluirTurnoNano').value;
-const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
-if (volumesProcessados <= 0) { UI.showToast('warning', 'Atenção', 'Informe a quantidade de volumes'); return; }
-const faltam = (p.volumesTotal || 0) - (p.volumesProcessados || 0);
-if (volumesProcessados > faltam) { UI.showToast('error', 'Erro', `Você informou ${volumesProcessados}, mas faltam apenas ${faltam} volumes.`); return; }
-p.volumesProcessados += volumesProcessados;
-if (p.volumesProcessados >= p.volumesTotal) { await this.concluirDireto(State.projetoParaConcluir, turno); }
-else {
-p.status = 'Parcial';
-p.turno = turno;
-p.atualizadoEm = Date.now();
-await Storage.salvarApi('update', p);
-Posto.renderTable();
-Admin.renderTable();
-UI.showToast('info', 'Conclusão parcial', `${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados}.`);
-}
-} else if (p.processo === 'Pintura') {
-const turno = document.getElementById('concluirTurnoPintura').value;
-const observacao = document.getElementById('concluirObservacaoPintura').value;
-p.observacaoPintura = observacao || null;
-await this.concluirDireto(State.projetoParaConcluir, turno);
-} else {
-const turno = document.getElementById('concluirTurno').value;
-await this.concluirDireto(State.projetoParaConcluir, turno);
-}
-UI.closeModal('modalConcluir');
-State.projetoParaConcluir = null;
-},
-registrarHistoricoPosto(p, turno, tempoReal) {
-const registro = { id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), projetoId: p.id, pep: p.pep, diagrama: p.diagrama, placa: p.placa, processo: p.processo, turno: turno, tempoReal: tempoReal, observacao: p.observacaoPintura || null, dataHoraConclusao: Date.now() };
-State.data.historicoPostos.unshift(registro);
-Storage.salvarLocal();
-},
-async concluirDireto(id, turno) {
-const idx = State.data.projetos.findIndex(x => x.id === id);
-if (idx < 0) return;
-const p = State.data.projetos[idx];
-const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
-this.registrarHistoricoPosto(p, turno, tempoReal);
-const proximoProcesso = CONFIG.FLUXO_PROCESSOS[p.processo];
-if (proximoProcesso) {
-p.processo = proximoProcesso;
-p.status = 'Aguardando';
-p.turno = State.data.turnosPorPosto[proximoProcesso] || turno;
-p.dataHoraFim = Date.now();
-p.tempoReal = tempoReal;
-p.volumesProcessados = 0;
-p.dataHoraInicio = null;
-p.observacaoPintura = null;
-p.atualizadoEm = Date.now();
-await Storage.salvarApi('update', p);
-Posto.renderTable();
-Admin.renderTable();
-const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
-UI.showToast('success', 'Fluxo atualizado', `${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
-} else {
-p.dataHoraFim = Date.now();
-const concluido = Object.assign({}, p, { status: 'Concluído', turno: turno || p.turno || '1º Turno', concluidoEm: Date.now(), tempoReal: tempoReal });
-State.data.historico.unshift(concluido);
-State.data.projetos.splice(idx, 1);
-await Storage.salvarApi('update', concluido);
-Storage.salvarLocal();
-Admin.renderTable();
-Posto.renderTable();
-Historico.renderGeral();
-Charts.render();
-UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Utils.formatarTempo(tempoReal));
-}
-}
+  solicitar(id) {
+    const p = State.data.projetos.find(x => x.id === id);
+    if (!p) return;
+    State.projetoParaConcluir = id;
+    document.getElementById('concluirCodigo').textContent = p.diagrama;
+    document.getElementById('concluirVolumesSection').style.display = 'none';
+    document.getElementById('concluirPinturaSection').style.display = 'none';
+    document.getElementById('concluirTurnoNormal').style.display = 'block';
+    if (p.processo === 'Nanocerâmico') {
+      document.getElementById('concluirVolumesSection').style.display = 'block';
+      document.getElementById('concluirTurnoNormal').style.display = 'none';
+      document.getElementById('concluirTurnoNano').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
+      const total = p.volumesTotal || 0;
+      const jaProcessados = p.volumesProcessados || 0;
+      const faltam = total - jaProcessados;
+      document.getElementById('concluirTotalVolumes').textContent = total;
+      document.getElementById('concluirJaProcessados').textContent = jaProcessados;
+      document.getElementById('concluirFaltam').textContent = faltam;
+      document.getElementById('concluirVolumesProcessados').value = '';
+      document.getElementById('concluirVolumesProcessados').max = faltam;
+      document.getElementById('concluirVolumesRestantes').textContent = faltam;
+      document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
+      document.getElementById('concluirVolumesProcessados').oninput = this.atualizarVolumesRestantes;
+    } else if (p.processo === 'Pintura') {
+      document.getElementById('concluirPinturaSection').style.display = 'block';
+      document.getElementById('concluirTurnoNormal').style.display = 'none';
+      document.getElementById('concluirTurnoPintura').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
+      document.getElementById('concluirObservacaoPintura').value = '';
+    } else { document.getElementById('concluirTurno').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno'; }
+    UI.openModal('modalConcluir');
+    setTimeout(() => {
+      if (p.processo === 'Nanocerâmico') { document.getElementById('concluirVolumesProcessados').focus(); }
+      else if (p.processo === 'Pintura') { document.getElementById('concluirObservacaoPintura').focus(); }
+    }, 100);
+  },
+  atualizarVolumesRestantes() {
+    const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
+    if (!p) return;
+    const processadosAgora = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
+    const total = p.volumesTotal || 0;
+    const jaProcessados = p.volumesProcessados || 0;
+    const restantes = total - jaProcessados - processadosAgora;
+    document.getElementById('concluirVolumesRestantes').textContent = restantes;
+    document.getElementById('concluirVolumesRestantes').style.color = restantes > 0 ? 'var(--warning)' : 'var(--success)';
+  },
+  async confirmar() {
+    if (!State.projetoParaConcluir) return;
+    const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
+    if (!p) return;
+    if (p.processo === 'Nanocerâmico') {
+      const turno = document.getElementById('concluirTurnoNano').value;
+      const volumesProcessados = parseInt(document.getElementById('concluirVolumesProcessados').value) || 0;
+      if (volumesProcessados <= 0) { UI.showToast('warning', 'Atenção', 'Informe a quantidade de volumes'); return; }
+      const faltam = (p.volumesTotal || 0) - (p.volumesProcessados || 0);
+      if (volumesProcessados > faltam) { UI.showToast('error', 'Erro', `Você informou ${volumesProcessados}, mas faltam apenas ${faltam} volumes.`); return; }
+      p.volumesProcessados += volumesProcessados;
+      if (p.volumesProcessados >= p.volumesTotal) { await this.concluirDireto(State.projetoParaConcluir, turno); }
+      else {
+        p.status = 'Parcial';
+        p.turno = turno;
+        p.atualizadoEm = Date.now();
+        await Storage.salvarApi('update', p);
+        Posto.renderTable();
+        Admin.renderTable();
+        UI.showToast('info', 'Conclusão parcial', `${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados}.`);
+      }
+    } else if (p.processo === 'Pintura') {
+      const turno = document.getElementById('concluirTurnoPintura').value;
+      const observacao = document.getElementById('concluirObservacaoPintura').value;
+      p.observacaoPintura = observacao || null;
+      await this.concluirDireto(State.projetoParaConcluir, turno);
+    } else {
+      const turno = document.getElementById('concluirTurno').value;
+      await this.concluirDireto(State.projetoParaConcluir, turno);
+    }
+    UI.closeModal('modalConcluir');
+    State.projetoParaConcluir = null;
+  },
+  registrarHistoricoPosto(p, turno, tempoReal) {
+    const registro = { 
+      id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), 
+      projetoId: p.id, 
+      pep: p.pep, 
+      diagrama: p.diagrama, 
+      placa: p.placa, 
+      processo: p.processo, 
+      turno: turno, 
+      tempoReal: tempoReal, 
+      observacao: p.observacaoPintura || null, 
+      dataHoraConclusao: Date.now() 
+    };
+    
+    // Salva localmente para exibição imediata
+    State.data.historicoPostos.unshift(registro);
+    Storage.salvarLocal();
+    
+    // ✅ ENVIA PARA O GOOGLE SHEETS VIA API
+    if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
+      API.registerPostoHistory(registro).catch(err => {
+        console.error('Erro ao registrar no HistoricoPostos:', err);
+      });
+    }
+  },
+  async concluirDireto(id, turno) {
+    const idx = State.data.projetos.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const p = State.data.projetos[idx];
+    const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
+    
+    // ✅ Registra no histórico de postos (local + API)
+    this.registrarHistoricoPosto(p, turno, tempoReal);
+    
+    const proximoProcesso = CONFIG.FLUXO_PROCESSOS[p.processo];
+    if (proximoProcesso) {
+      p.processo = proximoProcesso;
+      p.status = 'Aguardando';
+      p.turno = State.data.turnosPorPosto[proximoProcesso] || turno;
+      p.dataHoraFim = Date.now();
+      p.tempoReal = tempoReal;
+      p.volumesProcessados = 0;
+      p.dataHoraInicio = null;
+      p.observacaoPintura = null;
+      p.atualizadoEm = Date.now();
+      await Storage.salvarApi('update', p);
+      Posto.renderTable();
+      Admin.renderTable();
+      const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
+      UI.showToast('success', 'Fluxo atualizado', `${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
+    } else {
+      p.dataHoraFim = Date.now();
+      const concluido = Object.assign({}, p, { status: 'Concluído', turno: turno || p.turno || '1º Turno', concluidoEm: Date.now(), tempoReal: tempoReal });
+      State.data.historico.unshift(concluido);
+      State.data.projetos.splice(idx, 1);
+      Storage.salvarLocal();
+      Admin.renderTable();
+      Posto.renderTable();
+      Historico.renderGeral();
+      Charts.render();
+      UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Utils.formatarTempo(tempoReal));
+    }
+  }
 };
+
 const Historico = {
-switchTab(tab, el) {
-document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
-el.classList.add('active');
-if (tab === 'geral') { document.getElementById('historicoGeralSection').style.display = 'block'; document.getElementById('historicoPostosSection').style.display = 'none'; }
-else { document.getElementById('historicoGeralSection').style.display = 'none'; document.getElementById('historicoPostosSection').style.display = 'block'; this.renderPostos(); }
-},
-setFilterGeral(f, el) { State.histFilter = f; document.querySelectorAll('#historicoGeralSection .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderGeral(); },
-setFilterPostos(f, el) { State.histPostoFilter = f; document.querySelectorAll('#historicoPostosSection .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderPostos(); },
-setFilterPostoAtual(f, el) { State.historicoPostoFilter = f; document.querySelectorAll('#page-historico-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderPostoAtual(); },
-renderGeral() {
-const tbody = document.getElementById('histTableBody');
-const search = (document.getElementById('histSearch').value || '').toLowerCase();
-let data = [...State.data.historico];
-if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
-if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-data.sort((a,b) => b.concluidoEm - a.concluidoEm);
-if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
-tbody.innerHTML = data.map(p => {
-const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
-const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
-const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
-const obsPintura = p.observacaoPintura ? `<br><small style="color:var(--text-light);">${p.observacaoPintura}</small>` : '';
-return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong>${obsPintura}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td><td style="text-align:center;">${dtInicio}</td><td style="text-align:center;">${dtFim}</td><td style="text-align:center;"><div class="row-actions">${State.currentUser === 'admin' ? `<button class="icon-action" title="Reativar" onclick="Historico.reativar('${p.id}')"><i class="fa-solid fa-rotate-left"></i></button>` : ''}${State.currentUser === 'admin' ? `<button class="icon-action delete" title="Excluir" onclick="Historico.excluir('${p.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}</div></td></tr>`;
-}).join('');
-},
-renderPostos() {
-const tbody = document.getElementById('histPostoTableBody');
-const search = (document.getElementById('histPostoSearch').value || '').toLowerCase();
-let data = [...State.data.historicoPostos];
-if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
-if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
-if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>`; return; }
-const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
-tbody.innerHTML = data.map(p => {
-const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
-const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
-const postoClass = postoClassMap[p.processo] || '';
-const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
-return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;"><span class="posto-badge ${postoClass}">${p.processo}</span></td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td><td style="text-align:center;">${dataConclusao}</td><td style="text-align:center;">${obs}</td></tr>`;
-}).join('');
-},
-renderPostoAtual() {
-const tbody = document.getElementById('historicoPostoTableBody');
-const search = (document.getElementById('historicoPostoSearch').value || '').toLowerCase();
-document.getElementById('historicoPostoNome').textContent = State.currentPosto;
-document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
-let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
-if (State.historicoPostoFilter !== 'all') data = data.filter(p => p.turno === State.historicoPostoFilter);
-if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search));
-data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
-if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div></td></tr>`; return; }
-tbody.innerHTML = data.map(p => {
-const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
-const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
-const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
-return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td><td style="text-align:center;">${dataConclusao}</td><td style="text-align:center;">${obs}</td></tr>`;
-}).join('');
-},
-reativar(id) {
-const idx = State.data.historico.findIndex(x => x.id === id);
-if (idx < 0) return;
-if (!confirm('Reativar este projeto?')) return;
-const p = State.data.historico[idx];
-p.status = 'Aguardando';
-delete p.concluidoEm;
-delete p.dataHoraFim;
-State.data.projetos.push(p);
-State.data.historico.splice(idx, 1);
-Storage.salvarLocal();
-this.renderGeral();
-Admin.renderTable();
-Posto.render();
-Charts.render();
-UI.showToast('success', 'Reativado', p.diagrama + ' voltou para processamento');
-},
-excluir(id) {
-if (!confirm('Excluir permanentemente este registro?')) return;
-State.data.historico = State.data.historico.filter(x => x.id !== id);
-Storage.salvarLocal();
-this.renderGeral();
-Charts.render();
-UI.showToast('success', 'Excluído', 'Registro removido');
-}
+  switchTab(tab, el) {
+    document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    if (tab === 'geral') { document.getElementById('historicoGeralSection').style.display = 'block'; document.getElementById('historicoPostosSection').style.display = 'none'; }
+    else { document.getElementById('historicoGeralSection').style.display = 'none'; document.getElementById('historicoPostosSection').style.display = 'block'; this.renderPostos(); }
+  },
+  setFilterGeral(f, el) { State.histFilter = f; document.querySelectorAll('#historicoGeralSection .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderGeral(); },
+  setFilterPostos(f, el) { State.histPostoFilter = f; document.querySelectorAll('#historicoPostosSection .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderPostos(); },
+  setFilterPostoAtual(f, el) { State.historicoPostoFilter = f; document.querySelectorAll('#page-historico-posto .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderPostoAtual(); },
+  renderGeral() {
+    const tbody = document.getElementById('histTableBody');
+    const search = (document.getElementById('histSearch').value || '').toLowerCase();
+    let data = [...State.data.historico];
+    if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
+    if (search) {
+      data = data.filter(p => {
+        const pepStr = (p.pep || '').toLowerCase();
+        const diagStr = (p.diagrama || '').toLowerCase();
+        const placaStr = (p.placa || '').toLowerCase();
+        return pepStr.includes(search) || diagStr.includes(search) || placaStr.includes(search);
+      });
+    }
+    data.sort((a,b) => b.concluidoEm - a.concluidoEm);
+    if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(p => {
+      const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
+      const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
+      const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+      const obsPintura = p.observacaoPintura ? `<br><small style="color:var(--text-light);">${p.observacaoPintura}</small>` : '';
+      return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong>${obsPintura}</td><td style="text-align:center;">${p.processo}</td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td><td style="text-align:center;">${dtInicio}</td><td style="text-align:center;">${dtFim}</td><td style="text-align:center;"><div class="row-actions">${State.currentUser === 'admin' ? `<button class="icon-action" title="Reativar" onclick="Historico.reativar('${p.id}')"><i class="fa-solid fa-rotate-left"></i></button>` : ''}${State.currentUser === 'admin' ? `<button class="icon-action delete" title="Excluir" onclick="Historico.excluir('${p.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}</div></td></tr>`;
+    }).join('');
+  },
+  renderPostos() {
+    const tbody = document.getElementById('histPostoTableBody');
+    const search = (document.getElementById('histPostoSearch').value || '').toLowerCase();
+    let data = [...State.data.historicoPostos];
+    if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
+    if (search) {
+      data = data.filter(p => {
+        const pepStr = (p.pep || '').toLowerCase();
+        const diagStr = (p.diagrama || '').toLowerCase();
+        const placaStr = (p.placa || '').toLowerCase();
+        return pepStr.includes(search) || diagStr.includes(search) || placaStr.includes(search);
+      });
+    }
+    data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
+    if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>`; return; }
+    const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
+    tbody.innerHTML = data.map(p => {
+      const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+      const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const postoClass = postoClassMap[p.processo] || '';
+      const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
+      return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;"><span class="posto-badge ${postoClass}">${p.processo}</span></td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td><td style="text-align:center;">${dataConclusao}</td><td style="text-align:center;">${obs}</td></tr>`;
+    }).join('');
+  },
+  renderPostoAtual() {
+    const tbody = document.getElementById('historicoPostoTableBody');
+    const search = (document.getElementById('historicoPostoSearch').value || '').toLowerCase();
+    document.getElementById('historicoPostoNome').textContent = State.currentPosto;
+    document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
+    let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
+    if (State.historicoPostoFilter !== 'all') data = data.filter(p => p.turno === State.historicoPostoFilter);
+    if (search) {
+      data = data.filter(p => {
+        const pepStr = (p.pep || '').toLowerCase();
+        const diagStr = (p.diagrama || '').toLowerCase();
+        const placaStr = (p.placa || '').toLowerCase();
+        return pepStr.includes(search) || diagStr.includes(search) || placaStr.includes(search);
+      });
+    }
+    data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
+    if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(p => {
+      const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+      const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const obs = p.observacao ? `<small style="color:var(--text-light);">${p.observacao}</small>` : '-';
+      return `<tr><td style="text-align:center;">${p.pep||'-'}</td><td style="text-align:center;"><strong>${p.diagrama}</strong></td><td style="text-align:center;">${p.placa||'-'}</td><td style="text-align:center;"><span class="turno-badge">${p.turno||'-'}</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">${tempoStr}</strong></td><td style="text-align:center;">${dataConclusao}</td><td style="text-align:center;">${obs}</td></tr>`;
+    }).join('');
+  },
+  reativar(id) {
+    const idx = State.data.historico.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    if (!confirm('Reativar este projeto?')) return;
+    const p = State.data.historico[idx];
+    p.status = 'Aguardando';
+    delete p.concluidoEm;
+    delete p.dataHoraFim;
+    State.data.projetos.push(p);
+    State.data.historico.splice(idx, 1);
+    Storage.salvarLocal();
+    this.renderGeral();
+    Admin.renderTable();
+    Posto.render();
+    Charts.render();
+    UI.showToast('success', 'Reativado', p.diagrama + ' voltou para processamento');
+  },
+  excluir(id) {
+    if (!confirm('Excluir permanentemente este registro?')) return;
+    State.data.historico = State.data.historico.filter(x => x.id !== id);
+    Storage.salvarLocal();
+    this.renderGeral();
+    Charts.render();
+    UI.showToast('success', 'Excluído', 'Registro removido');
+  }
 };
+
 const Turno = {
-confirmarFimSemana(turno) {
-State.data.turnosPorPosto[State.currentPosto] = turno;
-State.data.ultimaSelecaoTurno = Date.now();
-Storage.salvarLocal();
-document.getElementById('postoTurno').value = turno;
-UI.closeModal('modalTurnoFimSemana');
-State.turnoFimSemanaPendente = false;
-UI.showToast('info', 'Turno selecionado', `${turno} definido. Próxima pergunta em 2h.`);
-},
-cancelarSelecao() {
-const turnoDetectado = Utils.detectarTurnoAutomatico();
-State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
-State.data.ultimaSelecaoTurno = Date.now();
-Storage.salvarLocal();
-document.getElementById('postoTurno').value = turnoDetectado;
-UI.closeModal('modalTurnoFimSemana');
-State.turnoFimSemanaPendente = false;
-}
+  confirmarFimSemana(turno) {
+    State.data.turnosPorPosto[State.currentPosto] = turno;
+    State.data.ultimaSelecaoTurno = Date.now();
+    Storage.salvarLocal();
+    document.getElementById('postoTurno').value = turno;
+    UI.closeModal('modalTurnoFimSemana');
+    State.turnoFimSemanaPendente = false;
+    UI.showToast('info', 'Turno selecionado', `${turno} definido. Próxima pergunta em 2h.`);
+  },
+  cancelarSelecao() {
+    const turnoDetectado = Utils.detectarTurnoAutomatico();
+    State.data.turnosPorPosto[State.currentPosto] = turnoDetectado;
+    State.data.ultimaSelecaoTurno = Date.now();
+    Storage.salvarLocal();
+    document.getElementById('postoTurno').value = turnoDetectado;
+    UI.closeModal('modalTurnoFimSemana');
+    State.turnoFimSemanaPendente = false;
+  }
 };
+
 const VirtualKeyboard = {
-show() { document.getElementById('virtualKeyboard').classList.add('active'); State.vkActive = true; if (State.vkTarget) UI.scrollParaElemento(State.vkTarget); },
-hide() { document.getElementById('virtualKeyboard').classList.remove('active'); State.vkActive = false; State.vkTarget = null; },
-toggle() { if (State.vkActive) this.hide(); else this.show(); }
+  show() { document.getElementById('virtualKeyboard').classList.add('active'); State.vkActive = true; if (State.vkTarget) UI.scrollParaElemento(State.vkTarget); },
+  hide() { document.getElementById('virtualKeyboard').classList.remove('active'); State.vkActive = false; State.vkTarget = null; },
+  toggle() { if (State.vkActive) this.hide(); else this.show(); }
 };
+
 const Charts = {
-render() {
-const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
-const gridColor = 'rgba(128,128,128,0.15)';
-Object.values(State.charts).forEach(c => c.destroy());
-State.charts = {};
-const ctx1 = document.getElementById('chartProcessos');
-if (ctx1) {
-const counts = { 'Nanocerâmico': State.data.projetos.filter(p => p.processo === 'Nanocerâmico').length, 'Pintura': State.data.projetos.filter(p => p.processo === 'Pintura').length, 'Conferência': State.data.projetos.filter(p => p.processo === 'Conferência').length };
-State.charts.processos = new Chart(ctx1, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Projetos Ativos', data: Object.values(counts), backgroundColor: ['#005BAC', '#00A651', '#FFB000'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Projetos por Processo', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } } });
-}
-const ctx2 = document.getElementById('chartTurnos');
-if (ctx2) {
-const turnosData = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
-State.data.projetos.forEach(p => { if (turnosData[p.turno]) turnosData[p.turno].total++; });
-State.data.historico.forEach(p => { if (turnosData[p.turno]) turnosData[p.turno].concluidos++; });
-const eficiencia = Object.keys(turnosData).map(t => { const d = turnosData[t]; return d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0; });
-State.charts.turnos = new Chart(ctx2, { type: 'doughnut', data: { labels: Object.keys(turnosData), datasets: [{ data: eficiencia, backgroundColor: ['#005BAC', '#00A651', '#FFB000'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Eficiência por Turno (%)', color: textColor } } } });
-}
-const ctx3 = document.getElementById('chartTempoExecucao');
-if (ctx3) {
-const temposPorProcesso = { 'Nanocerâmico': [], 'Pintura': [], 'Conferência': [] };
-State.data.historico.forEach(p => { if (p.tempoReal && temposPorProcesso[p.processo]) temposPorProcesso[p.processo].push(p.tempoReal / 60000); });
-const mediaTempos = Object.keys(temposPorProcesso).map(proc => { const t = temposPorProcesso[proc]; return t.length > 0 ? Math.round(t.reduce((a,b)=>a+b,0)/t.length) : 0; });
-State.charts.tempo = new Chart(ctx3, { type: 'line', data: { labels: Object.keys(temposPorProcesso), datasets: [{ label: 'Tempo Médio (min)', data: mediaTempos, borderColor: '#005BAC', backgroundColor: 'rgba(0,91,172,0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Tempo Médio (min)', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } } });
-}
-const ctx4 = document.getElementById('chartEficiencia');
-if (ctx4) {
-const prioridades = { 'Urgente': State.data.projetos.filter(p => p.prioridade === 'Urgente').length, 'Alta': State.data.projetos.filter(p => p.prioridade === 'Alta').length, 'Normal': State.data.projetos.filter(p => p.prioridade === 'Normal').length };
-State.charts.eficiencia = new Chart(ctx4, { type: 'pie', data: { labels: Object.keys(prioridades), datasets: [{ data: Object.values(prioridades), backgroundColor: ['#D32F2F', '#FFB000', '#00A651'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Distribuição por Prioridade', color: textColor } } } });
-}
-}
+  render() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
+    const gridColor = 'rgba(128,128,128,0.15)';
+    Object.values(State.charts).forEach(c => c.destroy());
+    State.charts = {};
+    const ctx1 = document.getElementById('chartProcessos');
+    if (ctx1) {
+      const counts = { 'Nanocerâmico': State.data.projetos.filter(p => p.processo === 'Nanocerâmico').length, 'Pintura': State.data.projetos.filter(p => p.processo === 'Pintura').length, 'Conferência': State.data.projetos.filter(p => p.processo === 'Conferência').length };
+      State.charts.processos = new Chart(ctx1, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Projetos Ativos', data: Object.values(counts), backgroundColor: ['#005BAC', '#00A651', '#FFB000'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Projetos por Processo', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } } });
+    }
+    const ctx2 = document.getElementById('chartTurnos');
+    if (ctx2) {
+      const turnosData = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
+      State.data.projetos.forEach(p => { if (turnosData[p.turno]) turnosData[p.turno].total++; });
+      State.data.historico.forEach(p => { if (turnosData[p.turno]) turnosData[p.turno].concluidos++; });
+      const eficiencia = Object.keys(turnosData).map(t => { const d = turnosData[t]; return d.total > 0 ? Math.round((d.concluidos / (d.total + d.concluidos)) * 100) : 0; });
+      State.charts.turnos = new Chart(ctx2, { type: 'doughnut', data: { labels: Object.keys(turnosData), datasets: [{ data: eficiencia, backgroundColor: ['#005BAC', '#00A651', '#FFB000'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Eficiência por Turno (%)', color: textColor } } } });
+    }
+    const ctx3 = document.getElementById('chartTempoExecucao');
+    if (ctx3) {
+      const temposPorProcesso = { 'Nanocerâmico': [], 'Pintura': [], 'Conferência': [] };
+      State.data.historico.forEach(p => { if (p.tempoReal && temposPorProcesso[p.processo]) temposPorProcesso[p.processo].push(p.tempoReal / 60000); });
+      const mediaTempos = Object.keys(temposPorProcesso).map(proc => { const t = temposPorProcesso[proc]; return t.length > 0 ? Math.round(t.reduce((a,b)=>a+b,0)/t.length) : 0; });
+      State.charts.tempo = new Chart(ctx3, { type: 'line', data: { labels: Object.keys(temposPorProcesso), datasets: [{ label: 'Tempo Médio (min)', data: mediaTempos, borderColor: '#005BAC', backgroundColor: 'rgba(0,91,172,0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Tempo Médio (min)', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } } });
+    }
+    const ctx4 = document.getElementById('chartEficiencia');
+    if (ctx4) {
+      const prioridades = { 'Urgente': State.data.projetos.filter(p => p.prioridade === 'Urgente').length, 'Alta': State.data.projetos.filter(p => p.prioridade === 'Alta').length, 'Normal': State.data.projetos.filter(p => p.prioridade === 'Normal').length };
+      State.charts.eficiencia = new Chart(ctx4, { type: 'pie', data: { labels: Object.keys(prioridades), datasets: [{ data: Object.values(prioridades), backgroundColor: ['#D32F2F', '#FFB000', '#00A651'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Distribuição por Prioridade', color: textColor } } } });
+    }
+  }
 };
+
 const Export = {
-downloadFile(name, content, type) { const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); },
-csv() {
-const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
-const rows = State.data.projetos.map(p => [p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
-const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
-this.downloadFile('projetos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
-UI.showToast('success', 'Exportado', 'Arquivo CSV gerado');
-},
-historicoCSV() {
-let data = State.data.historico;
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-const headers = ['PEP','Diagrama/Ordem','Placa','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
-const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
-const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
-this.downloadFile('historico_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
-UI.showToast('success', 'Exportado', 'Histórico exportado');
-},
-historicoPostosCSV() {
-let data = State.data.historicoPostos;
-if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
-const headers = ['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
-const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
-const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
-this.downloadFile('historico_postos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
-UI.showToast('success', 'Exportado', 'Histórico por posto exportado');
-},
-postoConcluidosCSV() {
-let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
-const headers = ['PEP','Diagrama/Ordem','Placa','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
-const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
-const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
-this.downloadFile(`concluidos_${State.currentPosto.toLowerCase().replace('ê','e').replace('á','a').replace(' ','_')}_${Utils.dateStamp()}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8;');
-UI.showToast('success', 'Exportado', `Concluídos no ${State.currentPosto} exportados`);
-},
-backup() { const json = JSON.stringify(State.data, null, 2); this.downloadFile('backup_weg_' + Utils.dateStamp() + '.json', json, 'application/json'); UI.showToast('success', 'Backup', 'Arquivo gerado'); },
-restaurar(e) {
-const file = e.target.files[0];
-if (!file) return;
-const reader = new FileReader();
-reader.onload = ev => {
-try {
-const obj = JSON.parse(ev.target.result);
-if (!confirm('Isso substituirá todos os dados atuais. Continuar?')) return;
-State.data = Object.assign(State.data, obj);
-if (!State.data.historicoPostos) State.data.historicoPostos = [];
-Storage.salvarLocal();
-Storage.migrarTurnosAntigos();
-Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Charts.render();
-UI.aplicarEstadoCursor(); Config.applyDeviceConfig();
-UI.showToast('success', 'Restaurado', 'Dados restaurados');
-} catch(err) { UI.showToast('error', 'Erro', 'Arquivo inválido'); }
+  downloadFile(name, content, type) { const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); },
+  csv() {
+    const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
+    const rows = State.data.projetos.map(p => [p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
+    const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+    this.downloadFile('projetos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
+    UI.showToast('success', 'Exportado', 'Arquivo CSV gerado');
+  },
+  historicoCSV() {
+    let data = State.data.historico;
+    if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
+    const headers = ['PEP','Diagrama/Ordem','Placa','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
+    const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
+    const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+    this.downloadFile('historico_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
+    UI.showToast('success', 'Exportado', 'Histórico exportado');
+  },
+  historicoPostosCSV() {
+    let data = State.data.historicoPostos;
+    if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
+    const headers = ['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
+    const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
+    const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+    this.downloadFile('historico_postos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
+    UI.showToast('success', 'Exportado', 'Histórico por posto exportado');
+  },
+  postoConcluidosCSV() {
+    let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
+    const headers = ['PEP','Diagrama/Ordem','Placa','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
+    const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
+    const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+    this.downloadFile(`concluidos_${State.currentPosto.toLowerCase().replace('ê','e').replace('á','a').replace(' ','_')}_${Utils.dateStamp()}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8;');
+    UI.showToast('success', 'Exportado', `Concluídos no ${State.currentPosto} exportados`);
+  },
+  backup() { const json = JSON.stringify(State.data, null, 2); this.downloadFile('backup_weg_' + Utils.dateStamp() + '.json', json, 'application/json'); UI.showToast('success', 'Backup', 'Arquivo gerado'); },
+  restaurar(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const obj = JSON.parse(ev.target.result);
+        if (!confirm('Isso substituirá todos os dados atuais. Continuar?')) return;
+        State.data = Object.assign(State.data, obj);
+        State.data.projetos = State.data.projetos.map(sanitizarProjeto).filter(Boolean);
+        if (!State.data.historicoPostos) State.data.historicoPostos = [];
+        Storage.salvarLocal();
+        Storage.migrarTurnosAntigos();
+        Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Charts.render();
+        UI.aplicarEstadoCursor(); Config.applyDeviceConfig();
+        UI.showToast('success', 'Restaurado', 'Dados restaurados');
+      } catch(err) { UI.showToast('error', 'Erro', 'Arquivo inválido'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
 };
-reader.readAsText(file);
-e.target.value = '';
-}
-};
+
 const App = {
-async init() {
-await Storage.carregar();
-UI.aplicarEstadoCursor();
-UI.setupModalClickHandlers();
-UI.setupSidebarClickHandler();
-UI.setupVirtualKeyboard();
-setInterval(UI.updateDate, 1000);
-UI.updateDate();
-if (typeof API !== 'undefined' && State.apiAvailable) {
-API.on('project:synced', (proj) => {
-const projLocal = Utils.fromApiFormat(proj);
-const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) {
-State.data.projetos.push(projLocal);
-console.log('➕ Projeto adicionado via sync:', projLocal.diagrama);
-} else {
-const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
-const remoteAtualizado = projLocal.atualizadoEm || 0;
-if (remoteAtualizado > localAtualizado) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...projLocal,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
+  async init() {
+    await Storage.carregar();
+    UI.aplicarEstadoCursor();
+    UI.setupModalClickHandlers();
+    UI.setupSidebarClickHandler();
+    UI.setupVirtualKeyboard();
+    setInterval(UI.updateDate, 1000);
+    UI.updateDate();
+    
+    if (typeof API !== 'undefined' && State.apiAvailable) {
+      API.on('project:synced', (proj) => {
+        const projLocal = Utils.fromApiFormat(proj);
+        const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+        if (index === -1) {
+          State.data.projetos.push(projLocal);
+          console.log('➕ Projeto adicionado via sync:', projLocal.diagrama);
+        } else {
+          const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
+          const remoteAtualizado = projLocal.atualizadoEm || 0;
+          if (remoteAtualizado > localAtualizado) {
+            State.data.projetos[index] = {
+              ...State.data.projetos[index],
+              ...projLocal,
+              dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+              dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
+            };
+            console.log('🔄 Projeto atualizado via sync:', projLocal.diagrama);
+          }
+        }
+        Storage.salvarLocal();
+        if (State.currentUser === 'admin') Admin.renderTable();
+        if (State.currentPosto) Posto.render();
+        Charts.render();
+      });
+      
+      API.on('sync:full', (remoteProjects) => {
+        console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
+        const remoteMap = new Map();
+        remoteProjects.forEach(p => {
+          const local = Utils.fromApiFormat(p);
+          remoteMap.set(local.id, local);
+        });
+        const idsRemotos = new Set(remoteMap.keys());
+        const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
+        if (removidos.length > 0) {
+          console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
+        }
+        State.data.projetos = Array.from(remoteMap.values()).map(sanitizarProjeto).filter(Boolean);
+        Storage.salvarLocal();
+        if (State.currentUser === 'admin') Admin.renderTable();
+        if (State.currentPosto) Posto.render();
+        Dashboard.render();
+        Historico.renderGeral();
+        Historico.renderPostos();
+        Charts.render();
+      });
+      
+      API.on('project:created', (proj) => {
+        const projLocal = Utils.fromApiFormat(proj);
+        const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+        if (index === -1) {
+          State.data.projetos.push(projLocal);
+          Storage.salvarLocal();
+          if (State.currentUser === 'admin') Admin.renderTable();
+          if (State.currentPosto) Posto.render();
+        }
+      });
+      
+      API.on('project:updated', (proj) => {
+        const projLocal = Utils.fromApiFormat(proj);
+        const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+        if (index !== -1) {
+          State.data.projetos[index] = {
+            ...State.data.projetos[index],
+            ...projLocal,
+            dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+            dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
+            tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
+            concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
+            observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
+          };
+          Storage.salvarLocal();
+          if (State.currentUser === 'admin') Admin.renderTable();
+          if (State.currentPosto) Posto.render();
+          Charts.render();
+        }
+      });
+      
+      API.on('project:deleted', (projectId) => {
+        State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
+        Storage.salvarLocal();
+        if (State.currentUser === 'admin') Admin.renderTable();
+        if (State.currentPosto) Posto.render();
+        Charts.render();
+      });
+      
+      API.on('sync:complete', (data) => {
+        console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`);
+      });
+      
+      API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
+    }
+    
+    window.addEventListener('online', () => {
+      State.isOnline = true;
+      State.apiAvailable = (typeof API !== 'undefined');
+      UI.showToast('success', 'Online', 'Conexão restaurada.');
+      if (State.apiAvailable) {
+        API.startPolling(API_CONFIG.POLLING_INTERVAL);
+        Storage.processarFila();
+      }
+    });
+    
+    window.addEventListener('offline', () => {
+      State.isOnline = false;
+      State.apiAvailable = false;
+      UI.showToast('warning', 'Offline', 'Sem conexão.');
+    });
+  }
 };
-console.log('🔄 Projeto atualizado via sync:', projLocal.diagrama);
-}
-}
-Storage.salvarLocal();
-if (State.currentUser === 'admin') Admin.renderTable();
-if (State.currentPosto) Posto.render();
-Charts.render();
-});
-API.on('sync:full', (remoteProjects) => {
-console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
-const remoteMap = new Map();
-remoteProjects.forEach(p => {
-const local = Utils.fromApiFormat(p);
-remoteMap.set(local.id, local);
-});
-const idsRemotos = new Set(remoteMap.keys());
-const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
-if (removidos.length > 0) {
-console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
-}
-State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
-remoteMap.forEach((remoteProj, id) => {
-const index = State.data.projetos.findIndex(p => p.id === id);
-if (index === -1) {
-State.data.projetos.push(remoteProj);
-} else {
-const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
-const remoteAtualizado = remoteProj.atualizadoEm || 0;
-if (remoteAtualizado > localAtualizado) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...remoteProj,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || remoteProj.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim,
-tempoReal: State.data.projetos[index].tempoReal || remoteProj.tempoReal,
-concluidoEm: State.data.projetos[index].concluidoEm || remoteProj.concluidoEm,
-observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.observacaoPintura
-};
-}
-}
-});
-Storage.salvarLocal();
-if (State.currentUser === 'admin') Admin.renderTable();
-if (State.currentPosto) Posto.render();
-Dashboard.render();
-Historico.renderGeral();
-Historico.renderPostos();
-Charts.render();
-});
-API.on('project:created', (proj) => {
-const projLocal = Utils.fromApiFormat(proj);
-const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) {
-State.data.projetos.push(projLocal);
-Storage.salvarLocal();
-if (State.currentUser === 'admin') Admin.renderTable();
-if (State.currentPosto) Posto.render();
-}
-});
-API.on('project:updated', (proj) => {
-const projLocal = Utils.fromApiFormat(proj);
-const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index !== -1) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...projLocal,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
-tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
-concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
-observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
-};
-Storage.salvarLocal();
-if (State.currentUser === 'admin') Admin.renderTable();
-if (State.currentPosto) Posto.render();
-Charts.render();
-}
-});
-API.on('project:deleted', (projectId) => {
-State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
-Storage.salvarLocal();
-if (State.currentUser === 'admin') Admin.renderTable();
-if (State.currentPosto) Posto.render();
-Charts.render();
-});
-API.on('sync:complete', (data) => {
-console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`);
-});
-API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
-}
-window.addEventListener('online', () => {
-State.isOnline = true;
-State.apiAvailable = (typeof API !== 'undefined');
-UI.showToast('success', 'Online', 'Conexão restaurada.');
-if (State.apiAvailable) {
-API.startPolling(API_CONFIG.POLLING_INTERVAL);
-Storage.processarFila();
-}
-});
-window.addEventListener('offline', () => {
-State.isOnline = false;
-State.apiAvailable = false;
-UI.showToast('warning', 'Offline', 'Sem conexão.');
-});
-}
-};
+
 App.init();
 </script>
 </body>
