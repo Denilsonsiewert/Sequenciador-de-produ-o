@@ -686,7 +686,6 @@ lastPepFound: null,
 lastDiagramaFound: null
 };
 
-// ✅ FUNÇÃO CRÍTICA: Normaliza qualquer projeto para garantir consistência
 function sanitizarProjeto(p) {
 if (!p || typeof p !== 'object') return null;
 return {
@@ -766,7 +765,6 @@ ObservacaoPintura: projeto.observacaoPintura || null
 };
 },
 fromApiFormat(apiProj) {
-// ✅ Usa sanitizarProjeto para garantir consistência
 return sanitizarProjeto({
 id: apiProj.ID,
 pep: apiProj.PEP,
@@ -867,7 +865,6 @@ if (raw) {
 try {
 const obj = JSON.parse(raw);
 State.data = Object.assign(State.data, obj);
-// ✅ Sanitiza todos os projetos carregados
 State.data.projetos = State.data.projetos.map(sanitizarProjeto).filter(Boolean);
 if (!State.data.senhaAdmin) State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
 if (!State.data.turnosPorPosto) State.data.turnosPorPosto = { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' };
@@ -1513,13 +1510,11 @@ const volumes = document.getElementById('cad-volumes').value.trim();
 const processo = document.getElementById('cad-processo').value;
 const prioridade = document.getElementById('cad-prioridade').value;
 const obs = document.getElementById('cad-obs').value.trim();
-// Validação: Diagrama é obrigatório
 if (!diagrama) {
 UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
 document.getElementById('cad-diagrama').focus();
 return false;
 }
-// ✅ Verificação segura de duplicidade (PEP pode repetir)
 const existeDiagrama = State.data.projetos.some(p =>
 p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
 );
@@ -1572,7 +1567,6 @@ const tbody = document.getElementById('admTableBody');
 const search = (document.getElementById('admSearch').value || '').toLowerCase();
 let data = [...State.data.projetos];
 if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
-// ✅ Busca segura que funciona mesmo com dados do Excel
 if (search) {
 data = data.filter(p => {
 const pepStr = (p.pep || '').toLowerCase();
@@ -1709,7 +1703,6 @@ const tbody = document.getElementById('postoTableBody');
 const search = (document.getElementById('postoSearch').value || '').toLowerCase();
 let data = State.data.projetos.filter(p => p.processo === State.currentPosto && p.status !== 'Concluído');
 if (State.postoFilter !== 'all') data = data.filter(p => p.status === State.postoFilter);
-// ✅ Busca segura
 if (search) {
 data = data.filter(p => {
 const pepStr = (p.pep || '').toLowerCase();
@@ -1867,7 +1860,18 @@ UI.closeModal('modalConcluir');
 State.projetoParaConcluir = null;
 },
 registrarHistoricoPosto(p, turno, tempoReal) {
-const registro = { id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), projetoId: p.id, pep: p.pep, diagrama: p.diagrama, placa: p.placa, processo: p.processo, turno: turno, tempoReal: tempoReal, observacao: p.observacaoPintura || null, dataHoraConclusao: Date.now() };
+const registro = {
+id: 'hp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+projetoId: p.id,
+pep: p.pep,
+diagrama: p.diagrama,
+placa: p.placa,
+processo: p.processo,
+turno: turno,
+tempoReal: tempoReal,
+observacao: p.observacaoPintura || null,
+dataHoraConclusao: Date.now()
+};
 State.data.historicoPostos.unshift(registro);
 Storage.salvarLocal();
 },
@@ -1922,10 +1926,7 @@ renderGeral() {
 const tbody = document.getElementById('histTableBody');
 const search = (document.getElementById('histSearch').value || '').toLowerCase();
 let data = [...State.data.historico];
-// ✅ CORREÇÃO: Mostra TODOS os projetos no histórico geral, incluindo Nanocerâmico
-// Remove a filtragem que bloqueava Nanocerâmico para usuários de posto
 if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
-// ✅ Busca segura
 if (search) {
 data = data.filter(p => {
 const pepStr = (p.pep || '').toLowerCase();
@@ -1949,7 +1950,6 @@ const tbody = document.getElementById('histPostoTableBody');
 const search = (document.getElementById('histPostoSearch').value || '').toLowerCase();
 let data = [...State.data.historicoPostos];
 if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
-// ✅ Busca segura
 if (search) {
 data = data.filter(p => {
 const pepStr = (p.pep || '').toLowerCase();
@@ -1976,7 +1976,6 @@ document.getElementById('historicoPostoNome').textContent = State.currentPosto;
 document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
 let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
 if (State.historicoPostoFilter !== 'all') data = data.filter(p => p.turno === State.historicoPostoFilter);
-// ✅ Busca segura
 if (search) {
 data = data.filter(p => {
 const pepStr = (p.pep || '').toLowerCase();
@@ -2125,7 +2124,6 @@ try {
 const obj = JSON.parse(ev.target.result);
 if (!confirm('Isso substituirá todos os dados atuais. Continuar?')) return;
 State.data = Object.assign(State.data, obj);
-// ✅ Sanitiza dados restaurados
 State.data.projetos = State.data.projetos.map(sanitizarProjeto).filter(Boolean);
 if (!State.data.historicoPostos) State.data.historicoPostos = [];
 Storage.salvarLocal();
@@ -2186,7 +2184,6 @@ const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
 if (removidos.length > 0) {
 console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
 }
-// ✅ CORREÇÃO CRÍTICA: Substitui e sanitiza a lista inteira
 State.data.projetos = Array.from(remoteMap.values()).map(sanitizarProjeto).filter(Boolean);
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
