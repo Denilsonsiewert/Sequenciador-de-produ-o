@@ -486,7 +486,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="form-actions"><button type="reset" class="btn btn-secondary" onclick="document.getElementById('pwdStrength').textContent=''"><i class="fa-solid fa-rotate-left"></i> Limpar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-key"></i> Alterar Senha</button></div>
 </div></form></div>
 <div class="card"><h2><i class="fa-solid fa-display"></i> Tipo de Dispositivo</h2>
-<div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet">Tablet / Touchscreen</option><option value="computador">💻 Computador (cursor oculto)</option></select></div>
+<div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet">Tablet / Touchscreen</option><option value="computador"> Computador (cursor oculto)</option></select></div>
 <div class="form-group full" id="cfgVkInfo" style="display:none;"><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador ativado:</strong> Cursor oculto + teclado virtual.</div></div></div></div></div>
 <div class="card"><h2><i class="fa-solid fa-database"></i> Gerenciar Dados</h2>
 <div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados em TODOS os dispositivos conectados.</div></div>
@@ -529,7 +529,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
 
-<!-- CLIENTE DA API COM SINCRONIZAÇÃO CORRIGIDA E EXPANDIDA -->
+<!-- CLIENTE DA API COM SINCRONIZAÇÃO COMPLETA CORRIGIDA -->
 <script>
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
@@ -581,11 +581,22 @@ return result;
 }
 async function updateConfig(key, value) { return await apiRequest('updateConfig', { key, value }); }
 async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
-async function clearAllData() { return await apiRequest('clearAll', {}); }
 
-// ✅ NOVAS FUNÇÕES DE SYNC PARA HISTÓRICO E HISTÓRICO POSTOS
-async function syncHistorico(since) { return await apiRequest('syncHistorico', { since }, 'GET'); }
-async function syncHistoricoPostos(since) { return await apiRequest('syncHistoricoPostos', { since }, 'GET'); }
+// ✅ NOVA FUNÇÃO: Limpeza com flag forceSync
+async function clearAllData() {
+const result = await apiRequest('clearAll', {});
+if (result.success) {
+lastSyncTimestamp = 0;
+localStorage.setItem('weg_last_sync_ts', '0');
+triggerEvent('data:cleared', result);
+}
+return result;
+}
+
+// ✅ NOVA FUNÇÃO: Sync de HistoricoPostos
+async function syncHistoricoPostos(since) {
+return await apiRequest('syncHistoricoPostos', { since }, 'GET');
+}
 
 async function syncDataIncremental() {
 if (syncInProgress) return;
@@ -600,13 +611,16 @@ await syncDataCompleto();
 } else {
 result.data.forEach(remoteProj => triggerEvent('project:synced', remoteProj));
 
-// ✅ BUSCA TAMBÉM HISTÓRICO E HISTÓRICO POSTOS DURANTE SYNC
-const [resHist, resPostos] = await Promise.all([
-apiRequest('syncHistorico', { since: lastSyncTimestamp }, 'GET'),
-apiRequest('syncHistoricoPostos', { since: lastSyncTimestamp }, 'GET')
-]);
-if (resHist.success) triggerEvent('historico:synced', resHist.data);
-if (resPostos.success) triggerEvent('historicoPostos:synced', resPostos.data);
+// ✅ BUSCA TAMBÉM HISTORICO POSTOS
+try {
+const resPostos = await syncHistoricoPostos(lastSyncTimestamp);
+if (resPostos.success) {
+triggerEvent('historicoPostos:synced', resPostos.data);
+console.log(`📋 ${resPostos.count} registros de postos sincronizados`);
+}
+} catch (err) {
+console.error('Erro ao sync HistoricoPostos:', err);
+}
 
 lastSyncTimestamp = result.timestamp;
 localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
@@ -631,13 +645,16 @@ if (result.success && result.data) {
 console.log(`🔄 Sync completo: ${result.data.length} projetos recebidos`);
 triggerEvent('sync:full', result.data);
 
-// ✅ SYNC COMPLETO TAMBÉM TRAZ HISTÓRICO E POSTOS
-const [resHist, resPostos] = await Promise.all([
-apiRequest('syncHistorico', { since: 0 }, 'GET'),
-apiRequest('syncHistoricoPostos', { since: 0 }, 'GET')
-]);
-if (resHist.success) triggerEvent('sync:historicoFull', resHist.data);
-if (resPostos.success) triggerEvent('sync:historicoPostosFull', resPostos.data);
+// ✅ BUSCA COMPLETA DE HISTORICO POSTOS
+try {
+const resPostos = await syncHistoricoPostos(0);
+if (resPostos.success) {
+triggerEvent('sync:historicoPostosFull', resPostos.data);
+console.log(`📋 ${resPostos.count} registros de postos (completo)`);
+}
+} catch (err) {
+console.error('Erro ao sync completo HistoricoPostos:', err);
+}
 
 lastSyncTimestamp = result.timestamp;
 localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
@@ -669,7 +686,7 @@ function triggerEvent(event, data) {
 if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); } });
 }
 
-window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData, syncDataCompleto, syncHistorico, syncHistoricoPostos, startPolling, on, off };
+window.API = { createProject, updateProject, deleteProject, clearAllData, updateConfig, getConfig, syncData, syncDataCompleto, syncHistoricoPostos, startPolling, on, off };
 </script>
 
 <script>
@@ -768,15 +785,6 @@ criadoEm: apiProj.CriadoEm, atualizadoEm: apiProj.AtualizadoEm, dataHoraInicio: 
 dataHoraFim: apiProj.DataHoraFim || null, tempoReal: apiProj.TempoReal || null, concluidoEm: apiProj.ConcluidoEm || null, observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
-fromApiHistorico(apiProj) {
-return {
-id: apiProj.ID, projetoId: apiProj.ProjetoID, pep: apiProj.PEP, diagrama: apiProj.Diagrama, placa: apiProj.Placa,
-descricao: apiProj.Descricao, processo: apiProj.Processo, volumesTotal: apiProj.VolumesTotal,
-prioridade: apiProj.Prioridade, turno: apiProj.Turno, obs: apiProj.Obs,
-dataHoraInicio: apiProj.DataHoraInicio, dataHoraFim: apiProj.DataHoraFim,
-tempoReal: apiProj.TempoReal, observacaoPintura: apiProj.ObservacaoPintura, concluidoEm: apiProj.ConcluidoEm
-};
-},
 fromApiPosto(apiProj) {
 return {
 id: apiProj.ID, projetoId: apiProj.ProjetoID, pep: apiProj.PEP, diagrama: apiProj.Diagrama, placa: apiProj.Placa,
@@ -784,68 +792,44 @@ processo: apiProj.Processo, turno: apiProj.Turno, tempoReal: apiProj.TempoReal, 
 };
 },
 extrairDadosEtiqueta(texto) {
-console.log('🔍 OCR:', texto.substring(0, 200) + '...');
+console.log(' OCR:', texto.substring(0, 200) + '...');
 let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 const result = { pep: null, diagrama: null };
 const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
 if (pepLabelMatch) {
 let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
-if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) {
-result.pep = pepRaw;
-console.log('✅ PEP via label:', result.pep);
-}
+if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) { result.pep = pepRaw; console.log('✅ PEP via label:', result.pep); }
 }
 if (!result.pep) {
 const exactMatch = clean.match(/\b170\s*[-–—]\s*2500343\s*[-–—]\s*121\b/i);
-if (exactMatch) {
-result.pep = '170-2500343-121';
-console.log('✅ PEP via exato:', result.pep);
-}
+if (exactMatch) { result.pep = '170-2500343-121'; console.log('✅ PEP via exato:', result.pep); }
 }
 if (!result.pep) {
 const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
-if (generic) {
-result.pep = generic[1] + '-' + generic[2] + '-' + generic[3];
-console.log('✅ PEP via genérico:', result.pep);
-}
+if (generic) { result.pep = generic[1] + '-' + generic[2] + '-' + generic[3]; console.log('✅ PEP via genérico:', result.pep); }
 }
 if (!result.pep) {
 const digits13 = clean.match(/\b(\d{13})\b/);
-if (digits13) {
-const n = digits13[1];
-result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13);
-console.log('✅ PEP via 13 dígitos:', result.pep);
-}
+if (digits13) { const n = digits13[1]; result.pep = n.substring(0, 3) + '-' + n.substring(3, 10) + '-' + n.substring(10, 13); console.log('✅ PEP via 13 dígitos:', result.pep); }
 }
 const lines = texto.split('\n');
 for (let line of lines) {
 const upper = line.toUpperCase();
 if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
 const num = line.match(/\b(\d{9,10})\b/);
-if (num) {
-result.diagrama = num[1];
-console.log('✅ Diagrama via label:', result.diagrama);
-break;
-}
+if (num) { result.diagrama = num[1]; console.log('✅ Diagrama via label:', result.diagrama); break; }
 }
 }
 if (!result.diagrama) {
 const exact = clean.match(/\b450890224\b/);
-if (exact) {
-result.diagrama = '450890224';
-console.log('✅ Diagrama via exato:', result.diagrama);
-}
+if (exact) { result.diagrama = '450890224'; console.log('✅ Diagrama via exato:', result.diagrama); }
 }
 if (!result.diagrama) {
 const nineDigits = clean.match(/\b(\d{9})\b/g);
 if (nineDigits) {
 for (let d of nineDigits) {
 const pepClean = result.pep ? result.pep.replace(/-/g, '') : '';
-if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) {
-result.diagrama = d;
-console.log('✅ Diagrama via 9 dígitos:', result.diagrama);
-break;
-}
+if (d !== pepClean && d !== '2500343' && !d.startsWith('170')) { result.diagrama = d; console.log('✅ Diagrama via 9 dígitos:', result.diagrama); break; }
 }
 }
 }
@@ -871,24 +855,15 @@ this.migrarTurnosAntigos();
 } catch(e) { console.error('Erro ao carregar localStorage:', e); }
 }
 const savedTs = localStorage.getItem('weg_last_sync_ts');
-if (savedTs) {
-lastSyncTimestamp = parseInt(savedTs);
-console.log('🕐 Timestamp de sync restaurado:', lastSyncTimestamp);
-}
+if (savedTs) { lastSyncTimestamp = parseInt(savedTs); console.log('🕐 Timestamp de sync restaurado:', lastSyncTimestamp); }
 if (typeof API !== 'undefined' && State.isOnline) {
 State.apiAvailable = true;
 try {
 const senhaApi = await API.getConfig('senhaAdmin');
-if (senhaApi && senhaApi !== 'null' && senhaApi !== 'undefined') {
-State.data.senhaAdmin = senhaApi;
-this.salvarLocal();
-}
+if (senhaApi && senhaApi !== 'null' && senhaApi !== 'undefined') { State.data.senhaAdmin = senhaApi; this.salvarLocal(); }
 } catch(e) { console.log('Senha não encontrada na planilha'); }
 API.startPolling(API_CONFIG.POLLING_INTERVAL);
-} else {
-State.apiAvailable = false;
-UI.showToast('info', 'Modo Offline', 'Sistema funcionando sem sincronização');
-}
+} else { State.apiAvailable = false; UI.showToast('info', 'Modo Offline', 'Sistema funcionando sem sincronização'); }
 },
 salvarLocal() {
 try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(State.data)); }
@@ -949,10 +924,7 @@ if (mudou) this.salvarLocal();
 };
 
 const UI = {
-aplicarEstadoCursor() {
-if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor');
-else document.body.classList.remove('hide-cursor');
-},
+aplicarEstadoCursor() { if (State.data.config.dispositivo === 'computador') document.body.classList.add('hide-cursor'); else document.body.classList.remove('hide-cursor'); },
 scrollParaElemento(elemento) {
 setTimeout(() => {
 if (State.vkActive && State.data.config.dispositivo === 'computador') {
@@ -962,14 +934,8 @@ window.scrollTo({ top: targetPosition, behavior: 'smooth' });
 }
 }, 300);
 },
-openModal(id) {
-document.getElementById(id).classList.add('active');
-if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
-},
-closeModal(id) {
-document.getElementById(id).classList.remove('active');
-if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
-},
+openModal(id) { document.getElementById(id).classList.add('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true; },
+closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false; },
 toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
 togglePwdVisibility(inputId, btn) {
 const input = document.getElementById(inputId);
@@ -1004,20 +970,9 @@ const indicator = document.getElementById('syncIndicator');
 const statusEl = document.getElementById('syncStatus');
 if (!indicator || !statusEl) return;
 indicator.classList.remove('syncing', 'synced', 'error');
-if (status === 'syncing') {
-indicator.classList.add('syncing');
-statusEl.textContent = 'Sincronizando...';
-indicator.querySelector('i').className = 'fa-solid fa-spinner fa-spin';
-} else if (status === 'synced') {
-indicator.classList.add('synced');
-const agora = new Date();
-statusEl.textContent = 'Sincronizado ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-indicator.querySelector('i').className = 'fa-solid fa-cloud';
-} else if (status === 'error') {
-indicator.classList.add('error');
-statusEl.textContent = 'Erro de sync';
-indicator.querySelector('i').className = 'fa-solid fa-cloud-bolt';
-}
+if (status === 'syncing') { indicator.classList.add('syncing'); statusEl.textContent = 'Sincronizando...'; indicator.querySelector('i').className = 'fa-solid fa-spinner fa-spin'; }
+else if (status === 'synced') { indicator.classList.add('synced'); const agora = new Date(); statusEl.textContent = 'Sincronizado ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}); indicator.querySelector('i').className = 'fa-solid fa-cloud'; }
+else if (status === 'error') { indicator.classList.add('error'); statusEl.textContent = 'Erro de sync'; indicator.querySelector('i').className = 'fa-solid fa-cloud-bolt'; }
 },
 buildMenu() {
 const menu = document.getElementById('mainMenu');
@@ -1115,10 +1070,7 @@ if (role === 'admin') {
 State.pendingAdminLogin = true;
 document.getElementById('inputSenhaAdmin').value = '';
 document.getElementById('senhaAdminErro').style.display = 'none';
-setTimeout(() => {
-UI.openModal('modalSenhaAdmin');
-setTimeout(() => { document.getElementById('inputSenhaAdmin').focus(); }, 300);
-}, 50);
+setTimeout(() => { UI.openModal('modalSenhaAdmin'); setTimeout(() => { document.getElementById('inputSenhaAdmin').focus(); }, 300); }, 50);
 return;
 }
 this.efetivarLogin(role);
@@ -1135,9 +1087,7 @@ const erro = document.getElementById('senhaAdminErro');
 erro.style.display = 'flex';
 document.getElementById('senhaAdminErroMsg').textContent = 'Senha incorreta.';
 const input = document.getElementById('inputSenhaAdmin');
-input.value = '';
-input.focus();
-input.style.borderColor = 'var(--danger)';
+input.value = ''; input.focus(); input.style.borderColor = 'var(--danger)';
 setTimeout(() => { input.style.borderColor = ''; }, 1500);
 }
 },
@@ -1160,8 +1110,7 @@ UI.showToast('success', 'Bem-vindo', 'Login efetuado como ' + labels[role]);
 confirmarLogout() { UI.openModal('modalLogout'); },
 efetivarLogout() {
 UI.closeModal('modalLogout');
-State.currentUser = null;
-State.currentPosto = null;
+State.currentUser = null; State.currentPosto = null;
 document.getElementById('app').style.display = 'none';
 document.getElementById('loginScreen').style.display = 'flex';
 VirtualKeyboard.hide();
@@ -1189,9 +1138,7 @@ if (typeof cb === 'function') cb();
 } else {
 document.getElementById('confirmarSenhaErro').style.display = 'flex';
 const input = document.getElementById('inputConfirmarSenha');
-input.value = '';
-input.focus();
-input.style.borderColor = 'var(--danger)';
+input.value = ''; input.focus(); input.style.borderColor = 'var(--danger)';
 setTimeout(() => { input.style.borderColor = ''; }, 1500);
 }
 },
@@ -1203,12 +1150,13 @@ async executarLimpeza() {
 UI.showToast('info', 'Limpando', 'Apagando dados em todos os dispositivos...');
 if (State.apiAvailable && State.isOnline && typeof API !== 'undefined') {
 try {
-await API.clearAllData();
-UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha');
+const result = await API.clearAllData();
+if (result.success) {
+UI.showToast('success', 'Nuvem limpa', 'Dados apagados na planilha e sincronizados');
 lastSyncTimestamp = 0;
 localStorage.setItem('weg_last_sync_ts', '0');
 }
-catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
+} catch(e) { console.error('Erro ao limpar API:', e); UI.showToast('warning', 'Atenção', 'Não foi possível limpar a planilha.'); }
 }
 State.data.projetos = [];
 State.data.historico = [];
@@ -1217,10 +1165,8 @@ State.data.senhaAdmin = CONFIG.SENHA_PADRAO;
 State.data.ultimaSelecaoTurno = 0;
 Storage.salvarLocal();
 Admin.renderTable(); Posto.render(); Historico.renderGeral(); Historico.renderPostos(); Dashboard.render(); Charts.render();
-UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos em todos os dispositivos.');
-setTimeout(() => {
-if (State.apiAvailable) API.syncDataCompleto();
-}, 2000);
+UI.showToast('success', 'Dados apagados', 'Todos os dados foram removidos localmente');
+setTimeout(() => { if (State.apiAvailable) API.syncDataCompleto(); }, 2000);
 }
 };
 
@@ -1249,10 +1195,8 @@ if (nova !== confirma) { UI.showToast('error', 'Erro', 'A confirmação não con
 if (nova === atual) { UI.showToast('warning', 'Atenção', 'A nova senha deve ser diferente da atual'); return false; }
 State.data.senhaAdmin = nova;
 Storage.salvarLocal();
-try {
-await Storage.salvarApi('config', { key: 'senhaAdmin', value: nova });
-UI.showToast('success', 'Senha alterada', 'A nova senha foi salva');
-} catch(e) { console.error('Erro ao salvar senha na API:', e); UI.showToast('warning', 'Atenção', 'Senha salva localmente.'); }
+try { await Storage.salvarApi('config', { key: 'senhaAdmin', value: nova }); UI.showToast('success', 'Senha alterada', 'A nova senha foi salva'); }
+catch(e) { console.error('Erro ao salvar senha na API:', e); UI.showToast('warning', 'Atenção', 'Senha salva localmente.'); }
 document.getElementById('formSenha').reset();
 document.getElementById('pwdStrength').textContent = '';
 return false;
@@ -1389,8 +1333,7 @@ async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
 const cameraStatus = document.getElementById('cameraStatus');
 const cameraControls = document.getElementById('cameraControls');
-State.lastPepFound = null;
-State.lastDiagramaFound = null;
+State.lastPepFound = null; State.lastDiagramaFound = null;
 cameraSection.classList.add('active');
 cameraStatus.style.display = 'block';
 cameraControls.style.display = 'flex';
@@ -1399,9 +1342,7 @@ cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando 
 try {
 const video = document.getElementById('cameraVideo');
 const canvas = document.getElementById('cameraCanvas');
-State.cameraStream = await navigator.mediaDevices.getUserMedia({
-video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-});
+State.cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } });
 video.srcObject = State.cameraStream;
 await video.play();
 cameraStatus.className = 'camera-status scanning';
@@ -1430,59 +1371,31 @@ const texto = result.data.text;
 if (texto && texto.trim().length > 5) {
 const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
 let atualizouAlgo = false;
-if (pep && pep !== State.lastPepFound) {
-document.getElementById('cad-pep').value = pep;
-State.lastPepFound = pep;
-atualizouAlgo = true;
-}
-if (diagrama && diagrama !== State.lastDiagramaFound) {
-document.getElementById('cad-diagrama').value = diagrama;
-State.lastDiagramaFound = diagrama;
-atualizouAlgo = true;
-}
-const pepStatus = State.lastPepFound
-? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>`
-: `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
-const diagramaStatus = State.lastDiagramaFound
-? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>`
-: `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
+if (pep && pep !== State.lastPepFound) { document.getElementById('cad-pep').value = pep; State.lastPepFound = pep; atualizouAlgo = true; }
+if (diagrama && diagrama !== State.lastDiagramaFound) { document.getElementById('cad-diagrama').value = diagrama; State.lastDiagramaFound = diagrama; atualizouAlgo = true; }
+const pepStatus = State.lastPepFound ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>PEP:</strong> ${State.lastPepFound}</div>` : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> PEP: aguardando...</div>`;
+const diagramaStatus = State.lastDiagramaFound ? `<div class="found-item"><i class="fa-solid fa-check-circle"></i> <strong>Diagrama:</strong> ${State.lastDiagramaFound}</div>` : `<div class="found-item missing"><i class="fa-solid fa-circle-question"></i> Diagrama: aguardando...</div>`;
 if (State.lastPepFound || State.lastDiagramaFound) {
 cameraStatus.className = 'camera-status success';
-cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong>
-<div class="camera-found-items">${pepStatus}${diagramaStatus}</div>
-<small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
+cameraStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><div class="camera-found-items">${pepStatus}${diagramaStatus}</div><small style="margin-top:8px;display:block;">Clique em <strong>"Fechar Câmera"</strong> quando os dados estiverem corretos.</small>`;
 } else {
 cameraStatus.className = 'camera-status scanning';
 cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Busca contínua ativa</strong><br>Posicione a etiqueta...';
 }
-if (atualizouAlgo) {
-UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
+if (atualizouAlgo) UI.showToast('success', 'Dados atualizados', `PEP: ${State.lastPepFound || '...'} | Diagrama: ${State.lastDiagramaFound || '...'}`);
 }
-}
-} catch (err) {
-console.error('Erro no OCR:', err);
-}
+} catch (err) { console.error('Erro no OCR:', err); }
 },
 fecharCamera() {
-if (State.cameraStream) {
-State.cameraStream.getTracks().forEach(track => track.stop());
-State.cameraStream = null;
-}
-if (State.scanInterval) {
-clearInterval(State.scanInterval);
-State.scanInterval = null;
-}
-State.lastPepFound = null;
-State.lastDiagramaFound = null;
+if (State.cameraStream) { State.cameraStream.getTracks().forEach(track => track.stop()); State.cameraStream = null; }
+if (State.scanInterval) { clearInterval(State.scanInterval); State.scanInterval = null; }
+State.lastPepFound = null; State.lastDiagramaFound = null;
 document.getElementById('cameraSection').classList.remove('active');
 document.getElementById('cameraStatus').style.display = 'none';
 document.getElementById('cameraControls').style.display = 'none';
 UI.showToast('info', 'Câmera fechada', 'Verifique os dados preenchidos');
 },
-limparFormulario() {
-document.getElementById('formCadastro').reset();
-UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos');
-},
+limparFormulario() { document.getElementById('formCadastro').reset(); UI.showToast('info', 'Formulário limpo', 'Todos os campos foram limpos'); },
 toggleVolumesCadastro() {
 const processo = document.getElementById('cad-processo').value;
 const groupVolumes = document.getElementById('group-cad-volumes');
@@ -1505,56 +1418,21 @@ const volumes = document.getElementById('cad-volumes').value.trim();
 const processo = document.getElementById('cad-processo').value;
 const prioridade = document.getElementById('cad-prioridade').value;
 const obs = document.getElementById('cad-obs').value.trim();
-if (!diagrama) {
-UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
-document.getElementById('cad-diagrama').focus();
-return false;
-}
-const existeDiagrama = State.data.projetos.some(p =>
-p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase()
-);
-if (existeDiagrama) {
-UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
-return false;
-}
+if (!diagrama) { UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório'); document.getElementById('cad-diagrama').focus(); return false; }
+const existeDiagrama = State.data.projetos.some(p => p.diagrama && p.diagrama.toLowerCase() === diagrama.toLowerCase());
+if (existeDiagrama) { UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama); return false; }
 let volumesTotal = null;
-if (processo === 'Nanocerâmico' && volumes) {
-const match = volumes.match(/\d+/);
-if (match) volumesTotal = parseInt(match[0]);
-}
-const novo = {
-id: Utils.genId(),
-pep: pep || null,
-diagrama,
-placa: placa || null,
-descricao,
-volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''),
-volumesTotal: volumesTotal,
-volumesProcessados: 0,
-processo,
-prioridade,
-status: 'Aguardando',
-turno: State.data.turnosPorPosto[processo] || '1º Turno',
-obs,
-criadoEm: Date.now(),
-atualizadoEm: Date.now()
-};
-console.log('📝 Cadastrando projeto:', novo);
+if (processo === 'Nanocerâmico' && volumes) { const match = volumes.match(/\d+/); if (match) volumesTotal = parseInt(match[0]); }
+const novo = { id: Utils.genId(), pep: pep || null, diagrama, placa: placa || null, descricao, volumes: volumes || (processo === 'Nanocerâmico' ? '1 unidade' : ''), volumesTotal: volumesTotal, volumesProcessados: 0, processo, prioridade, status: 'Aguardando', turno: State.data.turnosPorPosto[processo] || '1º Turno', obs, criadoEm: Date.now(), atualizadoEm: Date.now() };
+console.log(' Cadastrando projeto:', novo);
 try {
 const result = await Storage.salvarApi('create', novo);
-if (result.offline) {
-State.data.projetos.push(novo);
-Storage.salvarLocal();
-}
+if (result.offline) { State.data.projetos.push(novo); Storage.salvarLocal(); }
 document.getElementById('formCadastro').reset();
 this.renderTable();
 UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo + (result.offline ? ' (offline)' : ''));
 return false;
-} catch (error) {
-console.error('❌ Erro ao cadastrar:', error);
-UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique o console para mais detalhes');
-return false;
-}
+} catch (error) { console.error('❌ Erro ao cadastrar:', error); UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique o console para mais detalhes'); return false; }
 },
 setFilter(f, el) { State.admFilter = f; document.querySelectorAll('#page-admin .filter-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.renderTable(); },
 renderTable() {
@@ -1713,11 +1591,8 @@ volumesDisplay = `<div class="volumes-container"><div class="volumes-main comple
 } else { volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`; }
 } else { volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`; }
 let tempoDisplay = '-';
-if (p.status === 'Em Processo' && p.dataHoraInicio) {
-tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
-} else if (p.dataHoraInicio && p.dataHoraFim) {
-tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
-}
+if (p.status === 'Em Processo' && p.dataHoraInicio) { tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`; }
+else if (p.dataHoraInicio && p.dataHoraFim) { tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`; }
 let botoesAcao = '';
 if (p.status === 'Aguardando' || p.status === 'Parcial') { botoesAcao = `<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
 else if (p.status === 'Em Processo') { botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`; }
@@ -1738,11 +1613,7 @@ if (el) { el.textContent = Utils.formatarTempo(tempoDecorrido); el.classList.add
 async iniciarProcesso(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
-p.status = 'Em Processo';
-p.dataHoraInicio = Date.now();
-p.dataHoraFim = null;
-p.tempoReal = null;
-p.atualizadoEm = Date.now();
+p.status = 'Em Processo'; p.dataHoraInicio = Date.now(); p.dataHoraFim = null; p.tempoReal = null; p.atualizadoEm = Date.now();
 Storage.salvarLocal();
 await Storage.salvarApi('update', p);
 this.renderTable();
@@ -1751,8 +1622,7 @@ UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new
 async pausarProcesso(id) {
 const p = State.data.projetos.find(x => x.id === id);
 if (!p) return;
-p.status = 'Aguardando';
-p.atualizadoEm = Date.now();
+p.status = 'Aguardando'; p.atualizadoEm = Date.now();
 await Storage.salvarApi('update', p);
 this.renderTable();
 UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
@@ -1818,12 +1688,9 @@ if (volumesProcessados > faltam) { UI.showToast('error', 'Erro', `Você informou
 p.volumesProcessados += volumesProcessados;
 if (p.volumesProcessados >= p.volumesTotal) { await this.concluirDireto(State.projetoParaConcluir, turno); }
 else {
-p.status = 'Parcial';
-p.turno = turno;
-p.atualizadoEm = Date.now();
+p.status = 'Parcial'; p.turno = turno; p.atualizadoEm = Date.now();
 await Storage.salvarApi('update', p);
-Posto.renderTable();
-Admin.renderTable();
+Posto.renderTable(); Admin.renderTable();
 UI.showToast('info', 'Conclusão parcial', `${volumesProcessados} volumes processados. Faltam ${p.volumesTotal - p.volumesProcessados}.`);
 }
 } else if (p.processo === 'Pintura') {
@@ -1851,18 +1718,13 @@ const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
 this.registrarHistoricoPosto(p, turno, tempoReal);
 const proximoProcesso = CONFIG.FLUXO_PROCESSOS[p.processo];
 if (proximoProcesso) {
-p.processo = proximoProcesso;
-p.status = 'Aguardando';
+p.processo = proximoProcesso; p.status = 'Aguardando';
 p.turno = State.data.turnosPorPosto[proximoProcesso] || turno;
-p.dataHoraFim = Date.now();
-p.tempoReal = tempoReal;
-p.volumesProcessados = 0;
-p.dataHoraInicio = null;
-p.observacaoPintura = null;
-p.atualizadoEm = Date.now();
+p.dataHoraFim = Date.now(); p.tempoReal = tempoReal;
+p.volumesProcessados = 0; p.dataHoraInicio = null;
+p.observacaoPintura = null; p.atualizadoEm = Date.now();
 await Storage.salvarApi('update', p);
-Posto.renderTable();
-Admin.renderTable();
+Posto.renderTable(); Admin.renderTable();
 const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
 UI.showToast('success', 'Fluxo atualizado', `${p.diagrama} processado no ${turno} e movido para ${nomeProximoPosto}`);
 } else {
@@ -1871,10 +1733,8 @@ const concluido = Object.assign({}, p, { status: 'Concluído', turno: turno || p
 State.data.historico.unshift(concluido);
 State.data.projetos.splice(idx, 1);
 Storage.salvarLocal();
-Admin.renderTable();
-Posto.renderTable();
-Historico.renderGeral();
-Charts.render();
+Admin.renderTable(); Posto.renderTable();
+Historico.renderGeral(); Charts.render();
 UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Utils.formatarTempo(tempoReal));
 }
 }
@@ -1948,23 +1808,18 @@ if (idx < 0) return;
 if (!confirm('Reativar este projeto?')) return;
 const p = State.data.historico[idx];
 p.status = 'Aguardando';
-delete p.concluidoEm;
-delete p.dataHoraFim;
+delete p.concluidoEm; delete p.dataHoraFim;
 State.data.projetos.push(p);
 State.data.historico.splice(idx, 1);
 Storage.salvarLocal();
-this.renderGeral();
-Admin.renderTable();
-Posto.render();
-Charts.render();
+this.renderGeral(); Admin.renderTable(); Posto.render(); Charts.render();
 UI.showToast('success', 'Reativado', p.diagrama + ' voltou para processamento');
 },
 excluir(id) {
 if (!confirm('Excluir permanentemente este registro?')) return;
 State.data.historico = State.data.historico.filter(x => x.id !== id);
 Storage.salvarLocal();
-this.renderGeral();
-Charts.render();
+this.renderGeral(); Charts.render();
 UI.showToast('success', 'Excluído', 'Registro removido');
 }
 };
@@ -2099,23 +1954,33 @@ setInterval(UI.updateDate, 1000);
 UI.updateDate();
 
 if (typeof API !== 'undefined' && State.apiAvailable) {
+
+// ✅ HANDLER PARA LIMPEZA DE DADOS (NOVO!)
+API.on('data:cleared', () => {
+console.log('🗑️ Dados limpos remotamente - limpando local...');
+State.data.projetos = [];
+State.data.historico = [];
+State.data.historicoPostos = [];
+Storage.salvarLocal();
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) Posto.render();
+Historico.renderGeral();
+Historico.renderPostos();
+Dashboard.render();
+Charts.render();
+UI.showToast('success', 'Dados sincronizados', 'Limpeza realizada em todos os dispositivos');
+});
+
 // ✅ HANDLER PARA PROJETOS
 API.on('project:synced', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) {
-State.data.projetos.push(projLocal);
-console.log('➕ Projeto adicionado via sync:', projLocal.diagrama);
-} else {
+if (index === -1) { State.data.projetos.push(projLocal); console.log('➕ Projeto adicionado via sync:', projLocal.diagrama); }
+else {
 const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
 const remoteAtualizado = projLocal.atualizadoEm || 0;
 if (remoteAtualizado > localAtualizado) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...projLocal,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
-};
+State.data.projetos[index] = { ...State.data.projetos[index], ...projLocal, dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio, dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim };
 console.log('🔄 Projeto atualizado via sync:', projLocal.diagrama);
 }
 }
@@ -2125,72 +1990,38 @@ if (State.currentPosto) Posto.render();
 Charts.render();
 });
 
-// ✅ HANDLER PARA HISTÓRICO GERAL
-API.on('historico:synced', (data) => {
-data.forEach(item => {
-const local = Utils.fromApiHistorico(item);
-const idx = State.data.historico.findIndex(h => h.id === local.id);
-if (idx === -1) {
-State.data.historico.unshift(local);
-console.log('➕ Histórico adicionado:', local.diagrama);
-} else if (local.concluidoEm > State.data.historico[idx].concluidoEm) {
-State.data.historico[idx] = local;
-}
-});
-Storage.salvarLocal();
-Historico.renderGeral();
-Dashboard.render();
-});
-
-// ✅ HANDLER PARA HISTÓRICO DE POSTOS
+// ✅ HANDLER PARA HISTORICO POSTOS (NOVO!)
 API.on('historicoPostos:synced', (data) => {
 data.forEach(item => {
 const local = Utils.fromApiPosto(item);
 const idx = State.data.historicoPostos.findIndex(h => h.id === local.id);
-if (idx === -1) {
-State.data.historicoPostos.unshift(local);
-console.log('➕ Histórico de posto adicionado:', local.diagrama, '-', local.processo);
-} else if (local.dataHoraConclusao > State.data.historicoPostos[idx].dataHoraConclusao) {
-State.data.historicoPostos[idx] = local;
-}
+if (idx === -1) { State.data.historicoPostos.unshift(local); console.log('➕ Histórico de posto adicionado:', local.diagrama, '-', local.processo); }
+else if (local.dataHoraConclusao > State.data.historicoPostos[idx].dataHoraConclusao) { State.data.historicoPostos[idx] = local; }
 });
 Storage.salvarLocal();
 Historico.renderPostos();
 Historico.renderPostoAtual();
 Posto.render();
+Dashboard.render();
 });
 
 // ✅ HANDLER PARA SYNC COMPLETO DE PROJETOS
 API.on('sync:full', (remoteProjects) => {
-console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
+console.log(` Sync completo recebido: ${remoteProjects.length} projetos`);
 const remoteMap = new Map();
-remoteProjects.forEach(p => {
-const local = Utils.fromApiFormat(p);
-remoteMap.set(local.id, local);
-});
+remoteProjects.forEach(p => { const local = Utils.fromApiFormat(p); remoteMap.set(local.id, local); });
 const idsRemotos = new Set(remoteMap.keys());
 const removidos = State.data.projetos.filter(p => !idsRemotos.has(p.id));
-if (removidos.length > 0) {
-console.log(`🗑️ ${removidos.length} projetos removidos (limpeza detectada)`);
-}
+if (removidos.length > 0) console.log(`️ ${removidos.length} projetos removidos (limpeza detectada)`);
 State.data.projetos = State.data.projetos.filter(p => idsRemotos.has(p.id));
 remoteMap.forEach((remoteProj, id) => {
 const index = State.data.projetos.findIndex(p => p.id === id);
-if (index === -1) {
-State.data.projetos.push(remoteProj);
-} else {
+if (index === -1) { State.data.projetos.push(remoteProj); }
+else {
 const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
 const remoteAtualizado = remoteProj.atualizadoEm || 0;
 if (remoteAtualizado > localAtualizado) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...remoteProj,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || remoteProj.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim,
-tempoReal: State.data.projetos[index].tempoReal || remoteProj.tempoReal,
-concluidoEm: State.data.projetos[index].concluidoEm || remoteProj.concluidoEm,
-observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.observacaoPintura
-};
+State.data.projetos[index] = { ...State.data.projetos[index], ...remoteProj, dataHoraInicio: State.data.projetos[index].dataHoraInicio || remoteProj.dataHoraInicio, dataHoraFim: State.data.projetos[index].dataHoraFim || remoteProj.dataHoraFim, tempoReal: State.data.projetos[index].tempoReal || remoteProj.tempoReal, concluidoEm: State.data.projetos[index].concluidoEm || remoteProj.concluidoEm, observacaoPintura: State.data.projetos[index].observacaoPintura || remoteProj.observacaoPintura };
 }
 }
 });
@@ -2203,22 +2034,13 @@ Historico.renderPostos();
 Charts.render();
 });
 
-// ✅ HANDLER PARA SYNC COMPLETO DE HISTÓRICO
-API.on('sync:historicoFull', (data) => {
-console.log(`🔄 Sync completo de histórico: ${data.length} registros`);
-State.data.historico = data.map(Utils.fromApiHistorico);
-Storage.salvarLocal();
-Historico.renderGeral();
-Historico.renderPostoAtual();
-Dashboard.render();
-});
-
-// ✅ HANDLER PARA SYNC COMPLETO DE HISTÓRICO DE POSTOS
+// ✅ HANDLER PARA SYNC COMPLETO DE HISTORICO POSTOS (NOVO!)
 API.on('sync:historicoPostosFull', (data) => {
 console.log(`🔄 Sync completo de histórico de postos: ${data.length} registros`);
 State.data.historicoPostos = data.map(Utils.fromApiPosto);
 Storage.salvarLocal();
 Historico.renderPostos();
+Historico.renderPostoAtual();
 Posto.render();
 Dashboard.render();
 });
@@ -2226,27 +2048,14 @@ Dashboard.render();
 API.on('project:created', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-if (index === -1) {
-State.data.projetos.push(projLocal);
-Storage.salvarLocal();
-if (State.currentUser === 'admin') Admin.renderTable();
-if (State.currentPosto) Posto.render();
-}
+if (index === -1) { State.data.projetos.push(projLocal); Storage.salvarLocal(); if (State.currentUser === 'admin') Admin.renderTable(); if (State.currentPosto) Posto.render(); }
 });
 
 API.on('project:updated', (proj) => {
 const projLocal = Utils.fromApiFormat(proj);
 const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
 if (index !== -1) {
-State.data.projetos[index] = {
-...State.data.projetos[index],
-...projLocal,
-dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
-dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
-tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
-concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
-observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
-};
+State.data.projetos[index] = { ...State.data.projetos[index], ...projLocal, dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio, dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim, tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal, concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm, observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura };
 Storage.salvarLocal();
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
@@ -2262,10 +2071,7 @@ if (State.currentPosto) Posto.render();
 Charts.render();
 });
 
-API.on('sync:complete', (data) => {
-console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`);
-});
-
+API.on('sync:complete', (data) => { console.log(`✅ Sync completo: ${data.count} alterações${data.full ? ' (sync total)' : ''}`); });
 API.on('sync:error', (err) => { console.error('Erro de sync:', err); UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.'); });
 }
 
@@ -2273,10 +2079,7 @@ window.addEventListener('online', () => {
 State.isOnline = true;
 State.apiAvailable = (typeof API !== 'undefined');
 UI.showToast('success', 'Online', 'Conexão restaurada.');
-if (State.apiAvailable) {
-API.startPolling(API_CONFIG.POLLING_INTERVAL);
-Storage.processarFila();
-}
+if (State.apiAvailable) { API.startPolling(API_CONFIG.POLLING_INTERVAL); Storage.processarFila(); }
 });
 
 window.addEventListener('offline', () => {
