@@ -1841,6 +1841,7 @@ p.dataHoraFim = Date.now();
 const concluido = Object.assign({}, p, { status: 'Concluído', turno: turno || p.turno || '1º Turno', concluidoEm: Date.now(), tempoReal: tempoReal });
 State.data.historico.unshift(concluido);
 State.data.projetos.splice(idx, 1);
+await Storage.salvarApi('update', concluido);
 Storage.salvarLocal();
 Admin.renderTable();
 Posto.renderTable();
