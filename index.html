@@ -72,7 +72,6 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .kpi-value{font-size:34px;color:var(--weg-blue);font-weight:bold;margin-top:5px;position:relative;z-index:1}
 .kpi-trend{font-size:12px;margin-top:8px;display:flex;align-items:center;gap:5px;position:relative;z-index:1}
 .trend-up{color:var(--success)}
-.trend-down{color:var(--danger)}
 .card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);transition:var(--transition);margin-bottom:20px}
 .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px}
 .card h2{color:var(--text);font-size:16px;display:flex;align-items:center;gap:10px}
@@ -517,6 +516,7 @@ input,select,textarea{position:relative;z-index:5}
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
+
 <script>
 const API_CONFIG={URL:"https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",SECRET:"16101961",POLLING_INTERVAL:5000,FULL_SYNC_INTERVAL:30000};
 let lastSyncTimestamp=0;
@@ -529,7 +529,7 @@ url.searchParams.append('action',action);
 const options={method:method,mode:'cors',redirect:'follow'};
 if(method==='POST'){options.body=JSON.stringify({action,secret:API_CONFIG.SECRET,...payload});}
 else if(method==='GET'){
-if(payload.since)url.searchParams.append('since',payload.since);
+if(payload.since!==undefined)url.searchParams.append('since',payload.since);
 if(payload.key)url.searchParams.append('key',payload.key);
 url.searchParams.append('secret',API_CONFIG.SECRET);
 }
@@ -545,9 +545,11 @@ async function updateProject(projectData){const result=await apiRequest('update'
 async function deleteProject(projectId){const result=await apiRequest('delete',{id:projectId});triggerEvent('project:deleted',projectId);return result;}
 async function createHistorico(data){return await apiRequest('createHistorico',{data:data});}
 async function createHistoricoPosto(data){return await apiRequest('createHistoricoPosto',{data:data});}
+async function deleteHistorico(id){return await apiRequest('deleteHistorico',{id:id});}
 async function updateConfig(key,value){return await apiRequest('updateConfig',{key:key,value:value});}
 async function getConfig(key){const result=await apiRequest('getConfig',{key:key},'GET');return result.value;}
 async function clearAllData(){return await apiRequest('clearAll',{});}
+
 async function syncHistorico(){
 try{
 const result=await apiRequest('syncHistorico',{since:0},'GET');
@@ -561,11 +563,10 @@ tempoReal:p.TempoReal,observacaoPintura:p.ObservacaoPintura,
 concluidoEm:p.ConcluidoEm
 }));
 console.log('📜 Histórico carregado: '+result.data.length+' registros');
-if(State.currentPage==='historico')Historico.renderGeral();
-if(State.currentPage==='dashboard')Dashboard.render();
 }
 }catch(error){console.error('Erro ao sincronizar histórico:',error);}
 }
+
 async function syncHistoricoPostos(){
 try{
 const result=await apiRequest('syncHistoricoPostos',{since:0},'GET');
@@ -577,13 +578,10 @@ turno:p.Turno,tempoReal:p.TempoReal,observacao:p.Observacao,
 dataHoraConclusao:p.DataHoraConclusao
 }));
 console.log('📜 Histórico de Postos carregado: '+result.data.length+' registros');
-if(State.currentPage==='historico')Historico.renderPostos();
-if(State.currentPage==='historico-posto')Historico.renderPostoAtual();
-if(State.currentPosto&&State.currentPage==='posto')Posto.renderTable();
-if(State.currentPage==='dashboard')Dashboard.render();
 }
 }catch(error){console.error('Erro ao sincronizar histórico de postos:',error);}
 }
+
 async function syncDataIncremental(){
 if(syncInProgress)return;
 syncInProgress=true;
@@ -616,6 +614,7 @@ indicator.innerHTML='<i class="fa-solid fa-cloud-bolt"></i> <span id="syncStatus
 triggerEvent('sync:error',error);
 }finally{syncInProgress=false;}
 }
+
 async function syncDataCompleto(){
 if(syncInProgress)return;
 syncInProgress=true;
@@ -630,11 +629,18 @@ triggerEvent('sync:complete',{count:result.data.length,full:true});
 }
 await syncHistorico();
 await syncHistoricoPostos();
+if(State.currentUser==='admin')Admin.renderTable();
+if(State.currentPosto)Posto.render();
+Dashboard.render();
+Historico.renderGeral();
+Historico.renderPostos();
+Charts.render();
 }catch(error){
 console.error('Sync completo failed:',error);
 triggerEvent('sync:error',error);
 }finally{syncInProgress=false;}
 }
+
 function startPolling(interval){
 syncDataCompleto().then(()=>{
 setInterval(syncDataIncremental,interval||API_CONFIG.POLLING_INTERVAL);
@@ -646,10 +652,11 @@ function off(event,callback){if(eventListeners[event])eventListeners[event]=even
 function triggerEvent(event,data){
 if(eventListeners[event])eventListeners[event].forEach(callback=>{try{callback(data);}catch(e){console.error('Error in event listener for '+event+':',e);}});
 }
-window.API={createProject,updateProject,deleteProject,createHistorico,createHistoricoPosto,updateConfig,getConfig,clearAllData,syncData:syncDataIncremental,syncDataCompleto,syncHistorico,syncHistoricoPostos,startPolling,on,off};
+window.API={createProject,updateProject,deleteProject,createHistorico,createHistoricoPosto,deleteHistorico,updateConfig,getConfig,clearAllData,syncData:syncDataIncremental,syncDataCompleto,syncHistorico,syncHistoricoPostos,startPolling,on,off};
 </script>
+
 <script>
-const CONFIG={STORAGE_KEY:'weg_fluxo_produtivo_v35',SENHA_PADRAO:'16101961',TURNO_LEGADO:{'Manhã':'1º Turno','Tarde':'2º Turno','Noite':'3º Turno'},PRIORIDADE_ORDEM:{'Urgente':0,'Alta':1,'Normal':2},FLUXO_PROCESSOS:{'Nanocerâmico':'Pintura','Pintura':'Conferência','Conferência':null},TURNO_COOLDOWN:2*60*60*1000};
+const CONFIG={STORAGE_KEY:'weg_fluxo_produtivo_v40',SENHA_PADRAO:'16101961',PRIORIDADE_ORDEM:{'Urgente':0,'Alta':1,'Normal':2},FLUXO_PROCESSOS:{'Nanocerâmico':'Pintura','Pintura':'Conferência','Conferência':null},TURNO_COOLDOWN:2*60*60*1000};
 const State={
 data:{projetos:[],historico:[],historicoPostos:[],config:{dispositivo:'tablet'},turnosPorPosto:{'Nanocerâmico':'1º Turno','Pintura':'1º Turno','Conferência':'1º Turno'},senhaAdmin:CONFIG.SENHA_PADRAO,ultimaSelecaoTurno:0},
 currentUser:null,currentPosto:null,currentPage:'dashboard',dashboardPostoAtual:'Nanocerâmico',postoFilter:'all',historicoPostoFilter:'all',admFilter:'all',histFilter:'all',histPostoFilter:'all',vkActive:false,vkTarget:null,projetoParaConcluir:null,pendingAdminLogin:false,acaoPendenteSenha:null,charts:{},turnoFimSemanaPendente:false,turnoFimSemanaModalAberto:false,timerInterval:null,isOnline:navigator.onLine,lastSync:0,apiAvailable:false,cameraStream:null,scanInterval:null,lastPepFound:null,lastDiagramaFound:null
@@ -797,6 +804,7 @@ else if(acao==='update')result=await API.updateProject(Utils.toApiFormat(dados))
 else if(acao==='delete')result=await API.deleteProject(dados.id);
 else if(acao==='createHistorico')result=await API.createHistorico(dados);
 else if(acao==='createHistoricoPosto')result=await API.createHistoricoPosto(dados);
+else if(acao==='deleteHistorico')result=await API.deleteHistorico(dados.id);
 else if(acao==='config')result=await API.updateConfig(dados.key,dados.value);
 if(result&&result.success){
 this.salvarLocal();
@@ -806,8 +814,7 @@ return{success:true,offline:false};
 }
 throw new Error(result?result.error:'Erro na API');
 }catch(error){console.error('Erro ao salvar na API:',error);throw error;}
-},
-migrarTurnosAntigos(){}
+}
 };
 const UI={
 aplicarEstadoCursor(){
@@ -1682,6 +1689,9 @@ const nomeProximoPosto=proximoProcesso==='Pintura'?'Pintura':'Conferência';
 UI.showToast('success','Fluxo atualizado',p.diagrama+' processado no '+turno+' e movido para '+nomeProximoPosto);
 Posto.renderTable();
 Admin.renderTable();
+if(State.currentPage==='historico')Historico.renderPostos();
+if(State.currentPage==='historico-posto')Historico.renderPostoAtual();
+if(State.currentPage==='dashboard')Dashboard.render();
 }catch(error){UI.showToast('error','Erro',error.message);}
 }else{
 p.dataHoraFim=now;
@@ -1719,6 +1729,9 @@ UI.showToast('success','Concluído',p.diagrama+' finalizado. Tempo: '+Utils.form
 Admin.renderTable();
 Posto.renderTable();
 Historico.renderGeral();
+Historico.renderPostos();
+if(State.currentPage==='historico-posto')Historico.renderPostoAtual();
+if(State.currentPage==='dashboard')Dashboard.render();
 Charts.render();
 }catch(error){UI.showToast('error','Erro',error.message);}
 }
@@ -1786,7 +1799,7 @@ const obs=p.observacao?'<small style="color:var(--text-light);">'+p.observacao+'
 return '<tr><td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;">'+(p.descricao||'-')+'</td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dataConclusao+'</td><td style="text-align:center;">'+obs+'</td></tr>';
 }).join('');
 },
-reativar(id){
+async reativar(id){
 const idx=State.data.historico.findIndex(x=>x.id===id);
 if(idx<0)return;
 if(!confirm('Reativar este projeto?'))return;
@@ -1796,20 +1809,34 @@ delete p.concluidoEm;
 delete p.dataHoraFim;
 State.data.projetos.push(p);
 State.data.historico.splice(idx,1);
-Storage.salvarLocal();
+try{
+await Storage.salvarApi('deleteHistorico',{id:id});
+await Storage.salvarApi('create',p);
 this.renderGeral();
 Admin.renderTable();
 Posto.render();
 Charts.render();
 UI.showToast('success','Reativado',p.diagrama+' voltou para processamento');
+}catch(error){
+State.data.historico.splice(0,0,p);
+State.data.projetos=State.data.projetos.filter(x=>x.id!==p.id);
+UI.showToast('error','Erro','Não foi possível reativar: '+error.message);
+}
 },
-excluir(id){
+async excluir(id){
 if(!confirm('Excluir permanentemente este registro?'))return;
+const p=State.data.historico.find(x=>x.id===id);
 State.data.historico=State.data.historico.filter(x=>x.id!==id);
-Storage.salvarLocal();
 this.renderGeral();
 Charts.render();
-UI.showToast('success','Excluído','Registro removido');
+try{
+await Storage.salvarApi('deleteHistorico',{id:id});
+UI.showToast('success','Excluído','Registro removido da nuvem');
+}catch(error){
+if(p)State.data.historico.unshift(p);
+this.renderGeral();
+UI.showToast('error','Erro','Não foi possível excluir da nuvem: '+error.message);
+}
 }
 };
 const Turno={
