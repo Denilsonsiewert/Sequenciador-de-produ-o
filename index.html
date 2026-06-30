@@ -512,7 +512,6 @@ backdrop-filter: none;
                     </div>
                     <div class="table-wrapper">
                         <table class="table">
-                            <!-- ✅ CORRIGIDO: Adicionada coluna Descrição -->
                             <thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="admTableBody"></tbody>
                         </table>
@@ -531,14 +530,7 @@ backdrop-filter: none;
                         <select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
                     <div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="Posto.renderTable()" data-vk></div>
                         <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
-                    <div class="table-wrapper">
-                        <table class="table">
-                            <!-- ✅ CORRIGIDO: Adicionada coluna Descrição -->
-                            <thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead>
-                            <tbody id="postoTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                    <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
             </section>
             <section class="page" id="page-historico">
                 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
@@ -546,14 +538,7 @@ backdrop-filter: none;
                 <div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                     <div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP..." oninput="Historico.renderGeral()" data-vk></div>
                         <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
-                    <div class="table-wrapper">
-                        <table class="table">
-                            <!-- ✅ CORRIGIDO: Adicionada coluna Descrição -->
-                            <thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo Real</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead>
-                            <tbody id="histTableBody"></tbody>
-                        </table>
-                    </div>
-                </div></div>
+                    <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo Real</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
                 <div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                     <div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostos()" data-vk></div>
                         <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
@@ -564,14 +549,7 @@ backdrop-filter: none;
                 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                     <div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostoAtual()" data-vk></div>
                         <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
-                    <div class="table-wrapper">
-                        <table class="table">
-                            <!-- ✅ CORRIGIDO: Adicionada coluna Descrição -->
-                            <thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead>
-                            <tbody id="historicoPostoTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                    <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
             </section>
             <section class="page" id="page-config">
                 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
@@ -871,7 +849,6 @@ const Utils = {
     },
     extrairDadosEtiqueta(texto) {
         console.log(' OCR:', texto.substring(0, 200) + '...');
-        // ✅ CORREÇÃO: Regex corrigido para evitar quebra de linha
         let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
         const result = { pep: null, diagrama: null };
         const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
@@ -904,8 +881,7 @@ const Utils = {
                 console.log('✅ PEP via 13 dígitos:', result.pep);
             }
         }
-        // ✅ CORREÇÃO: Split seguro
-        const lines = texto.split(/\r?\n/);
+        const lines = texto.split('\n');
         for (let line of lines) {
             const upper = line.toUpperCase();
             if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
@@ -1191,6 +1167,10 @@ const Auth = {
     cancelarLoginAdmin() { State.pendingAdminLogin = false; UI.closeModal('modalSenhaAdmin'); },
     efetivarLogin(role) {
         State.currentUser = role;
+        
+        // ✅ SALVA O ESTADO DO LOGIN PARA MANTER APÓS RECARREGAMENTO
+        localStorage.setItem('weg_logged_in_role', role);
+        
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         const labels = { admin: 'Administrador', nano: 'Operador - Nanocerâmico', pintura: 'Operador - Pintura', conferencia: 'Operador - Conferência' };
@@ -1207,6 +1187,10 @@ const Auth = {
     confirmarLogout() { UI.openModal('modalLogout'); },
     efetivarLogout() {
         UI.closeModal('modalLogout');
+        
+        // ✅ LIMPA O ESTADO DO LOGIN AO SAIR MANUALMENTE
+        localStorage.removeItem('weg_logged_in_role');
+        
         State.currentUser = null;
         State.currentPosto = null;
         document.getElementById('app').style.display = 'none';
@@ -1607,13 +1591,7 @@ const Admin = {
         const search = (document.getElementById('admSearch').value || '').toLowerCase();
         let data = [...State.data.projetos];
         if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
-        // ✅ CORRIGIDO: Busca robusta com proteção contra null
-        if (search) data = data.filter(p => 
-            (p.pep||'').toLowerCase().includes(search) || 
-            p.diagrama.toLowerCase().includes(search) || 
-            (p.placa||'').toLowerCase().includes(search) || 
-            (p.descricao||'').toLowerCase().includes(search)
-        );
+        if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
         data = Utils.ordenarPorPrioridade(data);
         if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>`; return; }
         tbody.innerHTML = data.map(p => {
@@ -1751,13 +1729,7 @@ const Posto = {
         const search = (document.getElementById('postoSearch').value || '').toLowerCase();
         let data = State.data.projetos.filter(p => p.processo === State.currentPosto && p.status !== 'Concluído');
         if (State.postoFilter !== 'all') data = data.filter(p => p.status === State.postoFilter);
-        // ✅ CORRIGIDO: Busca robusta
-        if (search) data = data.filter(p => 
-            (p.pep||'').toLowerCase().includes(search) || 
-            p.diagrama.toLowerCase().includes(search) || 
-            (p.placa||'').toLowerCase().includes(search) || 
-            (p.descricao||'').toLowerCase().includes(search)
-        );
+        if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
         data = Utils.ordenarPorPrioridade(data);
         const todosPosto = State.data.projetos.filter(p => p.processo === State.currentPosto);
         document.getElementById('posto-aguardando').textContent = todosPosto.filter(p => p.status === 'Aguardando').length;
@@ -1987,13 +1959,7 @@ const Historico = {
         const search = (document.getElementById('histSearch').value || '').toLowerCase();
         let data = [...State.data.historico];
         if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
-        // ✅ CORRIGIDO: Busca robusta
-        if (search) data = data.filter(p => 
-            (p.pep||'').toLowerCase().includes(search) || 
-            p.diagrama.toLowerCase().includes(search) || 
-            (p.placa||'').toLowerCase().includes(search) ||
-            (p.descricao||'').toLowerCase().includes(search)
-        );
+        if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
         if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
         data.sort((a,b) => b.concluidoEm - a.concluidoEm);
         if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>`; return; }
@@ -2030,13 +1996,7 @@ const Historico = {
         document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
         let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
         if (State.historicoPostoFilter !== 'all') data = data.filter(p => p.turno === State.historicoPostoFilter);
-        // ✅ CORRIGIDO: Busca robusta
-        if (search) data = data.filter(p => 
-            (p.pep||'').toLowerCase().includes(search) || 
-            p.diagrama.toLowerCase().includes(search) || 
-            (p.placa||'').toLowerCase().includes(search) ||
-            (p.descricao||'').toLowerCase().includes(search)
-        );
+        if (search) data = data.filter(p => (p.pep||'').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa||'').toLowerCase().includes(search) || (p.descricao||'').toLowerCase().includes(search));
         data.sort((a,b) => b.dataHoraConclusao - a.dataHoraConclusao);
         if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div></td></tr>`; return; }
         tbody.innerHTML = data.map(p => {
@@ -2253,13 +2213,19 @@ const App = {
             setInterval(UI.updateDate, 1000);
             UI.updateDate();
             
+            // ✅ VERIFICA SE JÁ ESTÁ LOGADO AO CARREGAR A PÁGINA
+            const savedRole = localStorage.getItem('weg_logged_in_role');
+            if (savedRole) {
+                // Se tiver um papel salvo, entra direto sem mostrar login
+                Auth.efetivarLogin(savedRole);
+            }
+
             // ✅ ATUALIZAÇÃO INTELIGENTE A CADA 1 MINUTO (SEM RECARREGAR)
+            // Comentado pois você pediu recarregamento completo agora
+            /*
             setInterval(() => {
                 if (State.apiAvailable && State.isOnline) {
-                    // Executa um sync silencioso
                     syncDataIncremental().then(() => {
-                        // Se houver mudanças, as funções de renderização são chamadas automaticamente pelos eventos
-                        // Mas forçamos um refresh visual caso algo tenha mudado sem disparar evento específico
                         if (State.currentUser === 'admin') Admin.renderTable();
                         if (State.currentPosto) Posto.render();
                         Dashboard.render();
@@ -2268,6 +2234,12 @@ const App = {
                         Charts.render();
                     });
                 }
+            }, 60000); 
+            */
+
+            // ✅ RECARREGAMENTO COMPLETO DA PÁGINA A CADA 1 MINUTO
+            setTimeout(() => {
+                location.reload();
             }, 60000); // 60000ms = 1 minuto
 
             if (typeof API !== 'undefined' && State.apiAvailable) {
