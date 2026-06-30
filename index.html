@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <title>WEG - Centro de Fluxo Produtivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -14,8 +12,8 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation}
 body.hide-cursor,body.hide-cursor *,body.hide-cursor button,body.hide-cursor a,body.hide-cursor input,body.hide-cursor select,body.hide-cursor textarea{cursor:none !important}
-button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.posto-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:1;touch-action:manipulation;-webkit-touch-callout:none}
-button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.posto-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:2}
+button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:1;touch-action:manipulation;-webkit-touch-callout:none}
+button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:2}
 ::-webkit-scrollbar{width:30px;height:30px}
 ::-webkit-scrollbar-track{background:var(--bg);border-radius:15px;border:3px solid var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--weg-blue);border-radius:15px;border:5px solid var(--bg);min-height:80px}
@@ -394,17 +392,17 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 <form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
 <div class="form-grid">
-<div class="form-group"><label>PEP <small style="color:var(--text-light);font-weight:400;">(opcional, pode repetir)</small></label><input type="text" id="cad-pep" placeholder="Ex: 170-2500343-121" data-vk></div>
-<div class="form-group"><label>Diagrama / Ordem do Invólucro <span class="req">*</span> <small style="color:var(--text-light);font-weight:400;">(único)</small></label><input type="text" id="cad-diagrama" required placeholder="Ex: 45089024" data-vk></div>
-<div class="form-group"><label>Placa de Identificação</label><input type="text" id="cad-placa" placeholder="Ex: PLACA123" data-vk></div>
-<div class="form-group" id="group-cad-volumes"><label>Quantidade / Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 28" data-vk></div>
+<div class="form-group"><label>PEP <small style="color:var(--text-light);font-weight:400;">(opcional)</small></label><input type="text" id="cad-pep" placeholder="Ex: 170-2500343-121" data-vk></div>
+<div class="form-group"><label>Diagrama / Ordem <span class="req">*</span></label><input type="text" id="cad-diagrama" required placeholder="Ex: 45089024" data-vk></div>
+<div class="form-group"><label>Placa</label><input type="text" id="cad-placa" placeholder="Ex: PLACA123" data-vk></div>
+<div class="form-group" id="group-cad-volumes"><label>Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 28" data-vk></div>
 <div class="form-group"><label>Descrição</label><input type="text" id="cad-descricao" placeholder="Ex: Motor W22 Premium" data-vk></div>
-<div class="form-group"><label>Processo de Destino <span class="req">*</span></label><select id="cad-processo" required onchange="Admin.toggleVolumesCadastro()"><option value="">Selecione...</option><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
+<div class="form-group"><label>Processo <span class="req">*</span></label><select id="cad-processo" required onchange="Admin.toggleVolumesCadastro()"><option value="">Selecione...</option><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
 <div class="form-group"><label>Prioridade</label><select id="cad-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
-<div class="form-group full"><label>Observações</label><textarea id="cad-obs" rows="2" placeholder="Observações adicionais..." data-vk></textarea></div>
+<div class="form-group full"><label>Observações</label><textarea id="cad-obs" rows="2" placeholder="Observações..." data-vk></textarea></div>
 <div class="form-actions">
 <button type="button" class="btn btn-secondary" onclick="Admin.limparFormulario()"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
-<button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar Projeto</button>
+<button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar</button>
 </div>
 </div>
 </form>
@@ -425,7 +423,7 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 <div class="table-wrapper">
 <table class="table">
-<thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
+<thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
 <tbody id="admTableBody"></tbody>
 </table>
 </div>
@@ -439,11 +437,11 @@ input,select,textarea{position:relative;z-index:5}
 <div class="kpi"><div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div><div class="kpi-value" id="posto-concluidos">0</div></div>
 </div>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
-<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno atual:</label>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno:</label>
 <select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
 <div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="Posto.renderTable()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Descrição</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-historico">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
@@ -451,18 +449,18 @@ input,select,textarea{position:relative;z-index:5}
 <div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP..." oninput="Historico.renderGeral()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo Real</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
 <div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostos()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP..." oninput="Historico.renderPostos()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Posto</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Descrição</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostoAtual()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP..." oninput="Historico.renderPostoAtual()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Descrição</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
@@ -477,7 +475,7 @@ input,select,textarea{position:relative;z-index:5}
 <div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet">Tablet / Touchscreen</option><option value="computador">💻 Computador (cursor oculto)</option></select></div>
 <div class="form-group full" id="cfgVkInfo" style="display:none;"><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador ativado:</strong> Cursor oculto + teclado virtual.</div></div></div></div></div>
 <div class="card"><h2><i class="fa-solid fa-database"></i> Gerenciar Dados</h2>
-<div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados na nuvem (Planilha).</div></div>
+<div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados na nuvem.</div></div>
 <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;"><button class="btn btn-secondary" onclick="Export.backup()"><i class="fa-solid fa-download"></i> Backup Local</button><button class="btn btn-danger" onclick="Auth.solicitarLimpeza()"><i class="fa-solid fa-trash"></i> Limpar Nuvem</button></div></div>
 </section>
 </main>
@@ -489,7 +487,7 @@ input,select,textarea{position:relative;z-index:5}
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid">
 <div class="form-group"><label>PEP</label><input type="text" id="edit-pep" data-vk></div>
-<div class="form-group"><label>Diagrama / Ordem</label><input type="text" id="edit-diagrama" data-vk></div>
+<div class="form-group"><label>Diagrama</label><input type="text" id="edit-diagrama" data-vk></div>
 <div class="form-group"><label>Placa</label><input type="text" id="edit-placa" data-vk></div>
 <div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao" data-vk></div>
 <div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
@@ -549,7 +547,6 @@ async function deleteHistorico(id){return await apiRequest('deleteHistorico',{id
 async function updateConfig(key,value){return await apiRequest('updateConfig',{key:key,value:value});}
 async function getConfig(key){const result=await apiRequest('getConfig',{key:key},'GET');return result.value;}
 async function clearAllData(){return await apiRequest('clearAll',{});}
-
 async function syncHistorico(){
 try{
 const result=await apiRequest('syncHistorico',{since:0},'GET');
@@ -566,7 +563,6 @@ console.log('📜 Histórico carregado: '+result.data.length+' registros');
 }
 }catch(error){console.error('Erro ao sincronizar histórico:',error);}
 }
-
 async function syncHistoricoPostos(){
 try{
 const result=await apiRequest('syncHistoricoPostos',{since:0},'GET');
@@ -581,7 +577,6 @@ console.log('📜 Histórico de Postos carregado: '+result.data.length+' registr
 }
 }catch(error){console.error('Erro ao sincronizar histórico de postos:',error);}
 }
-
 async function syncDataIncremental(){
 if(syncInProgress)return;
 syncInProgress=true;
@@ -614,7 +609,6 @@ indicator.innerHTML='<i class="fa-solid fa-cloud-bolt"></i> <span id="syncStatus
 triggerEvent('sync:error',error);
 }finally{syncInProgress=false;}
 }
-
 async function syncDataCompleto(){
 if(syncInProgress)return;
 syncInProgress=true;
@@ -640,7 +634,6 @@ console.error('Sync completo failed:',error);
 triggerEvent('sync:error',error);
 }finally{syncInProgress=false;}
 }
-
 function startPolling(interval){
 syncDataCompleto().then(()=>{
 setInterval(syncDataIncremental,interval||API_CONFIG.POLLING_INTERVAL);
@@ -1807,34 +1800,30 @@ const p=State.data.historico[idx];
 p.status='Aguardando';
 delete p.concluidoEm;
 delete p.dataHoraFim;
-State.data.projetos.push(p);
-State.data.historico.splice(idx,1);
 try{
 await Storage.salvarApi('deleteHistorico',{id:id});
 await Storage.salvarApi('create',p);
+State.data.projetos.push(p);
+State.data.historico.splice(idx,1);
 this.renderGeral();
 Admin.renderTable();
 Posto.render();
 Charts.render();
 UI.showToast('success','Reativado',p.diagrama+' voltou para processamento');
 }catch(error){
-State.data.historico.splice(0,0,p);
-State.data.projetos=State.data.projetos.filter(x=>x.id!==p.id);
 UI.showToast('error','Erro','Não foi possível reativar: '+error.message);
 }
 },
 async excluir(id){
 if(!confirm('Excluir permanentemente este registro?'))return;
 const p=State.data.historico.find(x=>x.id===id);
+try{
+await Storage.salvarApi('deleteHistorico',{id:id});
 State.data.historico=State.data.historico.filter(x=>x.id!==id);
 this.renderGeral();
 Charts.render();
-try{
-await Storage.salvarApi('deleteHistorico',{id:id});
 UI.showToast('success','Excluído','Registro removido da nuvem');
 }catch(error){
-if(p)State.data.historico.unshift(p);
-this.renderGeral();
 UI.showToast('error','Erro','Não foi possível excluir da nuvem: '+error.message);
 }
 }
