@@ -10,7 +10,7 @@
 <style>
 :root{--weg-blue:#005BAC;--weg-dark:#003D79;--weg-light:#E8F1FB;--bg:#F4F6F9;--card:#FFFFFF;--border:#D9E2EC;--success:#00A651;--warning:#FFB000;--danger:#D32F2F;--info:#2196F3;--text:#2C3E50;--text-light:#7B8A9A;--shadow:0 2px 8px rgba(0,0,0,.08);--shadow-lg:0 8px 24px rgba(0,0,0,.12);--radius:12px;--sidebar-width:72px;--header-height:90px;--transition:all .25s ease}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation}
+body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation;overflow-x:hidden}
 body.hide-cursor,body.hide-cursor *,body.hide-cursor button,body.hide-cursor a,body.hide-cursor input,body.hide-cursor select,body.hide-cursor textarea{cursor:none !important}
 button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:1;touch-action:manipulation}
 button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:2}
@@ -413,7 +413,7 @@ input,select,textarea{position:relative;z-index:5}
 <div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="Admin.renderTableDebounced()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="UI.debounceSearch('adm')" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
@@ -439,7 +439,7 @@ input,select,textarea{position:relative;z-index:5}
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno:</label>
 <select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
-<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="Posto.renderTableDebounced()" data-vk></div>
+<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="UI.debounceSearch('posto')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
 </section>
@@ -447,18 +447,18 @@ input,select,textarea{position:relative;z-index:5}
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs"><button class="historico-tab active" onclick="Historico.switchTab('geral', this)"><i class="fa-solid fa-archive"></i> Histórico Geral</button><button class="historico-tab" onclick="Historico.switchTab('postos', this)"><i class="fa-solid fa-route"></i> Histórico por Posto</button></div>
 <div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="Historico.renderGeralDebounced()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="UI.debounceSearch('hist')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
 <div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostosDebounced()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="UI.debounceSearch('histPosto')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostoAtualDebounced()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="UI.debounceSearch('historicoPosto')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
@@ -514,9 +514,8 @@ input,select,textarea{position:relative;z-index:5}
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
-
 <script>
-const API_CONFIG={URL:"https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",SECRET:"16101961",POLLING_INTERVAL:3000,FULL_SYNC_INTERVAL:15000};
+const API_CONFIG={URL:"https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",SECRET:"16101961",POLLING_INTERVAL:30000,FULL_SYNC_INTERVAL:15000};
 let lastSyncTimestamp=0;
 let syncInProgress=false;
 const eventListeners={};
@@ -577,7 +576,7 @@ console.log('Histórico de Postos carregado: '+result.data.length+' registros');
 }catch(error){console.error('Erro ao sincronizar histórico de postos:',error);}
 }
 async function syncDataIncremental(){
-if(syncInProgress||document.hidden)return;
+if(syncInProgress)return;
 syncInProgress=true;
 const indicator=document.getElementById('syncIndicator');
 if(indicator)indicator.style.opacity='0.7';
@@ -633,18 +632,12 @@ console.error('Sync completo failed:',error);
 triggerEvent('sync:error',error);
 }finally{syncInProgress=false;}
 }
-let _pollIncrementalId=null,_pollFullId=null;
 function startPolling(interval){
 syncDataCompleto().then(()=>{
-if(_pollIncrementalId)clearInterval(_pollIncrementalId);
-if(_pollFullId)clearInterval(_pollFullId);
-_pollIncrementalId=setInterval(syncDataIncremental,interval||API_CONFIG.POLLING_INTERVAL);
-_pollFullId=setInterval(()=>{if(!document.hidden)syncDataCompleto();},API_CONFIG.FULL_SYNC_INTERVAL);
+setInterval(syncDataIncremental,interval||API_CONFIG.POLLING_INTERVAL);
+setInterval(syncDataCompleto,API_CONFIG.FULL_SYNC_INTERVAL);
 });
 }
-document.addEventListener('visibilitychange',()=>{
-if(!document.hidden&&typeof State!=='undefined'&&State.apiAvailable){syncDataIncremental();}
-});
 function on(event,callback){if(!eventListeners[event])eventListeners[event]=[];eventListeners[event].push(callback);}
 function off(event,callback){if(eventListeners[event])eventListeners[event]=eventListeners[event].filter(cb=>cb!==callback);}
 function triggerEvent(event,data){
@@ -652,16 +645,14 @@ if(eventListeners[event])eventListeners[event].forEach(callback=>{try{callback(d
 }
 window.API={createProject,updateProject,deleteProject,createHistorico,createHistoricoPosto,deleteHistorico,updateConfig,getConfig,clearAllData,syncData:syncDataIncremental,syncDataCompleto,syncHistorico,syncHistoricoPostos,startPolling,on,off};
 </script>
-
 <script>
 const CONFIG={STORAGE_KEY:'weg_fluxo_produtivo_v40',SENHA_PADRAO:'16101961',PRIORIDADE_ORDEM:{'Urgente':0,'Alta':1,'Normal':2},FLUXO_PROCESSOS:{'Nanocerâmico':'Pintura','Pintura':'Conferência','Conferência':null},TURNO_COOLDOWN:2*60*60*1000};
 const State={
 data:{projetos:[],historico:[],historicoPostos:[],config:{dispositivo:'tablet'},turnosPorPosto:{'Nanocerâmico':'1º Turno','Pintura':'1º Turno','Conferência':'1º Turno'},senhaAdmin:CONFIG.SENHA_PADRAO,ultimaSelecaoTurno:0},
-currentUser:null,currentPosto:null,currentPage:'dashboard',dashboardPostoAtual:'Nanocerâmico',postoFilter:'all',historicoPostoFilter:'all',admFilter:'all',histFilter:'all',histPostoFilter:'all',vkActive:false,vkTarget:null,projetoParaConcluir:null,pendingAdminLogin:false,acaoPendenteSenha:null,charts:{},turnoFimSemanaPendente:false,turnoFimSemanaModalAberto:false,timerInterval:null,isOnline:navigator.onLine,lastSync:0,apiAvailable:false,cameraStream:null,scanInterval:null,lastPepFound:null,lastDiagramaFound:null
+currentUser:null,currentPosto:null,currentPage:'dashboard',dashboardPostoAtual:'Nanocerâmico',postoFilter:'all',historicoPostoFilter:'all',admFilter:'all',histFilter:'all',histPostoFilter:'all',vkActive:false,vkTarget:null,projetoParaConcluir:null,pendingAdminLogin:false,acaoPendenteSenha:null,charts:{},turnoFimSemanaPendente:false,turnoFimSemanaModalAberto:false,timerInterval:null,isOnline:navigator.onLine,lastSync:0,apiAvailable:false,cameraStream:null,scanInterval:null,lastPepFound:null,lastDiagramaFound:null,debounceTimers:{}
 };
 const Utils={
 genId(){return 'p_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);},
-debounce(fn,delay){let t=null;return function(...args){clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);};},
 formatarTempo(ms){
 if(!ms||ms<0)return '00:00:00';
 const segundos=Math.floor(ms/1000);
@@ -718,7 +709,8 @@ tempoReal:apiProj.TempoReal||null,concluidoEm:apiProj.ConcluidoEm||null,observac
 },
 extrairDadosEtiqueta(texto){
 console.log('OCR:',texto.substring(0,200)+'...');
-let clean=texto.replace(/\r/g,'').replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+let clean=texto.replace(/\r/g,'').replace(/
+/g,' ').replace(/\s+/g,' ').trim();
 const result={pep:null,diagrama:null};
 const pepLabelMatch=clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
 if(pepLabelMatch){
@@ -737,7 +729,8 @@ if(!result.pep){
 const digits13=clean.match(/\b(\d{13})\b/);
 if(digits13){const n=digits13[1];result.pep=n.substring(0,3)+'-'+n.substring(3,10)+'-'+n.substring(10,13);console.log('PEP via 13 dígitos:',result.pep);}
 }
-const lines=texto.split(/\r?\n/);
+const lines=texto.split(/\r?
+/);
 for(let line of lines){
 const upper=line.toUpperCase();
 if(upper.includes('DIAGR')||upper.includes('ORD')||upper.includes('INVIOL')){
@@ -927,6 +920,16 @@ State.vkTarget.dispatchEvent(new Event('input',{bubbles:true}));
 State.vkTarget.focus();
 UI.scrollParaElemento(State.vkTarget);
 });
+},
+debounceSearch(context){
+if(State.debounceTimers[context])clearTimeout(State.debounceTimers[context]);
+State.debounceTimers[context]=setTimeout(()=>{
+if(context==='adm')Admin.renderTable();
+if(context==='posto')Posto.renderTable();
+if(context==='hist')Historico.renderGeral();
+if(context==='histPosto')Historico.renderPostos();
+if(context==='historicoPosto')Historico.renderPostoAtual();
+},300);
 }
 };
 const Navigation={
@@ -1342,8 +1345,17 @@ let data=[...State.data.projetos];
 if(State.admFilter!=='all')data=data.filter(p=>p.processo===State.admFilter);
 if(search)data=data.filter(p=>(p.pep||'').toLowerCase().includes(search)||p.diagrama.toLowerCase().includes(search)||(p.placa||'').toLowerCase().includes(search)||(p.descricao||'').toLowerCase().includes(search));
 data=Utils.ordenarPorPrioridade(data);
-if(data.length===0){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>';return;}
-tbody.innerHTML=data.map(p=>{
+const fragment=document.createDocumentFragment();
+if(data.length===0){
+const tr=document.createElement('tr');
+const td=document.createElement('td');
+td.colSpan=8;
+td.innerHTML='<div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div>';
+tr.appendChild(td);
+fragment.appendChild(tr);
+}else{
+data.forEach(p=>{
+const tr=document.createElement('tr');
 const statusClass=p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':p.status==='Concluído'?'concluido':'parcial';
 const prioColor=p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
 let volumesDisplay='';
@@ -1356,8 +1368,12 @@ volumesDisplay='<div class="volumes-container"><div class="volumes-main"><span c
 volumesDisplay='<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>'+p.volumesTotal+'/'+p.volumesTotal+'</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>';
 }else{volumesDisplay='<div class="volumes-container"><span class="volumes-total-only">'+p.volumesTotal+' volume'+(p.volumesTotal!==1?'s':'')+'</span></div>';}
 }else{volumesDisplay='<span class="volumes-simple">'+(p.volumes||'-')+'</span>';}
-return '<tr><td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;">'+p.processo+'</td><td style="text-align:center;">'+volumesDisplay+'</td><td style="text-align:center;"><span style="color:'+prioColor+';font-weight:600;">'+p.prioridade+'</span></td><td style="text-align:center;"><span class="status '+statusClass+'">'+p.status+'</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao(\''+p.id+'\')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar(\''+p.id+'\')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto(\''+p.id+'\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
-}).join('');
+tr.innerHTML='<td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;">'+p.processo+'</td><td style="text-align:center;">'+volumesDisplay+'</td><td style="text-align:center;"><span style="color:'+prioColor+';font-weight:600;">'+p.prioridade+'</span></td><td style="text-align:center;"><span class="status '+statusClass+'">'+p.status+'</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao(\''+p.id+'\')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar(\''+p.id+'\')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto(\''+p.id+'\')"><i class="fa-solid fa-trash"></i></button></div></td>';
+fragment.appendChild(tr);
+});
+}
+tbody.innerHTML='';
+tbody.appendChild(fragment);
 },
 abrirEdicao(id){
 const p=State.data.projetos.find(x=>x.id===id);
@@ -1427,7 +1443,6 @@ UI.showToast('error','Erro','Não foi possível excluir da nuvem: '+error.messag
 }
 }
 };
-Admin.renderTableDebounced=Utils.debounce(()=>Admin.renderTable(),220);
 const Posto={
 render(){
 if(!State.currentPosto)return;
@@ -1484,8 +1499,17 @@ document.getElementById('posto-processo').textContent=todosPosto.filter(p=>p.sta
 const hoje=new Date();hoje.setHours(0,0,0,0);
 const concluidosHoje=State.data.historicoPostos.filter(p=>p.processo===State.currentPosto&&Utils.isHoje(p.dataHoraConclusao)).length;
 document.getElementById('posto-concluidos').textContent=concluidosHoje;
-if(data.length===0){tbody.innerHTML='<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para '+State.currentPosto+'.</p></div></td></tr>';return;}
-tbody.innerHTML=data.map(p=>{
+const fragment=document.createDocumentFragment();
+if(data.length===0){
+const tr=document.createElement('tr');
+const td=document.createElement('td');
+td.colSpan=9;
+td.innerHTML='<div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para '+State.currentPosto+'.</p></div>';
+tr.appendChild(td);
+fragment.appendChild(tr);
+}else{
+data.forEach(p=>{
+const tr=document.createElement('tr');
 const statusClass=p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
 const prioColor=p.prioridade==='Urgente'?'var(--danger)':p.prioridade==='Alta'?'var(--warning)':'var(--text-light)';
 let volumesDisplay='';
@@ -1507,8 +1531,12 @@ botoesAcao='<button class="icon-action-lg warning" title="Iniciar" onclick="Post
 }else if(p.status==='Em Processo'){
 botoesAcao='<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso(\''+p.id+'\')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\''+p.id+'\')"><i class="fa-solid fa-circle-check"></i></button>';
 }
-return '<tr><td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;">'+volumesDisplay+'</td><td style="text-align:center;"><span style="color:'+prioColor+';font-weight:600;">'+p.prioridade+'</span></td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;">'+tempoDisplay+'</td><td style="text-align:center;"><span class="status '+statusClass+'">'+p.status+'</span></td><td style="text-align:center;"><div class="action-main">'+botoesAcao+'</div></td></tr>';
-}).join('');
+tr.innerHTML='<td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;">'+volumesDisplay+'</td><td style="text-align:center;"><span style="color:'+prioColor+';font-weight:600;">'+p.prioridade+'</span></td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;">'+tempoDisplay+'</td><td style="text-align:center;"><span class="status '+statusClass+'">'+p.status+'</span></td><td style="text-align:center;"><div class="action-main">'+botoesAcao+'</div></td>';
+fragment.appendChild(tr);
+});
+}
+tbody.innerHTML='';
+tbody.appendChild(fragment);
 setTimeout(this.atualizarTemposEmTempoReal,100);
 },
 atualizarTemposEmTempoReal(){
@@ -1547,7 +1575,6 @@ UI.showToast('info','Processo pausado',p.diagrama+' pausado');
 }catch(error){UI.showToast('error','Erro','Não foi possível pausar: '+error.message);}
 }
 };
-Posto.renderTableDebounced=Utils.debounce(()=>Posto.renderTable(),220);
 const Conclusao={
 solicitar(id){
 const p=State.data.projetos.find(x=>x.id===id);
@@ -1719,13 +1746,26 @@ if(State.histFilter!=='all')data=data.filter(p=>p.processo===State.histFilter);
 if(search)data=data.filter(p=>(p.pep||'').toLowerCase().includes(search)||p.diagrama.toLowerCase().includes(search)||(p.placa||'').toLowerCase().includes(search));
 if(State.currentUser!=='admin'&&State.currentPosto)data=data.filter(p=>p.processo===State.currentPosto);
 data.sort((a,b)=>(b.concluidoEm||0)-(a.concluidoEm||0));
-if(data.length===0){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>';return;}
-tbody.innerHTML=data.map(p=>{
+const fragment=document.createDocumentFragment();
+if(data.length===0){
+const tr=document.createElement('tr');
+const td=document.createElement('td');
+td.colSpan=8;
+td.innerHTML='<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div>';
+tr.appendChild(td);
+fragment.appendChild(tr);
+}else{
+data.forEach(p=>{
+const tr=document.createElement('tr');
 const dtInicio=p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'-';
 const dtFim=p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'-';
 const tempoStr=p.tempoReal?Utils.formatarTempo(p.tempoReal):'-';
-return '<tr><td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+p.processo+'</td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dtInicio+'</td><td style="text-align:center;">'+dtFim+'</td><td style="text-align:center;"><div class="row-actions">'+(State.currentUser==='admin'?'<button class="icon-action" title="Reativar" onclick="Historico.reativar(\''+p.id+'\')"><i class="fa-solid fa-rotate-left"></i></button>':'')+(State.currentUser==='admin'?'<button class="icon-action delete" title="Excluir" onclick="Historico.excluir(\''+p.id+'\')"><i class="fa-solid fa-trash"></i></button>':'')+'</div></td></tr>';
-}).join('');
+tr.innerHTML='<td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+p.processo+'</td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dtInicio+'</td><td style="text-align:center;">'+dtFim+'</td><td style="text-align:center;"><div class="row-actions">'+(State.currentUser==='admin'?'<button class="icon-action" title="Reativar" onclick="Historico.reativar(\''+p.id+'\')"><i class="fa-solid fa-rotate-left"></i></button>':'')+(State.currentUser==='admin'?'<button class="icon-action delete" title="Excluir" onclick="Historico.excluir(\''+p.id+'\')"><i class="fa-solid fa-trash"></i></button>':'')+'</div></td>';
+fragment.appendChild(tr);
+});
+}
+tbody.innerHTML='';
+tbody.appendChild(fragment);
 },
 renderPostos(){
 const tbody=document.getElementById('histPostoTableBody');
@@ -1735,15 +1775,28 @@ if(State.histPostoFilter!=='all')data=data.filter(p=>p.processo===State.histPost
 if(search)data=data.filter(p=>(p.pep||'').toLowerCase().includes(search)||p.diagrama.toLowerCase().includes(search)||(p.placa||'').toLowerCase().includes(search));
 if(State.currentUser!=='admin'&&State.currentPosto)data=data.filter(p=>p.processo===State.currentPosto);
 data.sort((a,b)=>(b.dataHoraConclusao||0)-(a.dataHoraConclusao||0));
-if(data.length===0){tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>';return;}
+const fragment=document.createDocumentFragment();
+if(data.length===0){
+const tr=document.createElement('tr');
+const td=document.createElement('td');
+td.colSpan=7;
+td.innerHTML='<div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div>';
+tr.appendChild(td);
+fragment.appendChild(tr);
+}else{
 const postoClassMap={'Nanocerâmico':'posto-nano','Pintura':'posto-pintura','Conferência':'posto-conferencia'};
-tbody.innerHTML=data.map(p=>{
+data.forEach(p=>{
+const tr=document.createElement('tr');
 const tempoStr=p.tempoReal?Utils.formatarTempo(p.tempoReal):'-';
 const dataConclusao=new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 const postoClass=postoClassMap[p.processo]||'';
 const obs=p.observacao?'<small style="color:var(--text-light);">'+p.observacao+'</small>':'-';
-return '<tr><td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;"><span class="posto-badge '+postoClass+'">'+p.processo+'</span></td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dataConclusao+'</td><td style="text-align:center;">'+obs+'</td></tr>';
-}).join('');
+tr.innerHTML='<td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;"><span class="posto-badge '+postoClass+'">'+p.processo+'</span></td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dataConclusao+'</td><td style="text-align:center;">'+obs+'</td>';
+fragment.appendChild(tr);
+});
+}
+tbody.innerHTML='';
+tbody.appendChild(fragment);
 },
 renderPostoAtual(){
 const tbody=document.getElementById('historicoPostoTableBody');
@@ -1754,13 +1807,26 @@ let data=State.data.historicoPostos.filter(p=>p.processo===State.currentPosto);
 if(State.historicoPostoFilter!=='all')data=data.filter(p=>p.turno===State.historicoPostoFilter);
 if(search)data=data.filter(p=>(p.pep||'').toLowerCase().includes(search)||p.diagrama.toLowerCase().includes(search)||(p.placa||'').toLowerCase().includes(search));
 data.sort((a,b)=>(b.dataHoraConclusao||0)-(a.dataHoraConclusao||0));
-if(data.length===0){tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div></td></tr>';return;}
-tbody.innerHTML=data.map(p=>{
+const fragment=document.createDocumentFragment();
+if(data.length===0){
+const tr=document.createElement('tr');
+const td=document.createElement('td');
+td.colSpan=7;
+td.innerHTML='<div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div>';
+tr.appendChild(td);
+fragment.appendChild(tr);
+}else{
+data.forEach(p=>{
+const tr=document.createElement('tr');
 const tempoStr=p.tempoReal?Utils.formatarTempo(p.tempoReal):'-';
 const dataConclusao=new Date(p.dataHoraConclusao).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 const obs=p.observacao?'<small style="color:var(--text-light);">'+p.observacao+'</small>':'-';
-return '<tr><td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dataConclusao+'</td><td style="text-align:center;">'+obs+'</td></tr>';
-}).join('');
+tr.innerHTML='<td style="text-align:center;">'+(p.pep||'-')+'</td><td style="text-align:center;"><strong>'+p.diagrama+'</strong></td><td style="text-align:center;">'+(p.placa||'-')+'</td><td style="text-align:center;"><span class="turno-badge">'+(p.turno||'-')+'</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">'+tempoStr+'</strong></td><td style="text-align:center;">'+dataConclusao+'</td><td style="text-align:center;">'+obs+'</td>';
+fragment.appendChild(tr);
+});
+}
+tbody.innerHTML='';
+tbody.appendChild(fragment);
 },
 async reativar(id){
 const idx=State.data.historico.findIndex(x=>x.id===id);
@@ -1794,9 +1860,6 @@ UI.showToast('success','Excluído','Registro removido da nuvem');
 }catch(error){UI.showToast('error','Erro','Não foi possível excluir da nuvem: '+error.message);}
 }
 };
-Historico.renderGeralDebounced=Utils.debounce(()=>Historico.renderGeral(),220);
-Historico.renderPostosDebounced=Utils.debounce(()=>Historico.renderPostos(),220);
-Historico.renderPostoAtualDebounced=Utils.debounce(()=>Historico.renderPostoAtual(),220);
 const Turno={
 confirmarFimSemana(turno){
 State.data.turnosPorPosto[State.currentPosto]=turno;
@@ -1824,7 +1887,6 @@ toggle(){if(State.vkActive)this.hide();else this.show();}
 };
 const Charts={
 render(){
-if(document.hidden)return;
 const textColor=getComputedStyle(document.body).getPropertyValue('--text').trim()||'#2C3E50';
 const gridColor='rgba(128,128,128,0.15)';
 Object.values(State.charts).forEach(c=>c.destroy());
@@ -1835,7 +1897,7 @@ const counts={'Nanocerâmico':State.data.projetos.filter(p=>p.processo==='Nanoce
 State.charts.processos=new Chart(ctx1,{
 type:'bar',
 data:{labels:Object.keys(counts),datasets:[{label:'Projetos Ativos',data:Object.values(counts),backgroundColor:['#005BAC','#00A651','#FFB000'],borderRadius:8}]},
-options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},title:{display:true,text:'Projetos por Processo',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Projetos por Processo',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
 });
 }
 const ctx2=document.getElementById('chartTurnos');
@@ -1850,7 +1912,7 @@ return d.total>0?Math.round((d.concluidos/(d.total+d.concluidos))*100):0;
 State.charts.turnos=new Chart(ctx2,{
 type:'doughnut',
 data:{labels:Object.keys(turnosData),datasets:[{data:eficiencia,backgroundColor:['#005BAC','#00A651','#FFB000']}]},
-options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Eficiência por Turno (%)',color:textColor}}}
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Eficiência por Turno (%)',color:textColor}}}
 });
 }
 const ctx3=document.getElementById('chartTempoExecucao');
@@ -1864,7 +1926,7 @@ return t.length>0?Math.round(t.reduce((a,b)=>a+b,0)/t.length):0;
 State.charts.tempo=new Chart(ctx3,{
 type:'line',
 data:{labels:Object.keys(temposPorProcesso),datasets:[{label:'Tempo Médio (min)',data:mediaTempos,borderColor:'#005BAC',backgroundColor:'rgba(0,91,172,0.1)',tension:0.4,fill:true}]},
-options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},title:{display:true,text:'Tempo Médio (min)',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Tempo Médio (min)',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
 });
 }
 const ctx4=document.getElementById('chartEficiencia');
@@ -1873,7 +1935,7 @@ const prioridades={'Urgente':State.data.projetos.filter(p=>p.prioridade==='Urgen
 State.charts.eficiencia=new Chart(ctx4,{
 type:'pie',
 data:{labels:Object.keys(prioridades),datasets:[{data:Object.values(prioridades),backgroundColor:['#D32F2F','#FFB000','#00A651']}]},
-options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Distribuição por Prioridade',color:textColor}}}
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Distribuição por Prioridade',color:textColor}}}
 });
 }
 }
@@ -1883,7 +1945,8 @@ downloadFile(name,content,type){const blob=new Blob([content],{type});const url=
 csv(){
 const headers=['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
 const rows=State.data.projetos.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
-const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
+const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('
+');
 this.downloadFile('projetos_'+Utils.dateStamp()+'.csv','\ufeff'+csv,'text/csv;charset=utf-8;');
 UI.showToast('success','Exportado','Arquivo CSV gerado');
 },
@@ -1892,7 +1955,8 @@ let data=State.data.historico;
 if(State.currentUser!=='admin'&&State.currentPosto)data=data.filter(p=>p.processo===State.currentPosto);
 const headers=['PEP','Diagrama/Ordem','Placa','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
 const rows=data.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
-const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
+const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('
+');
 this.downloadFile('historico_'+Utils.dateStamp()+'.csv','\ufeff'+csv,'text/csv;charset=utf-8;');
 UI.showToast('success','Exportado','Histórico exportado');
 },
@@ -1901,7 +1965,8 @@ let data=State.data.historicoPostos;
 if(State.currentUser!=='admin'&&State.currentPosto)data=data.filter(p=>p.processo===State.currentPosto);
 const headers=['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
 const rows=data.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
-const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
+const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('
+');
 this.downloadFile('historico_postos_'+Utils.dateStamp()+'.csv','\ufeff'+csv,'text/csv;charset=utf-8;');
 UI.showToast('success','Exportado','Histórico por posto exportado');
 },
@@ -1909,7 +1974,8 @@ postoConcluidosCSV(){
 let data=State.data.historicoPostos.filter(p=>p.processo===State.currentPosto);
 const headers=['PEP','Diagrama/Ordem','Placa','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
 const rows=data.map(p=>[p.pep||'',p.diagrama,p.placa||'',p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
-const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
+const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('
+');
 this.downloadFile('concluidos_'+State.currentPosto.toLowerCase().replace('ê','e').replace('á','a').replace(' ','_')+'_'+Utils.dateStamp()+'.csv','\ufeff'+csv,'text/csv;charset=utf-8;');
 UI.showToast('success','Exportado','Concluídos no '+State.currentPosto+' exportados');
 },
