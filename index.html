@@ -1,3 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>WEG - Centro de Fluxo Produtivo</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+:root {
+--weg-blue: #005BAC;
+--weg-dark: #003D79;
+--weg-light: #E8F1FB;
+--bg: #F4F6F9;
+--card: #FFFFFF;
+--border: #D9E2EC;
+--success: #00A651;
+--warning: #FFB000;
+--danger: #D32F2F;
+--info: #2196F3;
+--text: #2C3E50;
+--text-light: #7B8A9A;
+--shadow-sm: 0 2px 4px rgba(0,0,0,.06);
+--shadow: 0 2px 8px rgba(0,0,0,.08);
+--shadow-lg: 0 8px 24px rgba(0,0,0,.12);
+--radius: 12px;
+--sidebar-width: 72px;
+--header-height: 90px;
+--transition: all .25s ease;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); transition: var(--transition); cursor: default !important; touch-action: manipulation; }
+body.hide-cursor, body.hide-cursor *, body.hide-cursor button, body.hide-cursor a, body.hide-cursor input, body.hide-cursor select, body.hide-cursor textarea { cursor: none !important; }
+button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .historico-tab, .dashboard-tab, .posto-tab, .password-toggle, .modal-close, .vk-key { position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer !important; user-select: none; -webkit-tap-highlight-color: transparent; z-index: 1; touch-action: manipulation; -webkit-touch-callout: none; }
+button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > i, .menu a > i, .filter-chip > i, .historico-tab > i, .dashboard-tab > i, .posto-tab > i, .password-toggle > i, .modal-close > i, .vk-key > i { pointer-events: none; position: relative; z-index: 2; }
+::-webkit-scrollbar { width: 30px; height: 30px; }
+::-webkit-scrollbar-track { background: var(--bg); border-radius: 15px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--weg-blue); border-radius: 15px; border: 5px solid var(--bg); min-height: 80px; }
+::-webkit-scrollbar-thumb:hover { background: var(--weg-dark); }
+::-webkit-scrollbar-corner { background: var(--bg); }
+* { scrollbar-width: thin; scrollbar-color: var(--weg-blue) var(--bg); }
+.login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--weg-blue), var(--weg-dark)); display: flex; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
+.login-box { background: var(--card); border-radius: var(--radius); padding: 40px 30px; max-width: 500px; width: 100%; box-shadow: var(--shadow-lg); text-align: center; }
+.login-box h1 { color: var(--weg-blue); font-size: 28px; margin-bottom: 5px; }
+.login-box p { color: var(--text-light); margin-bottom: 25px; font-size: 14px; }
+.login-box .logo-big { font-size: 48px; color: var(--weg-blue); margin-bottom: 15px; }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.role-btn { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; padding: 20px 12px; cursor: pointer !important; transition: var(--transition); color: var(--text); text-align: center; width: 100%; flex-direction: column; gap: 8px; }
+.role-btn:hover { border-color: var(--weg-blue); background: var(--weg-light); }
+.role-btn:active { background: var(--weg-light); }
+.role-btn i { font-size: 32px; color: var(--weg-blue); margin-bottom: 0; display: block; }
+.role-btn strong { display: block; font-size: 14px; margin-bottom: 3px; }
+.role-btn small { color: var(--text-light); font-size: 11px; }
+.header { background: linear-gradient(90deg, var(--weg-blue), var(--weg-dark)); color: white; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: var(--shadow-lg); position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
+.header-logo { font-size: 28px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,.2); }
+.header-subtitle { font-size: 12px; opacity: .9; line-height: 1.2; }
+.header-center { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 20px; }
+.header-title { font-size: 26px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,.2); line-height: 1.2; }
+.header-badge { background: rgba(255,255,255,.2); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; backdrop-filter: blur(10px); }
+.header-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.user-info { text-align: right; line-height: 1.4; }
+.user-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.user-name i { font-size: 14px; opacity: .8; }
+.user-date { font-size: 12px; opacity: .85; margin-top: 2px; }
+.sync-indicator { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 8px; border-radius: 10px; background: rgba(0,166,81,.3); color: white; font-weight: 600; }
+.sync-indicator.disconnected { background: rgba(211,47,47,.3); }
+.btn-logout { background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.3); color: white; width: 52px; height: 52px; border-radius: 50%; cursor: pointer !important; display: inline-flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 22px; backdrop-filter: blur(10px); padding: 0; }
+.btn-logout:hover { background: rgba(255,255,255,.3); border-color: rgba(255,255,255,.5); }
+.btn-logout:active { background: rgba(255,255,255,.3); }
+.layout { display: flex; min-height: calc(100vh - var(--header-height)); }
+.sidebar { width: var(--sidebar-width); background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; flex-shrink: 0; position: relative; z-index: 50; }
+.menu { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 8px; }
+.menu a { width: 52px; height: 52px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text-light); border-radius: 12px; transition: var(--transition); font-size: 20px; cursor: pointer !important; position: relative; border: 2px solid transparent; padding: 0; }
+.menu a:hover { background: var(--weg-light); color: var(--weg-blue); border-color: var(--weg-blue); }
+.menu a:active { background: var(--weg-light); }
+.menu a.active { background: var(--weg-blue); color: white; border-color: var(--weg-blue); box-shadow: 0 4px 12px rgba(0,91,172,.35); }
+.menu a::after { content: attr(data-tooltip); position: absolute; left: calc(100% + 15px); top: 50%; background: var(--weg-dark); color: white; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+.menu a:hover::after { opacity: 1; }
+.content { flex: 1; padding: 25px; overflow-x: hidden; transition: var(--transition); }
+.page { display: none; animation: fadeIn .4s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page-title { font-size: 24px; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.page-title i { color: var(--weg-blue); }
+.process-badge { background: var(--weg-blue); color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.kpi { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); transition: var(--transition); position: relative; overflow: hidden; border-left: 4px solid var(--weg-blue); }
+.kpi:hover { box-shadow: var(--shadow-lg); }
+.kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
+.kpi h3 { color: var(--text-light); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+.kpi-icon { width: 40px; height: 40px; background: var(--weg-light); color: var(--weg-blue); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; }
+.kpi-value { font-size: 34px; color: var(--weg-blue); font-weight: bold; margin-top: 5px; position: relative; z-index: 1; }
+.kpi-trend { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 5px; position: relative; z-index: 1; }
+.trend-up { color: var(--success); }
+.trend-down { color: var(--danger); }
+.card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); transition: var(--transition); margin-bottom: 20px; }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+.card h2 { color: var(--text); font-size: 16px; display: flex; align-items: center; gap: 10px; }
+.card h2 i { color: var(--weg-blue); }
+.btn { background: var(--weg-blue); color: white; border: none; padding: 11px 20px; border-radius: 8px; cursor: pointer !important; font-size: 14px; font-weight: 500; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px; position: relative; touch-action: manipulation; }
+.btn:hover { background: var(--weg-dark); }
+.btn:active { background: var(--weg-dark); }
+.btn-secondary { background: transparent; color: var(--weg-blue); border: 1px solid var(--weg-blue); }
+.btn-secondary:hover { background: var(--weg-blue); color: white; }
+.btn-secondary:active { background: var(--weg-blue); color: white; }
+.btn-sm { padding: 7px 12px; font-size: 12px; }
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: #b71c1c; }
+.btn-danger:active { background: #b71c1c; }
+.btn-success { background: var(--success); }
+.btn-success:hover { background: #008a40; }
+.btn-success:active { background: #008a40; }
+.btn-warning { background: var(--warning); color: #333; }
+.btn-warning:hover { background: #e09e00; }
+.btn-warning:active { background: #e09e00; }
+.btn-lg { padding: 14px 28px; font-size: 16px; font-weight: 600; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 13px; }
+.form-group label .req { color: var(--danger); }
+.form-group input, .form-group select, .form-group textarea { padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--card); color: var(--text); transition: var(--transition); font-family: inherit; cursor: text !important; touch-action: manipulation; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--weg-blue); box-shadow: 0 0 0 3px rgba(0,91,172,.15); }
+.full { grid-column: span 2; }
+.form-actions { grid-column: span 2; display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
+.table-wrapper { overflow-x: auto; border-radius: 8px; margin-top: 15px; }
+.table-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+.search-box { position: relative; flex: 1; max-width: 300px; }
+.search-box input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: 14px; cursor: text !important; touch-action: manipulation; }
+.search-box i { position: absolute; left: 12px; top: 50%; color: var(--text-light); pointer-events: none; }
+.table { width: 100%; border-collapse: collapse; }
+.table thead th { background: var(--weg-blue); color: white; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.table tbody tr { transition: var(--transition); }
+.table tbody tr:hover { background: var(--bg); }
+.table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; text-align: center; }
+.status { padding: 4px 10px; border-radius: 20px; color: white; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .3px; display: inline-block; }
+.emprocesso { background: var(--info); }
+.aguardando { background: var(--warning); color: #333; }
+.concluido { background: var(--success); }
+.parcial { background: #9C27B0; }
+.turno-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; background: var(--weg-light); color: var(--weg-blue); display: inline-block; }
+.posto-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block; }
+.posto-nano { background: #E3F2FD; color: #1565C0; }
+.posto-pintura { background: #FFF3E0; color: #E65100; }
+.posto-conferencia { background: #E8F5E9; color: #2E7D32; }
+.volumes-container { display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center; text-align: center; margin: 0 auto; }
+.volumes-main { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; justify-content: center; }
+.volumes-processed { color: var(--weg-blue); font-size: 16px; }
+.volumes-divider { color: var(--text-light); font-weight: 400; }
+.volumes-total { color: var(--text); }
+.volumes-main.complete { color: var(--success); }
+.volumes-main.complete i { font-size: 16px; }
+.volumes-progress-bar { width: 100%; max-width: 120px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 2px auto; }
+.volumes-progress-fill { height: 100%; background: linear-gradient(90deg, var(--warning), var(--weg-blue)); border-radius: 3px; transition: width 0.3s ease; }
+.volumes-progress-fill.complete { background: var(--success); }
+.volumes-remaining { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--warning); font-weight: 600; background: rgba(255,176,0,0.1); padding: 2px 8px; border-radius: 12px; justify-content: center; margin: 0 auto; }
+.volumes-remaining i { font-size: 10px; }
+.volumes-total-only { color: var(--text); font-weight: 600; font-size: 13px; text-align: center; }
+.volumes-simple { color: var(--text-light); font-size: 13px; text-align: center; }
+.tempo-real { background: var(--weg-light); color: var(--weg-blue); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; font-family: 'Courier New', monospace; display: inline-block; margin-top: 4px; }
+.tempo-real.ativo { background: var(--success); color: white; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+.action-main { display: flex; gap: 8px; align-items: center; justify-content: center; min-width: 180px; margin: 0 auto; }
+.icon-action-lg { background: var(--bg); border: 2px solid var(--border); cursor: pointer !important; padding: 12px 16px; border-radius: 10px; color: var(--text); transition: var(--transition); font-size: 20px; min-width: 60px; min-height: 52px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,.08); flex: 0 0 auto; position: relative; touch-action: manipulation; }
+.icon-action-lg:hover { box-shadow: 0 4px 8px rgba(0,0,0,.12); }
+.icon-action-lg:active { box-shadow: 0 1px 2px rgba(0,0,0,.08); opacity: 0.9; }
+.icon-action-lg.success { background: var(--success); border-color: var(--success); color: white; }
+.icon-action-lg.success:hover { background: #008a40; border-color: #008a40; color: white; }
+.icon-action-lg.warning { background: var(--warning); border-color: var(--warning); color: #333; }
+.icon-action-lg.warning:hover { background: #e09e00; border-color: #e09e00; color: white; }
+.icon-action-lg.info { background: var(--info); border-color: var(--info); color: white; }
+.icon-action-lg.info:hover { background: #1976D2; border-color: #1976D2; color: white; }
+.row-actions { display: flex; gap: 12px; flex-wrap: nowrap; align-items: center; justify-content: center; }
+.icon-action { background: transparent; border: none; cursor: pointer !important; padding: 12px 14px; border-radius: 8px; color: var(--text-light); transition: var(--transition); font-size: 20px; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; min-width: 48px; position: relative; z-index: 10; touch-action: manipulation; }
+.icon-action:hover { background: var(--weg-light); color: var(--weg-blue); }
+.icon-action:active { background: var(--weg-light); color: var(--weg-blue); }
+.icon-action.delete:hover { background: rgba(211,47,47,.1); color: var(--danger); }
+.icon-action.success:hover { background: rgba(0,166,81,.1); color: var(--success); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; z-index: 6000; backdrop-filter: blur(4px); padding: 20px; }
+.modal-overlay.active { display: flex; animation: fadeIn .3s ease; }
+.modal { background: var(--card); border-radius: var(--radius); padding: 25px; max-width: 600px; width: 100%; max-height: calc(100vh - 200px); overflow-y: auto; box-shadow: var(--shadow-lg); animation: slideUp .3s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+.modal-head h3 { color: var(--text); display: flex; align-items: center; gap: 10px; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer !important; color: var(--text-light); transition: var(--transition); width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; touch-action: manipulation; }
+.modal-close:hover { background: var(--bg); color: var(--danger); }
+.modal-close:active { background: var(--bg); color: var(--danger); }
+.modal-logout { max-width: 450px; text-align: center; }
+.modal-logout .modal-body { padding: 20px 0; }
+.modal-logout .logout-icon { width: 80px; height: 80px; background: var(--weg-light); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 40px; color: var(--weg-blue); }
+.modal-logout h3 { color: var(--text); font-size: 22px; margin-bottom: 10px; }
+.modal-logout p { color: var(--text-light); font-size: 15px; margin-bottom: 25px; }
+.modal-logout .modal-actions { display: flex; gap: 12px; justify-content: center; }
+.modal-logout .btn { min-width: 140px; justify-content: center; }
+.camera-container { position: relative; width: 100%; max-width: 500px; margin: 15px auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; display: none; }
+.camera-container.active { display: block; }
+.camera-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.camera-container canvas { display: none; }
+.camera-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; border: 3px solid var(--weg-blue); border-radius: 12px; }
+.scan-line { position: absolute; top: 50%; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, transparent, var(--success), transparent); animation: scan 2s ease-in-out infinite; box-shadow: 0 0 10px var(--success); }
+@keyframes scan { 0%, 100% { transform: translateY(-60px); } 50% { transform: translateY(60px); } }
+.camera-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+.camera-status { text-align: center; padding: 10px; margin-top: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.camera-status.scanning { background: var(--weg-light); color: var(--weg-blue); }
+.camera-status.success { background: rgba(0,166,81,.1); color: var(--success); }
+.camera-status.error { background: rgba(211,47,47,.1); color: var(--danger); }
+.camera-found-items { margin-top: 10px; padding: 10px; background: var(--bg); border-radius: 8px; font-size: 12px; text-align: left; }
+.camera-found-items .found-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.camera-found-items .found-item i { color: var(--success); }
+.camera-found-items .found-item.missing i { color: var(--text-light); }
+.virtual-keyboard { position: fixed; bottom: 20px; left: 50%; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.15); z-index: 7000; display: none; max-width: 380px; width: 95%; touch-action: manipulation; }
+.virtual-keyboard.active { display: block; animation: slideUp .3s ease; }
+.vk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.vk-header i { color: var(--weg-blue); font-size: 16px; }
+.vk-header span { font-size: 14px; color: var(--text); font-weight: 600; }
+.vk-row { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }
+.vk-key { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; min-width: 70px; height: 58px; font-size: 20px; font-weight: 600; color: var(--text); cursor: pointer !important; transition: all .15s ease; display: inline-flex; align-items: center; justify-content: center; padding: 0; user-select: none; flex: 1; max-width: 85px; box-shadow: 0 2px 4px rgba(0,0,0,.05); position: relative; touch-action: manipulation; }
+.vk-key:hover { background: var(--weg-light); border-color: var(--weg-blue); }
+.vk-key:active { background: var(--weg-blue); color: white; }
+.vk-key.wide { min-width: 90px; font-size: 16px; max-width: 110px; }
+.vk-key.action { background: var(--weg-blue); color: white; border-color: var(--weg-blue); }
+.vk-key.action:hover { background: var(--weg-dark); border-color: var(--weg-dark); }
+.vk-key.action.danger { background: var(--danger); border-color: var(--danger); }
+.vk-key.action.danger:hover { background: #b71c1c; border-color: #b71c1c; }
+.vk-key.action.success { background: var(--success); border-color: var(--success); }
+.vk-key.action.success:hover { background: #008a40; border-color: #008a40; }
+.vk-key.action.clear { background: var(--info); border-color: var(--info); }
+.vk-key.action.clear:hover { background: #1976D2; border-color: #1976D2; }
+.toast-container { position: fixed; top: 100px; right: 25px; z-index: 8000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: var(--card); border-left: 4px solid var(--info); padding: 12px 16px; border-radius: 8px; box-shadow: var(--shadow-lg); min-width: 280px; display: flex; align-items: center; gap: 12px; animation: slideIn .3s ease; pointer-events: auto; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+.toast.success { border-left-color: var(--success); }
+.toast.success i { color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.error i { color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+.toast.warning i { color: var(--warning); }
+.toast i { font-size: 18px; }
+.toast-content { flex: 1; }
+.toast-title { font-weight: 600; font-size: 13px; }
+.toast-message { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.filter-chip { background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer !important; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 5px; touch-action: manipulation; }
+.filter-chip:hover, .filter-chip.active { background: var(--weg-blue); color: white; border-color: var(--weg-blue); }
+.filter-chip:active { background: var(--weg-blue); color: white; }
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-light); }
+.empty-state i { font-size: 60px; color: var(--border); margin-bottom: 15px; }
+.empty-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--text); }
+.password-wrapper { position: relative; }
+.password-wrapper input { width: 100%; padding-right: 40px; }
+.password-toggle { position: absolute; right: 10px; top: 50%; background: none; border: none; color: var(--text-light); cursor: pointer !important; font-size: 16px; padding: 4px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: var(--transition); touch-action: manipulation; z-index: 10; }
+.password-toggle:hover { background: var(--bg); color: var(--weg-blue); }
+.password-toggle:active { background: var(--bg); color: var(--weg-blue); }
+.password-strength { margin-top: 6px; font-size: 11px; font-weight: 600; }
+.strength-weak { color: var(--danger); }
+.strength-medium { color: var(--warning); }
+.strength-strong { color: var(--success); }
+.alert { padding: 12px 15px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.alert-danger { background: rgba(211,47,47,.1); color: var(--danger); border-left: 4px solid var(--danger); }
+.alert-info { background: var(--weg-light); color: var(--weg-blue); border-left: 4px solid var(--weg-blue); }
+.alert-warning { background: rgba(255,176,0,.12); color: #a87400; border-left: 4px solid var(--warning); }
+.charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
+.chart-container { position: relative; height: 300px; }
+.dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+.stat-card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); text-align: center; border-top: 4px solid var(--weg-blue); }
+.stat-card h4 { color: var(--text-light); font-size: 12px; text-transform: uppercase; margin-bottom: 10px; }
+.stat-card .stat-value { font-size: 28px; font-weight: bold; color: var(--weg-blue); margin-bottom: 5px; }
+.stat-card .stat-label { font-size: 11px; color: var(--text-light); }
+.comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+.comparison-card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.comparison-card h3 { color: var(--text); font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.comparison-card h3 i { color: var(--weg-blue); }
+.turno-comparison { display: flex; justify-content: space-around; margin-top: 15px; }
+.turno-stat { text-align: center; padding: 15px; background: var(--bg); border-radius: 8px; flex: 1; margin: 0 5px; }
+.turno-stat .turno-name { font-size: 12px; color: var(--text-light); margin-bottom: 8px; font-weight: 600; }
+.turno-stat .turno-value { font-size: 24px; font-weight: bold; color: var(--weg-blue); }
+.turno-stat .turno-label { font-size: 11px; color: var(--text-light); margin-top: 5px; }
+.dashboard-tabs, .historico-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 0; flex-wrap: wrap; }
+.dashboard-tab, .historico-tab { padding: 12px 20px; background: transparent; border: none; border-bottom: 3px solid transparent; cursor: pointer !important; font-size: 14px; font-weight: 600; color: var(--text-light); transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; margin-bottom: -2px; touch-action: manipulation; }
+.dashboard-tab:hover, .historico-tab:hover { color: var(--weg-blue); }
+.dashboard-tab:active, .historico-tab:active { color: var(--weg-blue); }
+.dashboard-tab.active, .historico-tab.active { color: var(--weg-blue); border-bottom-color: var(--weg-blue); }
+@media(max-width:1000px){ .charts-grid { grid-template-columns: 1fr; } .sidebar { position: fixed; left: 0; top: var(--header-height); height: calc(100vh - var(--header-height)); z-index: 99; box-shadow: var(--shadow-lg); transition: transform .3s ease; } .sidebar.open { transform: translateX(0); } .form-grid { grid-template-columns: 1fr; } .full, .form-actions { grid-column: span 1; } .header-title { font-size: 18px; } .header-subtitle { display: none; } .user-info { display: none; } .role-grid { grid-template-columns: 1fr; } .virtual-keyboard { max-width: 340px; bottom: 10px; padding: 15px; } .vk-key { min-width: 60px; height: 52px; font-size: 18px; } .modal-overlay { padding: 15px; } .comparison-grid { grid-template-columns: 1fr; } }
+.menu-toggle { display: none; background: rgba(255,255,255,.15); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer !important; align-items: center; justify-content: center; font-size: 16px; touch-action: manipulation; }
+@media(max-width:1000px){ .menu-toggle { display: inline-flex; } }
+@media(max-width:768px){ .volumes-container { min-width: 120px; } .volumes-main { font-size: 12px; } .volumes-processed { font-size: 14px; } .volumes-remaining { font-size: 10px; } .modal-logout .btn { min-width: 120px; padding: 12px 20px; font-size: 14px; } .turno-comparison { flex-direction: column; } .turno-stat { margin: 5px 0; } }
+@media(max-width:600px){ .content { padding: 15px; } .kpi-grid { grid-template-columns: 1fr 1fr; } .header { padding: 0 15px; } .header-title { font-size: 16px; } .header-logo { font-size: 22px; } .vk-key { min-width: 50px; height: 48px; font-size: 16px; } .vk-key.wide { min-width: 70px; font-size: 14px; } .icon-action-lg { min-width: 50px; min-height: 46px; padding: 10px 12px; font-size: 18px; } .action-main { min-width: 140px; gap: 6px; } .virtual-keyboard { max-width: 300px; padding: 12px; } .vk-row { gap: 8px; margin-bottom: 8px; } .icon-action { width: 44px; height: 44px; min-width: 44px; padding: 10px 12px; font-size: 18px; } .modal-logout .btn { min-width: 100%; } .modal-logout .modal-actions { flex-direction: column; } }
+@media (hover: none) and (pointer: coarse) {
+* { transform: none !important; }
+button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .password-toggle, .modal-close, .vk-key, .dashboard-tab, .historico-tab { min-height: 44px; min-width: 44px; }
+button:hover, .btn:hover, .role-btn:hover, .menu a:hover, .vk-key:hover, .filter-chip:hover, .icon-action:hover, .icon-action-lg:hover { opacity: 0.85; }
+button:active, .btn:active, .role-btn:active, .menu a:active, .vk-key:active, .filter-chip:active, .icon-action:active, .icon-action-lg:active { opacity: 0.7; }
+}
+button, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .vk-key, .password-toggle, .modal-close, .dashboard-tab, .historico-tab { position: relative; z-index: 10; pointer-events: auto; }
+.card, .kpi, .table-wrapper, .comparison-card, .stat-card { overflow: visible; }
+input, select, textarea { position: relative; z-index: 5; }
+.modal-overlay { z-index: 6000; }
+.modal { z-index: 6001; position: relative; }
+.toast-container { pointer-events: none; }
+.toast { pointer-events: auto; }
+.sidebar { pointer-events: auto; }
+.password-toggle, .search-box i { pointer-events: auto; }
+@media (hover: none) and (pointer: coarse) {
+.header-badge, .btn-logout { backdrop-filter: none; }
+}
+</style>
+</head>
+<body>
+<div class="login-screen" id="loginScreen">
+<div class="login-box">
+<div class="logo-big"><i class="fa-solid fa-industry"></i></div>
+<h1>WEG</h1>
+<p>Centro de Fluxo Produtivo<br>Selecione seu perfil para continuar</p>
+<div class="role-grid">
+<div class="role-btn" onclick="Auth.login('admin')"><i class="fa-solid fa-user-shield"></i><strong>Administrador</strong><small>Coordenação / Cadastros</small></div>
+<div class="role-btn" onclick="Auth.login('nano')"><i class="fa-solid fa-flask"></i><strong>Nanocerâmico</strong><small>Operador do posto</small></div>
+<div class="role-btn" onclick="Auth.login('pintura')"><i class="fa-solid fa-paint-roller"></i><strong>Pintura</strong><small>Operador do posto</small></div>
+<div class="role-btn" onclick="Auth.login('conferencia')"><i class="fa-solid fa-clipboard-check"></i><strong>Conferência</strong><small>Operador do posto</small></div>
+</div>
+</div>
+</div>
+<div id="app" style="display:none;">
+<header class="header">
+<div class="header-left">
+<button class="menu-toggle" onclick="UI.toggleSidebarMobile()"><i class="fa-solid fa-bars"></i></button>
+<div><div class="header-logo">WEG</div><div class="header-subtitle">Centro de Fluxo Produtivo</div></div>
+</div>
+<div class="header-center">
+<div class="header-title" id="headerTitle">Dashboard</div>
+<div class="header-badge" id="headerBadge" style="display:none;"></div>
+</div>
+<div class="header-right">
+<div class="user-info">
+<div class="user-name"><i class="fa-solid fa-user"></i> <span id="userLabel">Operador</span></div>
+<div class="user-date" id="currentDate"></div>
+<div class="sync-indicator" id="syncIndicator"><i class="fa-solid fa-cloud"></i> <span id="syncStatus">Conectado</span></div>
+</div>
+<button class="btn-logout" title="Sair" onclick="Auth.confirmarLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+</div>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
+<main class="content">
+<section class="page" id="page-dashboard">
+<h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
+<div class="dashboard-tabs">
+<button class="dashboard-tab active" onclick="Dashboard.switchTab('geral', this)"><i class="fa-solid fa-chart-line"></i> Geral</button>
+<button class="dashboard-tab" onclick="Dashboard.switchTab('nano', this)"><i class="fa-solid fa-flask"></i> Nanocerâmico</button>
+<button class="dashboard-tab" onclick="Dashboard.switchTab('pintura', this)"><i class="fa-solid fa-paint-roller"></i> Pintura</button>
+<button class="dashboard-tab" onclick="Dashboard.switchTab('conferencia', this)"><i class="fa-solid fa-clipboard-check"></i> Conferência</button>
+</div>
+<div id="dashboardGeralSection">
+<div class="kpi-grid">
+<div class="kpi"><div class="kpi-head"><h3>Total Cadastrados</h3><div class="kpi-icon"><i class="fa-solid fa-folder-open"></i></div></div><div class="kpi-value" id="dash-total">0</div><div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-up"></i> <span id="dash-total-trend">0</span> hoje</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Nanocerâmico</h3><div class="kpi-icon"><i class="fa-solid fa-flask"></i></div></div><div class="kpi-value" id="dash-nano">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Pintura</h3><div class="kpi-icon"><i class="fa-solid fa-paint-roller"></i></div></div><div class="kpi-value" id="dash-pint">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Conferência</h3><div class="kpi-icon"><i class="fa-solid fa-clipboard-check"></i></div></div><div class="kpi-value" id="dash-conf">0</div></div>
+</div>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-chart-line"></i> Indicadores de Produção</h2></div>
+<div class="charts-grid"><div class="chart-container"><canvas id="chartProcessos"></canvas></div><div class="chart-container"><canvas id="chartTurnos"></canvas></div></div>
+<div class="charts-grid" style="margin-top:20px;"><div class="chart-container"><canvas id="chartTempoExecucao"></canvas></div><div class="chart-container"><canvas id="chartEficiencia"></canvas></div></div>
+</div>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-trophy"></i> Comparativo de Desempenho por Turno</h2></div>
+<div class="comparison-grid">
+<div class="comparison-card"><h3><i class="fa-solid fa-clock"></i> Projetos Concluídos por Turno</h3>
+<div class="turno-comparison">
+<div class="turno-stat"><div class="turno-name">1º Turno</div><div class="turno-value" id="turno1-concluidos">0</div><div class="turno-label">projetos</div></div>
+<div class="turno-stat"><div class="turno-name">2º Turno</div><div class="turno-value" id="turno2-concluidos">0</div><div class="turno-label">projetos</div></div>
+<div class="turno-stat"><div class="turno-name">3º Turno</div><div class="turno-value" id="turno3-concluidos">0</div><div class="turno-label">projetos</div></div>
+</div></div>
+<div class="comparison-card"><h3><i class="fa-solid fa-bolt"></i> Eficiência por Turno</h3>
+<div class="turno-comparison">
+<div class="turno-stat"><div class="turno-name">1º Turno</div><div class="turno-value" id="turno1-eficiencia">0%</div><div class="turno-label">eficiência</div></div>
+<div class="turno-stat"><div class="turno-name">2º Turno</div><div class="turno-value" id="turno2-eficiencia">0%</div><div class="turno-label">eficiência</div></div>
+<div class="turno-stat"><div class="turno-name">3º Turno</div><div class="turno-value" id="turno3-eficiencia">0%</div><div class="turno-label">eficiência</div></div>
+</div></div>
+</div>
+<div class="dashboard-stats" style="margin-top:20px;">
+<div class="stat-card"><h4>Total Concluídos (Histórico)</h4><div class="stat-value" id="totalConcluidos">0</div><div class="stat-label">projetos finalizados</div></div>
+<div class="stat-card"><h4>Tempo Médio Geral</h4><div class="stat-value" id="tempoMedioGeral">00:00</div><div class="stat-label">minutos por projeto</div></div>
+<div class="stat-card"><h4>Projeto Mais Rápido</h4><div class="stat-value" id="projetoMaisRapido">-</div><div class="stat-label" id="projetoMaisRapidoTempo">00:00 min</div></div>
+<div class="stat-card"><h4>Último Projeto Concluído</h4><div class="stat-value" id="ultimoProjeto" style="font-size:16px;">-</div><div class="stat-label" id="ultimoProjetoData">-</div></div>
+</div>
+</div>
+</div>
+<div id="dashboardPostoSection" style="display:none;">
+<div class="kpi-grid">
+<div class="kpi"><div class="kpi-head"><h3>Projetos no Posto</h3><div class="kpi-icon"><i class="fa-solid fa-industry"></i></div></div><div class="kpi-value" id="dash-posto-total">0</div><div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-up"></i> <span id="dash-posto-hoje">0</span> hoje</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Em Andamento</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div><div class="kpi-value" id="dash-posto-andamento">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Concluídos no Posto</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div><div class="kpi-value" id="dash-posto-concluidos">0</div></div>
+</div>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-trophy"></i> Desempenho por Turno - <span id="dash-posto-nome"></span></h2></div>
+<div class="comparison-grid">
+<div class="comparison-card"><h3><i class="fa-solid fa-clock"></i> Projetos Concluídos por Turno</h3>
+<div class="turno-comparison">
+<div class="turno-stat"><div class="turno-name">1º Turno</div><div class="turno-value" id="posto-turno1-concluidos">0</div><div class="turno-label">projetos</div></div>
+<div class="turno-stat"><div class="turno-name">2º Turno</div><div class="turno-value" id="posto-turno2-concluidos">0</div><div class="turno-label">projetos</div></div>
+<div class="turno-stat"><div class="turno-name">3º Turno</div><div class="turno-value" id="posto-turno3-concluidos">0</div><div class="turno-label">projetos</div></div>
+</div></div>
+<div class="comparison-card"><h3><i class="fa-solid fa-bolt"></i> Eficiência por Turno</h3>
+<div class="turno-comparison">
+<div class="turno-stat"><div class="turno-name">1º Turno</div><div class="turno-value" id="posto-turno1-eficiencia">0%</div><div class="turno-label">eficiência</div></div>
+<div class="turno-stat"><div class="turno-name">2º Turno</div><div class="turno-value" id="posto-turno2-eficiencia">0%</div><div class="turno-label">eficiência</div></div>
+<div class="turno-stat"><div class="turno-name">3º Turno</div><div class="turno-value" id="posto-turno3-eficiencia">0%</div><div class="turno-label">eficiência</div></div>
+</div></div>
+</div>
+<div class="dashboard-stats" style="margin-top:20px;">
+<div class="stat-card"><h4>Total Concluídos no Posto</h4><div class="stat-value" id="posto-total-concluidos">0</div><div class="stat-label">projetos finalizados</div></div>
+<div class="stat-card"><h4>Tempo Médio no Posto</h4><div class="stat-value" id="posto-tempo-medio">00:00</div><div class="stat-label">minutos por projeto</div></div>
+<div class="stat-card"><h4>Projeto Mais Rápido</h4><div class="stat-value" id="posto-mais-rapido">-</div><div class="stat-label" id="posto-mais-rapido-tempo">00:00 min</div></div>
+<div class="stat-card"><h4>Último Projeto Concluído</h4><div class="stat-value" id="posto-ultimo-projeto" style="font-size:16px;">-</div><div class="stat-label" id="posto-ultimo-data">-</div></div>
+</div>
+</div>
+</div>
+</section>
+<section class="page" id="page-admin">
+<h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
+<div class="card">
+<div class="card-head">
+<h2><i class="fa-solid fa-plus-circle"></i> Cadastrar Novo Projeto</h2>
+<button class="btn btn-sm btn-success" onclick="Admin.abrirCamera()"><i class="fa-solid fa-camera"></i> Ler Etiqueta (Câmera)</button>
+</div>
+<div id="cameraSection" class="camera-container">
+<video id="cameraVideo" autoplay playsinline></video>
+<canvas id="cameraCanvas"></canvas>
+<div class="camera-overlay"><div class="scan-line"></div></div>
+</div>
+<div id="cameraStatus" class="camera-status" style="display:none;"></div>
+<div class="camera-controls" id="cameraControls" style="display:none;">
+<button class="btn btn-danger" onclick="Admin.fecharCamera()"><i class="fa-solid fa-times"></i> Fechar Câmera</button>
+</div>
+<form id="formCadastro" onsubmit="return Admin.cadastrarProjeto(event)">
+<div class="form-grid">
+<div class="form-group"><label>PEP <small style="color:var(--text-light);font-weight:400;">(opcional, pode repetir)</small></label><input type="text" id="cad-pep" placeholder="Ex: 170-2500343-121" data-vk></div>
+<div class="form-group"><label>Diagrama / Ordem do Invólucro <span class="req">*</span> <small style="color:var(--text-light);font-weight:400;">(único)</small></label><input type="text" id="cad-diagrama" required placeholder="Ex: 45089024" data-vk></div>
+<div class="form-group"><label>Placa de Identificação</label><input type="text" id="cad-placa" placeholder="Ex: PLACA123" data-vk></div>
+<div class="form-group" id="group-cad-volumes"><label>Quantidade / Volumes</label><input type="text" id="cad-volumes" placeholder="Ex: 28" data-vk></div>
+<div class="form-group"><label>Descrição</label><input type="text" id="cad-descricao" placeholder="Ex: Motor W22 Premium" data-vk></div>
+<div class="form-group"><label>Processo de Destino <span class="req">*</span></label><select id="cad-processo" required onchange="Admin.toggleVolumesCadastro()"><option value="">Selecione...</option><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
+<div class="form-group"><label>Prioridade</label><select id="cad-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
+<div class="form-group full"><label>Observações</label><textarea id="cad-obs" rows="2" placeholder="Observações adicionais..." data-vk></textarea></div>
+<div class="form-actions">
+<button type="button" class="btn btn-secondary" onclick="Admin.limparFormulario()"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+<button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar Projeto</button>
+</div>
+</div>
+</form>
+</div>
+<div class="card">
+<div class="card-head">
+<h2><i class="fa-solid fa-list"></i> Projetos Cadastrados</h2>
+<div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+</div>
+<div class="table-toolbar">
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, descrição..." oninput="Admin.renderTable()" data-vk></div>
+<div class="filter-bar">
+<span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
+<span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
+<span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span>
+<span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span>
+</div>
+</div>
+<div class="table-wrapper">
+<table class="table">
+<thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
+<tbody id="admTableBody"></tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="page" id="page-posto">
+<h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto de Trabalho</span> <span class="process-badge" id="postoBadge"></span></h1>
+<div class="kpi-grid">
+<div class="kpi"><div class="kpi-head"><h3>Aguardando</h3><div class="kpi-icon"><i class="fa-solid fa-hourglass-half"></i></div></div><div class="kpi-value" id="posto-aguardando">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Em Processo</h3><div class="kpi-icon"><i class="fa-solid fa-gear"></i></div></div><div class="kpi-value" id="posto-processo">0</div></div>
+<div class="kpi"><div class="kpi-head"><h3>Concluídos (Hoje)</h3><div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div></div><div class="kpi-value" id="posto-concluidos">0</div></div>
+</div>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno atual:</label>
+<select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
+<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP..." oninput="Posto.renderTable()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
+</section>
+<section class="page" id="page-historico">
+<h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
+<div class="historico-tabs"><button class="historico-tab active" onclick="Historico.switchTab('geral', this)"><i class="fa-solid fa-archive"></i> Histórico Geral</button><button class="historico-tab" onclick="Historico.switchTab('postos', this)"><i class="fa-solid fa-route"></i> Histórico por Posto</button></div>
+<div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP..." oninput="Historico.renderGeral()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Processo</th><th>Turno</th><th>Tempo Real</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
+<div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostos()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
+</section>
+<section class="page" id="page-historico-posto">
+<h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
+<div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP ou Diagrama..." oninput="Historico.renderPostoAtual()" data-vk></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo no Posto</th><th>Data/Hora Conclusão</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
+</section>
+<section class="page" id="page-config">
+<h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
+<div class="card" id="cardSeguranca" style="display:none;"><h2><i class="fa-solid fa-shield-halved"></i> Segurança - Senha do Administrador</h2><p style="margin-top:8px;color:var(--text-light);font-size:14px;">Altere a senha de acesso ao painel administrativo.</p>
+<form id="formSenha" onsubmit="return Config.alterarSenha(event)" style="margin-top:15px;"><div class="form-grid" style="max-width:600px;">
+<div class="form-group full"><label>Senha Atual <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="senhaAtual" required data-vk><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('senhaAtual',this)"><i class="fa-solid fa-eye"></i></button></div></div>
+<div class="form-group full"><label>Nova Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="novaSenha" required minlength="4" oninput="Config.avaliarForcaSenha()" data-vk><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('novaSenha',this)"><i class="fa-solid fa-eye"></i></button></div><div class="password-strength" id="pwdStrength"></div></div>
+<div class="form-group full"><label>Confirmar Nova Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="confirmaSenha" required minlength="4" data-vk><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('confirmaSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div>
+<div class="form-actions"><button type="reset" class="btn btn-secondary" onclick="document.getElementById('pwdStrength').textContent=''"><i class="fa-solid fa-rotate-left"></i> Limpar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-key"></i> Alterar Senha</button></div>
+</div></form></div>
+<div class="card"><h2><i class="fa-solid fa-display"></i> Tipo de Dispositivo</h2>
+<div class="form-grid" style="max-width:600px;"><div class="form-group full"><label>Modo de operação</label><select id="cfgDevice" onchange="Config.salvarDispositivo()"><option value="tablet">Tablet / Touchscreen</option><option value="computador">💻 Computador (cursor oculto)</option></select></div>
+<div class="form-group full" id="cfgVkInfo" style="display:none;"><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador ativado:</strong> Cursor oculto + teclado virtual.</div></div></div></div></div>
+<div class="card"><h2><i class="fa-solid fa-database"></i> Gerenciar Dados</h2>
+<div class="alert alert-warning" style="margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados na nuvem (Planilha).</div></div>
+<div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;"><button class="btn btn-secondary" onclick="Export.backup()"><i class="fa-solid fa-download"></i> Backup Local</button><button class="btn btn-danger" onclick="Auth.solicitarLimpeza()"><i class="fa-solid fa-trash"></i> Limpar Nuvem</button></div></div>
+</section>
+</main>
+</div>
+</div>
+<div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você será redirecionado para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
+<div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno está processando?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Pergunta repetida a cada 2 horas.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
+<div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha do administrador.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
+<div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+<div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid">
+<div class="form-group"><label>PEP</label><input type="text" id="edit-pep" data-vk></div>
+<div class="form-group"><label>Diagrama / Ordem</label><input type="text" id="edit-diagrama" data-vk></div>
+<div class="form-group"><label>Placa</label><input type="text" id="edit-placa" data-vk></div>
+<div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div>
+<div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes" data-vk></div>
+<div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao" data-vk></div>
+<div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
+<div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div>
+<div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2" data-vk></textarea></div>
+<div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div>
+</div></form></div></div>
+<div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Projeto <strong id="concluirCodigo"></strong></p>
+<div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;">
+<div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
+<div style="margin-top:12px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div>
+<div class="form-group" style="margin-top:12px;"><label>Processar agora <span class="req">*</span></label><input type="number" id="concluirVolumesProcessados" min="1" required placeholder="Ex: 5"></div>
+<div style="margin-top:10px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div></div>
+<div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;">
+<div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
+<div class="form-group" style="margin-top:12px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso/repintura">Peças em reprocesso/repintura</option><option value="Gancherias/volumes pendentes">Gancherias/volumes pendentes</option></select></div></div>
+<div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
+<div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+<div class="toast-container" id="toastContainer"></div>
+<div class="virtual-keyboard" id="virtualKeyboard"><div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
+<div class="vk-row"><button class="vk-key" data-key="7">7</button><button class="vk-key" data-key="8">8</button><button class="vk-key" data-key="9">9</button><button class="vk-key action danger" data-action="backspace"><i class="fa-solid fa-delete-left"></i></button></div>
+<div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
+<div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div></div>
+
+<!-- CLIENTE DA API ONLINE - CORRIGIDO E OTIMIZADO -->
+<script>
+const API_CONFIG = {
+  URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
+  SECRET: "16101961",
+  POLLING_INTERVAL: 3000, // ⚡ REDUZIDO de 5s para 3s (mais rápido)
+  FULL_SYNC_INTERVAL: 15000 // ⚡ REDUZIDO de 30s para 15s
+};
+let lastSyncTimestamp = 0;
+let syncInProgress = false;
+const eventListeners = {};
+
+async function apiRequest(action, payload = {}, method = 'POST') {
+  try {
+    const url = new URL(API_CONFIG.URL);
+    url.searchParams.append('action', action);
+    const options = { method: method, mode: 'cors', redirect: 'follow' };
+    if (method === 'POST') {
+      options.body = JSON.stringify({ action, secret: API_CONFIG.SECRET, ...payload });
+    } else if (method === 'GET') {
+      if (payload.since !== undefined) url.searchParams.append('since', payload.since);
+      if (payload.key) url.searchParams.append('key', payload.key);
+      url.searchParams.append('secret', API_CONFIG.SECRET);
+    }
+    const response = await fetch(url.toString(), options);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error || 'Erro na API');
+    return result;
+  } catch (error) {
+    console.error('API Request failed:', error);
+    throw error;
+  }
+}
+
+// ✅ NOVAS FUNÇÕES PARA HISTÓRICO NA NUVEM
+async function createHistorico(data) { return await apiRequest('createHistorico', { data: data }); }
+async function createHistoricoPosto(data) { return await apiRequest('createHistoricoPosto', { data: data }); }
+async function deleteHistorico(id) { return await apiRequest('deleteHistorico', { id: id }); }
+
+async function syncHistorico() {
+  try {
+    const result = await apiRequest('syncHistorico', { since: 0 }, 'GET');
+    if (result.success && result.data) {
+      State.data.historico = result.data.map(p => ({
+        id: p.ID, projetoId: p.ProjetoID, pep: p.PEP, diagrama: p.Diagrama, placa: p.Placa,
+        descricao: p.Descricao, processo: p.Processo, volumesTotal: p.VolumesTotal,
+        prioridade: p.Prioridade, turno: p.Turno, obs: p.Obs, criadoEm: p.CriadoEm,
+        dataHoraInicio: p.DataHoraInicio, dataHoraFim: p.DataHoraFim,
+        tempoReal: p.TempoReal, observacaoPintura: p.ObservacaoPintura,
+        concluidoEm: p.ConcluidoEm
+      }));
+      console.log('📜 Histórico carregado: ' + result.data.length + ' registros');
+    }
+  } catch (error) { console.error('Erro ao sincronizar histórico:', error); }
+}
+
+async function syncHistoricoPostos() {
+  try {
+    const result = await apiRequest('syncHistoricoPostos', { since: 0 }, 'GET');
+    if (result.success && result.data) {
+      State.data.historicoPostos = result.data.map(p => ({
+        id: p.ID, projetoId: p.ProjetoID, pep: p.PEP, diagrama: p.Diagrama,
+        placa: p.Placa, processo: p.Processo, turno: p.Turno, tempoReal: p.TempoReal,
+        observacao: p.Observacao, dataHoraConclusao: p.DataHoraConclusao
+      }));
+      console.log('📜 Histórico de Postos carregado: ' + result.data.length + ' registros');
+    }
+  } catch (error) { console.error('Erro ao sincronizar histórico de postos:', error); }
+}
+
+async function syncDataIncremental() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  const indicator = document.getElementById('syncIndicator');
+  if (indicator) indicator.style.opacity = '0.7';
+  try {
+    const result = await apiRequest('sync', { since: lastSyncTimestamp }, 'GET');
+    if (result.success && result.data) {
+      if (result.timestamp < lastSyncTimestamp && lastSyncTimestamp > 0) {
+        console.log('🔄 Detectada limpeza remota - fazendo sync completo');
+        await syncDataCompleto();
+      } else {
+        result.data.forEach(remoteProj => triggerEvent('project:synced', remoteProj));
+        lastSyncTimestamp = result.timestamp;
+        localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+        triggerEvent('sync:complete', { count: result.data.length });
+      }
+      if (indicator) {
+        indicator.classList.remove('disconnected');
+        indicator.innerHTML = '<i class="fa-solid fa-cloud"></i> <span id="syncStatus">Conectado</span>';
+        indicator.style.opacity = '1';
+      }
+    }
+  } catch (error) {
+    console.error('Sync incremental failed:', error);
+    if (indicator) {
+      indicator.classList.add('disconnected');
+      indicator.innerHTML = '<i class="fa-solid fa-cloud-bolt"></i> <span id="syncStatus">Erro Conexão</span>';
+    }
+    triggerEvent('sync:error', error);
+  } finally { syncInProgress = false; }
+}
+
+async function syncDataCompleto() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  try {
+    const result = await apiRequest('sync', { since: 0 }, 'GET');
+    if (result.success && result.data) {
+      console.log('🔄 Sync completo: ' + result.data.length + ' projetos recebidos');
+      triggerEvent('sync:full', result.data);
+      lastSyncTimestamp = result.timestamp;
+      localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+      triggerEvent('sync:complete', { count: result.data.length, full: true });
+    }
+    // ✅ BUSCA HISTÓRICO E HISTÓRICO DE POSTOS
+    await syncHistorico();
+    await syncHistoricoPostos();
+    
+    // Atualiza telas
+    if (State.currentUser === 'admin') Admin.renderTable();
+    if (State.currentPosto) Posto.render();
+    Dashboard.render();
+    Historico.renderGeral();
+    Historico.renderPostos();
+    Charts.render();
+  } catch (error) {
+    console.error('Sync completo failed:', error);
+    triggerEvent('sync:error', error);
+  } finally { syncInProgress = false; }
+}
+
+function startPolling(interval = API_CONFIG.POLLING_INTERVAL) {
+  syncDataCompleto().then(() => {
+    setInterval(syncDataIncremental, interval);
+    setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
+  });
+}
+
+function on(event, callback) { if (!eventListeners[event]) eventListeners[event] = []; eventListeners[event].push(callback); }
+function off(event, callback) { if (eventListeners[event]) eventListeners[event] = eventListeners[event].filter(cb => cb !== callback); }
+function triggerEvent(event, data) {
+  if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error('Error in event listener for ' + event + ':', e); } });
+}
+
+window.API = { 
+  createProject, updateProject, deleteProject, 
+  createHistorico, createHistoricoPosto, deleteHistorico, 
+  updateConfig, getConfig, clearAllData, 
+  syncData: syncDataIncremental, syncDataCompleto, syncHistorico, syncHistoricoPostos, 
+  startPolling, on, off 
+};
+</script>
 <script>
 const CONFIG = {
   STORAGE_KEY: 'weg_fluxo_produtivo_v40',
