@@ -132,7 +132,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .search-box input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: 14px; cursor: text !important; touch-action: manipulation; }
 .search-box i { position: absolute; left: 12px; top: 50%; color: var(--text-light); pointer-events: none; }
 .table { width: 100%; border-collapse: collapse; }
-.table thead th { background: var(--weg-blue); color: white; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.table thead th { background: var(--weg-blue); color: white; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
 .table tbody tr { transition: var(--transition); }
 .table tbody tr:hover { background: var(--bg); }
 .table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; text-align: center; }
@@ -849,8 +849,8 @@ const Utils = {
     },
     extrairDadosEtiqueta(texto) {
         console.log(' OCR:', texto.substring(0, 200) + '...');
-        let clean = texto.replace(/\r/g, '').replace(/
-/g, ' ').replace(/\s+/g, ' ').trim();
+        // ✅ CORREÇÃO: Regex corrigido para evitar quebra de linha
+        let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
         const result = { pep: null, diagrama: null };
         const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
         if (pepLabelMatch) {
@@ -882,8 +882,8 @@ const Utils = {
                 console.log('✅ PEP via 13 dígitos:', result.pep);
             }
         }
-        const lines = texto.split('
-');
+        // ✅ CORREÇÃO: Split seguro
+        const lines = texto.split(/\r?\n/);
         for (let line of lines) {
             const upper = line.toUpperCase();
             if (upper.includes('DIAGR') || upper.includes('ORD') || upper.includes('INVIOL')) {
@@ -951,7 +951,8 @@ const Storage = {
             API.startPolling(API_CONFIG.POLLING_INTERVAL);
         } else {
             State.apiAvailable = false;
-            alert("Este sistema requer conexão com a internet para funcionar.");
+            // Não bloqueia mais a interface se offline, apenas avisa
+            console.warn("Sistema iniciado sem API disponível.");
         }
     },
     salvarLocal() {
@@ -2158,8 +2159,7 @@ const Export = {
     csv() {
         const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Prioridade','Status','Turno','Observações'];
         const rows = State.data.projetos.map(p => [p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.prioridade,p.status,p.turno||'',p.obs||'']);
-        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('
-');
+        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
         this.downloadFile('projetos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
         UI.showToast('success', 'Exportado', 'Arquivo CSV gerado');
     },
@@ -2168,8 +2168,7 @@ const Export = {
         if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
         const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Processo','Volumes','Turno','Tempo Real (ms)','Início','Término'];
         const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.processo,p.volumes,p.turno||'',p.tempoReal||'',p.dataHoraInicio?new Date(p.dataHoraInicio).toLocaleString('pt-BR'):'',p.dataHoraFim?new Date(p.dataHoraFim).toLocaleString('pt-BR'):'']);
-        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('
-');
+        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
         this.downloadFile('historico_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
         UI.showToast('success', 'Exportado', 'Histórico exportado');
     },
@@ -2178,8 +2177,7 @@ const Export = {
         if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
         const headers = ['PEP','Diagrama/Ordem','Placa','Posto','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
         const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.processo,p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
-        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('
-');
+        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
         this.downloadFile('historico_postos_' + Utils.dateStamp() + '.csv', '\ufeff' + csv, 'text/csv;charset=utf-8;');
         UI.showToast('success', 'Exportado', 'Histórico por posto exportado');
     },
@@ -2187,8 +2185,7 @@ const Export = {
         let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
         const headers = ['PEP','Diagrama/Ordem','Placa','Descrição','Turno','Tempo Real (ms)','Observação','Data/Hora Conclusão'];
         const rows = data.map(p => [p.pep||'',p.diagrama,p.placa||'',p.descricao||'',p.turno||'',p.tempoReal||'',p.observacao||'',new Date(p.dataHoraConclusao).toLocaleString('pt-BR')]);
-        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('
-');
+        const csv = [headers,...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
         this.downloadFile(`concluidos_${State.currentPosto.toLowerCase().replace('ê','e').replace('á','a').replace(' ','_')}_${Utils.dateStamp()}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8;');
         UI.showToast('success', 'Exportado', `Concluídos no ${State.currentPosto} exportados`);
     },
@@ -2201,21 +2198,68 @@ const Export = {
 };
 const App = {
     async init() {
-        await Storage.carregar();
-        UI.aplicarEstadoCursor();
-        UI.setupModalClickHandlers();
-        UI.setupSidebarClickHandler();
-        UI.setupVirtualKeyboard();
-        setInterval(UI.updateDate, 1000);
-        UI.updateDate();
-        
-        // ✅ ATUALIZAÇÃO INTELIGENTE A CADA 1 MINUTO (SEM RECARREGAR)
-        setInterval(() => {
-            if (State.apiAvailable && State.isOnline) {
-                // Executa um sync silencioso
-                syncDataIncremental().then(() => {
-                    // Se houver mudanças, as funções de renderização são chamadas automaticamente pelos eventos
-                    // Mas forçamos um refresh visual caso algo tenha mudado sem disparar evento específico
+        try {
+            await Storage.carregar();
+            UI.aplicarEstadoCursor();
+            UI.setupModalClickHandlers();
+            UI.setupSidebarClickHandler();
+            UI.setupVirtualKeyboard();
+            setInterval(UI.updateDate, 1000);
+            UI.updateDate();
+            
+            // ✅ ATUALIZAÇÃO INTELIGENTE A CADA 1 MINUTO (SEM RECARREGAR)
+            setInterval(() => {
+                if (State.apiAvailable && State.isOnline) {
+                    // Executa um sync silencioso
+                    syncDataIncremental().then(() => {
+                        // Se houver mudanças, as funções de renderização são chamadas automaticamente pelos eventos
+                        // Mas forçamos um refresh visual caso algo tenha mudado sem disparar evento específico
+                        if (State.currentUser === 'admin') Admin.renderTable();
+                        if (State.currentPosto) Posto.render();
+                        Dashboard.render();
+                        Historico.renderGeral();
+                        Historico.renderPostos();
+                        Charts.render();
+                    });
+                }
+            }, 60000); // 60000ms = 1 minuto
+
+            if (typeof API !== 'undefined' && State.apiAvailable) {
+                // Listeners para atualizar a UI quando os dados chegarem da nuvem
+                API.on('project:synced', (proj) => {
+                    const projLocal = Utils.fromApiFormat(proj);
+                    const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+                    if (index === -1) {
+                        State.data.projetos.push(projLocal);
+                    } else {
+                        // Atualiza apenas se a versão remota for mais recente
+                        const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
+                        const remoteAtualizado = projLocal.atualizadoEm || 0;
+                        if (remoteAtualizado > localAtualizado) {
+                            State.data.projetos[index] = {
+                                ...State.data.projetos[index],
+                                ...projLocal,
+                                // Preserva dados temporários de UI se necessário
+                                dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
+                                dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
+                            };
+                        }
+                    }
+                    // Atualiza telas ativas
+                    if (State.currentUser === 'admin') Admin.renderTable();
+                    if (State.currentPosto) Posto.render();
+                    Charts.render();
+                });
+                API.on('sync:full', (remoteProjects) => {
+                    console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
+                    const remoteMap = new Map();
+                    remoteProjects.forEach(p => {
+                        const local = Utils.fromApiFormat(p);
+                        remoteMap.set(local.id, local);
+                    });
+                    // Substitui lista local pela lista da nuvem
+                    State.data.projetos = Array.from(remoteMap.values());
+                    Storage.salvarLocal();
                     if (State.currentUser === 'admin') Admin.renderTable();
                     if (State.currentPosto) Posto.render();
                     Dashboard.render();
@@ -2223,108 +2267,66 @@ const App = {
                     Historico.renderPostos();
                     Charts.render();
                 });
-            }
-        }, 60000); // 60000ms = 1 minuto
-
-        if (typeof API !== 'undefined' && State.apiAvailable) {
-            // Listeners para atualizar a UI quando os dados chegarem da nuvem
-            API.on('project:synced', (proj) => {
-                const projLocal = Utils.fromApiFormat(proj);
-                const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-                if (index === -1) {
-                    State.data.projetos.push(projLocal);
-                } else {
-                    // Atualiza apenas se a versão remota for mais recente
-                    const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
-                    const remoteAtualizado = projLocal.atualizadoEm || 0;
-                    if (remoteAtualizado > localAtualizado) {
+                API.on('project:created', (proj) => {
+                    const projLocal = Utils.fromApiFormat(proj);
+                    if (!State.data.projetos.find(p => p.id === projLocal.id)) {
+                        State.data.projetos.push(projLocal);
+                        Storage.salvarLocal();
+                        if (State.currentUser === 'admin') Admin.renderTable();
+                        if (State.currentPosto) Posto.render();
+                    }
+                });
+                API.on('project:updated', (proj) => {
+                    const projLocal = Utils.fromApiFormat(proj);
+                    const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
+                    if (index !== -1) {
                         State.data.projetos[index] = {
                             ...State.data.projetos[index],
                             ...projLocal,
-                            // Preserva dados temporários de UI se necessário
                             dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
-                            dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim
+                            dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
+                            tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
+                            concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
+                            observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
                         };
+                        Storage.salvarLocal();
+                        if (State.currentUser === 'admin') Admin.renderTable();
+                        if (State.currentPosto) Posto.render();
+                        Charts.render();
                     }
-                }
-                // Atualiza telas ativas
-                if (State.currentUser === 'admin') Admin.renderTable();
-                if (State.currentPosto) Posto.render();
-                Charts.render();
-            });
-            API.on('sync:full', (remoteProjects) => {
-                console.log(`🔄 Sync completo recebido: ${remoteProjects.length} projetos`);
-                const remoteMap = new Map();
-                remoteProjects.forEach(p => {
-                    const local = Utils.fromApiFormat(p);
-                    remoteMap.set(local.id, local);
                 });
-                // Substitui lista local pela lista da nuvem
-                State.data.projetos = Array.from(remoteMap.values());
-                Storage.salvarLocal();
-                if (State.currentUser === 'admin') Admin.renderTable();
-                if (State.currentPosto) Posto.render();
-                Dashboard.render();
-                Historico.renderGeral();
-                Historico.renderPostos();
-                Charts.render();
-            });
-            API.on('project:created', (proj) => {
-                const projLocal = Utils.fromApiFormat(proj);
-                if (!State.data.projetos.find(p => p.id === projLocal.id)) {
-                    State.data.projetos.push(projLocal);
-                    Storage.salvarLocal();
-                    if (State.currentUser === 'admin') Admin.renderTable();
-                    if (State.currentPosto) Posto.render();
-                }
-            });
-            API.on('project:updated', (proj) => {
-                const projLocal = Utils.fromApiFormat(proj);
-                const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
-                if (index !== -1) {
-                    State.data.projetos[index] = {
-                        ...State.data.projetos[index],
-                        ...projLocal,
-                        dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio,
-                        dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim,
-                        tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal,
-                        concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm,
-                        observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura
-                    };
+                API.on('project:deleted', (projectId) => {
+                    State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
                     Storage.salvarLocal();
                     if (State.currentUser === 'admin') Admin.renderTable();
                     if (State.currentPosto) Posto.render();
                     Charts.render();
+                });
+                API.on('sync:complete', (data) => {
+                    // Silencioso para não poluir a tela
+                });
+                API.on('sync:error', (err) => {
+                    console.error('Erro de sync:', err);
+                    // UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.');
+                });
+            }
+            window.addEventListener('online', () => {
+                State.isOnline = true;
+                State.apiAvailable = (typeof API !== 'undefined');
+                UI.showToast('success', 'Online', 'Conexão restaurada.');
+                if (State.apiAvailable) {
+                    API.startPolling(API_CONFIG.POLLING_INTERVAL);
                 }
             });
-            API.on('project:deleted', (projectId) => {
-                State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
-                Storage.salvarLocal();
-                if (State.currentUser === 'admin') Admin.renderTable();
-                if (State.currentPosto) Posto.render();
-                Charts.render();
+            window.addEventListener('offline', () => {
+                State.isOnline = false;
+                State.apiAvailable = false;
+                UI.showToast('error', 'Offline', 'Sem conexão. O sistema parará de atualizar.');
             });
-            API.on('sync:complete', (data) => {
-                // Silencioso para não poluir a tela
-            });
-            API.on('sync:error', (err) => {
-                console.error('Erro de sync:', err);
-                // UI.showToast('warning', 'Sincronização', 'Erro ao sincronizar.');
-            });
+        } catch (e) {
+            console.error("Erro crítico na inicialização:", e);
+            alert("Ocorreu um erro ao iniciar o sistema. Por favor, recarregue a página.");
         }
-        window.addEventListener('online', () => {
-            State.isOnline = true;
-            State.apiAvailable = (typeof API !== 'undefined');
-            UI.showToast('success', 'Online', 'Conexão restaurada.');
-            if (State.apiAvailable) {
-                API.startPolling(API_CONFIG.POLLING_INTERVAL);
-            }
-        });
-        window.addEventListener('offline', () => {
-            State.isOnline = false;
-            State.apiAvailable = false;
-            UI.showToast('error', 'Offline', 'Sem conexão. O sistema parará de atualizar.');
-        });
     }
 };
 App.init();
