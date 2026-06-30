@@ -655,6 +655,26 @@ async function deleteProject(projectId) {
 async function updateConfig(key, value) { return await apiRequest('updateConfig', { key, value }); }
 async function getConfig(key) { const result = await apiRequest('getConfig', { key }, 'GET'); return result.value; }
 async function clearAllData() { return await apiRequest('clearAll', {}); }
+
+// ✅ NOVA FUNÇÃO: Sincroniza especificamente o Histórico de Postos
+async function syncHistoricoPostos() {
+    try {
+        // Busca tudo (since=0) para garantir que o histórico esteja completo após reload
+        const result = await apiRequest('syncHistoricoPostos', { since: 0 }, 'GET');
+        if (result.success && result.data) {
+            State.data.historicoPostos = result.data;
+            console.log(`📜 Histórico de Postos carregado: ${result.data.length} registros`);
+            // Se estiver na tela de histórico, atualiza
+            if (document.getElementById('page-historico').classList.contains('active')) {
+                Historico.renderPostos();
+                Historico.renderPostoAtual();
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao sincronizar histórico de postos:', error);
+    }
+}
+
 // Sincronização Apenas Leitura (para manter todos os dispositivos atualizados)
 async function syncDataIncremental() {
     if (syncInProgress) return;
@@ -698,14 +718,18 @@ async function syncDataCompleto() {
     if (syncInProgress) return;
     syncInProgress = true;
     try {
+        // 1. Sincroniza Projetos
         const result = await apiRequest('sync', { since: 0 }, 'GET');
         if (result.success && result.data) {
-            console.log(`🔄 Sync completo: ${result.data.length} projetos recebidos`);
             triggerEvent('sync:full', result.data);
             lastSyncTimestamp = result.timestamp;
             localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
-            triggerEvent('sync:complete', { count: result.data.length, full: true });
         }
+        
+        // ✅ 2. Sincroniza Histórico de Postos (CORREÇÃO PRINCIPAL)
+        await syncHistoricoPostos();
+        
+        triggerEvent('sync:complete', { full: true });
     } catch (error) {
         console.error('Sync completo failed:', error);
         triggerEvent('sync:error', error);
@@ -725,7 +749,7 @@ function off(event, callback) { if (eventListeners[event]) eventListeners[event]
 function triggerEvent(event, data) {
     if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error(`Error in event listener for ${event}:`, e); } });
 }
-window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData: syncDataIncremental, syncDataCompleto, startPolling, on, off };
+window.API = { createProject, updateProject, deleteProject, updateConfig, getConfig, clearAllData, syncData: syncDataIncremental, syncDataCompleto, syncHistoricoPostos, startPolling, on, off };
 </script>
 <script>
 const CONFIG = {
@@ -1372,11 +1396,18 @@ const Dashboard = {
         const hoje = new Date(); hoje.setHours(0,0,0,0);
         const projetosNoPosto = State.data.projetos.filter(p => p.processo === posto);
         const concluidosNoPosto = State.data.historicoPostos.filter(p => p.processo === posto);
-        const concluidosHoje = concluidosNoPosto.filter(p => p.dataHoraConclusao >= hoje.getTime());
+        
+        // ✅ CONTADOR DE CONCLUÍDOS HOJE
+        const concluidosHoje = concluidosNoPosto.filter(p => {
+            const dataConclusao = new Date(p.dataHoraConclusao);
+            return dataConclusao >= hoje;
+        });
+
         document.getElementById('dash-posto-total').textContent = projetosNoPosto.length;
         document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
         document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
         document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
+        
         const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
         concluidosNoPosto.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
         document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
@@ -1734,9 +1765,15 @@ const Posto = {
         const todosPosto = State.data.projetos.filter(p => p.processo === State.currentPosto);
         document.getElementById('posto-aguardando').textContent = todosPosto.filter(p => p.status === 'Aguardando').length;
         document.getElementById('posto-processo').textContent = todosPosto.filter(p => p.status === 'Em Processo').length;
+        
+        // ✅ CONTADOR DE CONCLUÍDOS HOJE
         const hoje = new Date(); hoje.setHours(0,0,0,0);
-        const concluidosHoje = State.data.historicoPostos.filter(p => p.processo === State.currentPosto && p.dataHoraConclusao >= hoje.getTime()).length;
-        document.getElementById('posto-concluidos').textContent = concluidosHoje;
+        const concluidosHoje = State.data.historicoPostos.filter(p => {
+            const dataConclusao = new Date(p.dataHoraConclusao);
+            return p.processo === State.currentPosto && dataConclusao >= hoje;
+        });
+        document.getElementById('posto-concluidos').textContent = concluidosHoje.length;
+
         if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para ${State.currentPosto}.</p></div></td></tr>`; return; }
         tbody.innerHTML = data.map(p => {
             const statusClass = p.status==='Em Processo'?'emprocesso':p.status==='Aguardando'?'aguardando':'parcial';
@@ -2219,23 +2256,6 @@ const App = {
                 // Se tiver um papel salvo, entra direto sem mostrar login
                 Auth.efetivarLogin(savedRole);
             }
-
-            // ✅ ATUALIZAÇÃO INTELIGENTE A CADA 1 MINUTO (SEM RECARREGAR)
-            // Comentado pois você pediu recarregamento completo agora
-            /*
-            setInterval(() => {
-                if (State.apiAvailable && State.isOnline) {
-                    syncDataIncremental().then(() => {
-                        if (State.currentUser === 'admin') Admin.renderTable();
-                        if (State.currentPosto) Posto.render();
-                        Dashboard.render();
-                        Historico.renderGeral();
-                        Historico.renderPostos();
-                        Charts.render();
-                    });
-                }
-            }, 60000); 
-            */
 
             // ✅ RECARREGAMENTO COMPLETO DA PÁGINA A CADA 1 MINUTO
             setTimeout(() => {
