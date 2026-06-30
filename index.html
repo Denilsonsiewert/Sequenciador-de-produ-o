@@ -413,7 +413,7 @@ input,select,textarea{position:relative;z-index:5}
 <div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="Admin.renderTable()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="Admin.renderTableDebounced()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
@@ -439,7 +439,7 @@ input,select,textarea{position:relative;z-index:5}
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno:</label>
 <select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
-<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="Posto.renderTable()" data-vk></div>
+<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="Posto.renderTableDebounced()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
 </section>
@@ -447,18 +447,18 @@ input,select,textarea{position:relative;z-index:5}
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs"><button class="historico-tab active" onclick="Historico.switchTab('geral', this)"><i class="fa-solid fa-archive"></i> Histórico Geral</button><button class="historico-tab" onclick="Historico.switchTab('postos', this)"><i class="fa-solid fa-route"></i> Histórico por Posto</button></div>
 <div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="Historico.renderGeral()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="Historico.renderGeralDebounced()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
 <div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostos()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostosDebounced()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostoAtual()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostoAtualDebounced()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
@@ -577,7 +577,7 @@ console.log('Histórico de Postos carregado: '+result.data.length+' registros');
 }catch(error){console.error('Erro ao sincronizar histórico de postos:',error);}
 }
 async function syncDataIncremental(){
-if(syncInProgress)return;
+if(syncInProgress||document.hidden)return;
 syncInProgress=true;
 const indicator=document.getElementById('syncIndicator');
 if(indicator)indicator.style.opacity='0.7';
@@ -633,12 +633,18 @@ console.error('Sync completo failed:',error);
 triggerEvent('sync:error',error);
 }finally{syncInProgress=false;}
 }
+let _pollIncrementalId=null,_pollFullId=null;
 function startPolling(interval){
 syncDataCompleto().then(()=>{
-setInterval(syncDataIncremental,interval||API_CONFIG.POLLING_INTERVAL);
-setInterval(syncDataCompleto,API_CONFIG.FULL_SYNC_INTERVAL);
+if(_pollIncrementalId)clearInterval(_pollIncrementalId);
+if(_pollFullId)clearInterval(_pollFullId);
+_pollIncrementalId=setInterval(syncDataIncremental,interval||API_CONFIG.POLLING_INTERVAL);
+_pollFullId=setInterval(()=>{if(!document.hidden)syncDataCompleto();},API_CONFIG.FULL_SYNC_INTERVAL);
 });
 }
+document.addEventListener('visibilitychange',()=>{
+if(!document.hidden&&typeof State!=='undefined'&&State.apiAvailable){syncDataIncremental();}
+});
 function on(event,callback){if(!eventListeners[event])eventListeners[event]=[];eventListeners[event].push(callback);}
 function off(event,callback){if(eventListeners[event])eventListeners[event]=eventListeners[event].filter(cb=>cb!==callback);}
 function triggerEvent(event,data){
@@ -655,6 +661,7 @@ currentUser:null,currentPosto:null,currentPage:'dashboard',dashboardPostoAtual:'
 };
 const Utils={
 genId(){return 'p_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);},
+debounce(fn,delay){let t=null;return function(...args){clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);};},
 formatarTempo(ms){
 if(!ms||ms<0)return '00:00:00';
 const segundos=Math.floor(ms/1000);
@@ -1420,6 +1427,7 @@ UI.showToast('error','Erro','Não foi possível excluir da nuvem: '+error.messag
 }
 }
 };
+Admin.renderTableDebounced=Utils.debounce(()=>Admin.renderTable(),220);
 const Posto={
 render(){
 if(!State.currentPosto)return;
@@ -1539,6 +1547,7 @@ UI.showToast('info','Processo pausado',p.diagrama+' pausado');
 }catch(error){UI.showToast('error','Erro','Não foi possível pausar: '+error.message);}
 }
 };
+Posto.renderTableDebounced=Utils.debounce(()=>Posto.renderTable(),220);
 const Conclusao={
 solicitar(id){
 const p=State.data.projetos.find(x=>x.id===id);
@@ -1785,6 +1794,9 @@ UI.showToast('success','Excluído','Registro removido da nuvem');
 }catch(error){UI.showToast('error','Erro','Não foi possível excluir da nuvem: '+error.message);}
 }
 };
+Historico.renderGeralDebounced=Utils.debounce(()=>Historico.renderGeral(),220);
+Historico.renderPostosDebounced=Utils.debounce(()=>Historico.renderPostos(),220);
+Historico.renderPostoAtualDebounced=Utils.debounce(()=>Historico.renderPostoAtual(),220);
 const Turno={
 confirmarFimSemana(turno){
 State.data.turnosPorPosto[State.currentPosto]=turno;
@@ -1812,6 +1824,7 @@ toggle(){if(State.vkActive)this.hide();else this.show();}
 };
 const Charts={
 render(){
+if(document.hidden)return;
 const textColor=getComputedStyle(document.body).getPropertyValue('--text').trim()||'#2C3E50';
 const gridColor='rgba(128,128,128,0.15)';
 Object.values(State.charts).forEach(c=>c.destroy());
@@ -1822,7 +1835,7 @@ const counts={'Nanocerâmico':State.data.projetos.filter(p=>p.processo==='Nanoce
 State.charts.processos=new Chart(ctx1,{
 type:'bar',
 data:{labels:Object.keys(counts),datasets:[{label:'Projetos Ativos',data:Object.values(counts),backgroundColor:['#005BAC','#00A651','#FFB000'],borderRadius:8}]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Projetos por Processo',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
+options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},title:{display:true,text:'Projetos por Processo',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
 });
 }
 const ctx2=document.getElementById('chartTurnos');
@@ -1837,7 +1850,7 @@ return d.total>0?Math.round((d.concluidos/(d.total+d.concluidos))*100):0;
 State.charts.turnos=new Chart(ctx2,{
 type:'doughnut',
 data:{labels:Object.keys(turnosData),datasets:[{data:eficiencia,backgroundColor:['#005BAC','#00A651','#FFB000']}]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Eficiência por Turno (%)',color:textColor}}}
+options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Eficiência por Turno (%)',color:textColor}}}
 });
 }
 const ctx3=document.getElementById('chartTempoExecucao');
@@ -1851,7 +1864,7 @@ return t.length>0?Math.round(t.reduce((a,b)=>a+b,0)/t.length):0;
 State.charts.tempo=new Chart(ctx3,{
 type:'line',
 data:{labels:Object.keys(temposPorProcesso),datasets:[{label:'Tempo Médio (min)',data:mediaTempos,borderColor:'#005BAC',backgroundColor:'rgba(0,91,172,0.1)',tension:0.4,fill:true}]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Tempo Médio (min)',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
+options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{display:false},title:{display:true,text:'Tempo Médio (min)',color:textColor}},scales:{y:{beginAtZero:true,grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
 });
 }
 const ctx4=document.getElementById('chartEficiencia');
@@ -1860,7 +1873,7 @@ const prioridades={'Urgente':State.data.projetos.filter(p=>p.prioridade==='Urgen
 State.charts.eficiencia=new Chart(ctx4,{
 type:'pie',
 data:{labels:Object.keys(prioridades),datasets:[{data:Object.values(prioridades),backgroundColor:['#D32F2F','#FFB000','#00A651']}]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Distribuição por Prioridade',color:textColor}}}
+options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},plugins:{legend:{position:'bottom',labels:{color:textColor}},title:{display:true,text:'Distribuição por Prioridade',color:textColor}}}
 });
 }
 }
