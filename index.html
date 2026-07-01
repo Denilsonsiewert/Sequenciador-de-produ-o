@@ -8,9 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
-/* ============================================================ */
-/* ESTILOS GERAIS E VARIÁVEIS (MANTIDOS DO ORIGINAL) */
-/* ============================================================ */
 :root {
 --weg-blue: #005BAC;
 --weg-dark: #003D79;
@@ -96,8 +93,6 @@ background: var(--weg-dark);
 scrollbar-width: thin;
 scrollbar-color: var(--weg-blue) var(--bg);
 }
-
-/* LOGIN SCREEN */
 .login-screen {
 position: fixed;
 inset: 0;
@@ -173,8 +168,6 @@ margin-bottom: 3px;
 color: var(--text-light);
 font-size: 11px;
 }
-
-/* HEADER */
 .header {
 background: linear-gradient(90deg, var(--weg-blue), var(--weg-dark));
 color: white;
@@ -317,8 +310,6 @@ flex-shrink: 0;
 .menu-toggle:hover {
 background: rgba(255,255,255,.25);
 }
-
-/* LAYOUT & SIDEBAR */
 .layout {
 display: flex;
 min-height: calc(100vh - var(--header-height));
@@ -436,8 +427,6 @@ border-radius: 20px;
 font-size: 12px;
 font-weight: 600;
 }
-
-/* KPIS & CARDS */
 .kpi-grid {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -534,8 +523,6 @@ gap: 8px;
 .card h2 i {
 color: var(--weg-blue);
 }
-
-/* BUTTONS & FORMS */
 .btn {
 background: var(--weg-blue);
 color: white;
@@ -652,8 +639,6 @@ justify-content: flex-end;
 margin-top: 10px;
 flex-wrap: wrap;
 }
-
-/* TABLES & SEARCH */
 .table-wrapper {
 overflow-x: auto;
 border-radius: 8px;
@@ -757,8 +742,6 @@ display: inline-block;
 .posto-nano { background: #E3F2FD; color: #1565C0; }
 .posto-pintura { background: #FFF3E0; color: #E65100; }
 .posto-conferencia { background: #E8F5E9; color: #2E7D32; }
-
-/* VOLUMES DISPLAY */
 .volumes-container {
 display: flex;
 flex-direction: column;
@@ -835,8 +818,6 @@ color: var(--text-light);
 font-size: 12px;
 text-align: center;
 }
-
-/* TIMER & ACTIONS */
 .tempo-real {
 background: var(--weg-light);
 color: var(--weg-blue);
@@ -954,8 +935,6 @@ color: var(--danger);
 background: rgba(0,166,81,.1);
 color: var(--success);
 }
-
-/* MODALS & PASSWORD */
 .modal-overlay {
 position: fixed;
 inset: 0;
@@ -1062,8 +1041,6 @@ flex-wrap: wrap;
 min-width: 120px;
 justify-content: center;
 }
-
-/* CAMERA & KEYBOARD */
 .camera-container {
 position: relative;
 width: 100%;
@@ -1250,8 +1227,6 @@ border-color: var(--info);
 background: #1976D2;
 border-color: #1976D2;
 }
-
-/* TOASTS & FILTERS */
 .toast-container {
 position: fixed;
 top: 100px;
@@ -1332,8 +1307,7 @@ font-size: 16px;
 margin-bottom: 6px;
 color: var(--text);
 }
-
-/* PASSWORD WRAPPER CORREÇÃO */
+/* CORREÇÃO CRÍTICA: Centralização do ícone de senha */
 .password-wrapper {
 position: relative;
 width: 100%;
@@ -1405,8 +1379,6 @@ background: rgba(255,176,0,.12);
 color: #a87400;
 border-left: 4px solid var(--warning);
 }
-
-/* CHARTS & DASHBOARD */
 .charts-grid {
 display: grid;
 grid-template-columns: 2fr 1fr;
@@ -1565,8 +1537,9 @@ gap: 12px;
 padding: 12px 24px;
 font-size: 14px;
 }
-
-/* RESPONSIVE BREAKPOINTS (MANTIDOS DO ORIGINAL) */
+/* ============================================================ */
+/* RESPONSIVE BREAKPOINTS */
+/* ============================================================ */
 @media (min-width: 1024px) {
 .sidebar {
 transform: translateX(0) !important;
@@ -1583,6 +1556,7 @@ display: none !important;
 margin-left: var(--sidebar-width);
 }
 }
+/* CORREÇÃO CRÍTICA: Sidebar Mobile Funcional */
 @media (max-width: 1023px) {
 .menu-toggle {
 display: inline-flex !important;
@@ -1594,7 +1568,7 @@ top: var(--header-height) !important;
 height: calc(100vh - var(--header-height)) !important;
 z-index: 99 !important;
 box-shadow: var(--shadow-lg);
-transform: translateX(-100%) !important;
+transform: translateX(-100%) !important; /* Escondido por padrão */
 width: var(--sidebar-width) !important;
 border-right: none;
 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -1603,7 +1577,7 @@ will-change: transform;
 backface-visibility: hidden;
 }
 .sidebar.open {
-transform: translateX(0) !important;
+transform: translateX(0) !important; /* Visível quando aberto */
 box-shadow: 0 8px 32px rgba(0,0,0,.25);
 }
 .sidebar-overlay {
@@ -2029,7 +2003,6 @@ pointer-events: auto;
 </style>
 </head>
 <body>
-<!-- ===== LOGIN SCREEN ===== -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
 <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -2059,8 +2032,6 @@ pointer-events: auto;
 </div>
 </div>
 </div>
-
-<!-- ===== APP ===== -->
 <div id="app" style="display:none;">
 <header class="header">
 <div class="header-left">
@@ -2090,15 +2061,12 @@ pointer-events: auto;
 </button>
 </div>
 </header>
-
 <div class="layout">
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="UI.closeSidebarMobile()"></div>
 <aside class="sidebar" id="sidebar">
 <nav class="menu" id="mainMenu"></nav>
 </aside>
 <main class="content" id="mainContent">
-
-<!-- DASHBOARD -->
 <section class="page" id="page-dashboard">
 <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
 <div class="dashboard-tabs">
@@ -2188,8 +2156,6 @@ pointer-events: auto;
 </div>
 </div>
 </section>
-
-<!-- ADMIN -->
 <section class="page" id="page-admin">
 <h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
 <div class="card">
@@ -2229,7 +2195,7 @@ pointer-events: auto;
 <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
-<!-- CORREÇÃO BUSCA INSTANTÂNEA -->
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Admin.renderTable()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
@@ -2246,8 +2212,6 @@ pointer-events: auto;
 </div>
 </div>
 </section>
-
-<!-- POSTO -->
 <section class="page" id="page-posto">
 <h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto</span> <span class="process-badge" id="postoBadge"></span></h1>
 <div class="kpi-grid">
@@ -2268,7 +2232,7 @@ pointer-events: auto;
 </div>
 </div>
 <div class="table-toolbar">
-<!-- CORREÇÃO BUSCA INSTANTÂNEA -->
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Posto.renderTable()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span>
@@ -2284,8 +2248,6 @@ pointer-events: auto;
 </div>
 </div>
 </section>
-
-<!-- HISTÓRICO -->
 <section class="page" id="page-historico">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs">
@@ -2296,7 +2258,7 @@ pointer-events: auto;
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
-<!-- CORREÇÃO BUSCA INSTANTÂNEA -->
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderGeral()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span>
@@ -2317,7 +2279,7 @@ pointer-events: auto;
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
-<!-- CORREÇÃO BUSCA INSTANTÂNEA -->
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostos()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span>
@@ -2335,14 +2297,12 @@ pointer-events: auto;
 </div>
 </div>
 </section>
-
-<!-- HISTÓRICO DO POSTO -->
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
-<!-- CORREÇÃO BUSCA INSTANTÂNEA -->
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostoAtual()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span>
@@ -2359,8 +2319,6 @@ pointer-events: auto;
 </div>
 </div>
 </section>
-
-<!-- CONFIG -->
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
 <div class="card" id="cardSeguranca" style="display:none;">
@@ -2420,12 +2378,9 @@ pointer-events: auto;
 </div>
 </div>
 </section>
-
 </main>
 </div>
 </div>
-
-<!-- MODALS -->
 <div class="modal-overlay" id="modalLogout">
 <div class="modal modal-logout">
 <div class="modal-body">
@@ -2439,7 +2394,6 @@ pointer-events: auto;
 </div>
 </div>
 </div>
-
 <div class="modal-overlay" id="modalTurnoFimSemana">
 <div class="modal" style="max-width:420px;">
 <div class="modal-head">
@@ -2457,7 +2411,6 @@ pointer-events: auto;
 </div>
 </div>
 </div>
-
 <div class="modal-overlay" id="modalSenhaAdmin">
 <div class="modal" style="max-width:500px;padding:25px;">
 <div class="modal-head">
@@ -2479,7 +2432,6 @@ pointer-events: auto;
 </div>
 </div>
 </div>
-
 <div class="modal-overlay" id="modalConfirmarSenha">
 <div class="modal" style="max-width:500px;padding:25px;">
 <div class="modal-head">
@@ -2501,7 +2453,6 @@ pointer-events: auto;
 </div>
 </div>
 </div>
-
 <div class="modal-overlay" id="modalEditar">
 <div class="modal">
 <div class="modal-head">
@@ -2528,7 +2479,6 @@ pointer-events: auto;
 </form>
 </div>
 </div>
-
 <div class="modal-overlay" id="modalConcluir">
 <div class="modal" style="max-width:500px;">
 <div class="modal-head">
@@ -2553,9 +2503,7 @@ pointer-events: auto;
 </div>
 </div>
 </div>
-
 <div class="toast-container" id="toastContainer"></div>
-
 <div class="virtual-keyboard" id="virtualKeyboard">
 <div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
 <div class="vk-row">
@@ -2582,11 +2530,7 @@ pointer-events: auto;
 <button class="vk-key" data-key="-">-</button>
 </div>
 </div>
-
 <script>
-// ============================================================
-// CONFIGURAÇÕES DA API E ESTADO GLOBAL
-// ============================================================
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
 SECRET: "16101961",
@@ -2638,16 +2582,11 @@ apiAvailable: false,
 cameraStream: null,
 scanInterval: null,
 lastPepFound: null,
-lastDiagramaFound: null,
-searchTimers: {}
+lastDiagramaFound: null
 };
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
-
-// ============================================================
-// API FUNCTIONS
-// ============================================================
 async function apiRequest(action, payload = {}, method = 'POST') {
 try {
 const url = new URL(API_CONFIG.URL);
@@ -2706,10 +2645,6 @@ try { callback(data); } catch (e) { console.error('Error in event listener for '
 }
 }
 window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, on, off };
-
-// ============================================================
-// UTILIDADES
-// ============================================================
 const Utils = {
 genId() {
 return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -2746,7 +2681,7 @@ const diaSemana = new Date().getDay();
 return diaSemana === 0 || diaSemana === 6;
 },
 ordenarPorPrioridade(data) {
-// CORREÇÃO: Retorna cópia para não modificar array original
+// CORREÇÃO: Retorna uma cópia para não modificar o array original
 return [...data].sort((a, b) => {
 const prioA = CONFIG.PRIORIDADE_ORDEM[a.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[a.prioridade] : 9;
 const prioB = CONFIG.PRIORIDADE_ORDEM[b.prioridade] !== undefined ? CONFIG.PRIORIDADE_ORDEM[b.prioridade] : 9;
@@ -2823,10 +2758,6 @@ if (num) { result.diagrama = num[1]; break; }
 return result;
 }
 };
-
-// ============================================================
-// STORAGE
-// ============================================================
 const Storage = {
 async carregar() {
 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -2880,10 +2811,6 @@ throw error;
 }
 }
 };
-
-// ============================================================
-// UI
-// ============================================================
 const UI = {
 aplicarEstadoCursor() {
 if (State.data.config.dispositivo === 'computador') {
@@ -3080,10 +3007,6 @@ UI.scrollParaElemento(State.vkTarget);
 });
 }
 };
-
-// ============================================================
-// NAVIGATION
-// ============================================================
 const Navigation = {
 navigate(page) {
 State.currentPage = page;
@@ -3105,10 +3028,6 @@ if (page === 'config') Config.loadUI();
 UI.closeSidebarMobile();
 }
 };
-
-// ============================================================
-// AUTH
-// ============================================================
 const Auth = {
 login(role) {
 if (role === 'admin') {
@@ -3264,10 +3183,6 @@ Dashboard.render();
 Charts.render();
 }
 };
-
-// ============================================================
-// SYNC
-// ============================================================
 async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -3384,10 +3299,6 @@ Historico.renderGeral();
 Historico.renderPostos();
 Charts.render();
 }
-
-// ============================================================
-// CONFIG
-// ============================================================
 const Config = {
 loadUI() {
 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
@@ -3470,10 +3381,6 @@ el.className = 'password-strength strength-strong';
 }
 }
 };
-
-// ============================================================
-// DASHBOARD
-// ============================================================
 const Dashboard = {
 switchTab(tab, el) {
 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
@@ -3621,10 +3528,6 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 }
 };
-
-// ============================================================
-// ADMIN
-// ============================================================
 const Admin = {
 async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
@@ -3912,10 +3815,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
-// ============================================================
-// POSTO
-// ============================================================
 const Posto = {
 render() {
 if (!State.currentPosto) return;
@@ -3927,7 +3826,7 @@ document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.cu
 this.aplicarTurnoAutomatico();
 this.renderTable();
 if (State.timerInterval) clearInterval(State.timerInterval);
-// CORREÇÃO CRONÔMETRO: Arrow function para preservar contexto
+// CORREÇÃO 2: Arrow function para preservar contexto
 State.timerInterval = setInterval(() => this.atualizarTemposEmTempoReal(), 1000);
 },
 aplicarTurnoAutomatico() {
@@ -4012,7 +3911,7 @@ volumesDisplay = '<div class="volumes-container"><span class="volumes-total-only
 volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>';
 }
 let tempoDisplay = '-';
-// CORREÇÃO CRONÔMETRO: Verifica se dataHoraInicio é número válido
+// CORREÇÃO CRÔNOMETRO: Verifica se é número válido
 if (p.status === 'Em Processo' && p.dataHoraInicio && !isNaN(Number(p.dataHoraInicio))) {
 tempoDisplay = '<span class="tempo-real ativo" id="tempo-' + p.id + '">Calculando...</span>';
 } else if (p.dataHoraInicio && p.dataHoraFim) {
@@ -4027,13 +3926,13 @@ botoesAcao = '<button class="icon-action-lg info" title="Pausar" onclick="Posto.
 const descricaoDisplay = p.descricao ? '<small style="color:var(--text-light);display:block;">' + p.descricao + '</small>' : '';
 return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + descricaoDisplay + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + (p.prioridade || '') + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;">' + tempoDisplay + '</td><td style="text-align:center;"><span class="status ' + statusClass + '">' + (p.status || '') + '</span></td><td style="text-align:center;"><div class="action-main">' + botoesAcao + '</div></td></tr>';
 }).join('');
-// CORREÇÃO CRONÔMETRO: Chama atualização inicial após renderizar
+// CORREÇÃO 2: Arrow function para preservar contexto
 setTimeout(() => this.atualizarTemposEmTempoReal(), 100);
 },
 atualizarTemposEmTempoReal() {
 const agora = Date.now();
 State.data.projetos.forEach(p => {
-// CORREÇÃO CRONÔMETRO: Garante que dataHoraInicio seja tratado como número
+// CORREÇÃO CRÔNOMETRO: Usa Number() para garantir cálculo
 if (p.status === 'Em Processo' && p.dataHoraInicio && !isNaN(Number(p.dataHoraInicio))) {
 const tempoDecorrido = agora - Number(p.dataHoraInicio);
 const el = document.getElementById('tempo-' + p.id);
@@ -4074,10 +3973,6 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 }
 };
-
-// ============================================================
-// CONCLUSAO
-// ============================================================
 const Conclusao = {
 solicitar(id) {
 const p = State.data.projetos.find(x => x.id === id);
@@ -4101,7 +3996,7 @@ document.getElementById('concluirVolumesProcessados').value = '';
 document.getElementById('concluirVolumesProcessados').max = faltam;
 document.getElementById('concluirVolumesRestantes').textContent = faltam;
 document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
-// CORREÇÃO: Arrow function para preservar contexto
+// CORREÇÃO 2: Arrow function para preservar contexto
 document.getElementById('concluirVolumesProcessados').oninput = () => this.atualizarVolumesRestantes();
 } else if (p.processo === 'Pintura') {
 document.getElementById('concluirPinturaSection').style.display = 'block';
@@ -4299,10 +4194,6 @@ if (!p) return;
 await this.moverParaProximoProcesso(p, turno);
 }
 };
-
-// ============================================================
-// HISTORICO
-// ============================================================
 const Historico = {
 switchTab(tab, el) {
 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
@@ -4473,10 +4364,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
-// ============================================================
-// TURNO
-// ============================================================
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
@@ -4497,10 +4384,6 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaPendente = false;
 }
 };
-
-// ============================================================
-// VIRTUAL KEYBOARD
-// ============================================================
 const VirtualKeyboard = {
 show() {
 document.getElementById('virtualKeyboard').classList.add('active');
@@ -4517,10 +4400,6 @@ if (State.vkActive) this.hide();
 else this.show();
 }
 };
-
-// ============================================================
-// CHARTS
-// ============================================================
 const Charts = {
 render() {
 const textColor = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#2C3E50';
@@ -4632,10 +4511,6 @@ title: { display: true, text: 'Distribuição por Prioridade', color: textColor 
 }
 }
 };
-
-// ============================================================
-// EXPORT
-// ============================================================
 const Export = {
 downloadFile(name, content, type) {
 const blob = new Blob([content], { type });
@@ -4685,10 +4560,6 @@ this.downloadFile('backup_local_weg_' + Utils.dateStamp() + '.json', json, 'appl
 UI.showToast('success', 'Backup', 'Arquivo local gerado');
 }
 };
-
-// ============================================================
-// APP INIT
-// ============================================================
 const App = {
 async init() {
 try {
