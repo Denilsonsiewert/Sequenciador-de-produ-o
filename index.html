@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WEG - Câmera OCR</title>
+    <title>WEG - Câmera OCR Otimizada</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Usando versão mais recente e leve do Tesseract se possível, ou mantendo a estável -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -23,22 +24,8 @@
             --transition: all .25s ease;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
 
         .card {
             background: var(--card);
@@ -49,125 +36,64 @@
             max-width: 500px;
         }
 
-        .card-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: 18px;
-            color: var(--weg-blue);
-        }
+        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h2 { font-size: 18px; color: var(--weg-blue); }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-            min-height: 44px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer;
+            font-weight: 600; transition: var(--transition); min-height: 44px;
         }
-
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-secondary { background: var(--border); color: var(--text); }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
         .camera-container {
-            position: relative;
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-            aspect-ratio: 4/3;
-            display: none;
-            margin-bottom: 15px;
+            position: relative; width: 100%; border-radius: 12px; overflow: hidden;
+            background: #000; aspect-ratio: 4/3; display: none; margin-bottom: 15px;
+            border: 2px solid var(--border);
         }
-
         .camera-container.active { display: block; }
-
-        .camera-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
+        .camera-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
         .camera-container canvas { display: none; }
 
+        /* Guia visual para o usuário centralizar a etiqueta */
         .camera-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            border: 3px solid var(--weg-blue);
-            border-radius: 12px;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; display: flex; align-items: center; justify-content: center;
         }
-
+        .scan-region {
+            width: 80%; height: 40%; border: 2px dashed rgba(255,255,255,0.5);
+            border-radius: 8px; position: relative;
+            box-shadow: 0 0 0 1000px rgba(0,0,0,0.3);
+        }
         .scan-line {
-            position: absolute;
-            top: 50%; left: 10%; right: 10%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--success), transparent);
-            animation: scan 2s ease-in-out infinite;
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: var(--success); animation: scan 2s linear infinite;
             box-shadow: 0 0 10px var(--success);
         }
-
-        @keyframes scan {
-            0%, 100% { transform: translateY(-50px); }
-            50% { transform: translateY(50px); }
-        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         .camera-status {
-            text-align: center;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
+            text-align: center; padding: 12px; margin-bottom: 15px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; min-height: 45px;
         }
-
         .camera-status.scanning { background: var(--weg-light); color: var(--weg-blue); }
         .camera-status.success { background: rgba(0,166,81,.1); color: var(--success); }
         .camera-status.error { background: rgba(211,47,47,.1); color: var(--danger); }
 
-        .camera-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text-light); }
         .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 15px;
-            color: var(--text);
+            width: 100%; padding: 12px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 16px; color: var(--text); background: #f9f9f9;
         }
+        .form-group input:focus { border-color: var(--weg-blue); outline: none; background: white; }
 
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast {
-            background: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            margin-bottom: 10px;
-            border-left: 4px solid var(--weg-blue);
+            background: white; padding: 12px 20px; border-radius: 8px;
+            box-shadow: var(--shadow-lg); margin-bottom: 10px; border-left: 4px solid var(--weg-blue);
             animation: slideIn 0.3s ease;
         }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -177,33 +103,31 @@
 
 <div class="card">
     <div class="card-head">
-        <h2><i class="fa-solid fa-camera"></i> Leitor de Etiqueta (OCR)</h2>
-        <button id="btnAbrir" class="btn btn-success" onclick="Admin.abrirCamera()">
-            <i class="fa-solid fa-video"></i> Abrir Câmera
+        <h2><i class="fa-solid fa-bolt"></i> OCR Ultra Rápido</h2>
+        <button id="btnToggle" class="btn btn-success" onclick="Admin.toggleCamera()">
+            <i class="fa-solid fa-video"></i> Iniciar
         </button>
     </div>
 
     <div id="cameraSection" class="camera-container">
         <video id="cameraVideo" autoplay playsinline></video>
         <canvas id="cameraCanvas"></canvas>
-        <div class="camera-overlay"><div class="scan-line"></div></div>
+        <div class="camera-overlay">
+            <div class="scan-region">
+                <div class="scan-line"></div>
+            </div>
+        </div>
     </div>
 
     <div id="cameraStatus" class="camera-status" style="display:none;"></div>
 
-    <div class="camera-controls" id="cameraControls" style="display:none;">
-        <button class="btn btn-danger" onclick="Admin.fecharCamera()">
-            <i class="fa-solid fa-times"></i> Fechar Câmera
-        </button>
-    </div>
-
     <div class="form-group">
-        <label>PEP Detectado</label>
-        <input type="text" id="cad-pep" readonly placeholder="Aguardando leitura...">
+        <label>PEP (Detectado Automaticamente)</label>
+        <input type="text" id="cad-pep" readonly placeholder="Aproxime a etiqueta...">
     </div>
     <div class="form-group">
-        <label>Diagrama / Ordem Detectado</label>
-        <input type="text" id="cad-diagrama" readonly placeholder="Aguardando leitura...">
+        <label>Diagrama / Ordem</label>
+        <input type="text" id="cad-diagrama" readonly placeholder="...">
     </div>
 </div>
 
@@ -212,9 +136,10 @@
 <script>
     const State = {
         cameraStream: null,
-        scanInterval: null,
-        lastPepFound: null,
-        lastDiagramaFound: null
+        worker: null,
+        isScanning: false,
+        lastResult: null,
+        scanTimeout: null
     };
 
     const UI = {
@@ -225,78 +150,86 @@
             toast.style.borderLeftColor = type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--danger)' : 'var(--weg-blue)');
             toast.innerHTML = `<strong>${title}</strong><br>${msg}`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-    };
-
-    const Utils = {
-        extrairDadosEtiqueta(texto) {
-            let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-            const result = { pep: null, diagrama: null };
-            
-            // Regex para PEP
-            const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
-            if (pepLabelMatch) {
-                let pepRaw = pepLabelMatch[1].trim().replace(/\s/g, '').replace(/[–—]/g, '-');
-                if (pepRaw.match(/^\d{3}-\d{7}-\d{3}$/)) { result.pep = pepRaw; }
-            }
-            if (!result.pep) {
-                const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
-                if (generic) { result.pep = generic[1] + '-' + generic[2] + '-' + generic[3]; }
-            }
-
-            // Regex para Diagrama/Ordem
-            const lines = texto.split(/\r?\n/);
-            for (let line of lines) {
-                const upper = line.toUpperCase();
-                if (upper.includes('DIAGR') || upper.includes('ORD')) {
-                    const num = line.match(/\b(\d{9,10})\b/);
-                    if (num) { result.diagrama = num[1]; break; }
-                }
-            }
-            return result;
+            setTimeout(() => toast.remove(), 2500);
         }
     };
 
     const Admin = {
+        async initWorker() {
+            if (!State.worker) {
+                console.log("Inicializando Worker Tesseract...");
+                State.worker = await Tesseract.createWorker('por', 1, {
+                    logger: m => {} // Silenciar logs para performance
+                });
+                // Otimização: Configurar para procurar apenas caracteres relevantes se necessário
+                // await State.worker.setParameters({
+                //     tessedit_char_whitelist: '0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ ',
+                // });
+            }
+        },
+
+        async toggleCamera() {
+            const btn = document.getElementById('btnToggle');
+            if (State.cameraStream) {
+                this.fecharCamera();
+                btn.innerHTML = '<i class="fa-solid fa-video"></i> Iniciar';
+                btn.className = 'btn btn-success';
+            } else {
+                await this.abrirCamera();
+                btn.innerHTML = '<i class="fa-solid fa-stop"></i> Parar';
+                btn.className = 'btn btn-danger';
+            }
+        },
+
         async abrirCamera() {
             const cameraSection = document.getElementById('cameraSection');
             const cameraStatus = document.getElementById('cameraStatus');
-            const cameraControls = document.getElementById('cameraControls');
-            const btnAbrir = document.getElementById('btnAbrir');
-
-            State.lastPepFound = null;
-            State.lastDiagramaFound = null;
             
             cameraSection.classList.add('active');
             cameraStatus.style.display = 'block';
-            cameraControls.style.display = 'flex';
-            btnAbrir.style.display = 'none';
-            
             cameraStatus.className = 'camera-status scanning';
-            cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Iniciando câmera...';
+            cameraStatus.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Preparando motor OCR...';
 
             try {
+                // Inicializa o worker em paralelo
+                const workerPromise = this.initWorker();
+
                 const video = document.getElementById('cameraVideo');
                 State.cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+                    video: { 
+                        facingMode: 'environment', 
+                        width: { ideal: 1280 }, 
+                        height: { ideal: 720 },
+                        focusMode: 'continuous'
+                    }
                 });
                 video.srcObject = State.cameraStream;
                 await video.play();
 
-                cameraStatus.className = 'camera-status scanning';
-                cameraStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <strong>Escaneamento Ativo</strong><br>Buscando PEP e Diagrama...';
+                await workerPromise;
                 
-                // Inicia o loop de OCR
-                await this.performScan();
-                State.scanInterval = setInterval(() => this.performScan(), 2000);
+                cameraStatus.innerHTML = '<strong>SISTEMA PRONTO</strong><br>Posicione o PEP dentro do quadro';
+                State.isScanning = true;
+                this.loop();
 
             } catch (err) {
-                console.error('Erro ao acessar câmera:', err);
+                console.error(err);
                 cameraStatus.className = 'camera-status error';
-                cameraStatus.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Erro ao acessar câmera.';
-                UI.showToast('error', 'Erro', 'Não foi possível acessar a câmera');
+                cameraStatus.innerHTML = 'Erro ao acessar câmera.';
             }
+        },
+
+        async loop() {
+            if (!State.isScanning) return;
+            
+            const startTime = Date.now();
+            await this.performScan();
+            
+            // Ajuste dinâmico do intervalo: se o processamento for rápido, espera menos.
+            const processTime = Date.now() - startTime;
+            const delay = Math.max(100, 500 - processTime); 
+            
+            State.scanTimeout = setTimeout(() => this.loop(), delay);
         },
 
         async performScan() {
@@ -306,59 +239,62 @@
 
             if (!video.videoWidth || !video.videoHeight) return;
 
+            // OTIMIZAÇÃO 1: Crop da área de interesse (ROI)
+            // Pegamos apenas o centro da imagem onde está o guia visual
+            const sw = video.videoWidth * 0.8;
+            const sh = video.videoHeight * 0.4;
+            const sx = (video.videoWidth - sw) / 2;
+            const sy = (video.videoHeight - sh) / 2;
+
+            canvas.width = sw;
+            canvas.height = sh;
+
+            // OTIMIZAÇÃO 2: Pré-processamento de Imagem (Grayscale e Contraste)
+            ctx.filter = 'grayscale(1) contrast(1.2) brightness(1.1)';
+            ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+
             try {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                // OTIMIZAÇÃO 3: Uso de Worker persistente (não recria a cada scan)
+                const { data: { text } } = await State.worker.recognize(canvas);
+                this.processText(text);
+            } catch (err) {
+                console.error("Erro OCR:", err);
+            }
+        },
 
-                // Processamento com Tesseract
-                const result = await Tesseract.recognize(canvas, 'por', { 
-                    logger: m => console.log(m.status + ': ' + Math.round(m.progress * 100) + '%') 
-                });
-                
-                const texto = result.data.text;
-                console.log('Texto detectado:', texto);
-
-                if (texto && texto.trim().length > 5) {
-                    const { pep, diagrama } = Utils.extrairDadosEtiqueta(texto);
-                    let atualizouAlgo = false;
-
-                    if (pep && pep !== State.lastPepFound) {
-                        document.getElementById('cad-pep').value = pep;
-                        State.lastPepFound = pep;
-                        atualizouAlgo = true;
-                    }
-                    if (diagrama && diagrama !== State.lastDiagramaFound) {
-                        document.getElementById('cad-diagrama').value = diagrama;
-                        State.lastDiagramaFound = diagrama;
-                        atualizouAlgo = true;
-                    }
-
-                    if (atualizouAlgo) {
-                        UI.showToast('success', 'Dados Capturados', `PEP: ${State.lastPepFound || '-'} | Diag: ${State.lastDiagramaFound || '-'}`);
+        processText(texto) {
+            if (!texto) return;
+            
+            // OTIMIZAÇÃO 4: Regex mais agressiva e limpeza de ruído
+            let clean = texto.replace(/[^a-zA-Z0-9\-\s]/g, ' ').replace(/\s+/g, ' ');
+            
+            // Busca PEP: Padrão 000-0000000-000
+            const pepMatch = clean.match(/\b(\d{3})\s*[-]?\s*(\d{7})\s*[-]?\s*(\d{3})\b/);
+            if (pepMatch) {
+                const pep = `${pepMatch[1]}-${pepMatch[2]}-${pepMatch[3]}`;
+                if (pep !== State.lastResult) {
+                    document.getElementById('cad-pep').value = pep;
+                    State.lastResult = pep;
+                    UI.showToast('success', 'PEP Detectado!', pep);
+                    
+                    // Tenta achar o diagrama próximo
+                    const diagMatch = clean.match(/\b(\d{8,10})\b/);
+                    if (diagMatch && diagMatch[0] !== pepMatch[1] && diagMatch[0] !== pepMatch[2]) {
+                        document.getElementById('cad-diagrama').value = diagMatch[0];
                     }
                 }
-            } catch (err) {
-                console.error('Erro no OCR:', err);
             }
         },
 
         fecharCamera() {
+            State.isScanning = false;
+            if (State.scanTimeout) clearTimeout(State.scanTimeout);
             if (State.cameraStream) {
                 State.cameraStream.getTracks().forEach(track => track.stop());
                 State.cameraStream = null;
             }
-            if (State.scanInterval) {
-                clearInterval(State.scanInterval);
-                State.scanInterval = null;
-            }
-
             document.getElementById('cameraSection').classList.remove('active');
             document.getElementById('cameraStatus').style.display = 'none';
-            document.getElementById('cameraControls').style.display = 'none';
-            document.getElementById('btnAbrir').style.display = 'inline-flex';
-            
-            UI.showToast('info', 'Câmera encerrada', 'Leitura finalizada');
         }
     };
 </script>
