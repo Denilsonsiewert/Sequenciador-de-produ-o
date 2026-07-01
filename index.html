@@ -1307,19 +1307,20 @@ font-size: 16px;
 margin-bottom: 6px;
 color: var(--text);
 }
+/* CORREÇÃO 2: Password wrapper com display flex para centralizar ícone */
 .password-wrapper {
 position: relative;
 width: 100%;
 display: flex;
-align-items: center;
+align-items: stretch;
 }
 .password-wrapper input {
 width: 100%;
-padding-right: 44px !important;
+padding-right: 48px !important;
 }
 .password-toggle {
 position: absolute;
-right: 4px;
+right: 6px;
 top: 50%;
 transform: translateY(-50%);
 background: transparent;
@@ -1337,6 +1338,7 @@ border-radius: 6px;
 transition: var(--transition);
 touch-action: manipulation;
 z-index: 20;
+flex-shrink: 0;
 }
 .password-toggle:hover {
 background: var(--bg);
@@ -1535,6 +1537,9 @@ gap: 12px;
 padding: 12px 24px;
 font-size: 14px;
 }
+/* ============================================================ */
+/* RESPONSIVE BREAKPOINTS */
+/* ============================================================ */
 @media (min-width: 1024px) {
 .sidebar {
 transform: translateX(0) !important;
@@ -1551,24 +1556,28 @@ display: none !important;
 margin-left: var(--sidebar-width);
 }
 }
+/* CORREÇÃO 3: Sidebar mobile com transform fixo e overlay funcional */
 @media (max-width: 1023px) {
 .menu-toggle {
 display: inline-flex !important;
 }
 .sidebar {
-position: fixed;
-left: 0;
-top: var(--header-height);
-height: calc(100vh - var(--header-height));
-z-index: 99;
+position: fixed !important;
+left: 0 !important;
+top: var(--header-height) !important;
+height: calc(100vh - var(--header-height)) !important;
+z-index: 99 !important;
 box-shadow: var(--shadow-lg);
-transform: translateX(-100%);
-width: var(--sidebar-width);
+transform: translateX(-100%) !important;
+width: var(--sidebar-width) !important;
 border-right: none;
-transition: transform .3s cubic-bezier(.4, 0, .2, 1), box-shadow .3s cubic-bezier(.4, 0, .2, 1);
+transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+will-change: transform;
+-webkit-backface-visibility: hidden;
+backface-visibility: hidden;
 }
 .sidebar.open {
-transform: translateX(0);
+transform: translateX(0) !important;
 box-shadow: 0 8px 32px rgba(0,0,0,.25);
 }
 .sidebar-overlay {
@@ -1579,10 +1588,12 @@ background: rgba(0,0,0,.4);
 z-index: 48;
 opacity: 0;
 transition: opacity .3s ease;
+pointer-events: none;
 }
 .sidebar-overlay.active {
 display: block;
 opacity: 1;
+pointer-events: auto;
 }
 .content {
 margin-left: 0;
@@ -2184,6 +2195,7 @@ pointer-events: auto;
 <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Admin.renderTable()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
@@ -2220,6 +2232,7 @@ pointer-events: auto;
 </div>
 </div>
 <div class="table-toolbar">
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Posto.renderTable()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span>
@@ -2245,6 +2258,7 @@ pointer-events: auto;
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderGeral()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span>
@@ -2265,6 +2279,7 @@ pointer-events: auto;
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostos()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span>
@@ -2287,6 +2302,7 @@ pointer-events: auto;
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
+<!-- CORREÇÃO 1: Busca direta sem setTimeout -->
 <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostoAtual()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span>
@@ -2566,8 +2582,7 @@ apiAvailable: false,
 cameraStream: null,
 scanInterval: null,
 lastPepFound: null,
-lastDiagramaFound: null,
-searchTimers: {}
+lastDiagramaFound: null
 };
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
@@ -2827,14 +2842,21 @@ if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
 toggleSidebarMobile() {
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
-const isOpen = sidebar.classList.toggle('open');
-overlay.classList.toggle('active');
-document.body.style.overflow = isOpen ? 'hidden' : '';
+const isOpen = sidebar.classList.contains('open');
+if (isOpen) {
+sidebar.classList.remove('open');
+overlay.classList.remove('active');
+document.body.style.overflow = '';
+} else {
+sidebar.classList.add('open');
+overlay.classList.add('active');
+document.body.style.overflow = 'hidden';
+}
 },
 closeSidebarMobile() {
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
-if (window.innerWidth <= 1023 && sidebar.classList.contains('open')) {
+if (sidebar.classList.contains('open')) {
 sidebar.classList.remove('open');
 overlay.classList.remove('active');
 document.body.style.overflow = '';
@@ -3453,8 +3475,6 @@ document.getElementById('ultimoProjetoData').textContent = '-';
 },
 renderPosto() {
 const posto = State.dashboardPostoAtual;
-const hoje = new Date();
-hoje.setHours(0, 0, 0, 0);
 const projetosNoPosto = State.data.projetos.filter(p => p.processo === posto);
 const concluidosNoPosto = [...State.data.historicoPostos].filter(p => p.processo === posto);
 const concluidosHoje = concluidosNoPosto.filter(p => Utils.isHoje(p.dataHoraConclusao));
@@ -3551,7 +3571,6 @@ async performScan() {
 const video = document.getElementById('cameraVideo');
 const canvas = document.getElementById('cameraCanvas');
 const ctx = canvas.getContext('2d');
-const cameraStatus = document.getElementById('cameraStatus');
 if (!video.videoWidth || !video.videoHeight) return;
 try {
 canvas.width = video.videoWidth;
