@@ -265,6 +265,7 @@ input,select,textarea{position:relative;z-index:5}
 </style>
 </head>
 <body>
+
 <!-- TELA DE LOGIN -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
@@ -303,6 +304,7 @@ input,select,textarea{position:relative;z-index:5}
 <div class="layout">
 <aside class="sidebar closed" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
 <main class="content" id="mainContent">
+
 <!-- DASHBOARD -->
 <section class="page" id="page-dashboard">
 <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
@@ -531,7 +533,7 @@ input,select,textarea{position:relative;z-index:5}
 
 <script>
 // ==========================================
-// CONFIGURAÇÕES E VARIÁVEIS GLOBAIS
+// CONFIGURAÇÕES
 // ==========================================
 const API_CONFIG = {
     URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
@@ -591,16 +593,13 @@ async function updateConfig(key, value) { return await apiRequest('updateConfig'
 async function getConfig(key) { const result = await apiRequest('getConfig', { key: key }, 'GET'); return result.value; }
 async function clearAllData() { return await apiRequest('clearAll', {}); }
 
-// ==========================================
-// SISTEMA DE EVENTOS
-// ==========================================
 function on(event, callback) { if (!eventListeners[event]) eventListeners[event] = []; eventListeners[event].push(callback); }
 function off(event, callback) { if (eventListeners[event]) eventListeners[event] = eventListeners[event].filter(cb => cb !== callback); }
 function triggerEvent(event, data) {
     if (eventListeners[event]) eventListeners[event].forEach(callback => { try { callback(data); } catch (e) { console.error('Error in event listener for ' + event + ':', e); } });
 }
 
-window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, startPolling, on, off };
+window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, on, off };
 
 // ==========================================
 // ESTADO E UTILITÁRIOS
@@ -910,10 +909,11 @@ const Navigation = {
 };
 
 // ==========================================
-// AUTH
+// AUTH - CORRIGIDO
 // ==========================================
 const Auth = {
     login(role) {
+        console.log('Login chamado para:', role);
         if (role === 'admin') {
             State.pendingAdminLogin = true;
             document.getElementById('inputSenhaAdmin').value = '';
@@ -946,6 +946,7 @@ const Auth = {
     },
     cancelarLoginAdmin() { State.pendingAdminLogin = false; UI.closeModal('modalSenhaAdmin'); },
     efetivarLogin(role) {
+        console.log('Efetivando login para:', role);
         State.currentUser = role;
         localStorage.setItem('weg_logged_in_role', role);
         document.getElementById('loginScreen').style.display = 'none';
@@ -963,13 +964,12 @@ const Auth = {
         if (role === 'admin') { document.getElementById('cardSeguranca').style.display = 'block'; }
         else { document.getElementById('cardSeguranca').style.display = 'none'; }
         UI.showToast('success', 'Bem-vindo', 'Login efetuado como ' + labels[role]);
-        if (State.apiAvailable && State.isOnline) {
-            // Inicia polling
-            syncDataCompleto().then(() => {
-                setInterval(syncDataIncremental, API_CONFIG.POLLING_INTERVAL);
-                setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
-            });
-        }
+        State.apiAvailable = true;
+        // Inicia sincronização
+        syncDataCompleto().then(() => {
+            setInterval(syncDataIncremental, API_CONFIG.POLLING_INTERVAL);
+            setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
+        });
     },
     confirmarLogout() { UI.openModal('modalLogout'); },
     efetivarLogout() {
@@ -1035,7 +1035,7 @@ const Auth = {
 };
 
 // ==========================================
-// FUNÇÕES DE SINCRONIZAÇÃO
+// SINCRONIZAÇÃO
 // ==========================================
 async function syncDataIncremental() {
     if (syncInProgress) return;
@@ -1714,7 +1714,7 @@ const Conclusao = {
         const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
         if (!p) return;
         
-        // Fecha o modal IMEDIATAMENTE para feedback visual
+        // Fecha o modal IMEDIATAMENTE
         UI.closeModal('modalConcluir');
         
         try {
@@ -1734,7 +1734,6 @@ const Conclusao = {
                 }
                 p.volumesProcessados += volumesProcessados;
                 if (p.volumesProcessados >= p.volumesTotal) {
-                    // Concluiu todos os volumes, move para o próximo processo
                     await this.moverParaProximoProcesso(p, turno);
                 } else {
                     p.status = 'Parcial';
@@ -1751,7 +1750,6 @@ const Conclusao = {
                 p.observacaoPintura = observacao || null;
                 await this.moverParaProximoProcesso(p, turno);
             } else {
-                // Conferência - finaliza o projeto
                 const turno = document.getElementById('concluirTurno').value;
                 await this.finalizarProjeto(p, turno);
             }
@@ -1764,16 +1762,13 @@ const Conclusao = {
         State.projetoParaConcluir = null;
     },
     
-    // MOVE O PROJETO PARA O PRÓXIMO PROCESSO
     async moverParaProximoProcesso(p, turno) {
         const proximoProcesso = FLUXO_PROCESSOS[p.processo];
         
-        // Registra a passagem pelo posto atual
         const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
         await this.registrarHistoricoPosto(p, turno, tempoReal);
         
         if (proximoProcesso) {
-            // Move para o próximo posto
             p.processo = proximoProcesso;
             p.status = 'Aguardando';
             p.turno = State.data.turnosPorPosto[proximoProcesso] || turno;
@@ -1792,12 +1787,10 @@ const Conclusao = {
                                      proximoProcesso === 'Conferência' ? 'Conferência' : 'Finalizado';
             UI.showToast('success', 'Fluxo atualizado', p.diagrama + ' processado no ' + turno + ' e movido para ' + nomeProximoPosto);
         } else {
-            // Não tem próximo processo, finaliza
             await this.finalizarProjeto(p, turno);
         }
     },
     
-    // FINALIZA O PROJETO (Conferência)
     async finalizarProjeto(p, turno) {
         const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
         await this.registrarHistoricoPosto(p, turno, tempoReal);
@@ -1850,7 +1843,6 @@ const Conclusao = {
             concluidoEm: concluido.ConcluidoEm
         });
         
-        // Remove o projeto da lista ativa
         State.data.projetos = State.data.projetos.filter(x => x.id !== p.id);
         await Storage.salvarApi('delete', { id: p.id });
         
@@ -1891,7 +1883,6 @@ const Conclusao = {
         });
     },
     
-    // Mantido para compatibilidade com edição
     async concluirDireto(id, turno) {
         const p = State.data.projetos.find(x => x.id === id);
         if (!p) return;
@@ -2201,7 +2192,7 @@ const App = {
                         const localAtualizado = State.data.projetos[index].atualizadoEm || 0;
                         const remoteAtualizado = projLocal.atualizadoEm || 0;
                         if (remoteAtualizado > localAtualizado) {
-                            State.data.projetos[index] = { ...State.data.projetos[index], ...projLocal, dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio, dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim };
+                            State.data.projetos[index] = { ...State.data.projetos[index], ...projLocal };
                         }
                     }
                     if (State.currentUser === 'admin') Admin.renderTable();
@@ -2236,7 +2227,7 @@ const App = {
                     const projLocal = Utils.fromApiFormat(proj);
                     const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
                     if (index !== -1) {
-                        State.data.projetos[index] = { ...State.data.projetos[index], ...projLocal, dataHoraInicio: State.data.projetos[index].dataHoraInicio || projLocal.dataHoraInicio, dataHoraFim: State.data.projetos[index].dataHoraFim || projLocal.dataHoraFim, tempoReal: State.data.projetos[index].tempoReal || projLocal.tempoReal, concluidoEm: State.data.projetos[index].concluidoEm || projLocal.concluidoEm, observacaoPintura: State.data.projetos[index].observacaoPintura || projLocal.observacaoPintura };
+                        State.data.projetos[index] = { ...State.data.projetos[index], ...projLocal };
                         Storage.salvarLocal();
                         if (State.currentUser === 'admin') Admin.renderTable();
                         if (State.currentPosto) Posto.render();
