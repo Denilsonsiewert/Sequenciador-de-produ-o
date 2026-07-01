@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
-/* --- CSS COMPLETO ORIGINAL --- */
+/* --- CSS COMPLETO --- */
 :root{--weg-blue:#005BAC;--weg-dark:#003D79;--weg-light:#E8F1FB;--bg:#F4F6F9;--card:#FFFFFF;--border:#D9E2EC;--success:#00A651;--warning:#FFB000;--danger:#D32F2F;--info:#2196F3;--text:#2C3E50;--text-light:#7B8A9A;--shadow:0 2px 8px rgba(0,0,0,.08);--shadow-lg:0 8px 24px rgba(0,0,0,.12);--radius:12px;--sidebar-width:72px;--header-height:90px;--transition:all .25s ease}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation}
@@ -150,11 +150,11 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .icon-action.success:hover{background:rgba(0,166,81,.1);color:var(--success)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:6000;backdrop-filter:blur(4px);padding:20px}
 .modal-overlay.active{display:flex;animation:fadeIn .3s ease}
-.modal{background:var(--card);border-radius:var(--radius);padding:25px;max-width:600px;width:100%;max-height:calc(100vh - 200px);overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .3s ease}
+.modal{background:var(--card);border-radius:var(--radius);padding:30px;max-width:650px;width:100%;max-height:calc(100vh - 200px);overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .3s ease}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--border)}
-.modal-head h3{color:var(--text);display:flex;align-items:center;gap:10px}
-.modal-close{background:none;border:none;font-size:24px;cursor:pointer !important;color:var(--text-light);transition:var(--transition);width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0;touch-action:manipulation}
+.modal-head h3{color:var(--text);font-size:20px;display:flex;align-items:center;gap:10px}
+.modal-close{background:none;border:none;font-size:28px;cursor:pointer !important;color:var(--text-light);transition:var(--transition);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0;touch-action:manipulation}
 .modal-close:hover{background:var(--bg);color:var(--danger)}
 .modal-logout{max-width:450px;text-align:center}
 .modal-logout .modal-body{padding:20px 0}
@@ -213,9 +213,9 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .empty-state{text-align:center;padding:50px 20px;color:var(--text-light)}
 .empty-state i{font-size:60px;color:var(--border);margin-bottom:15px}
 .empty-state h3{font-size:18px;margin-bottom:8px;color:var(--text)}
-.password-wrapper{position:relative}
-.password-wrapper input{width:100%;padding-right:45px}
-.password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-light);cursor:pointer !important;font-size:18px;padding:8px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;transition:var(--transition);touch-action:manipulation;z-index:10}
+.password-wrapper{position:relative;width:100%}
+.password-wrapper input{width:100%;padding-right:45px !important}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-light);cursor:pointer !important;font-size:18px;padding:8px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;transition:var(--transition);touch-action:manipulation;z-index:20}
 .password-toggle:hover{background:var(--bg);color:var(--weg-blue)}
 .password-toggle:active{background:var(--weg-light)}
 .password-strength{margin-top:6px;font-size:11px;font-weight:600}
@@ -265,6 +265,7 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
   .vk-key{min-width:60px;height:52px;font-size:18px}
   .modal-overlay{padding:15px}
   .comparison-grid{grid-template-columns:1fr}
+  .modal{max-width:95%;padding:20px}
 }
 @media(max-width:768px){
   .volumes-container{min-width:120px}
@@ -290,6 +291,7 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
   .icon-action{width:44px;height:44px;min-width:44px;padding:10px 12px;font-size:18px}
   .modal-logout .btn{min-width:100%}
   .modal-logout .modal-actions{flex-direction:column}
+  .modal{max-width:100%;padding:15px;margin:10px}
 }
 @media(hover:none) and (pointer:coarse){*{transform:none !important}button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.password-toggle,.modal-close,.vk-key,.dashboard-tab,.historico-tab{min-height:44px;min-width:44px}button:hover,.btn:hover,.role-btn:hover,.menu a:hover,.vk-key:hover,.filter-chip:hover,.icon-action:hover,.icon-action-lg:hover{opacity:0.85}button:active,.btn:active,.role-btn:active,.menu a:active,.vk-key:active,.filter-chip:active,.icon-action:active,.icon-action-lg:active{opacity:0.7}}
 button,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.vk-key,.password-toggle,.modal-close,.dashboard-tab,.historico-tab{position:relative;z-index:10;pointer-events:auto}
@@ -538,8 +540,8 @@ input,select,textarea{position:relative;z-index:5}
 <!-- MODAIS -->
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você voltará para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
 <div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Pergunta a cada 2h.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
-<div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
-<div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+<div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
+<div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger" style="margin-bottom:15px;"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid">
 <div class="form-group"><label>PEP</label><input type="text" id="edit-pep" data-vk></div>
 <div class="form-group"><label>Diagrama</label><input type="text" id="edit-diagrama" data-vk></div>
@@ -808,7 +810,6 @@ const UI = {
     closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false; },
     toggleSidebarMobile() {
         const sidebar = document.getElementById('sidebar');
-        // Em mobile, alterna entre abrir e fechar
         if (window.innerWidth <= 1000) {
             sidebar.classList.toggle('open');
         }
@@ -924,7 +925,7 @@ const UI = {
             UI.scrollParaElemento(State.vkTarget);
         });
     },
-    // CORREÇÃO DA BUSCA - função com debounce
+    // CORREÇÃO DA BUSCA - AGORA FUNCIONA
     handleSearch(context) {
         if (State.searchTimers[context]) clearTimeout(State.searchTimers[context]);
         State.searchTimers[context] = setTimeout(() => {
