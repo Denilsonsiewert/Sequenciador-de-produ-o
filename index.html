@@ -13,21 +13,21 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation}
 body.hide-cursor,body.hide-cursor *,body.hide-cursor button,body.hide-cursor a,body.hide-cursor input,body.hide-cursor select,body.hide-cursor textarea{cursor:none !important}
-button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:1;touch-action:manipulation}
-button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:2}
+button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:10;touch-action:manipulation}
+button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:11}
 ::-webkit-scrollbar{width:30px;height:30px}
 ::-webkit-scrollbar-track{background:var(--bg);border-radius:15px;border:3px solid var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--weg-blue);border-radius:15px;border:5px solid var(--bg);min-height:80px}
 ::-webkit-scrollbar-thumb:hover{background:var(--weg-dark)}
 *{scrollbar-width:thin;scrollbar-color:var(--weg-blue) var(--bg)}
-.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--weg-blue),var(--weg-dark));display:flex;align-items:center;justify-content:center;z-index:5000;padding:20px}
-.login-box{background:var(--card);border-radius:var(--radius);padding:40px 30px;max-width:500px;width:100%;box-shadow:var(--shadow-lg);text-align:center}
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--weg-blue),var(--weg-dark));display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.login-box{background:var(--card);border-radius:var(--radius);padding:40px 30px;max-width:500px;width:100%;box-shadow:var(--shadow-lg);text-align:center;position:relative;z-index:10000}
 .login-box h1{color:var(--weg-blue);font-size:28px;margin-bottom:5px}
 .login-box p{color:var(--text-light);margin-bottom:25px;font-size:14px}
 .login-box .logo-big{font-size:48px;color:var(--weg-blue);margin-bottom:15px}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
 .role-btn{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:20px 12px;cursor:pointer !important;transition:var(--transition);color:var(--text);text-align:center;width:100%;flex-direction:column;gap:8px}
-.role-btn:hover{border-color:var(--weg-blue);background:var(--weg-light)}
+.role-btn:hover{border-color:var(--weg-blue);background:var(--weg-light);transform:translateY(-2px)}
 .role-btn i{font-size:32px;color:var(--weg-blue);margin-bottom:0;display:block}
 .role-btn strong{display:block;font-size:14px;margin-bottom:3px}
 .role-btn small{color:var(--text-light);font-size:11px}
@@ -48,14 +48,16 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .btn-logout{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);color:white;width:52px;height:52px;border-radius:50%;cursor:pointer !important;display:inline-flex;align-items:center;justify-content:center;transition:var(--transition);font-size:22px;padding:0}
 .btn-logout:hover{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.5)}
 .layout{display:flex;min-height:calc(100vh - var(--header-height))}
-.sidebar{width:var(--sidebar-width);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding-top:20px;flex-shrink:0;position:relative;z-index:50}
+.sidebar{width:var(--sidebar-width);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding-top:20px;flex-shrink:0;position:fixed;left:0;top:var(--header-height);height:calc(100vh - var(--header-height));z-index:99;transition:transform .3s ease;overflow-y:auto}
+.sidebar.closed{transform:translateX(-100%)}
+.sidebar.open{transform:translateX(0)}
 .menu{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 8px}
 .menu a{width:52px;height:52px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-light);border-radius:12px;transition:var(--transition);font-size:20px;cursor:pointer !important;position:relative;border:2px solid transparent;padding:0}
 .menu a:hover{background:var(--weg-light);color:var(--weg-blue);border-color:var(--weg-blue)}
 .menu a.active{background:var(--weg-blue);color:white;border-color:var(--weg-blue);box-shadow:0 4px 12px rgba(0,91,172,.35)}
 .menu a::after{content:attr(data-tooltip);position:absolute;left:calc(100% + 15px);top:50%;background:var(--weg-dark);color:white;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .menu a:hover::after{opacity:1}
-.content{flex:1;padding:25px;overflow-x:hidden;transition:var(--transition)}
+.content{flex:1;padding:25px;margin-left:var(--sidebar-width);overflow-x:hidden;transition:margin-left .3s ease}
 .page{display:none;animation:fadeIn .4s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -97,9 +99,9 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .form-actions{grid-column:span 2;display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
 .table-wrapper{overflow-x:auto;border-radius:8px;margin-top:15px}
 .table-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:15px;flex-wrap:wrap}
-.search-box{position:relative;flex:1;max-width:300px}
+.search-box{position:relative;flex:1;max-width:300px;min-width:140px}
 .search-box input{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:text !important;touch-action:manipulation}
-.search-box i{position:absolute;left:12px;top:50%;color:var(--text-light);pointer-events:none}
+.search-box i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-light);pointer-events:none}
 .table{width:100%;border-collapse:collapse}
 .table thead th{background:var(--weg-blue);color:white;padding:12px;text-align:center;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .table tbody tr{transition:var(--transition)}
@@ -175,10 +177,6 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .camera-status.scanning{background:var(--weg-light);color:var(--weg-blue)}
 .camera-status.success{background:rgba(0,166,81,.1);color:var(--success)}
 .camera-status.error{background:rgba(211,47,47,.1);color:var(--danger)}
-.camera-found-items{margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;text-align:left}
-.camera-found-items .found-item{display:flex;align-items:center;gap:8px;padding:4px 0}
-.camera-found-items .found-item i{color:var(--success)}
-.camera-found-items .found-item.missing i{color:var(--text-light)}
 .virtual-keyboard{position:fixed;bottom:20px;left:50%;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:7000;display:none;max-width:380px;width:95%;touch-action:manipulation}
 .virtual-keyboard.active{display:block;animation:slideUp .3s ease}
 .vk-header{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
@@ -218,9 +216,10 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .empty-state i{font-size:60px;color:var(--border);margin-bottom:15px}
 .empty-state h3{font-size:18px;margin-bottom:8px;color:var(--text)}
 .password-wrapper{position:relative}
-.password-wrapper input{width:100%;padding-right:40px}
-.password-toggle{position:absolute;right:10px;top:50%;background:none;border:none;color:var(--text-light);cursor:pointer !important;font-size:16px;padding:4px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;transition:var(--transition);touch-action:manipulation;z-index:10}
+.password-wrapper input{width:100%;padding-right:45px}
+.password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-light);cursor:pointer !important;font-size:18px;padding:8px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;transition:var(--transition);touch-action:manipulation;z-index:10}
 .password-toggle:hover{background:var(--bg);color:var(--weg-blue)}
+.password-toggle:active{background:var(--weg-light)}
 .password-strength{margin-top:6px;font-size:11px;font-weight:600}
 .strength-weak{color:var(--danger)}
 .strength-medium{color:var(--warning)}
@@ -249,9 +248,9 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .dashboard-tab,.historico-tab{padding:12px 20px;background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer !important;font-size:14px;font-weight:600;color:var(--text-light);transition:var(--transition);display:inline-flex;align-items:center;gap:8px;margin-bottom:-2px;touch-action:manipulation}
 .dashboard-tab:hover,.historico-tab:hover{color:var(--weg-blue)}
 .dashboard-tab.active,.historico-tab.active{color:var(--weg-blue);border-bottom-color:var(--weg-blue)}
-@media(max-width:1000px){.charts-grid{grid-template-columns:1fr}.sidebar{position:fixed;left:0;top:var(--header-height);height:calc(100vh - var(--header-height));z-index:99;box-shadow:var(--shadow-lg);transition:transform .3s ease;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.form-grid{grid-template-columns:1fr}.full,.form-actions{grid-column:span 1}.header-title{font-size:18px}.header-subtitle{display:none}.user-info{display:none}.role-grid{grid-template-columns:1fr}.virtual-keyboard{max-width:340px;bottom:10px;padding:15px}.vk-key{min-width:60px;height:52px;font-size:18px}.modal-overlay{padding:15px}.comparison-grid{grid-template-columns:1fr}}
-.menu-toggle{display:none;background:rgba(255,255,255,.15);border:none;color:white;width:40px;height:40px;border-radius:50%;cursor:pointer !important;align-items:center;justify-content:center;font-size:16px;touch-action:manipulation}
-@media(max-width:1000px){.menu-toggle{display:inline-flex}}
+.menu-toggle{display:none;background:rgba(255,255,255,.15);border:none;color:white;width:44px;height:44px;border-radius:50%;cursor:pointer !important;align-items:center;justify-content:center;font-size:18px;touch-action:manipulation}
+.menu-toggle:hover{background:rgba(255,255,255,.25)}
+@media(max-width:1000px){.menu-toggle{display:inline-flex}.sidebar{transform:translateX(-100%);width:72px}.sidebar.open{transform:translateX(0)}.content{margin-left:0}.charts-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full,.form-actions{grid-column:span 1}.header-title{font-size:18px}.header-subtitle{display:none}.user-info{display:none}.role-grid{grid-template-columns:1fr}.virtual-keyboard{max-width:340px;bottom:10px;padding:15px}.vk-key{min-width:60px;height:52px;font-size:18px}.modal-overlay{padding:15px}.comparison-grid{grid-template-columns:1fr}}
 @media(max-width:768px){.volumes-container{min-width:120px}.volumes-main{font-size:12px}.volumes-processed{font-size:14px}.volumes-remaining{font-size:10px}.modal-logout .btn{min-width:120px;padding:12px 20px;font-size:14px}.turno-comparison{flex-direction:column}.turno-stat{margin:5px 0}}
 @media(max-width:600px){.content{padding:15px}.kpi-grid{grid-template-columns:1fr 1fr}.header{padding:0 15px}.header-title{font-size:16px}.header-logo{font-size:22px}.vk-key{min-width:50px;height:48px;font-size:16px}.vk-key.wide{min-width:70px;font-size:14px}.icon-action-lg{min-width:50px;min-height:46px;padding:10px 12px;font-size:18px}.action-main{min-width:140px;gap:6px}.virtual-keyboard{max-width:300px;padding:12px}.vk-row{gap:8px;margin-bottom:8px}.icon-action{width:44px;height:44px;min-width:44px;padding:10px 12px;font-size:18px}.modal-logout .btn{min-width:100%}.modal-logout .modal-actions{flex-direction:column}}
 @media(hover:none) and (pointer:coarse){*{transform:none !important}button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.password-toggle,.modal-close,.vk-key,.dashboard-tab,.historico-tab{min-height:44px;min-width:44px}button:hover,.btn:hover,.role-btn:hover,.menu a:hover,.vk-key:hover,.filter-chip:hover,.icon-action:hover,.icon-action-lg:hover{opacity:0.85}button:active,.btn:active,.role-btn:active,.menu a:active,.vk-key:active,.filter-chip:active,.icon-action:active,.icon-action-lg:active{opacity:0.7}}
@@ -268,6 +267,7 @@ input,select,textarea{position:relative;z-index:5}
 </style>
 </head>
 <body>
+<!-- TELA DE LOGIN -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
 <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -281,10 +281,12 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </div>
 </div>
+
+<!-- APP PRINCIPAL -->
 <div id="app" style="display:none;">
 <header class="header">
 <div class="header-left">
-<button class="menu-toggle" onclick="UI.toggleSidebarMobile()"><i class="fa-solid fa-bars"></i></button>
+<button class="menu-toggle" id="menuToggle" onclick="UI.toggleSidebarMobile()"><i class="fa-solid fa-bars"></i></button>
 <div><div class="header-logo">WEG</div><div class="header-subtitle">Centro de Fluxo Produtivo</div></div>
 </div>
 <div class="header-center">
@@ -301,8 +303,10 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </header>
 <div class="layout">
-<aside class="sidebar" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
-<main class="content">
+<aside class="sidebar closed" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
+<main class="content" id="mainContent">
+
+<!-- DASHBOARD -->
 <section class="page" id="page-dashboard">
 <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
 <div class="dashboard-tabs">
@@ -375,6 +379,8 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </div>
 </section>
+
+<!-- ADMIN -->
 <section class="page" id="page-admin">
 <h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
 <div class="card">
@@ -414,7 +420,7 @@ input,select,textarea{position:relative;z-index:5}
 <div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="Admin.renderTable()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="UI.handleSearch('adm')" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
@@ -430,6 +436,8 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </div>
 </section>
+
+<!-- POSTO -->
 <section class="page" id="page-posto">
 <h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto</span> <span class="process-badge" id="postoBadge"></span></h1>
 <div class="kpi-grid">
@@ -440,29 +448,35 @@ input,select,textarea{position:relative;z-index:5}
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno:</label>
 <select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
-<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="Posto.renderTable()" data-vk></div>
+<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="UI.handleSearch('posto')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
 </section>
+
+<!-- HISTÓRICO -->
 <section class="page" id="page-historico">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs"><button class="historico-tab active" onclick="Historico.switchTab('geral', this)"><i class="fa-solid fa-archive"></i> Histórico Geral</button><button class="historico-tab" onclick="Historico.switchTab('postos', this)"><i class="fa-solid fa-route"></i> Histórico por Posto</button></div>
 <div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="Historico.renderGeral()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="UI.handleSearch('hist')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
 <div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostos()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="UI.handleSearch('histPosto')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
 </section>
+
+<!-- HISTÓRICO DO POSTO -->
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostoAtual()" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="UI.handleSearch('historicoPosto')" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
+
+<!-- CONFIG -->
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
 <div class="card" id="cardSeguranca" style="display:none;"><h2><i class="fa-solid fa-shield-halved"></i> Segurança - Senha</h2>
@@ -482,6 +496,8 @@ input,select,textarea{position:relative;z-index:5}
 </main>
 </div>
 </div>
+
+<!-- MODAIS -->
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você voltará para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
 <div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Pergunta a cada 2h.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
 <div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
@@ -509,7 +525,11 @@ input,select,textarea{position:relative;z-index:5}
 <div class="form-group" style="margin-top:12px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso">Peças em reprocesso</option><option value="Gancherias pendentes">Gancherias pendentes</option></select></div></div>
 <div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
 <div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+
+<!-- TOASTS -->
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- TECLADO VIRTUAL -->
 <div class="virtual-keyboard" id="virtualKeyboard"><div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
 <div class="vk-row"><button class="vk-key" data-key="7">7</button><button class="vk-key" data-key="8">8</button><button class="vk-key" data-key="9">9</button><button class="vk-key action danger" data-action="backspace"><i class="fa-solid fa-delete-left"></i></button></div>
 <div class="vk-row"><button class="vk-key" data-key="4">4</button><button class="vk-key" data-key="5">5</button><button class="vk-key" data-key="6">6</button><button class="vk-key action clear" data-action="clear"><i class="fa-solid fa-eraser"></i></button></div>
@@ -587,7 +607,7 @@ function triggerEvent(event, data) {
 window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, on, off };
 
 // ==========================================
-// ESTADO
+// ESTADO E UTILITÁRIOS
 // ==========================================
 const CONFIG = { 
     STORAGE_KEY: 'weg_fluxo_produtivo_v40', 
@@ -598,12 +618,9 @@ const CONFIG = {
 
 const State = {
     data: { projetos: [], historico: [], historicoPostos: [], config: { dispositivo: 'tablet' }, turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' }, senhaAdmin: CONFIG.SENHA_PADRAO, ultimaSelecaoTurno: 0 },
-    currentUser: null, currentPosto: null, currentPage: 'dashboard', dashboardPostoAtual: 'Nanocerâmico', postoFilter: 'all', historicoPostoFilter: 'all', admFilter: 'all', histFilter: 'all', histPostoFilter: 'all', vkActive: false, vkTarget: null, projetoParaConcluir: null, pendingAdminLogin: false, acaoPendenteSenha: null, charts: {}, turnoFimSemanaPendente: false, turnoFimSemanaModalAberto: false, timerInterval: null, isOnline: navigator.onLine, lastSync: 0, apiAvailable: false, cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: null
+    currentUser: null, currentPosto: null, currentPage: 'dashboard', dashboardPostoAtual: 'Nanocerâmico', postoFilter: 'all', historicoPostoFilter: 'all', admFilter: 'all', histFilter: 'all', histPostoFilter: 'all', vkActive: false, vkTarget: null, projetoParaConcluir: null, pendingAdminLogin: false, acaoPendenteSenha: null, charts: {}, turnoFimSemanaPendente: false, turnoFimSemanaModalAberto: false, timerInterval: null, isOnline: navigator.onLine, lastSync: 0, apiAvailable: false, cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: null, searchTimers: {}
 };
 
-// ==========================================
-// UTILITÁRIOS
-// ==========================================
 const Utils = {
     genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); },
     formatarTempo(ms) {
@@ -733,7 +750,7 @@ const Storage = {
 };
 
 // ==========================================
-// UI
+// UI - CORRIGIDA
 // ==========================================
 const UI = {
     aplicarEstadoCursor() {
@@ -751,12 +768,29 @@ const UI = {
     },
     openModal(id) { document.getElementById(id).classList.add('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true; },
     closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false; },
-    toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
+    toggleSidebarMobile() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+        sidebar.classList.toggle('closed');
+    },
+    closeSidebarMobile() {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth <= 1000 && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            sidebar.classList.add('closed');
+        }
+    },
     togglePwdVisibility(inputId, btn) {
         const input = document.getElementById(inputId);
         const icon = btn.querySelector('i');
-        if (input.type === 'password') { input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
-        else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-solid fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-solid fa-eye';
+        }
+        input.focus();
     },
     atualizarHeaderTitle(page) {
         const titleEl = document.getElementById('headerTitle');
@@ -793,7 +827,7 @@ const UI = {
             a.addEventListener('click', e => {
                 e.preventDefault();
                 Navigation.navigate(a.dataset.page);
-                if (window.innerWidth <= 1000) document.getElementById('sidebar').classList.remove('open');
+                UI.closeSidebarMobile();
             });
         });
     },
@@ -813,8 +847,9 @@ const UI = {
     setupSidebarClickHandler() {
         document.addEventListener('click', e => {
             const sb = document.getElementById('sidebar');
-            if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e.target) && !e.target.closest('.menu-toggle')) {
-                sb.classList.remove('open');
+            const toggle = document.getElementById('menuToggle');
+            if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e.target) && !toggle.contains(e.target)) {
+                UI.closeSidebarMobile();
             }
         });
     },
@@ -849,6 +884,17 @@ const UI = {
             State.vkTarget.focus();
             UI.scrollParaElemento(State.vkTarget);
         });
+    },
+    // CORREÇÃO DA BUSCA - função unificada com debounce
+    handleSearch(context) {
+        if (State.searchTimers[context]) clearTimeout(State.searchTimers[context]);
+        State.searchTimers[context] = setTimeout(() => {
+            if (context === 'adm') Admin.renderTable();
+            else if (context === 'posto') Posto.renderTable();
+            else if (context === 'hist') Historico.renderGeral();
+            else if (context === 'histPosto') Historico.renderPostos();
+            else if (context === 'historicoPosto') Historico.renderPostoAtual();
+        }, 300);
     }
 };
 
@@ -873,6 +919,7 @@ const Navigation = {
         if (page === 'historico') { Historico.renderGeral(); Historico.renderPostos(); }
         if (page === 'historico-posto') Historico.renderPostoAtual();
         if (page === 'config') Config.loadUI();
+        UI.closeSidebarMobile();
     }
 };
 
@@ -931,7 +978,6 @@ const Auth = {
         else { document.getElementById('cardSeguranca').style.display = 'none'; }
         UI.showToast('success', 'Bem-vindo', 'Login efetuado como ' + labels[role]);
         State.apiAvailable = true;
-        // Inicia sincronização
         syncDataCompleto().then(() => {
             setInterval(syncDataIncremental, API_CONFIG.POLLING_INTERVAL);
             setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
