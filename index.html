@@ -1307,7 +1307,7 @@ font-size: 16px;
 margin-bottom: 6px;
 color: var(--text);
 }
-/* CORREÇÃO 2: Password wrapper com display flex para centralizar ícone */
+/* CORREÇÃO 3: Password wrapper com display flex para centralizar ícone */
 .password-wrapper {
 position: relative;
 width: 100%;
@@ -3834,6 +3834,7 @@ document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.cu
 this.aplicarTurnoAutomatico();
 this.renderTable();
 if (State.timerInterval) clearInterval(State.timerInterval);
+// CORREÇÃO 2: Arrow function para preservar contexto
 State.timerInterval = setInterval(() => this.atualizarTemposEmTempoReal(), 1000);
 },
 aplicarTurnoAutomatico() {
@@ -3932,6 +3933,7 @@ botoesAcao = '<button class="icon-action-lg info" title="Pausar" onclick="Posto.
 const descricaoDisplay = p.descricao ? '<small style="color:var(--text-light);display:block;">' + p.descricao + '</small>' : '';
 return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + descricaoDisplay + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + (p.prioridade || '') + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;">' + tempoDisplay + '</td><td style="text-align:center;"><span class="status ' + statusClass + '">' + (p.status || '') + '</span></td><td style="text-align:center;"><div class="action-main">' + botoesAcao + '</div></td></tr>';
 }).join('');
+// CORREÇÃO 2: Arrow function para preservar contexto
 setTimeout(() => this.atualizarTemposEmTempoReal(), 100);
 },
 atualizarTemposEmTempoReal() {
@@ -4001,6 +4003,7 @@ document.getElementById('concluirVolumesProcessados').value = '';
 document.getElementById('concluirVolumesProcessados').max = faltam;
 document.getElementById('concluirVolumesRestantes').textContent = faltam;
 document.getElementById('concluirVolumesRestantes').style.color = 'var(--warning)';
+// CORREÇÃO 2: Arrow function para preservar contexto
 document.getElementById('concluirVolumesProcessados').oninput = () => this.atualizarVolumesRestantes();
 } else if (p.processo === 'Pintura') {
 document.getElementById('concluirPinturaSection').style.display = 'block';
