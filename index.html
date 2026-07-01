@@ -8,26 +8,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
-/* --- CSS COMPLETO E CORRIGIDO --- */
+/* --- CSS COMPLETO ORIGINAL --- */
 :root{--weg-blue:#005BAC;--weg-dark:#003D79;--weg-light:#E8F1FB;--bg:#F4F6F9;--card:#FFFFFF;--border:#D9E2EC;--success:#00A651;--warning:#FFB000;--danger:#D32F2F;--info:#2196F3;--text:#2C3E50;--text-light:#7B8A9A;--shadow:0 2px 8px rgba(0,0,0,.08);--shadow-lg:0 8px 24px rgba(0,0,0,.12);--radius:12px;--sidebar-width:72px;--header-height:90px;--transition:all .25s ease}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);transition:var(--transition);cursor:default !important;touch-action:manipulation}
 body.hide-cursor,body.hide-cursor *,body.hide-cursor button,body.hide-cursor a,body.hide-cursor input,body.hide-cursor select,body.hide-cursor textarea{cursor:none !important}
-button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:10;touch-action:manipulation}
-button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:11}
+button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.historico-tab,.dashboard-tab,.password-toggle,.modal-close,.vk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer !important;user-select:none;-webkit-tap-highlight-color:transparent;z-index:1;touch-action:manipulation}
+button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filter-chip>i,.historico-tab>i,.dashboard-tab>i,.password-toggle>i,.modal-close>i,.vk-key>i{pointer-events:none;position:relative;z-index:2}
 ::-webkit-scrollbar{width:30px;height:30px}
 ::-webkit-scrollbar-track{background:var(--bg);border-radius:15px;border:3px solid var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--weg-blue);border-radius:15px;border:5px solid var(--bg);min-height:80px}
 ::-webkit-scrollbar-thumb:hover{background:var(--weg-dark)}
 *{scrollbar-width:thin;scrollbar-color:var(--weg-blue) var(--bg)}
-.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--weg-blue),var(--weg-dark));display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-.login-box{background:var(--card);border-radius:var(--radius);padding:40px 30px;max-width:500px;width:100%;box-shadow:var(--shadow-lg);text-align:center;position:relative;z-index:10000}
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--weg-blue),var(--weg-dark));display:flex;align-items:center;justify-content:center;z-index:5000;padding:20px}
+.login-box{background:var(--card);border-radius:var(--radius);padding:40px 30px;max-width:500px;width:100%;box-shadow:var(--shadow-lg);text-align:center}
 .login-box h1{color:var(--weg-blue);font-size:28px;margin-bottom:5px}
 .login-box p{color:var(--text-light);margin-bottom:25px;font-size:14px}
 .login-box .logo-big{font-size:48px;color:var(--weg-blue);margin-bottom:15px}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
 .role-btn{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:20px 12px;cursor:pointer !important;transition:var(--transition);color:var(--text);text-align:center;width:100%;flex-direction:column;gap:8px}
-.role-btn:hover{border-color:var(--weg-blue);background:var(--weg-light);transform:translateY(-2px)}
+.role-btn:hover{border-color:var(--weg-blue);background:var(--weg-light)}
 .role-btn i{font-size:32px;color:var(--weg-blue);margin-bottom:0;display:block}
 .role-btn strong{display:block;font-size:14px;margin-bottom:3px}
 .role-btn small{color:var(--text-light);font-size:11px}
@@ -48,16 +48,14 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .btn-logout{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);color:white;width:52px;height:52px;border-radius:50%;cursor:pointer !important;display:inline-flex;align-items:center;justify-content:center;transition:var(--transition);font-size:22px;padding:0}
 .btn-logout:hover{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.5)}
 .layout{display:flex;min-height:calc(100vh - var(--header-height))}
-.sidebar{width:var(--sidebar-width);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding-top:20px;flex-shrink:0;position:fixed;left:0;top:var(--header-height);height:calc(100vh - var(--header-height));z-index:99;transition:transform .3s ease;overflow-y:auto}
-.sidebar.closed{transform:translateX(-100%)}
-.sidebar.open{transform:translateX(0)}
+.sidebar{width:var(--sidebar-width);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding-top:20px;flex-shrink:0;position:relative;z-index:50}
 .menu{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 8px}
 .menu a{width:52px;height:52px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-light);border-radius:12px;transition:var(--transition);font-size:20px;cursor:pointer !important;position:relative;border:2px solid transparent;padding:0}
 .menu a:hover{background:var(--weg-light);color:var(--weg-blue);border-color:var(--weg-blue)}
 .menu a.active{background:var(--weg-blue);color:white;border-color:var(--weg-blue);box-shadow:0 4px 12px rgba(0,91,172,.35)}
 .menu a::after{content:attr(data-tooltip);position:absolute;left:calc(100% + 15px);top:50%;background:var(--weg-dark);color:white;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .menu a:hover::after{opacity:1}
-.content{flex:1;padding:25px;margin-left:var(--sidebar-width);overflow-x:hidden;transition:margin-left .3s ease}
+.content{flex:1;padding:25px;overflow-x:hidden;transition:var(--transition)}
 .page{display:none;animation:fadeIn .4s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -97,9 +95,9 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--weg-blue);box-shadow:0 0 0 3px rgba(0,91,172,.15)}
 .full{grid-column:span 2}
 .form-actions{grid-column:span 2;display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
-.table-wrapper{overflow-x:auto;border-radius:8px;margin-top:15px;-webkit-overflow-scrolling:touch}
+.table-wrapper{overflow-x:auto;border-radius:8px;margin-top:15px}
 .table-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:15px;flex-wrap:wrap}
-.search-box{position:relative;flex:1;max-width:300px;min-width:140px}
+.search-box{position:relative;flex:1;max-width:300px}
 .search-box input{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:text !important;touch-action:manipulation}
 .search-box i{position:absolute;left:12px;top:50%;color:var(--text-light);pointer-events:none}
 .table{width:100%;border-collapse:collapse}
@@ -177,6 +175,10 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .camera-status.scanning{background:var(--weg-light);color:var(--weg-blue)}
 .camera-status.success{background:rgba(0,166,81,.1);color:var(--success)}
 .camera-status.error{background:rgba(211,47,47,.1);color:var(--danger)}
+.camera-found-items{margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;text-align:left}
+.camera-found-items .found-item{display:flex;align-items:center;gap:8px;padding:4px 0}
+.camera-found-items .found-item i{color:var(--success)}
+.camera-found-items .found-item.missing i{color:var(--text-light)}
 .virtual-keyboard{position:fixed;bottom:20px;left:50%;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:7000;display:none;max-width:380px;width:95%;touch-action:manipulation}
 .virtual-keyboard.active{display:block;animation:slideUp .3s ease}
 .vk-header{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
@@ -247,8 +249,9 @@ button>i,a>i,.btn>i,.icon-action>i,.icon-action-lg>i,.role-btn>i,.menu a>i,.filt
 .dashboard-tab,.historico-tab{padding:12px 20px;background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer !important;font-size:14px;font-weight:600;color:var(--text-light);transition:var(--transition);display:inline-flex;align-items:center;gap:8px;margin-bottom:-2px;touch-action:manipulation}
 .dashboard-tab:hover,.historico-tab:hover{color:var(--weg-blue)}
 .dashboard-tab.active,.historico-tab.active{color:var(--weg-blue);border-bottom-color:var(--weg-blue)}
+@media(max-width:1000px){.charts-grid{grid-template-columns:1fr}.sidebar{position:fixed;left:0;top:var(--header-height);height:calc(100vh - var(--header-height));z-index:99;box-shadow:var(--shadow-lg);transition:transform .3s ease;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.form-grid{grid-template-columns:1fr}.full,.form-actions{grid-column:span 1}.header-title{font-size:18px}.header-subtitle{display:none}.user-info{display:none}.role-grid{grid-template-columns:1fr}.virtual-keyboard{max-width:340px;bottom:10px;padding:15px}.vk-key{min-width:60px;height:52px;font-size:18px}.modal-overlay{padding:15px}.comparison-grid{grid-template-columns:1fr}}
 .menu-toggle{display:none;background:rgba(255,255,255,.15);border:none;color:white;width:40px;height:40px;border-radius:50%;cursor:pointer !important;align-items:center;justify-content:center;font-size:16px;touch-action:manipulation}
-@media(max-width:1000px){.menu-toggle{display:inline-flex}.sidebar{transform:translateX(-100%);width:72px}.sidebar.open{transform:translateX(0)}.content{margin-left:0}.charts-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full,.form-actions{grid-column:span 1}.header-title{font-size:18px}.header-subtitle{display:none}.user-info{display:none}.role-grid{grid-template-columns:1fr}.virtual-keyboard{max-width:340px;bottom:10px;padding:15px}.vk-key{min-width:60px;height:52px;font-size:18px}.modal-overlay{padding:15px}.comparison-grid{grid-template-columns:1fr}}
+@media(max-width:1000px){.menu-toggle{display:inline-flex}}
 @media(max-width:768px){.volumes-container{min-width:120px}.volumes-main{font-size:12px}.volumes-processed{font-size:14px}.volumes-remaining{font-size:10px}.modal-logout .btn{min-width:120px;padding:12px 20px;font-size:14px}.turno-comparison{flex-direction:column}.turno-stat{margin:5px 0}}
 @media(max-width:600px){.content{padding:15px}.kpi-grid{grid-template-columns:1fr 1fr}.header{padding:0 15px}.header-title{font-size:16px}.header-logo{font-size:22px}.vk-key{min-width:50px;height:48px;font-size:16px}.vk-key.wide{min-width:70px;font-size:14px}.icon-action-lg{min-width:50px;min-height:46px;padding:10px 12px;font-size:18px}.action-main{min-width:140px;gap:6px}.virtual-keyboard{max-width:300px;padding:12px}.vk-row{gap:8px;margin-bottom:8px}.icon-action{width:44px;height:44px;min-width:44px;padding:10px 12px;font-size:18px}.modal-logout .btn{min-width:100%}.modal-logout .modal-actions{flex-direction:column}}
 @media(hover:none) and (pointer:coarse){*{transform:none !important}button,a,.btn,.icon-action,.icon-action-lg,.role-btn,.menu a,.filter-chip,.password-toggle,.modal-close,.vk-key,.dashboard-tab,.historico-tab{min-height:44px;min-width:44px}button:hover,.btn:hover,.role-btn:hover,.menu a:hover,.vk-key:hover,.filter-chip:hover,.icon-action:hover,.icon-action-lg:hover{opacity:0.85}button:active,.btn:active,.role-btn:active,.menu a:active,.vk-key:active,.filter-chip:active,.icon-action:active,.icon-action-lg:active{opacity:0.7}}
@@ -265,8 +268,6 @@ input,select,textarea{position:relative;z-index:5}
 </style>
 </head>
 <body>
-
-<!-- TELA DE LOGIN -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
 <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -280,12 +281,10 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </div>
 </div>
-
-<!-- APP PRINCIPAL -->
 <div id="app" style="display:none;">
 <header class="header">
 <div class="header-left">
-<button class="menu-toggle" id="menuToggle" onclick="UI.toggleSidebarMobile()"><i class="fa-solid fa-bars"></i></button>
+<button class="menu-toggle" onclick="UI.toggleSidebarMobile()"><i class="fa-solid fa-bars"></i></button>
 <div><div class="header-logo">WEG</div><div class="header-subtitle">Centro de Fluxo Produtivo</div></div>
 </div>
 <div class="header-center">
@@ -302,10 +301,8 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </header>
 <div class="layout">
-<aside class="sidebar closed" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
-<main class="content" id="mainContent">
-
-<!-- DASHBOARD -->
+<aside class="sidebar" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
+<main class="content">
 <section class="page" id="page-dashboard">
 <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
 <div class="dashboard-tabs">
@@ -378,8 +375,6 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </div>
 </section>
-
-<!-- ADMIN -->
 <section class="page" id="page-admin">
 <h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
 <div class="card">
@@ -419,7 +414,7 @@ input,select,textarea{position:relative;z-index:5}
 <div style="display:flex;gap:8px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="UI.debounceSearch('adm')" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="Admin.renderTable()" data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
@@ -435,8 +430,6 @@ input,select,textarea{position:relative;z-index:5}
 </div>
 </div>
 </section>
-
-<!-- POSTO -->
 <section class="page" id="page-posto">
 <h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto</span> <span class="process-badge" id="postoBadge"></span></h1>
 <div class="kpi-grid">
@@ -447,35 +440,29 @@ input,select,textarea{position:relative;z-index:5}
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-list-check"></i> Projetos em Processamento</h2>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:13px;font-weight:600;">Turno:</label>
 <select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div></div>
-<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="UI.debounceSearch('posto')" data-vk></div>
+<div class="table-toolbar" style="margin-top:15px;"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="Posto.renderTable()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div></div>
 </section>
-
-<!-- HISTÓRICO -->
 <section class="page" id="page-historico">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs"><button class="historico-tab active" onclick="Historico.switchTab('geral', this)"><i class="fa-solid fa-archive"></i> Histórico Geral</button><button class="historico-tab" onclick="Historico.switchTab('postos', this)"><i class="fa-solid fa-route"></i> Histórico por Posto</button></div>
 <div id="historicoGeralSection"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="UI.debounceSearch('hist')" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="Historico.renderGeral()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div></div>
 <div id="historicoPostosSection" style="display:none;"><div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="UI.debounceSearch('histPosto')" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostos()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div></div>
 </section>
-
-<!-- HISTÓRICO DO POSTO -->
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="UI.debounceSearch('historicoPosto')" data-vk></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="Historico.renderPostoAtual()" data-vk></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
-
-<!-- CONFIG -->
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
 <div class="card" id="cardSeguranca" style="display:none;"><h2><i class="fa-solid fa-shield-halved"></i> Segurança - Senha</h2>
@@ -495,8 +482,6 @@ input,select,textarea{position:relative;z-index:5}
 </main>
 </div>
 </div>
-
-<!-- MODAIS -->
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você voltará para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
 <div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Pergunta a cada 2h.</small></div></div><div style="display:flex;flex-direction:column;gap:10px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
 <div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info" style="margin-bottom:15px;"><i class="fa-solid fa-circle-info"></i><div>Digite a senha.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
@@ -533,7 +518,7 @@ input,select,textarea{position:relative;z-index:5}
 
 <script>
 // ==========================================
-// CONFIGURAÇÕES
+// CONFIGURAÇÃO DA API
 // ==========================================
 const API_CONFIG = {
     URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
@@ -542,7 +527,7 @@ const API_CONFIG = {
     FULL_SYNC_INTERVAL: 15000
 };
 
-// FLUXO DE PROCESSOS: Nanocerâmico -> Pintura -> Conferência -> FINALIZADO
+// FLUXO DE PROCESSOS
 const FLUXO_PROCESSOS = {
     'Nanocerâmico': 'Pintura',
     'Pintura': 'Conferência',
@@ -602,7 +587,7 @@ function triggerEvent(event, data) {
 window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, on, off };
 
 // ==========================================
-// ESTADO E UTILITÁRIOS
+// ESTADO
 // ==========================================
 const CONFIG = { 
     STORAGE_KEY: 'weg_fluxo_produtivo_v40', 
@@ -613,9 +598,12 @@ const CONFIG = {
 
 const State = {
     data: { projetos: [], historico: [], historicoPostos: [], config: { dispositivo: 'tablet' }, turnosPorPosto: { 'Nanocerâmico': '1º Turno', 'Pintura': '1º Turno', 'Conferência': '1º Turno' }, senhaAdmin: CONFIG.SENHA_PADRAO, ultimaSelecaoTurno: 0 },
-    currentUser: null, currentPosto: null, currentPage: 'dashboard', dashboardPostoAtual: 'Nanocerâmico', postoFilter: 'all', historicoPostoFilter: 'all', admFilter: 'all', histFilter: 'all', histPostoFilter: 'all', vkActive: false, vkTarget: null, projetoParaConcluir: null, pendingAdminLogin: false, acaoPendenteSenha: null, charts: {}, turnoFimSemanaPendente: false, turnoFimSemanaModalAberto: false, timerInterval: null, isOnline: navigator.onLine, lastSync: 0, apiAvailable: false, cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: null, debounceTimers: {}
+    currentUser: null, currentPosto: null, currentPage: 'dashboard', dashboardPostoAtual: 'Nanocerâmico', postoFilter: 'all', historicoPostoFilter: 'all', admFilter: 'all', histFilter: 'all', histPostoFilter: 'all', vkActive: false, vkTarget: null, projetoParaConcluir: null, pendingAdminLogin: false, acaoPendenteSenha: null, charts: {}, turnoFimSemanaPendente: false, turnoFimSemanaModalAberto: false, timerInterval: null, isOnline: navigator.onLine, lastSync: 0, apiAvailable: false, cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: null
 };
 
+// ==========================================
+// UTILITÁRIOS
+// ==========================================
 const Utils = {
     genId() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); },
     formatarTempo(ms) {
@@ -696,6 +684,9 @@ const Utils = {
     }
 };
 
+// ==========================================
+// STORAGE
+// ==========================================
 const Storage = {
     async carregar() {
         const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -760,18 +751,7 @@ const UI = {
     },
     openModal(id) { document.getElementById(id).classList.add('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true; },
     closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false; },
-    toggleSidebarMobile() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
-        sidebar.classList.toggle('closed');
-    },
-    closeSidebarMobile() {
-        const sidebar = document.getElementById('sidebar');
-        if (window.innerWidth <= 1000 && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            sidebar.classList.add('closed');
-        }
-    },
+    toggleSidebarMobile() { document.getElementById('sidebar').classList.toggle('open'); },
     togglePwdVisibility(inputId, btn) {
         const input = document.getElementById(inputId);
         const icon = btn.querySelector('i');
@@ -813,7 +793,7 @@ const UI = {
             a.addEventListener('click', e => {
                 e.preventDefault();
                 Navigation.navigate(a.dataset.page);
-                UI.closeSidebarMobile();
+                if (window.innerWidth <= 1000) document.getElementById('sidebar').classList.remove('open');
             });
         });
     },
@@ -833,9 +813,8 @@ const UI = {
     setupSidebarClickHandler() {
         document.addEventListener('click', e => {
             const sb = document.getElementById('sidebar');
-            const toggle = document.getElementById('menuToggle');
-            if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e.target) && !toggle.contains(e.target)) {
-                UI.closeSidebarMobile();
+            if (window.innerWidth <= 1000 && sb.classList.contains('open') && !sb.contains(e.target) && !e.target.closest('.menu-toggle')) {
+                sb.classList.remove('open');
             }
         });
     },
@@ -870,16 +849,6 @@ const UI = {
             State.vkTarget.focus();
             UI.scrollParaElemento(State.vkTarget);
         });
-    },
-    debounceSearch(context) {
-        if (State.debounceTimers[context]) clearTimeout(State.debounceTimers[context]);
-        State.debounceTimers[context] = setTimeout(() => {
-            if (context === 'adm') Admin.renderTable();
-            if (context === 'posto') Posto.renderTable();
-            if (context === 'hist') Historico.renderGeral();
-            if (context === 'histPosto') Historico.renderPostos();
-            if (context === 'historicoPosto') Historico.renderPostoAtual();
-        }, 300);
     }
 };
 
@@ -904,16 +873,14 @@ const Navigation = {
         if (page === 'historico') { Historico.renderGeral(); Historico.renderPostos(); }
         if (page === 'historico-posto') Historico.renderPostoAtual();
         if (page === 'config') Config.loadUI();
-        UI.closeSidebarMobile();
     }
 };
 
 // ==========================================
-// AUTH - CORRIGIDO
+// AUTH
 // ==========================================
 const Auth = {
     login(role) {
-        console.log('Login chamado para:', role);
         if (role === 'admin') {
             State.pendingAdminLogin = true;
             document.getElementById('inputSenhaAdmin').value = '';
@@ -946,7 +913,6 @@ const Auth = {
     },
     cancelarLoginAdmin() { State.pendingAdminLogin = false; UI.closeModal('modalSenhaAdmin'); },
     efetivarLogin(role) {
-        console.log('Efetivando login para:', role);
         State.currentUser = role;
         localStorage.setItem('weg_logged_in_role', role);
         document.getElementById('loginScreen').style.display = 'none';
@@ -1401,7 +1367,6 @@ const Admin = {
             status: 'Aguardando', turno: State.data.turnosPorPosto[processo] || '1º Turno', obs,
             criadoEm: Date.now(), atualizadoEm: Date.now()
         };
-        console.log('Cadastrando projeto:', novo);
         try {
             await Storage.salvarApi('create', novo);
             State.data.projetos.push(novo);
@@ -1423,35 +1388,29 @@ const Admin = {
         if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
         if (search) data = data.filter(p => (p.pep || '').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa || '').toLowerCase().includes(search) || (p.descricao || '').toLowerCase().includes(search));
         data = Utils.ordenarPorPrioridade(data);
-        const fragment = document.createDocumentFragment();
         if (data.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 8;
-            td.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div>';
-            tr.appendChild(td);
-            fragment.appendChild(tr);
-        } else {
-            data.forEach(p => {
-                const tr = document.createElement('tr');
-                const statusClass = p.status === 'Em Processo' ? 'emprocesso' : p.status === 'Aguardando' ? 'aguardando' : p.status === 'Concluído' ? 'concluido' : 'parcial';
-                const prioColor = p.prioridade === 'Urgente' ? 'var(--danger)' : p.prioridade === 'Alta' ? 'var(--warning)' : 'var(--text-light)';
-                let volumesDisplay = '';
-                if (p.volumesTotal && p.volumesTotal > 0) {
-                    if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
-                        const restantes = p.volumesTotal - p.volumesProcessados;
-                        const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
-                        volumesDisplay = '<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">' + p.volumesProcessados + '</span><span class="volumes-divider">/</span><span class="volumes-total">' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ' + porcentagem + '%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>' + restantes + ' restante' + (restantes !== 1 ? 's' : '') + '</span></div></div>';
-                    } else if (p.volumesProcessados >= p.volumesTotal) {
-                        volumesDisplay = '<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>' + p.volumesTotal + '/' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>';
-                    } else { volumesDisplay = '<div class="volumes-container"><span class="volumes-total-only">' + p.volumesTotal + ' volume' + (p.volumesTotal !== 1 ? 's' : '') + '</span></div>'; }
-                } else { volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>'; }
-                tr.innerHTML = '<td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + p.processo + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + p.prioridade + '</span></td><td style="text-align:center;"><span class="status ' + statusClass + '">' + p.status + '</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div></td>';
-                fragment.appendChild(tr);
-            });
+            tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>';
+            return;
         }
-        tbody.innerHTML = '';
-        tbody.appendChild(fragment);
+        tbody.innerHTML = data.map(p => {
+            const statusClass = p.status === 'Em Processo' ? 'emprocesso' : p.status === 'Aguardando' ? 'aguardando' : p.status === 'Concluído' ? 'concluido' : 'parcial';
+            const prioColor = p.prioridade === 'Urgente' ? 'var(--danger)' : p.prioridade === 'Alta' ? 'var(--warning)' : 'var(--text-light)';
+            let volumesDisplay = '';
+            if (p.volumesTotal && p.volumesTotal > 0) {
+                if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
+                    const restantes = p.volumesTotal - p.volumesProcessados;
+                    const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
+                    volumesDisplay = '<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">' + p.volumesProcessados + '</span><span class="volumes-divider">/</span><span class="volumes-total">' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ' + porcentagem + '%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>' + restantes + ' restante' + (restantes !== 1 ? 's' : '') + '</span></div></div>';
+                } else if (p.volumesProcessados >= p.volumesTotal) {
+                    volumesDisplay = '<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>' + p.volumesTotal + '/' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>';
+                } else {
+                    volumesDisplay = '<div class="volumes-container"><span class="volumes-total-only">' + p.volumesTotal + ' volume' + (p.volumesTotal !== 1 ? 's' : '') + '</span></div>';
+                }
+            } else {
+                volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>';
+            }
+            return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + p.processo + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + p.prioridade + '</span></td><td style="text-align:center;"><span class="status ' + statusClass + '">' + p.status + '</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
+        }).join('');
     },
     abrirEdicao(id) {
         const p = State.data.projetos.find(x => x.id === id);
@@ -1581,44 +1540,41 @@ const Posto = {
         const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
         const concluidosHoje = State.data.historicoPostos.filter(p => p.processo === State.currentPosto && Utils.isHoje(p.dataHoraConclusao)).length;
         document.getElementById('posto-concluidos').textContent = concluidosHoje;
-        const fragment = document.createDocumentFragment();
         if (data.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 9;
-            td.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para ' + State.currentPosto + '.</p></div>';
-            tr.appendChild(td);
-            fragment.appendChild(tr);
-        } else {
-            data.forEach(p => {
-                const tr = document.createElement('tr');
-                const statusClass = p.status === 'Em Processo' ? 'emprocesso' : p.status === 'Aguardando' ? 'aguardando' : 'parcial';
-                const prioColor = p.prioridade === 'Urgente' ? 'var(--danger)' : p.prioridade === 'Alta' ? 'var(--warning)' : 'var(--text-light)';
-                let volumesDisplay = '';
-                if (p.volumesTotal && p.volumesTotal > 0) {
-                    if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
-                        const restantes = p.volumesTotal - p.volumesProcessados;
-                        const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
-                        volumesDisplay = '<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">' + p.volumesProcessados + '</span><span class="volumes-divider">/</span><span class="volumes-total">' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ' + porcentagem + '%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>' + restantes + ' restante' + (restantes !== 1 ? 's' : '') + '</span></div></div>';
-                    } else if (p.volumesProcessados >= p.volumesTotal) {
-                        volumesDisplay = '<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>' + p.volumesTotal + '/' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>';
-                    } else { volumesDisplay = '<div class="volumes-container"><span class="volumes-total-only">' + p.volumesTotal + ' volume' + (p.volumesTotal !== 1 ? 's' : '') + '</span></div>'; }
-                } else { volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>'; }
-                let tempoDisplay = '-';
-                if (p.status === 'Em Processo' && p.dataHoraInicio) { tempoDisplay = '<span class="tempo-real ativo" id="tempo-' + p.id + '">Calculando...</span>'; }
-                else if (p.dataHoraInicio && p.dataHoraFim) { tempoDisplay = '<span class="tempo-real">' + Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio) + '</span>'; }
-                let botoesAcao = '';
-                if (p.status === 'Aguardando' || p.status === 'Parcial') {
-                    botoesAcao = '<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
-                } else if (p.status === 'Em Processo') {
-                    botoesAcao = '<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
-                }
-                tr.innerHTML = '<td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + p.prioridade + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;">' + tempoDisplay + '</td><td style="text-align:center;"><span class="status ' + statusClass + '">' + p.status + '</span></td><td style="text-align:center;"><div class="action-main">' + botoesAcao + '</div></td>';
-                fragment.appendChild(tr);
-            });
+            tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para ' + State.currentPosto + '.</p></div></td></tr>';
+            return;
         }
-        tbody.innerHTML = '';
-        tbody.appendChild(fragment);
+        tbody.innerHTML = data.map(p => {
+            const statusClass = p.status === 'Em Processo' ? 'emprocesso' : p.status === 'Aguardando' ? 'aguardando' : 'parcial';
+            const prioColor = p.prioridade === 'Urgente' ? 'var(--danger)' : p.prioridade === 'Alta' ? 'var(--warning)' : 'var(--text-light)';
+            let volumesDisplay = '';
+            if (p.volumesTotal && p.volumesTotal > 0) {
+                if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
+                    const restantes = p.volumesTotal - p.volumesProcessados;
+                    const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
+                    volumesDisplay = '<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">' + p.volumesProcessados + '</span><span class="volumes-divider">/</span><span class="volumes-total">' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ' + porcentagem + '%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>' + restantes + ' restante' + (restantes !== 1 ? 's' : '') + '</span></div></div>';
+                } else if (p.volumesProcessados >= p.volumesTotal) {
+                    volumesDisplay = '<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>' + p.volumesTotal + '/' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>';
+                } else {
+                    volumesDisplay = '<div class="volumes-container"><span class="volumes-total-only">' + p.volumesTotal + ' volume' + (p.volumesTotal !== 1 ? 's' : '') + '</span></div>';
+                }
+            } else {
+                volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>';
+            }
+            let tempoDisplay = '-';
+            if (p.status === 'Em Processo' && p.dataHoraInicio) {
+                tempoDisplay = '<span class="tempo-real ativo" id="tempo-' + p.id + '">Calculando...</span>';
+            } else if (p.dataHoraInicio && p.dataHoraFim) {
+                tempoDisplay = '<span class="tempo-real">' + Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio) + '</span>';
+            }
+            let botoesAcao = '';
+            if (p.status === 'Aguardando' || p.status === 'Parcial') {
+                botoesAcao = '<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
+            } else if (p.status === 'Em Processo') {
+                botoesAcao = '<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
+            }
+            return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + p.prioridade + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;">' + tempoDisplay + '</td><td style="text-align:center;"><span class="status ' + statusClass + '">' + p.status + '</span></td><td style="text-align:center;"><div class="action-main">' + botoesAcao + '</div></td></tr>';
+        }).join('');
         setTimeout(this.atualizarTemposEmTempoReal, 100);
     },
     atualizarTemposEmTempoReal() {
@@ -1659,7 +1615,7 @@ const Posto = {
 };
 
 // ==========================================
-// CONCLUSÃO - CORRIGIDA COM FLUXO DE PROCESSOS
+// CONCLUSÃO
 // ==========================================
 const Conclusao = {
     solicitar(id) {
@@ -1713,10 +1669,7 @@ const Conclusao = {
         if (!State.projetoParaConcluir) return;
         const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
         if (!p) return;
-        
-        // Fecha o modal IMEDIATAMENTE
         UI.closeModal('modalConcluir');
-        
         try {
             if (p.processo === 'Nanocerâmico') {
                 const turno = document.getElementById('concluirTurnoNano').value;
@@ -1758,16 +1711,12 @@ const Conclusao = {
             UI.showToast('error', 'Erro', 'Falha ao concluir projeto: ' + error.message);
             UI.openModal('modalConcluir');
         }
-        
         State.projetoParaConcluir = null;
     },
-    
     async moverParaProximoProcesso(p, turno) {
         const proximoProcesso = FLUXO_PROCESSOS[p.processo];
-        
         const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
         await this.registrarHistoricoPosto(p, turno, tempoReal);
-        
         if (proximoProcesso) {
             p.processo = proximoProcesso;
             p.status = 'Aguardando';
@@ -1778,27 +1727,21 @@ const Conclusao = {
             p.dataHoraInicio = null;
             p.observacaoPintura = null;
             p.atualizadoEm = Date.now();
-            
             await Storage.salvarApi('update', p);
             Posto.renderTable();
             Admin.renderTable();
-            
-            const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 
-                                     proximoProcesso === 'Conferência' ? 'Conferência' : 'Finalizado';
+            const nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
             UI.showToast('success', 'Fluxo atualizado', p.diagrama + ' processado no ' + turno + ' e movido para ' + nomeProximoPosto);
         } else {
             await this.finalizarProjeto(p, turno);
         }
     },
-    
     async finalizarProjeto(p, turno) {
         const tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
         await this.registrarHistoricoPosto(p, turno, tempoReal);
-        
         p.dataHoraFim = Date.now();
         p.tempoReal = tempoReal;
         p.concluidoEm = Date.now();
-        
         const concluido = {
             ID: 'hist_' + Date.now(),
             ProjetoID: p.id,
@@ -1818,11 +1761,9 @@ const Conclusao = {
             ObservacaoPintura: p.observacaoPintura,
             ConcluidoEm: Date.now()
         };
-        
         try {
             await API.createHistorico(concluido);
         } catch (error) { console.error('Erro ao salvar histórico:', error); }
-        
         State.data.historico.unshift({
             id: concluido.ID,
             projetoId: concluido.ProjetoID,
@@ -1842,17 +1783,14 @@ const Conclusao = {
             observacaoPintura: concluido.ObservacaoPintura,
             concluidoEm: concluido.ConcluidoEm
         });
-        
         State.data.projetos = State.data.projetos.filter(x => x.id !== p.id);
         await Storage.salvarApi('delete', { id: p.id });
-        
         Admin.renderTable();
         Posto.renderTable();
         Historico.renderGeral();
         Charts.render();
         UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Utils.formatarTempo(tempoReal));
     },
-    
     async registrarHistoricoPosto(p, turno, tempoReal) {
         const registro = {
             ID: 'hp_' + Date.now(),
@@ -1882,7 +1820,6 @@ const Conclusao = {
             dataHoraConclusao: registro.DataHoraConclusao
         });
     },
-    
     async concluirDireto(id, turno) {
         const p = State.data.projetos.find(x => x.id === id);
         if (!p) return;
@@ -1911,26 +1848,16 @@ const Historico = {
         if (search) data = data.filter(p => (p.pep || '').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa || '').toLowerCase().includes(search));
         if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
         data.sort((a, b) => (b.concluidoEm || 0) - (a.concluidoEm || 0));
-        const fragment = document.createDocumentFragment();
         if (data.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 8;
-            td.innerHTML = '<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div>';
-            tr.appendChild(td);
-            fragment.appendChild(tr);
-        } else {
-            data.forEach(p => {
-                const tr = document.createElement('tr');
-                const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
-                const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
-                const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
-                tr.innerHTML = '<td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + p.processo + '</td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dtInicio + '</td><td style="text-align:center;">' + dtFim + '</td><td style="text-align:center;"><div class="row-actions">' + (State.currentUser === 'admin' ? '<button class="icon-action" title="Reativar" onclick="Historico.reativar(\'' + p.id + '\')"><i class="fa-solid fa-rotate-left"></i></button>' : '') + (State.currentUser === 'admin' ? '<button class="icon-action delete" title="Excluir" onclick="Historico.excluir(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</div></td>';
-                fragment.appendChild(tr);
-            });
+            tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>';
+            return;
         }
-        tbody.innerHTML = '';
-        tbody.appendChild(fragment);
+        tbody.innerHTML = data.map(p => {
+            const dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+            const dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+            const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+            return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + p.processo + '</td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dtInicio + '</td><td style="text-align:center;">' + dtFim + '</td><td style="text-align:center;"><div class="row-actions">' + (State.currentUser === 'admin' ? '<button class="icon-action" title="Reativar" onclick="Historico.reativar(\'' + p.id + '\')"><i class="fa-solid fa-rotate-left"></i></button>' : '') + (State.currentUser === 'admin' ? '<button class="icon-action delete" title="Excluir" onclick="Historico.excluir(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</div></td></tr>';
+        }).join('');
     },
     renderPostos() {
         const tbody = document.getElementById('histPostoTableBody');
@@ -1940,28 +1867,18 @@ const Historico = {
         if (search) data = data.filter(p => (p.pep || '').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa || '').toLowerCase().includes(search));
         if (State.currentUser !== 'admin' && State.currentPosto) data = data.filter(p => p.processo === State.currentPosto);
         data.sort((a, b) => (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0));
-        const fragment = document.createDocumentFragment();
         if (data.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 7;
-            td.innerHTML = '<div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div>';
-            tr.appendChild(td);
-            fragment.appendChild(tr);
-        } else {
-            const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
-            data.forEach(p => {
-                const tr = document.createElement('tr');
-                const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
-                const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-                const postoClass = postoClassMap[p.processo] || '';
-                const obs = p.observacao ? '<small style="color:var(--text-light);">' + p.observacao + '</small>' : '-';
-                tr.innerHTML = '<td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;"><span class="posto-badge ' + postoClass + '">' + p.processo + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dataConclusao + '</td><td style="text-align:center;">' + obs + '</td>';
-                fragment.appendChild(tr);
-            });
+            tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>';
+            return;
         }
-        tbody.innerHTML = '';
-        tbody.appendChild(fragment);
+        const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
+        tbody.innerHTML = data.map(p => {
+            const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+            const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const postoClass = postoClassMap[p.processo] || '';
+            const obs = p.observacao ? '<small style="color:var(--text-light);">' + p.observacao + '</small>' : '-';
+            return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;"><span class="posto-badge ' + postoClass + '">' + p.processo + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dataConclusao + '</td><td style="text-align:center;">' + obs + '</td></tr>';
+        }).join('');
     },
     renderPostoAtual() {
         const tbody = document.getElementById('historicoPostoTableBody');
@@ -1972,26 +1889,16 @@ const Historico = {
         if (State.historicoPostoFilter !== 'all') data = data.filter(p => p.turno === State.historicoPostoFilter);
         if (search) data = data.filter(p => (p.pep || '').toLowerCase().includes(search) || p.diagrama.toLowerCase().includes(search) || (p.placa || '').toLowerCase().includes(search));
         data.sort((a, b) => (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0));
-        const fragment = document.createDocumentFragment();
         if (data.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 7;
-            td.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div>';
-            tr.appendChild(td);
-            fragment.appendChild(tr);
-        } else {
-            data.forEach(p => {
-                const tr = document.createElement('tr');
-                const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
-                const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-                const obs = p.observacao ? '<small style="color:var(--text-light);">' + p.observacao + '</small>' : '-';
-                tr.innerHTML = '<td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dataConclusao + '</td><td style="text-align:center;">' + obs + '</td>';
-                fragment.appendChild(tr);
-            });
+            tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div></td></tr>';
+            return;
         }
-        tbody.innerHTML = '';
-        tbody.appendChild(fragment);
+        tbody.innerHTML = data.map(p => {
+            const tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+            const dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const obs = p.observacao ? '<small style="color:var(--text-light);">' + p.observacao + '</small>' : '-';
+            return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + p.diagrama + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dataConclusao + '</td><td style="text-align:center;">' + obs + '</td></tr>';
+        }).join('');
     },
     async reativar(id) {
         const idx = State.data.historico.findIndex(x => x.id === id);
@@ -2068,7 +1975,6 @@ const Charts = {
         const gridColor = 'rgba(128,128,128,0.15)';
         Object.values(State.charts).forEach(c => c.destroy());
         State.charts = {};
-        
         const ctx1 = document.getElementById('chartProcessos');
         if (ctx1) {
             const counts = { 'Nanocerâmico': State.data.projetos.filter(p => p.processo === 'Nanocerâmico').length, 'Pintura': State.data.projetos.filter(p => p.processo === 'Pintura').length, 'Conferência': State.data.projetos.filter(p => p.processo === 'Conferência').length };
@@ -2078,7 +1984,6 @@ const Charts = {
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Projetos por Processo', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } }
             });
         }
-        
         const ctx2 = document.getElementById('chartTurnos');
         if (ctx2) {
             const turnosData = { '1º Turno': { total: 0, concluidos: 0 }, '2º Turno': { total: 0, concluidos: 0 }, '3º Turno': { total: 0, concluidos: 0 } };
@@ -2094,7 +1999,6 @@ const Charts = {
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, title: { display: true, text: 'Eficiência por Turno (%)', color: textColor } } }
             });
         }
-        
         const ctx3 = document.getElementById('chartTempoExecucao');
         if (ctx3) {
             const temposPorProcesso = { 'Nanocerâmico': [], 'Pintura': [], 'Conferência': [] };
@@ -2109,7 +2013,6 @@ const Charts = {
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Tempo Médio (min)', color: textColor } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } } }
             });
         }
-        
         const ctx4 = document.getElementById('chartEficiencia');
         if (ctx4) {
             const prioridades = { 'Urgente': State.data.projetos.filter(p => p.prioridade === 'Urgente').length, 'Alta': State.data.projetos.filter(p => p.prioridade === 'Alta').length, 'Normal': State.data.projetos.filter(p => p.prioridade === 'Normal').length };
@@ -2180,9 +2083,7 @@ const App = {
             UI.setupVirtualKeyboard();
             setInterval(UI.updateDate, 1000);
             UI.updateDate();
-            
             const savedRole = localStorage.getItem('weg_logged_in_role');
-            
             if (typeof API !== 'undefined' && State.apiAvailable) {
                 API.on('project:synced', (proj) => {
                     const projLocal = Utils.fromApiFormat(proj);
@@ -2199,7 +2100,6 @@ const App = {
                     if (State.currentPosto) Posto.render();
                     Charts.render();
                 });
-                
                 API.on('sync:full', (remoteProjects) => {
                     const remoteMap = new Map();
                     remoteProjects.forEach(p => { const local = Utils.fromApiFormat(p); remoteMap.set(local.id, local); });
@@ -2212,7 +2112,6 @@ const App = {
                     Historico.renderPostos();
                     Charts.render();
                 });
-                
                 API.on('project:created', (proj) => {
                     const projLocal = Utils.fromApiFormat(proj);
                     if (!State.data.projetos.find(p => p.id === projLocal.id)) {
@@ -2222,7 +2121,6 @@ const App = {
                         if (State.currentPosto) Posto.render();
                     }
                 });
-                
                 API.on('project:updated', (proj) => {
                     const projLocal = Utils.fromApiFormat(proj);
                     const index = State.data.projetos.findIndex(p => p.id === projLocal.id);
@@ -2234,7 +2132,6 @@ const App = {
                         Charts.render();
                     }
                 });
-                
                 API.on('project:deleted', (projectId) => {
                     State.data.projetos = State.data.projetos.filter(p => p.id !== projectId);
                     Storage.salvarLocal();
@@ -2243,9 +2140,7 @@ const App = {
                     Charts.render();
                 });
             }
-            
             if (savedRole) { Auth.efetivarLogin(savedRole); }
-            
             window.addEventListener('online', () => {
                 State.isOnline = true;
                 State.apiAvailable = (typeof API !== 'undefined');
@@ -2257,7 +2152,6 @@ const App = {
                     });
                 }
             });
-            
             window.addEventListener('offline', () => {
                 State.isOnline = false;
                 State.apiAvailable = false;
