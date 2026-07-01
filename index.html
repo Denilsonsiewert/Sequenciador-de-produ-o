@@ -27,8 +27,6 @@
     --sidebar-width: 72px;
     --header-height: 90px;
     --transition: all .25s ease;
-    --breakpoint-desktop: 1024px;
-    --breakpoint-tablet: 768px;
 }
 
 * {
@@ -48,7 +46,6 @@ body {
     overflow-x: hidden;
 }
 
-/* ===== CURSOR MODES ===== */
 body.hide-cursor,
 body.hide-cursor *,
 body.hide-cursor button,
@@ -59,7 +56,6 @@ body.hide-cursor textarea {
     cursor: none !important;
 }
 
-/* ===== CLICKABLE ELEMENTS ===== */
 button, a, .btn, .icon-action, .icon-action-lg, .role-btn,
 .menu a, .filter-chip, .historico-tab, .dashboard-tab,
 .password-toggle, .modal-close, .vk-key {
@@ -84,7 +80,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     z-index: 11;
 }
 
-/* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -105,7 +100,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     scrollbar-color: var(--weg-blue) var(--bg);
 }
 
-/* ===== LOGIN SCREEN ===== */
 .login-screen {
     position: fixed;
     inset: 0;
@@ -192,7 +186,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     font-size: 11px;
 }
 
-/* ===== HEADER ===== */
 .header {
     background: linear-gradient(90deg, var(--weg-blue), var(--weg-dark));
     color: white;
@@ -353,13 +346,11 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     background: rgba(255,255,255,.25);
 }
 
-/* ===== LAYOUT ===== */
 .layout {
     display: flex;
     min-height: calc(100vh - var(--header-height));
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--card);
@@ -374,7 +365,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     height: calc(100vh - var(--header-height));
     overflow-y: auto;
     z-index: 50;
-    transition: transform .3s ease, box-shadow .3s ease;
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1), box-shadow .3s cubic-bezier(.4, 0, .2, 1);
 }
 
 .menu {
@@ -441,17 +432,15 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     opacity: 1;
 }
 
-/* ===== CONTENT ===== */
 .content {
     flex: 1;
     padding: 20px;
     margin-left: var(--sidebar-width);
     overflow-x: hidden;
-    transition: margin-left .3s ease;
+    transition: margin-left .3s cubic-bezier(.4, 0, .2, 1);
     min-width: 0;
 }
 
-/* ===== PAGES ===== */
 .page {
     display: none;
     animation: fadeIn .4s ease;
@@ -489,7 +478,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     font-weight: 600;
 }
 
-/* ===== KPI GRID ===== */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -565,7 +553,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--success);
 }
 
-/* ===== CARDS ===== */
 .card {
     background: var(--card);
     border-radius: var(--radius);
@@ -601,7 +588,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--weg-blue);
 }
 
-/* ===== BUTTONS ===== */
 .btn {
     background: var(--weg-blue);
     color: white;
@@ -676,7 +662,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     font-weight: 600;
 }
 
-/* ===== FORMS ===== */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -737,7 +722,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     flex-wrap: wrap;
 }
 
-/* ===== TABLES ===== */
 .table-wrapper {
     overflow-x: auto;
     border-radius: 8px;
@@ -818,7 +802,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     text-align: center;
 }
 
-/* ===== STATUS BADGES ===== */
 .status {
     padding: 3px 10px;
     border-radius: 20px;
@@ -857,7 +840,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
 .posto-pintura { background: #FFF3E0; color: #E65100; }
 .posto-conferencia { background: #E8F5E9; color: #2E7D32; }
 
-/* ===== VOLUMES DISPLAY ===== */
 .volumes-container {
     display: flex;
     flex-direction: column;
@@ -948,7 +930,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     text-align: center;
 }
 
-/* ===== TEMPO REAL ===== */
 .tempo-real {
     background: var(--weg-light);
     color: var(--weg-blue);
@@ -971,7 +952,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     50% { opacity: .7; }
 }
 
-/* ===== ACTION BUTTONS ===== */
 .action-main {
     display: flex;
     gap: 6px;
@@ -1085,7 +1065,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--success);
 }
 
-/* ===== MODALS ===== */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -1205,7 +1184,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     justify-content: center;
 }
 
-/* ===== CAMERA ===== */
 .camera-container {
     position: relative;
     width: 100%;
@@ -1292,7 +1270,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--danger);
 }
 
-/* ===== VIRTUAL KEYBOARD ===== */
 .virtual-keyboard {
     position: fixed;
     bottom: 20px;
@@ -1423,7 +1400,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     border-color: #1976D2;
 }
 
-/* ===== TOASTS ===== */
 .toast-container {
     position: fixed;
     top: 100px;
@@ -1467,7 +1443,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
 .toast-title { font-weight: 600; font-size: 12px; }
 .toast-message { font-size: 11px; color: var(--text-light); margin-top: 1px; }
 
-/* ===== FILTERS ===== */
 .filter-bar {
     display: flex;
     gap: 8px;
@@ -1498,7 +1473,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     border-color: var(--weg-blue);
 }
 
-/* ===== EMPTY STATE ===== */
 .empty-state {
     text-align: center;
     padding: 40px 20px;
@@ -1517,7 +1491,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--text);
 }
 
-/* ===== PASSWORD ===== */
 .password-wrapper {
     position: relative;
     width: 100%;
@@ -1527,12 +1500,12 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
 
 .password-wrapper input {
     width: 100%;
-    padding: 10px 44px 10px 12px !important;
+    padding-right: 44px !important;
 }
 
 .password-toggle {
     position: absolute;
-    right: 6px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
@@ -1540,7 +1513,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--text-light);
     cursor: pointer !important;
     font-size: 16px;
-    padding: 6px;
+    padding: 0;
     width: 36px;
     height: 36px;
     display: inline-flex;
@@ -1557,6 +1530,10 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--weg-blue);
 }
 
+.password-toggle:active {
+    background: var(--weg-light);
+}
+
 .password-strength {
     margin-top: 4px;
     font-size: 11px;
@@ -1567,7 +1544,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
 .strength-medium { color: var(--warning); }
 .strength-strong { color: var(--success); }
 
-/* ===== ALERTS ===== */
 .alert {
     padding: 10px 14px;
     border-radius: 8px;
@@ -1596,7 +1572,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     border-left: 4px solid var(--warning);
 }
 
-/* ===== CHARTS ===== */
 .charts-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -1644,7 +1619,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     color: var(--text-light);
 }
 
-/* ===== COMPARISON ===== */
 .comparison-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1706,7 +1680,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     margin-top: 4px;
 }
 
-/* ===== TABS ===== */
 .dashboard-tabs,
 .historico-tabs {
     display: flex;
@@ -1747,7 +1720,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     border-bottom-color: var(--weg-blue);
 }
 
-/* ===== SEGURANÇA CARD ===== */
 #cardSeguranca {
     min-height: auto !important;
     padding: 25px !important;
@@ -1786,10 +1758,10 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
 }
 
 /* ============================================================ */
-/* ===== RESPONSIVE BREAKPOINTS ===== */
+/* RESPONSIVE BREAKPOINTS */
 /* ============================================================ */
 
-/* ===== DESKTOP (>= 1024px) - Sidebar sempre visível ===== */
+/* DESKTOP - Sidebar sempre visível */
 @media (min-width: 1024px) {
     .sidebar {
         transform: translateX(0) !important;
@@ -1809,7 +1781,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     }
 }
 
-/* ===== TABLET (768px - 1023px) ===== */
+/* TABLET e MOBILE - Sidebar ocultável */
 @media (max-width: 1023px) {
     .menu-toggle {
         display: inline-flex !important;
@@ -1822,24 +1794,31 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
         height: calc(100vh - var(--header-height));
         z-index: 99;
         box-shadow: var(--shadow-lg);
-        transition: transform .3s ease, box-shadow .3s ease;
         transform: translateX(-100%);
         width: var(--sidebar-width);
         border-right: none;
+        transition: transform .3s cubic-bezier(.4, 0, .2, 1), box-shadow .3s cubic-bezier(.4, 0, .2, 1);
     }
     
     .sidebar.open {
         transform: translateX(0);
-        box-shadow: 0 8px 32px rgba(0,0,0,.2);
+        box-shadow: 0 8px 32px rgba(0,0,0,.25);
     }
     
     /* Overlay escuro quando sidebar aberta */
-    .sidebar.open::before {
-        content: '';
+    .sidebar-overlay {
+        display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.3);
-        z-index: -1;
+        background: rgba(0,0,0,.4);
+        z-index: 48;
+        opacity: 0;
+        transition: opacity .3s ease;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
     }
     
     .content {
@@ -1911,7 +1890,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     }
 }
 
-/* ===== MOBILE (<= 767px) ===== */
+/* MOBILE */
 @media (max-width: 767px) {
     :root {
         --header-height: 70px;
@@ -2228,7 +2207,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     }
 }
 
-/* ===== EXTRA SMALL (<= 400px) ===== */
+/* EXTRA SMALL */
 @media (max-width: 400px) {
     .kpi-grid {
         grid-template-columns: 1fr 1fr;
@@ -2285,7 +2264,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     }
 }
 
-/* ===== TOUCH DEVICES ===== */
+/* TOUCH DEVICES */
 @media (hover: none) and (pointer: coarse) {
     * {
         transform: none !important;
@@ -2311,7 +2290,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i,
     }
 }
 
-/* ===== UTILITY ===== */
+/* UTILITY */
 button, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a,
 .filter-chip, .vk-key, .password-toggle, .modal-close,
 .dashboard-tab, .historico-tab {
@@ -2353,28 +2332,6 @@ input, select, textarea {
 .password-toggle,
 .search-box i {
     pointer-events: auto;
-}
-
-/* ===== SIDEBAR OVERLAY (mobile) ===== */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.3);
-    z-index: 48;
-    opacity: 0;
-    transition: opacity .3s ease;
-}
-
-.sidebar-overlay.active {
-    display: block;
-    opacity: 1;
-}
-
-@media (max-width: 1023px) {
-    .sidebar-overlay.active {
-        display: block;
-    }
 }
 </style>
 </head>
@@ -2589,7 +2546,7 @@ input, select, textarea {
                         <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                     </div>
                     <div class="table-toolbar">
-                        <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar..." oninput="UI.handleSearch('adm')" data-vk></div>
+                        <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="UI.handleSearch('adm')" data-vk></div>
                         <div class="filter-bar">
                             <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
                             <span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
@@ -2627,7 +2584,7 @@ input, select, textarea {
                         </div>
                     </div>
                     <div class="table-toolbar">
-                        <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar..." oninput="UI.handleSearch('posto')" data-vk></div>
+                        <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="UI.handleSearch('posto')" data-vk></div>
                         <div class="filter-bar">
                             <span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span>
                             <span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span>
@@ -2654,7 +2611,7 @@ input, select, textarea {
                     <div class="card">
                         <div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                         <div class="table-toolbar">
-                            <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar..." oninput="UI.handleSearch('hist')" data-vk></div>
+                            <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="UI.handleSearch('hist')" data-vk></div>
                             <div class="filter-bar">
                                 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span>
                                 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span>
@@ -2674,7 +2631,7 @@ input, select, textarea {
                     <div class="card">
                         <div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                         <div class="table-toolbar">
-                            <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar..." oninput="UI.handleSearch('histPosto')" data-vk></div>
+                            <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="UI.handleSearch('histPosto')" data-vk></div>
                             <div class="filter-bar">
                                 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span>
                                 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span>
@@ -2698,7 +2655,7 @@ input, select, textarea {
                 <div class="card">
                     <div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
                     <div class="table-toolbar">
-                        <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar..." oninput="UI.handleSearch('historicoPosto')" data-vk></div>
+                        <div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="UI.handleSearch('historicoPosto')" data-vk></div>
                         <div class="filter-bar">
                             <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span>
                             <span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span>
@@ -3283,9 +3240,9 @@ const UI = {
     toggleSidebarMobile() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
-        sidebar.classList.toggle('open');
+        const isOpen = sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
-        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        document.body.style.overflow = isOpen ? 'hidden' : '';
     },
     closeSidebarMobile() {
         const sidebar = document.getElementById('sidebar');
@@ -3394,7 +3351,6 @@ const UI = {
                 UI.closeSidebarMobile();
             }
         });
-        // Fechar sidebar ao redimensionar para desktop
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) {
                 UI.closeSidebarMobile();
@@ -3487,10 +3443,11 @@ const Auth = {
             State.pendingAdminLogin = true;
             document.getElementById('inputSenhaAdmin').value = '';
             document.getElementById('senhaAdminErro').style.display = 'none';
+            // Abre o modal imediatamente
+            UI.openModal('modalSenhaAdmin');
             setTimeout(() => {
-                UI.openModal('modalSenhaAdmin');
-                setTimeout(() => { document.getElementById('inputSenhaAdmin').focus(); }, 300);
-            }, 50);
+                document.getElementById('inputSenhaAdmin').focus();
+            }, 100);
             return;
         }
         this.efetivarLogin(role);
