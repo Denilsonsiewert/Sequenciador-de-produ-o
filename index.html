@@ -31,7 +31,8 @@
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color:transparent; }
 body { background:var(--bg); color:var(--text); transition:var(--transition); cursor:default !important; touch-action:manipulation; overflow-x:hidden; }
 body.hide-cursor, body.hide-cursor *, body.hide-cursor button, body.hide-cursor a, body.hide-cursor input, body.hide-cursor select, body.hide-cursor textarea { cursor:none !important; }
-/* Esconde o ícone nativo de revelação de senha no Edge e Chrome */
+
+/* Remove o ícone nativo de revelação de senha no Edge/Chrome */
 input[type="password"]::-ms-reveal { display: none; }
 input[type="password"]::-webkit-textfield-decoration-container { display: none; }
 input[type="password"]::-webkit-credentials-auto-fill-button { display: none; }
@@ -282,13 +283,14 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 #cardSeguranca .form-group input { padding:12px 48px 12px 12px !important; font-size:14px; }
 #cardSeguranca .form-actions { margin-top:20px; gap:12px; }
 #cardSeguranca .form-actions .btn { padding:12px 24px; font-size:14px; }
+/* Ajustes responsivos para telas menores */
 @media (max-width:1023px) {
 .menu-toggle { display:inline-flex !important; }
 .sidebar { position:fixed !important; left:0 !important; top:var(--header-height) !important; height:calc(100vh - var(--header-height)) !important; z-index:99 !important; box-shadow:var(--shadow-lg); transform:translateX(-100%) !important; width:var(--sidebar-width) !important; border-right:none; transition:transform 0.3s cubic-bezier(.4,0,.2,1) !important; will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden; }
 .sidebar.open { transform:translateX(0) !important; box-shadow:0 8px 32px rgba(0,0,0,.25); }
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:48; opacity:0; transition:opacity .3s ease; pointer-events:none; }
 .sidebar-overlay.active { display:block; opacity:1; pointer-events:auto; }
-.content { margin-left:0; }
+.content { margin-left:0; padding:16px; padding-bottom:280px; }
 .header-title { font-size:18px; }
 .user-info { display:none; }
 .charts-grid { grid-template-columns:1fr; }
@@ -1274,7 +1276,7 @@ window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
 } else {
 const elementTop = rect.top + window.scrollY;
 const currentScroll = window.scrollY;
-if (elementTop < currentScroll) {
+if (elementTop < currentScroll || elementTop > currentScroll + viewportHeight - vkHeight - rect.height - margin) {
 window.scrollTo({ top: Math.max(0, elementTop - margin), behavior: 'smooth' });
 }
 }
@@ -1283,6 +1285,13 @@ window.scrollTo({ top: Math.max(0, elementTop - margin), behavior: 'smooth' });
 openModal(id) {
 document.getElementById(id).classList.add('active');
 if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
+// Rola para o topo do modal quando aberto
+setTimeout(() => {
+const modalContent = document.querySelector('#' + id + ' .modal');
+if (modalContent) {
+modalContent.scrollTop = 0;
+}
+}, 50);
 },
 closeModal(id) {
 document.getElementById(id).classList.remove('active');
