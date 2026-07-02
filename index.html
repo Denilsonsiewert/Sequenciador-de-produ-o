@@ -31,19 +31,6 @@
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color:transparent; }
 body { background:var(--bg); color:var(--text); transition:var(--transition); cursor:default !important; touch-action:manipulation; overflow-x:hidden; }
 body.hide-cursor, body.hide-cursor *, body.hide-cursor button, body.hide-cursor a, body.hide-cursor input, body.hide-cursor select, body.hide-cursor textarea { cursor:none !important; }
-
-/* Esconde completamente o ícone nativo de revelação de senha em todos os navegadores */
-input[type="password"]::-ms-reveal,
-input[type="password"]::-webkit-textfield-decoration-container,
-input[type="password"]::-webkit-credentials-auto-fill-button {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
 button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .historico-tab, .dashboard-tab, .password-toggle, .modal-close, .vk-key {
 position:relative; display:inline-flex; align-items:center; justify-content:center; cursor:pointer !important; user-select:none; -webkit-tap-highlight-color:transparent; z-index:10; touch-action:manipulation; min-height:44px; min-width:44px;
 }
@@ -90,7 +77,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .menu a.active { background:var(--weg-blue); color:white; border-color:var(--weg-blue); box-shadow:0 4px 12px rgba(0,91,172,.35); }
 .menu a::after { content:attr(data-tooltip); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%); background:var(--weg-dark); color:white; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,.15); }
 .menu a:hover::after { opacity:1; }
-.content { flex:1; padding:20px; margin-left:var(--sidebar-width); overflow-x:hidden; transition:margin-left .3s cubic-bezier(.4,0,.2,1); min-width:0; padding-bottom:300px; }
+.content { flex:1; padding:20px; margin-left:var(--sidebar-width); overflow-x:hidden; transition:margin-left .3s cubic-bezier(.4,0,.2,1); min-width:0; padding-bottom:220px; }
 .page { display:none; animation:fadeIn .4s ease; }
 .page.active { display:block; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -213,7 +200,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .camera-status.scanning { background:var(--weg-light); color:var(--weg-blue); }
 .camera-status.success { background:rgba(0,166,81,.1); color:var(--success); }
 .camera-status.error { background:rgba(211,47,47,.1); color:var(--danger); }
-.virtual-keyboard { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 -8px 40px rgba(0,0,0,.25); z-index:10050; display:none; max-width:400px; width:95%; touch-action:manipulation; }
+.virtual-keyboard { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 -8px 40px rgba(0,0,0,.25); z-index:9500; display:none; max-width:400px; width:95%; touch-action:manipulation; }
 .virtual-keyboard.active { display:block; animation:slideUp .3s ease; }
 .vk-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border); }
 .vk-header i { color:var(--weg-blue); font-size:15px; }
@@ -290,14 +277,13 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 #cardSeguranca .form-group input { padding:12px 48px 12px 12px !important; font-size:14px; }
 #cardSeguranca .form-actions { margin-top:20px; gap:12px; }
 #cardSeguranca .form-actions .btn { padding:12px 24px; font-size:14px; }
-/* Ajustes responsivos para telas menores */
 @media (max-width:1023px) {
 .menu-toggle { display:inline-flex !important; }
 .sidebar { position:fixed !important; left:0 !important; top:var(--header-height) !important; height:calc(100vh - var(--header-height)) !important; z-index:99 !important; box-shadow:var(--shadow-lg); transform:translateX(-100%) !important; width:var(--sidebar-width) !important; border-right:none; transition:transform 0.3s cubic-bezier(.4,0,.2,1) !important; will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden; }
 .sidebar.open { transform:translateX(0) !important; box-shadow:0 8px 32px rgba(0,0,0,.25); }
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:48; opacity:0; transition:opacity .3s ease; pointer-events:none; }
 .sidebar-overlay.active { display:block; opacity:1; pointer-events:auto; }
-.content { margin-left:0; padding:16px; padding-bottom:280px; }
+.content { margin-left:0; }
 .header-title { font-size:18px; }
 .user-info { display:none; }
 .charts-grid { grid-template-columns:1fr; }
@@ -324,7 +310,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .menu-toggle { width:38px; height:38px; font-size:15px; }
 .sidebar { width:var(--sidebar-width); padding-top:12px; }
 .menu a { width:42px; height:42px; font-size:16px; }
-.content { padding:12px; padding-bottom:280px; }
+.content { padding:12px; padding-bottom:220px; }
 .page-title { font-size:18px; }
 .kpi-grid { grid-template-columns:1fr 1fr; gap:10px; }
 .kpi { padding:12px 14px; }
@@ -392,10 +378,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .vk-key { min-width:38px; height:38px; font-size:13px; max-width:50px; }
 .vk-key.wide { min-width:50px; font-size:12px; max-width:70px; }
 .vk-row { gap:4px; margin-bottom:4px; }
-.modal { padding:12px; }
-.modal-head h3 { font-size:15px; }
-.modal .form-group input { font-size:12px; padding:8px; }
-.modal .btn { font-size:12px; padding:8px 12px; min-height:34px; }
 }
 @media (hover:none) and (pointer:coarse) {
 * { transform:none !important; }
@@ -1269,34 +1251,20 @@ document.body.classList.remove('hide-cursor');
 scrollParaElemento(elemento) {
 setTimeout(() => {
 if (!elemento) return;
-const vk = document.getElementById('virtualKeyboard');
-const vkHeight = State.vkActive ? (vk.offsetHeight || 260) : 0;
-const rect = elemento.getBoundingClientRect();
+const vkHeight = State.vkActive ? (document.getElementById('virtualKeyboard').offsetHeight || 260) : 0;
+const elementRect = elemento.getBoundingClientRect();
 const viewportHeight = window.innerHeight;
-const margin = 20;
-const maxBottom = viewportHeight - vkHeight - margin;
-const currentBottom = rect.bottom;
-if (currentBottom > maxBottom) {
-const targetScroll = rect.top + window.scrollY - (viewportHeight - vkHeight - rect.height - margin);
-window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
-} else {
-const elementTop = rect.top + window.scrollY;
-const currentScroll = window.scrollY;
-if (elementTop < currentScroll || elementTop > currentScroll + viewportHeight - vkHeight - rect.height - margin) {
-window.scrollTo({ top: Math.max(0, elementTop - margin), behavior: 'smooth' });
+const inputBottom = elementRect.bottom;
+const spaceBelow = viewportHeight - inputBottom;
+if (spaceBelow < vkHeight + 60) {
+const targetPosition = elementRect.top + window.scrollY - (viewportHeight - vkHeight - elementRect.height - 40);
+window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
 }
-}
-}, 300);
+}, 350);
 },
 openModal(id) {
 document.getElementById(id).classList.add('active');
 if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
-setTimeout(() => {
-const modalContent = document.querySelector('#' + id + ' .modal');
-if (modalContent) {
-modalContent.scrollTop = 0;
-}
-}, 50);
 },
 closeModal(id) {
 document.getElementById(id).classList.remove('active');
@@ -1434,14 +1402,12 @@ UI.closeSidebarMobile();
 },
 setupVirtualKeyboard() {
 document.addEventListener('focusin', e => {
-const target = e.target;
 if (State.data.config.dispositivo === 'computador' &&
-target.matches('input, textarea') &&
-!target.readOnly &&
-!target.disabled &&
-!['button','submit','reset','checkbox','radio','file','range'].includes(target.type)) {
-State.vkTarget = target;
+e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') &&
+!e.target.readOnly) {
+State.vkTarget = e.target;
 if (!State.vkActive) VirtualKeyboard.show();
+UI.scrollParaElemento(e.target);
 }
 });
 document.addEventListener('click', e => {
@@ -1891,11 +1857,16 @@ Charts.render();
 atualizarEstatisticas() {
 const historico = [...State.data.historico].sort((a, b) => (b.concluidoEm || 0) - (a.concluidoEm || 0));
 document.getElementById('totalConcluidos').textContent = historico.length;
+
+// Concluídos por turno (histórico geral)
 const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
 historico.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
 document.getElementById('turno1-concluidos').textContent = turnos['1º Turno'];
 document.getElementById('turno2-concluidos').textContent = turnos['2º Turno'];
 document.getElementById('turno3-concluidos').textContent = turnos['3º Turno'];
+
+// Eficiência por turno: (concluídos no turno) / (total de projetos que passaram pelo turno) * 100
+// "total que passou" = concluídos no turno + projetos ativos atualmente no turno
 const turnosStats = {
 '1º Turno': { concluidos: 0, ativos: 0 },
 '2º Turno': { concluidos: 0, ativos: 0 },
@@ -1903,12 +1874,15 @@ const turnosStats = {
 };
 historico.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].concluidos++; });
 State.data.projetos.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].ativos++; });
+
 ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
 const stats = turnosStats[turno];
 const total = stats.concluidos + stats.ativos;
 const eficiencia = total > 0 ? Math.round((stats.concluidos / total) * 100) : 0;
 document.getElementById('turno' + (idx + 1) + '-eficiencia').textContent = eficiencia + '%';
 });
+
+// Tempo médio geral
 const tempos = historico.filter(p => p.tempoReal).map(p => p.tempoReal);
 if (tempos.length > 0) {
 const media = tempos.reduce((a, b) => a + b, 0) / tempos.length;
@@ -1918,6 +1892,8 @@ document.getElementById('tempoMedioGeral').textContent = minutos + ':' + String(
 } else {
 document.getElementById('tempoMedioGeral').textContent = '00:00';
 }
+
+// Projeto mais rápido
 if (tempos.length > 0) {
 const maisRapido = Math.min(...tempos);
 const projetoRapido = historico.find(p => p.tempoReal === maisRapido);
@@ -1929,6 +1905,8 @@ document.getElementById('projetoMaisRapidoTempo').textContent = minutosRapido + 
 document.getElementById('projetoMaisRapido').textContent = '-';
 document.getElementById('projetoMaisRapidoTempo').textContent = '00:00 min';
 }
+
+// Último projeto concluído
 if (historico.length > 0) {
 const ultimo = historico[0];
 document.getElementById('ultimoProjeto').textContent = ultimo.diagrama;
@@ -1953,11 +1931,15 @@ document.getElementById('dash-posto-total').textContent = projetosNoPosto.length
 document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
 document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
 document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
+
+// Concluídos por turno (neste posto)
 const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
 concluidosNoPosto.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
 document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
 document.getElementById('posto-turno2-concluidos').textContent = turnos['2º Turno'];
 document.getElementById('posto-turno3-concluidos').textContent = turnos['3º Turno'];
+
+// Eficiência por turno (neste posto)
 const turnosStats = {
 '1º Turno': { concluidos: 0, ativos: 0 },
 '2º Turno': { concluidos: 0, ativos: 0 },
@@ -1965,12 +1947,14 @@ const turnosStats = {
 };
 concluidosNoPosto.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].concluidos++; });
 projetosNoPosto.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].ativos++; });
+
 ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
 const stats = turnosStats[turno];
 const total = stats.concluidos + stats.ativos;
 const eficiencia = total > 0 ? Math.round((stats.concluidos / total) * 100) : 0;
 document.getElementById('posto-turno' + (idx + 1) + '-eficiencia').textContent = eficiencia + '%';
 });
+
 document.getElementById('posto-total-concluidos').textContent = concluidosNoPosto.length;
 const tempos = concluidosNoPosto.filter(p => p.tempoReal).map(p => p.tempoReal);
 if (tempos.length > 0) {
@@ -2412,6 +2396,7 @@ tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...<
 } else if (p.dataHoraInicio && p.dataHoraFim) {
 tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
 }
+// Montar exibição do status + observação de pintura
 let statusDisplay = `<span class="status ${statusClass}">${p.status || ''}</span>`;
 if (State.currentPosto === 'Pintura' && p.status === 'Parcial' && p.observacaoPintura) {
 statusDisplay += `<div class="obs-pintura"><i class="fa-solid fa-circle-info"></i>${p.observacaoPintura}</div>`;
@@ -2545,18 +2530,12 @@ document.getElementById('concluirTurno').value = p.turno || State.data.turnosPor
 }
 UI.openModal('modalConcluir');
 setTimeout(() => {
-let targetInput = null;
 if (p.processo === 'Nanocerâmico') {
-targetInput = document.getElementById('concluirVolumesProcessados');
+document.getElementById('concluirVolumesProcessados').focus();
 } else if (p.processo === 'Pintura') {
-targetInput = document.getElementById('concluirStatusPintura');
-} else {
-targetInput = document.getElementById('concluirTurno');
+document.getElementById('concluirStatusPintura').focus();
 }
-if (targetInput) {
-targetInput.focus();
-}
-}, 300);
+}, 100);
 },
 atualizarVolumesRestantes() {
 const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
@@ -2951,9 +2930,7 @@ const vk = document.getElementById('virtualKeyboard');
 vk.classList.add('active');
 State.vkActive = true;
 if (State.vkTarget) {
-setTimeout(() => {
 UI.scrollParaElemento(State.vkTarget);
-}, 100);
 }
 },
 hide() {
