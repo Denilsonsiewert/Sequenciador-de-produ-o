@@ -77,7 +77,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .menu a.active { background:var(--weg-blue); color:white; border-color:var(--weg-blue); box-shadow:0 4px 12px rgba(0,91,172,.35); }
 .menu a::after { content:attr(data-tooltip); position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%); background:var(--weg-dark); color:white; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,.15); }
 .menu a:hover::after { opacity:1; }
-.content { flex:1; padding:20px; margin-left:var(--sidebar-width); overflow-x:hidden; transition:margin-left .3s cubic-bezier(.4,0,.2,1); min-width:0; padding-bottom:220px; }
+.content { flex:1; padding:20px; margin-left:var(--sidebar-width); overflow-x:hidden; transition:margin-left .3s cubic-bezier(.4,0,.2,1); min-width:0; padding-bottom:300px; /* extra space for keyboard */ }
 .page { display:none; animation:fadeIn .4s ease; }
 .page.active { display:block; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -310,7 +310,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .menu-toggle { width:38px; height:38px; font-size:15px; }
 .sidebar { width:var(--sidebar-width); padding-top:12px; }
 .menu a { width:42px; height:42px; font-size:16px; }
-.content { padding:12px; padding-bottom:220px; }
+.content { padding:12px; padding-bottom:280px; }
 .page-title { font-size:18px; }
 .kpi-grid { grid-template-columns:1fr 1fr; gap:10px; }
 .kpi { padding:12px 14px; }
@@ -1249,28 +1249,31 @@ document.body.classList.remove('hide-cursor');
 }
 },
 scrollParaElemento(elemento) {
+// Função melhorada para garantir que o campo fique visível acima do teclado
 setTimeout(() => {
 if (!elemento) return;
 const vk = document.getElementById('virtualKeyboard');
 const vkHeight = State.vkActive ? (vk.offsetHeight || 260) : 0;
 const rect = elemento.getBoundingClientRect();
 const viewportHeight = window.innerHeight;
-const margin = 20; // margem extra
-// Se o campo estiver abaixo do espaço disponível (viewport - teclado - margem)
-const spaceBelow = viewportHeight - rect.bottom;
-const targetY = rect.top + window.scrollY - (viewportHeight - vkHeight - rect.height - margin);
-if (spaceBelow < vkHeight + margin) {
-window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+const margin = 20; // margem extra acima do teclado
+// Calcula a posição de rolagem para que o campo fique visível
+// Queremos que o fundo do campo fique pelo menos (vkHeight + margin) acima da borda inferior da viewport
+const maxBottom = viewportHeight - vkHeight - margin;
+const currentBottom = rect.bottom;
+// Se o campo está abaixo do limite, rola para cima
+if (currentBottom > maxBottom) {
+const targetScroll = rect.top + window.scrollY - (viewportHeight - vkHeight - rect.height - margin);
+window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
 } else {
-// Se já houver espaço, mas ainda assim o campo pode estar fora de vista (ex: scroll manual)
-// Apenas garante que o campo esteja na viewport
+// Se o campo já está visível, mas pode estar parcialmente cortado em cima
+const elementTop = rect.top + window.scrollY;
 const currentScroll = window.scrollY;
-const elementTop = rect.top + currentScroll;
-if (elementTop < currentScroll || elementTop > currentScroll + viewportHeight - vkHeight - rect.height - margin) {
+if (elementTop < currentScroll) {
 window.scrollTo({ top: Math.max(0, elementTop - margin), behavior: 'smooth' });
 }
 }
-}, 400);
+}, 300);
 },
 openModal(id) {
 document.getElementById(id).classList.add('active');
@@ -1420,7 +1423,7 @@ target.matches('input, textarea') &&
 !['button','submit','reset','checkbox','radio','file','range'].includes(target.type)) {
 State.vkTarget = target;
 if (!State.vkActive) VirtualKeyboard.show();
-UI.scrollParaElemento(target);
+// a rolagem será chamada dentro do show() com atraso
 }
 });
 document.addEventListener('click', e => {
@@ -2523,18 +2526,21 @@ document.getElementById('concluirStatusPintura').value = (p.status === 'Parcial'
 document.getElementById('concluirTurno').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
 }
 UI.openModal('modalConcluir');
+// Aguarda o modal e o teclado aparecerem para então rolar
 setTimeout(() => {
+let targetInput = null;
 if (p.processo === 'Nanocerâmico') {
-document.getElementById('concluirVolumesProcessados').focus();
-UI.scrollParaElemento(document.getElementById('concluirVolumesProcessados'));
+targetInput = document.getElementById('concluirVolumesProcessados');
 } else if (p.processo === 'Pintura') {
-document.getElementById('concluirStatusPintura').focus();
-UI.scrollParaElemento(document.getElementById('concluirStatusPintura'));
+targetInput = document.getElementById('concluirStatusPintura');
 } else {
-document.getElementById('concluirTurno').focus();
-UI.scrollParaElemento(document.getElementById('concluirTurno'));
+targetInput = document.getElementById('concluirTurno');
 }
-}, 100);
+if (targetInput) {
+targetInput.focus();
+// A rolagem será tratada pelo evento focusin que chama o VirtualKeyboard.show()
+}
+}, 300);
 },
 atualizarVolumesRestantes() {
 const p = State.data.projetos.find(x => x.id === State.projetoParaConcluir);
@@ -2929,7 +2935,10 @@ const vk = document.getElementById('virtualKeyboard');
 vk.classList.add('active');
 State.vkActive = true;
 if (State.vkTarget) {
+// Aguarda o teclado ser renderizado para então rolar
+setTimeout(() => {
 UI.scrollParaElemento(State.vkTarget);
+}, 100);
 }
 },
 hide() {
