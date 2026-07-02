@@ -1251,16 +1251,26 @@ document.body.classList.remove('hide-cursor');
 scrollParaElemento(elemento) {
 setTimeout(() => {
 if (!elemento) return;
-const vkHeight = State.vkActive ? (document.getElementById('virtualKeyboard').offsetHeight || 260) : 0;
-const elementRect = elemento.getBoundingClientRect();
+const vk = document.getElementById('virtualKeyboard');
+const vkHeight = State.vkActive ? (vk.offsetHeight || 260) : 0;
+const rect = elemento.getBoundingClientRect();
 const viewportHeight = window.innerHeight;
-const inputBottom = elementRect.bottom;
-const spaceBelow = viewportHeight - inputBottom;
-if (spaceBelow < vkHeight + 60) {
-const targetPosition = elementRect.top + window.scrollY - (viewportHeight - vkHeight - elementRect.height - 40);
-window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
+const margin = 20; // margem extra
+// Se o campo estiver abaixo do espaço disponível (viewport - teclado - margem)
+const spaceBelow = viewportHeight - rect.bottom;
+const targetY = rect.top + window.scrollY - (viewportHeight - vkHeight - rect.height - margin);
+if (spaceBelow < vkHeight + margin) {
+window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+} else {
+// Se já houver espaço, mas ainda assim o campo pode estar fora de vista (ex: scroll manual)
+// Apenas garante que o campo esteja na viewport
+const currentScroll = window.scrollY;
+const elementTop = rect.top + currentScroll;
+if (elementTop < currentScroll || elementTop > currentScroll + viewportHeight - vkHeight - rect.height - margin) {
+window.scrollTo({ top: Math.max(0, elementTop - margin), behavior: 'smooth' });
 }
-}, 350);
+}
+}, 400);
 },
 openModal(id) {
 document.getElementById(id).classList.add('active');
@@ -1402,8 +1412,6 @@ UI.closeSidebarMobile();
 },
 setupVirtualKeyboard() {
 document.addEventListener('focusin', e => {
-// Agora incluímos inputs type="number" e também textarea
-// Filtramos apenas elementos editáveis e que não sejam de interação (button, submit, reset, etc.)
 const target = e.target;
 if (State.data.config.dispositivo === 'computador' &&
 target.matches('input, textarea') &&
@@ -2518,8 +2526,13 @@ UI.openModal('modalConcluir');
 setTimeout(() => {
 if (p.processo === 'Nanocerâmico') {
 document.getElementById('concluirVolumesProcessados').focus();
+UI.scrollParaElemento(document.getElementById('concluirVolumesProcessados'));
 } else if (p.processo === 'Pintura') {
 document.getElementById('concluirStatusPintura').focus();
+UI.scrollParaElemento(document.getElementById('concluirStatusPintura'));
+} else {
+document.getElementById('concluirTurno').focus();
+UI.scrollParaElemento(document.getElementById('concluirTurno'));
 }
 }, 100);
 },
