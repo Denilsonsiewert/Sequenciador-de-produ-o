@@ -32,10 +32,17 @@
 body { background:var(--bg); color:var(--text); transition:var(--transition); cursor:default !important; touch-action:manipulation; overflow-x:hidden; }
 body.hide-cursor, body.hide-cursor *, body.hide-cursor button, body.hide-cursor a, body.hide-cursor input, body.hide-cursor select, body.hide-cursor textarea { cursor:none !important; }
 
-/* Remove o ícone nativo de revelação de senha no Edge/Chrome */
-input[type="password"]::-ms-reveal { display: none; }
-input[type="password"]::-webkit-textfield-decoration-container { display: none; }
-input[type="password"]::-webkit-credentials-auto-fill-button { display: none; }
+/* Esconde completamente o ícone nativo de revelação de senha em todos os navegadores */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
 
 button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .historico-tab, .dashboard-tab, .password-toggle, .modal-close, .vk-key {
 position:relative; display:inline-flex; align-items:center; justify-content:center; cursor:pointer !important; user-select:none; -webkit-tap-highlight-color:transparent; z-index:10; touch-action:manipulation; min-height:44px; min-width:44px;
@@ -1260,7 +1267,6 @@ document.body.classList.remove('hide-cursor');
 }
 },
 scrollParaElemento(elemento) {
-// Função melhorada para garantir que o campo fique visível acima do teclado
 setTimeout(() => {
 if (!elemento) return;
 const vk = document.getElementById('virtualKeyboard');
@@ -1285,7 +1291,6 @@ window.scrollTo({ top: Math.max(0, elementTop - margin), behavior: 'smooth' });
 openModal(id) {
 document.getElementById(id).classList.add('active');
 if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
-// Rola para o topo do modal quando aberto
 setTimeout(() => {
 const modalContent = document.querySelector('#' + id + ' .modal');
 if (modalContent) {
