@@ -200,28 +200,8 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .camera-status.scanning { background:var(--weg-light); color:var(--weg-blue); }
 .camera-status.success { background:rgba(0,166,81,.1); color:var(--success); }
 .camera-status.error { background:rgba(211,47,47,.1); color:var(--danger); }
-
-/* ===== TECLADO VIRTUAL - CORRIGIDO ===== */
-.virtual-keyboard {
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 -8px 40px rgba(0,0,0,.25);
-  z-index:10003; /* ACIMA DOS MODAIS */
-  display:none;
-  max-width:400px;
-  width:95%;
-  touch-action:manipulation;
-}
-.virtual-keyboard.active {
-  display:block;
-  animation:slideUp .3s ease;
-}
+.virtual-keyboard { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 -8px 40px rgba(0,0,0,.25); z-index:9500; display:none; max-width:400px; width:95%; touch-action:manipulation; }
+.virtual-keyboard.active { display:block; animation:slideUp .3s ease; }
 .vk-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border); }
 .vk-header i { color:var(--weg-blue); font-size:15px; }
 .vk-header span { font-size:13px; color:var(--text); font-weight:600; }
@@ -238,7 +218,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .vk-key.action.success:hover { background:#008a40; border-color:#008a40; }
 .vk-key.action.clear { background:var(--info); border-color:var(--info); }
 .vk-key.action.clear:hover { background:#1976D2; border-color:#1976D2; }
-
 .toast-container { position:fixed; top:100px; right:20px; z-index:9700; display:flex; flex-direction:column; gap:8px; pointer-events:none; max-width:90%; }
 .toast { background:var(--card); border-left:4px solid var(--info); padding:10px 14px; border-radius:8px; box-shadow:var(--shadow-lg); min-width:250px; display:flex; align-items:center; gap:10px; animation:slideIn .3s ease; pointer-events:auto; }
 @keyframes slideIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
@@ -400,25 +379,11 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .vk-key.wide { min-width:50px; font-size:12px; max-width:70px; }
 .vk-row { gap:4px; margin-bottom:4px; }
 }
-
-/* ===== MEDIA QUERY TOUCH - CORRIGIDO ===== */
 @media (hover:none) and (pointer:coarse) {
-  /* REMOVIDO: * { transform: none !important; } — destruía o teclado virtual */
-  /* Aplicamos apenas em elementos que realmente precisam */
-  .role-btn:hover,
-  .menu a:hover,
-  .btn:hover,
-  .filter-chip:hover,
-  .icon-action:hover,
-  .icon-action-lg:hover,
-  .vk-key:hover,
-  .dashboard-tab:hover,
-  .historico-tab:hover {
-    transform: none !important;
-  }
-  button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .password-toggle, .modal-close, .vk-key, .dashboard-tab, .historico-tab { min-height:44px; min-width:44px; }
-  button:hover, .btn:hover, .role-btn:hover, .menu a:hover, .vk-key:hover, .filter-chip:hover, .icon-action:hover, .icon-action-lg:hover { opacity:0.85; }
-  button:active, .btn:active, .role-btn:active, .menu a:active, .vk-key:active, .filter-chip:active, .icon-action:active, .icon-action-lg:active { opacity:0.7; }
+* { transform:none !important; }
+button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .password-toggle, .modal-close, .vk-key, .dashboard-tab, .historico-tab { min-height:44px; min-width:44px; }
+button:hover, .btn:hover, .role-btn:hover, .menu a:hover, .vk-key:hover, .filter-chip:hover, .icon-action:hover, .icon-action-lg:hover { opacity:0.85; }
+button:active, .btn:active, .role-btn:active, .menu a:active, .vk-key:active, .filter-chip:active, .icon-action:active, .icon-action-lg:active { opacity:0.7; }
 }
 button, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .vk-key, .password-toggle, .modal-close, .dashboard-tab, .historico-tab { position:relative; z-index:10; pointer-events:auto; }
 .card, .kpi, .table-wrapper, .comparison-card, .stat-card { overflow:visible; }
@@ -807,11 +772,11 @@ input, select, textarea { position:relative; z-index:5; }
 <label>Modo</label>
 <select id="cfgDevice" onchange="Config.salvarDispositivo()">
 <option value="tablet">Tablet / Touchscreen</option>
-<option value="computador">Computador (cursor oculto + teclado virtual)</option>
+<option value="computador">Computador (cursor oculto)</option>
 </select>
 </div>
 <div class="form-group full" id="cfgVkInfo" style="display:none;">
-<div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador:</strong> Cursor oculto + teclado virtual ativado automaticamente ao focar em campos de texto.</div></div>
+<div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div><strong>Modo Computador:</strong> Cursor oculto + teclado virtual.</div></div>
 </div>
 </div>
 </div>
@@ -958,8 +923,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 <div class="toast-container" id="toastContainer"></div>
-
-<!-- ===== TECLADO VIRTUAL ===== -->
 <div class="virtual-keyboard" id="virtualKeyboard">
 <div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
 <div class="vk-row">
@@ -986,7 +949,6 @@ input, select, textarea { position:relative; z-index:5; }
 <button class="vk-key" data-key="-">-</button>
 </div>
 </div>
-
 <script>
 // ============================================================
 // CONFIGURAÇÕES E ESTADO
@@ -1043,7 +1005,6 @@ lastDiagramaFound: null
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
-
 // ============================================================
 // UTILITÁRIOS
 // ============================================================
@@ -1159,7 +1120,6 @@ if (num) { result.diagrama = num[1]; break; }
 return result;
 }
 };
-
 // ============================================================
 // API (FRONT-END)
 // ============================================================
@@ -1221,7 +1181,6 @@ try { callback(data); } catch (e) { console.error('Event error ' + event + ':', 
 }
 }
 window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, on, off };
-
 // ============================================================
 // STORAGE LOCAL
 // ============================================================
@@ -1278,7 +1237,6 @@ throw error;
 }
 }
 };
-
 // ============================================================
 // UI
 // ============================================================
@@ -1442,161 +1400,48 @@ UI.closeSidebarMobile();
 }
 });
 },
-
-/* ============================================================
-   TECLADO VIRTUAL - CORRIGIDO
-   - Aparece SOMENTE em modo "computador"
-   - Aparece ao focar em input/textarea (exceto number/button)
-   - Fecha ao clicar fora do input/teclado
-   - Backspace seguro na posição 0
-   ============================================================ */
 setupVirtualKeyboard() {
-  // 1) Mostrar teclado ao focar em campo de texto (apenas modo computador)
-  document.addEventListener('focusin', e => {
-    const target = e.target;
-
-    // Se o foco foi para algo DENTRO do próprio teclado, não faz nada
-    if (target.closest && target.closest('.virtual-keyboard')) return;
-
-    // Verifica se é um campo elegível
-    const isElegivel = target.matches && target.matches(
-      'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="image"]):not([type="hidden"]), textarea'
-    );
-
-    if (State.data.config.dispositivo === 'computador' && isElegivel && !target.readOnly) {
-      State.vkTarget = target;
-      if (!State.vkActive) {
-        VirtualKeyboard.show();
-      }
-      UI.scrollParaElemento(target);
-    }
-  });
-
-  // 2) Fechar teclado ao clicar fora do input e fora do teclado
-  document.addEventListener('mousedown', e => {
-    if (!State.vkActive) return;
-
-    const target = e.target;
-
-    // Se clicou dentro do teclado, não fecha
-    if (target.closest && target.closest('.virtual-keyboard')) return;
-
-    // Se clicou dentro do próprio target atual, não fecha
-    if (State.vkTarget && (target === State.vkTarget || (State.vkTarget.contains && State.vkTarget.contains(target)))) return;
-
-    // Se clicou em outro input elegível, o focusin vai tratar
-    const isOutroInputElegivel = target.matches && target.matches(
-      'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="image"]):not([type="hidden"]), textarea'
-    );
-    if (isOutroInputElegivel) return;
-
-    // Caso contrário: fecha o teclado
-    VirtualKeyboard.hide();
-  });
-
-  // 3) Fechar teclado ao perder foco (blur) — com pequeno delay para permitir clique nas teclas
-  document.addEventListener('focusout', e => {
-    if (!State.vkActive) return;
-
-    // Delay para permitir que o clique na tecla do teclado seja processado
-    setTimeout(() => {
-      const activeEl = document.activeElement;
-
-      // Se o novo elemento ativo está dentro do teclado, não fecha
-      if (activeEl && activeEl.closest && activeEl.closest('.virtual-keyboard')) return;
-
-      // Se o novo elemento ativo é um input elegível, não fecha (vai trocar de target)
-      const isElegivel = activeEl && activeEl.matches && activeEl.matches(
-        'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="image"]):not([type="hidden"]), textarea'
-      );
-      if (isElegivel && State.data.config.dispositivo === 'computador') {
-        State.vkTarget = activeEl;
-        return;
-      }
-
-      // Se nada elegível tem foco, fecha
-      VirtualKeyboard.hide();
-    }, 150);
-  });
-
-  // 4) Processar cliques nas teclas
-  document.addEventListener('click', e => {
-    const key = e.target.closest('.vk-key');
-    if (!key) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const k = key.dataset.key;
-    const action = key.dataset.action;
-
-    if (!State.vkTarget) {
-      UI.showToast('warning', 'Teclado virtual', 'Clique em um campo de texto primeiro');
-      return;
-    }
-
-    // Garantir que o target ainda está no DOM
-    if (!document.body.contains(State.vkTarget)) {
-      VirtualKeyboard.hide();
-      return;
-    }
-
-    if (action === 'backspace') {
-      const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
-      const end = State.vkTarget.selectionEnd ?? start;
-
-      // CORREÇÃO: se cursor no início e sem seleção, não faz nada
-      if (start === 0 && end === 0) {
-        State.vkTarget.focus();
-        return;
-      }
-
-      if (start === end) {
-        // Sem seleção: apaga 1 caractere antes do cursor
-        State.vkTarget.value = State.vkTarget.value.slice(0, start - 1) + State.vkTarget.value.slice(end);
-        State.vkTarget.setSelectionRange(Math.max(0, start - 1), Math.max(0, start - 1));
-      } else {
-        // Com seleção: apaga o trecho selecionado
-        State.vkTarget.value = State.vkTarget.value.slice(0, start) + State.vkTarget.value.slice(end);
-        State.vkTarget.setSelectionRange(start, start);
-      }
-    } else if (action === 'clear') {
-      State.vkTarget.value = '';
-      State.vkTarget.setSelectionRange(0, 0);
-    } else if (action === 'close') {
-      VirtualKeyboard.hide();
-      return;
-    } else if (k !== undefined) {
-      const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
-      const end = State.vkTarget.selectionEnd ?? start;
-      State.vkTarget.value = State.vkTarget.value.slice(0, start) + k + State.vkTarget.value.slice(end);
-      State.vkTarget.setSelectionRange(start + 1, start + 1);
-    }
-
-    State.vkTarget.dispatchEvent(new Event('input', { bubbles: true }));
-    State.vkTarget.focus();
-    UI.scrollParaElemento(State.vkTarget);
-  });
-
-  // 5) Prevenir que o teclado perca foco ao clicar nele (touch)
-  const vk = document.getElementById('virtualKeyboard');
-  if (vk) {
-    vk.addEventListener('mousedown', e => {
-      // Impede que o input perca o foco ao clicar nas teclas
-      if (e.target.closest('.vk-key')) {
-        e.preventDefault();
-      }
-    });
-    vk.addEventListener('touchstart', e => {
-      if (e.target.closest('.vk-key')) {
-        // Não prevenimos o touchstart para permitir o clique,
-        // mas o focusout com delay já trata
-      }
-    }, { passive: true });
-  }
+document.addEventListener('focusin', e => {
+if (State.data.config.dispositivo === 'computador' &&
+e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') &&
+!e.target.readOnly) {
+State.vkTarget = e.target;
+if (!State.vkActive) VirtualKeyboard.show();
+UI.scrollParaElemento(e.target);
+}
+});
+document.addEventListener('click', e => {
+const key = e.target.closest('.vk-key');
+if (!key) return;
+e.preventDefault();
+const k = key.dataset.key;
+const action = key.dataset.action;
+if (!State.vkTarget) {
+UI.showToast('warning', 'Teclado virtual', 'Clique em um campo de texto primeiro');
+return;
+}
+if (action === 'backspace') {
+const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
+const end = State.vkTarget.selectionEnd ?? start;
+State.vkTarget.value = State.vkTarget.value.slice(0, start - 1) + State.vkTarget.value.slice(end);
+State.vkTarget.setSelectionRange(Math.max(0, start - 1), Math.max(0, start - 1));
+} else if (action === 'clear') {
+State.vkTarget.value = '';
+} else if (action === 'close') {
+VirtualKeyboard.hide();
+return;
+} else if (k !== undefined) {
+const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
+const end = State.vkTarget.selectionEnd ?? start;
+State.vkTarget.value = State.vkTarget.value.slice(0, start) + k + State.vkTarget.value.slice(end);
+State.vkTarget.setSelectionRange(start + 1, start + 1);
+}
+State.vkTarget.dispatchEvent(new Event('input', { bubbles: true }));
+State.vkTarget.focus();
+UI.scrollParaElemento(State.vkTarget);
+});
 }
 };
-
 // ============================================================
 // NAVEGAÇÃO
 // ============================================================
@@ -1621,7 +1466,6 @@ if (page === 'config') Config.loadUI();
 UI.closeSidebarMobile();
 }
 };
-
 // ============================================================
 // AUTENTICAÇÃO
 // ============================================================
@@ -1774,7 +1618,6 @@ Dashboard.render();
 Charts.render();
 }
 };
-
 // ============================================================
 // SINCRONIZAÇÃO
 // ============================================================
@@ -1894,7 +1737,6 @@ Historico.renderGeral();
 Historico.renderPostos();
 Charts.render();
 }
-
 // ============================================================
 // CONFIG
 // ============================================================
@@ -1913,19 +1755,12 @@ console.warn('Falha ao salvar config na API:', e);
 }
 this.applyDeviceConfig();
 UI.aplicarEstadoCursor();
-const modo = State.data.config.dispositivo === 'computador' ? 'Computador (cursor oculto + teclado virtual)' : 'Tablet (cursor visível)';
+const modo = State.data.config.dispositivo === 'computador' ? 'Computador (cursor oculto)' : 'Tablet (cursor visível)';
 UI.showToast('success', 'Configuração salva', 'Modo: ' + modo);
-
-// Se mudou para tablet, esconde o teclado imediatamente
-if (State.data.config.dispositivo !== 'computador') {
-  VirtualKeyboard.hide();
-}
 },
 applyDeviceConfig() {
 const isComputer = State.data.config.dispositivo === 'computador';
-if (!isComputer) {
-  VirtualKeyboard.hide();
-}
+if (isComputer) VirtualKeyboard.hide();
 },
 async alterarSenha(e) {
 e.preventDefault();
@@ -1987,9 +1822,8 @@ el.className = 'password-strength strength-strong';
 }
 }
 };
-
 // ============================================================
-// DASHBOARD
+// DASHBOARD (CORRIGIDO - Eficiência por Turno funcionando)
 // ============================================================
 const Dashboard = {
 switchTab(tab, el) {
@@ -2023,11 +1857,16 @@ Charts.render();
 atualizarEstatisticas() {
 const historico = [...State.data.historico].sort((a, b) => (b.concluidoEm || 0) - (a.concluidoEm || 0));
 document.getElementById('totalConcluidos').textContent = historico.length;
+
+// Concluídos por turno (histórico geral)
 const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
 historico.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
 document.getElementById('turno1-concluidos').textContent = turnos['1º Turno'];
 document.getElementById('turno2-concluidos').textContent = turnos['2º Turno'];
 document.getElementById('turno3-concluidos').textContent = turnos['3º Turno'];
+
+// Eficiência por turno: (concluídos no turno) / (total de projetos que passaram pelo turno) * 100
+// "total que passou" = concluídos no turno + projetos ativos atualmente no turno
 const turnosStats = {
 '1º Turno': { concluidos: 0, ativos: 0 },
 '2º Turno': { concluidos: 0, ativos: 0 },
@@ -2035,12 +1874,15 @@ const turnosStats = {
 };
 historico.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].concluidos++; });
 State.data.projetos.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].ativos++; });
+
 ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
 const stats = turnosStats[turno];
 const total = stats.concluidos + stats.ativos;
 const eficiencia = total > 0 ? Math.round((stats.concluidos / total) * 100) : 0;
 document.getElementById('turno' + (idx + 1) + '-eficiencia').textContent = eficiencia + '%';
 });
+
+// Tempo médio geral
 const tempos = historico.filter(p => p.tempoReal).map(p => p.tempoReal);
 if (tempos.length > 0) {
 const media = tempos.reduce((a, b) => a + b, 0) / tempos.length;
@@ -2050,6 +1892,8 @@ document.getElementById('tempoMedioGeral').textContent = minutos + ':' + String(
 } else {
 document.getElementById('tempoMedioGeral').textContent = '00:00';
 }
+
+// Projeto mais rápido
 if (tempos.length > 0) {
 const maisRapido = Math.min(...tempos);
 const projetoRapido = historico.find(p => p.tempoReal === maisRapido);
@@ -2061,6 +1905,8 @@ document.getElementById('projetoMaisRapidoTempo').textContent = minutosRapido + 
 document.getElementById('projetoMaisRapido').textContent = '-';
 document.getElementById('projetoMaisRapidoTempo').textContent = '00:00 min';
 }
+
+// Último projeto concluído
 if (historico.length > 0) {
 const ultimo = historico[0];
 document.getElementById('ultimoProjeto').textContent = ultimo.diagrama;
@@ -2085,11 +1931,15 @@ document.getElementById('dash-posto-total').textContent = projetosNoPosto.length
 document.getElementById('dash-posto-hoje').textContent = concluidosHoje.length;
 document.getElementById('dash-posto-andamento').textContent = projetosNoPosto.filter(p => p.status === 'Em Processo').length;
 document.getElementById('dash-posto-concluidos').textContent = concluidosNoPosto.length;
+
+// Concluídos por turno (neste posto)
 const turnos = { '1º Turno': 0, '2º Turno': 0, '3º Turno': 0 };
 concluidosNoPosto.forEach(p => { if (turnos[p.turno] !== undefined) turnos[p.turno]++; });
 document.getElementById('posto-turno1-concluidos').textContent = turnos['1º Turno'];
 document.getElementById('posto-turno2-concluidos').textContent = turnos['2º Turno'];
 document.getElementById('posto-turno3-concluidos').textContent = turnos['3º Turno'];
+
+// Eficiência por turno (neste posto)
 const turnosStats = {
 '1º Turno': { concluidos: 0, ativos: 0 },
 '2º Turno': { concluidos: 0, ativos: 0 },
@@ -2097,12 +1947,14 @@ const turnosStats = {
 };
 concluidosNoPosto.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].concluidos++; });
 projetosNoPosto.forEach(p => { if (turnosStats[p.turno]) turnosStats[p.turno].ativos++; });
+
 ['1º Turno', '2º Turno', '3º Turno'].forEach((turno, idx) => {
 const stats = turnosStats[turno];
 const total = stats.concluidos + stats.ativos;
 const eficiencia = total > 0 ? Math.round((stats.concluidos / total) * 100) : 0;
 document.getElementById('posto-turno' + (idx + 1) + '-eficiencia').textContent = eficiencia + '%';
 });
+
 document.getElementById('posto-total-concluidos').textContent = concluidosNoPosto.length;
 const tempos = concluidosNoPosto.filter(p => p.tempoReal).map(p => p.tempoReal);
 if (tempos.length > 0) {
@@ -2140,7 +1992,6 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 }
 };
-
 // ============================================================
 // ADMIN
 // ============================================================
@@ -2431,9 +2282,8 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
 // ============================================================
-// POSTO
+// POSTO (com observação de Pintura Parcial visível)
 // ============================================================
 const Posto = {
 render() {
@@ -2546,6 +2396,7 @@ tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...<
 } else if (p.dataHoraInicio && p.dataHoraFim) {
 tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
 }
+// Montar exibição do status + observação de pintura
 let statusDisplay = `<span class="status ${statusClass}">${p.status || ''}</span>`;
 if (State.currentPosto === 'Pintura' && p.status === 'Parcial' && p.observacaoPintura) {
 statusDisplay += `<div class="obs-pintura"><i class="fa-solid fa-circle-info"></i>${p.observacaoPintura}</div>`;
@@ -2641,7 +2492,6 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 }
 };
-
 // ============================================================
 // CONCLUSÃO
 // ============================================================
@@ -2879,7 +2729,6 @@ if (!p) return;
 await this.moverParaProximoProcesso(p, turno);
 }
 };
-
 // ============================================================
 // HISTÓRICO
 // ============================================================
@@ -3053,7 +2902,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
 // ============================================================
 // TURNO
 // ============================================================
@@ -3073,35 +2921,25 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaModalAberto = false;
 }
 };
-
 // ============================================================
-// VIRTUAL KEYBOARD - CORRIGIDO
+// VIRTUAL KEYBOARD
 // ============================================================
 const VirtualKeyboard = {
-  show() {
-    // Só mostra se estiver em modo computador
-    if (State.data.config.dispositivo !== 'computador') return;
-
-    const vk = document.getElementById('virtualKeyboard');
-    if (!vk) return;
-    vk.classList.add('active');
-    State.vkActive = true;
-    if (State.vkTarget) {
-      UI.scrollParaElemento(State.vkTarget);
-    }
-  },
-  hide() {
-    const vk = document.getElementById('virtualKeyboard');
-    if (!vk) return;
-    vk.classList.remove('active');
-    State.vkActive = false;
-    State.vkTarget = null;
-  },
-  isActive() {
-    return State.vkActive;
-  }
+show() {
+const vk = document.getElementById('virtualKeyboard');
+vk.classList.add('active');
+State.vkActive = true;
+if (State.vkTarget) {
+UI.scrollParaElemento(State.vkTarget);
+}
+},
+hide() {
+const vk = document.getElementById('virtualKeyboard');
+vk.classList.remove('active');
+State.vkActive = false;
+State.vkTarget = null;
+}
 };
-
 // ============================================================
 // CHARTS
 // ============================================================
@@ -3269,7 +3107,6 @@ ticks: { callback: v => v + '%' }
 });
 }
 };
-
 // ============================================================
 // EXPORT
 // ============================================================
@@ -3380,7 +3217,6 @@ URL.revokeObjectURL(url);
 UI.showToast('success', 'Backup gerado', 'Arquivo de backup baixado');
 }
 };
-
 // ============================================================
 // INICIALIZAÇÃO
 // ============================================================
