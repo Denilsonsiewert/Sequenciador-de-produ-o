@@ -200,7 +200,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .camera-status.scanning { background:var(--weg-light); color:var(--weg-blue); }
 .camera-status.success { background:rgba(0,166,81,.1); color:var(--success); }
 .camera-status.error { background:rgba(211,47,47,.1); color:var(--danger); }
-.virtual-keyboard { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 -8px 40px rgba(0,0,0,.25); z-index:9500; display:none; max-width:400px; width:95%; touch-action:manipulation; }
+.virtual-keyboard { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 -8px 40px rgba(0,0,0,.25); z-index:10050; display:none; max-width:400px; width:95%; touch-action:manipulation; }
 .virtual-keyboard.active { display:block; animation:slideUp .3s ease; }
 .vk-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border); }
 .vk-header i { color:var(--weg-blue); font-size:15px; }
@@ -1402,12 +1402,17 @@ UI.closeSidebarMobile();
 },
 setupVirtualKeyboard() {
 document.addEventListener('focusin', e => {
+// Agora incluímos inputs type="number" e também textarea
+// Filtramos apenas elementos editáveis e que não sejam de interação (button, submit, reset, etc.)
+const target = e.target;
 if (State.data.config.dispositivo === 'computador' &&
-e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') &&
-!e.target.readOnly) {
-State.vkTarget = e.target;
+target.matches('input, textarea') &&
+!target.readOnly &&
+!target.disabled &&
+!['button','submit','reset','checkbox','radio','file','range'].includes(target.type)) {
+State.vkTarget = target;
 if (!State.vkActive) VirtualKeyboard.show();
-UI.scrollParaElemento(e.target);
+UI.scrollParaElemento(target);
 }
 });
 document.addEventListener('click', e => {
