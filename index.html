@@ -277,7 +277,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 #cardSeguranca .form-group input { padding:12px 48px 12px 12px !important; font-size:14px; }
 #cardSeguranca .form-actions { margin-top:20px; gap:12px; }
 #cardSeguranca .form-actions .btn { padding:12px 24px; font-size:14px; }
-/* ===== ESTILOS DE APONTAMENTO (NOVO) ===== */
 .apontamento-container { max-width:900px; margin:0 auto; }
 .apontamento-header { background:linear-gradient(135deg, var(--weg-blue), var(--weg-dark)); color:white; padding:24px; border-radius:var(--radius); margin-bottom:20px; box-shadow:var(--shadow-lg); }
 .apontamento-header h2 { font-size:22px; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
@@ -435,7 +434,6 @@ input, select, textarea { position:relative; z-index:5; }
 </style>
 </head>
 <body>
-<!-- ===== LOGIN ===== -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
 <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -465,7 +463,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </div>
-<!-- ===== APP ===== -->
 <div id="app" style="display:none;">
 <header class="header">
 <div class="header-left">
@@ -501,7 +498,6 @@ input, select, textarea { position:relative; z-index:5; }
 <nav class="menu" id="mainMenu"></nav>
 </aside>
 <main class="content" id="mainContent">
-<!-- PÁGINA DASHBOARD -->
 <section class="page" id="page-dashboard">
 <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
 <div class="dashboard-tabs">
@@ -591,7 +587,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
-<!-- PÁGINA ADMIN -->
 <section class="page" id="page-admin">
 <h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
 <div class="card">
@@ -647,7 +642,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
-<!-- PÁGINA POSTO -->
 <section class="page" id="page-posto">
 <h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto</span> <span class="process-badge" id="postoBadge"></span></h1>
 <div class="kpi-grid">
@@ -697,7 +691,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
-<!-- PÁGINA APONTAMENTO DE ORDENS (NOVA) -->
 <section class="page" id="page-apontamento">
 <div class="apontamento-container">
 <div class="apontamento-header">
@@ -744,7 +737,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
-<!-- PÁGINA HISTÓRICO GERAL -->
 <section class="page" id="page-historico">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs">
@@ -792,7 +784,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
-<!-- PÁGINA HISTÓRICO DO POSTO -->
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card">
@@ -814,7 +805,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
-<!-- PÁGINA CONFIG -->
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
 <div class="card" id="cardSeguranca" style="display:none;">
@@ -877,7 +867,6 @@ input, select, textarea { position:relative; z-index:5; }
 </main>
 </div>
 </div>
-<!-- ===== MODAIS ===== -->
 <div class="modal-overlay" id="modalLogout">
 <div class="modal modal-logout">
 <div class="modal-body">
@@ -986,7 +975,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;">
 <div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
 <div style="margin-top:10px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div>
-<div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="number" id="concluirVolumesProcessados" min="1" required placeholder="Ex: 5"></div>
+<div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="text" id="concluirVolumesProcessados" inputmode="numeric" pattern="[0-9]*" min="1" required placeholder="Ex: 5"></div>
 <div style="margin-top:8px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div>
 </div>
 <div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;">
@@ -1035,9 +1024,6 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 <script>
-// ============================================================
-// CONFIGURAÇÕES E ESTADO
-// ============================================================
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
 SECRET: "16101961",
@@ -1095,9 +1081,6 @@ let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
 
-// ============================================================
-// UTILITÁRIOS
-// ============================================================
 const Utils = {
 genId() {
 return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -1110,7 +1093,7 @@ const horas = Math.floor((segundos % 86400) / 3600);
 const minutos = Math.floor((segundos % 3600) / 60);
 const segs = segundos % 60;
 const pad = n => String(n).padStart(2, '0');
-if (dias > 0) return dias + 'd ' + pad(horas) + 'h' + pad(minutos) + 'm';
+if (dias > 0) return dias + 'd ' + pad(horas) + 'h ' + pad(minutos) + 'm';
 return pad(horas) + ':' + pad(minutos) + ':' + pad(segs);
 },
 dateStamp() {
@@ -1211,9 +1194,6 @@ return result;
 }
 };
 
-// ============================================================
-// API (FRONT-END)
-// ============================================================
 async function apiRequest(action, payload = {}, method = 'POST') {
 try {
 const url = new URL(API_CONFIG.URL);
@@ -1276,9 +1256,6 @@ try { callback(data); } catch (e) { console.error('Event error ' + event + ':', 
 }
 window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, salvarApontamento, buscarApontamentos, on, off };
 
-// ============================================================
-// STORAGE LOCAL
-// ============================================================
 const Storage = {
 async carregar() {
 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -1334,9 +1311,6 @@ throw error;
 }
 };
 
-// ============================================================
-// UI
-// ============================================================
 const UI = {
 aplicarEstadoCursor() {
 if (State.data.config.dispositivo === 'computador') {
@@ -1545,9 +1519,6 @@ UI.scrollParaElemento(State.vkTarget);
 }
 };
 
-// ============================================================
-// NAVEGAÇÃO
-// ============================================================
 const Navigation = {
 navigate(page) {
 State.currentPage = page;
@@ -1571,9 +1542,6 @@ UI.closeSidebarMobile();
 }
 };
 
-// ============================================================
-// APONTAMENTO DE ORDENS (COM SINCRONIZAÇÃO)
-// ============================================================
 const Apontamento = {
 init() {
 this.renderLista();
@@ -1604,7 +1572,6 @@ try {
 const hojeInicio = new Date();
 hojeInicio.setHours(0, 0, 0, 0);
 const hojeInicioMs = hojeInicio.getTime();
-
 const result = await API.buscarApontamentos(hojeInicioMs);
 if (result.success) {
 State.apontamentoEnviadasHoje = result.totalEnviadasHoje || 0;
@@ -1729,7 +1696,7 @@ UI.showToast('success', 'Apontamento realizado', totalEnviado + ' ordem(ns) envi
 const container = document.querySelector('.apontamento-container');
 const successDiv = document.createElement('div');
 successDiv.className = 'apontamento-success';
-successDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i><h3>Apontamento Realizado!</h3><p>' + totalEnviado + ' ordem(ns) enviada(s)</p>';
+successDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i><h3>Apontamento Realizado!</h3><p>' + totalEnviado + ' ordem(ns) enviada(s) para o Google Sheets</p>';
 container.insertBefore(successDiv, container.firstChild);
 setTimeout(() => successDiv.remove(), 3000);
 } catch (error) {
@@ -1743,9 +1710,6 @@ document.getElementById('apontInput').focus();
 }
 };
 
-// ============================================================
-// AUTENTICAÇÃO
-// ============================================================
 const Auth = {
 login(role) {
 if (role === 'admin') {
@@ -1897,9 +1861,6 @@ Charts.render();
 }
 };
 
-// ============================================================
-// SINCRONIZAÇÃO
-// ============================================================
 async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -2017,9 +1978,6 @@ Historico.renderPostos();
 Charts.render();
 }
 
-// ============================================================
-// CONFIG
-// ============================================================
 const Config = {
 loadUI() {
 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
@@ -2103,9 +2061,6 @@ el.className = 'password-strength strength-strong';
 }
 };
 
-// ============================================================
-// DASHBOARD
-// ============================================================
 const Dashboard = {
 switchTab(tab, el) {
 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
@@ -2256,9 +2211,6 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 };
 
-// ============================================================
-// ADMIN
-// ============================================================
 const Admin = {
 async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
@@ -2547,9 +2499,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 };
 
-// ============================================================
-// POSTO
-// ============================================================
 const Posto = {
 render() {
 if (!State.currentPosto) return;
@@ -2757,9 +2706,6 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 };
 
-// ============================================================
-// CONCLUSÃO
-// ============================================================
 const Conclusao = {
 solicitar(id) {
 const p = State.data.projetos.find(x => x.id === id);
@@ -2995,9 +2941,6 @@ await this.moverParaProximoProcesso(p, turno);
 }
 };
 
-// ============================================================
-// HISTÓRICO
-// ============================================================
 const Historico = {
 switchTab(tab, el) {
 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
@@ -3169,9 +3112,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 };
 
-// ============================================================
-// TURNO
-// ============================================================
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
@@ -3189,9 +3129,6 @@ State.turnoFimSemanaModalAberto = false;
 }
 };
 
-// ============================================================
-// VIRTUAL KEYBOARD
-// ============================================================
 const VirtualKeyboard = {
 show() {
 const vk = document.getElementById('virtualKeyboard');
@@ -3209,9 +3146,6 @@ State.vkTarget = null;
 }
 };
 
-// ============================================================
-// CHARTS
-// ============================================================
 const Charts = {
 render() {
 if (typeof Chart === 'undefined') return;
@@ -3377,9 +3311,6 @@ ticks: { callback: v => v + '%' }
 }
 };
 
-// ============================================================
-// EXPORT
-// ============================================================
 const Export = {
 csv() {
 const data = State.data.projetos;
@@ -3488,9 +3419,6 @@ UI.showToast('success', 'Backup gerado', 'Arquivo de backup baixado');
 }
 };
 
-// ============================================================
-// INICIALIZAÇÃO
-// ============================================================
 const App = {
 async init() {
 try {
