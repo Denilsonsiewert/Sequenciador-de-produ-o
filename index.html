@@ -123,7 +123,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .table-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
 .search-box { position:relative; flex:1; max-width:300px; min-width:140px; }
 .search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; }
-.search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none; font-size:14px; }
+.search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; }
 .table { width:100%; border-collapse:collapse; min-width:600px; }
 .table thead th { background:var(--weg-blue); color:white; padding:10px 8px; text-align:center; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
 .table tbody tr { transition:var(--transition); }
@@ -430,7 +430,8 @@ input, select, textarea { position:relative; z-index:5; }
 .toast-container { pointer-events:none; }
 .toast { pointer-events:auto; }
 .sidebar { pointer-events:auto; }
-.password-toggle, .search-box i { pointer-events:auto; }
+.password-toggle { pointer-events:auto; }
+.search-box i { pointer-events:none !important; }
 </style>
 </head>
 <body>
@@ -783,6 +784,7 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </div>
+</div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
@@ -1080,7 +1082,6 @@ apontamentosSyncInterval: null
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
-
 const Utils = {
 genId() {
 return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -1171,7 +1172,8 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta(texto) {
-let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+let clean = texto.replace(/\r/g, '').replace(/
+/g, ' ').replace(/\s+/g, ' ').trim();
 const result = { pep: null, diagrama: null };
 const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
 if (pepLabelMatch) {
@@ -1182,7 +1184,8 @@ if (!result.pep) {
 const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
 if (generic) { result.pep = generic[1] + '-' + generic[2] + '-' + generic[3]; }
 }
-const lines = texto.split(/\r?\n/);
+const lines = texto.split(/\r?
+/);
 for (let line of lines) {
 const upper = line.toUpperCase();
 if (upper.includes('DIAGR') || upper.includes('ORD')) {
@@ -1193,7 +1196,6 @@ if (num) { result.diagrama = num[1]; break; }
 return result;
 }
 };
-
 async function apiRequest(action, payload = {}, method = 'POST') {
 try {
 const url = new URL(API_CONFIG.URL);
@@ -1255,7 +1257,6 @@ try { callback(data); } catch (e) { console.error('Event error ' + event + ':', 
 }
 }
 window.API = { createProject, updateProject, deleteProject, createHistorico, createHistoricoPosto, deleteHistorico, updateConfig, getConfig, clearAllData, salvarApontamento, buscarApontamentos, on, off };
-
 const Storage = {
 async carregar() {
 const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -1310,7 +1311,6 @@ throw error;
 }
 }
 };
-
 const UI = {
 aplicarEstadoCursor() {
 if (State.data.config.dispositivo === 'computador') {
@@ -1477,8 +1477,7 @@ UI.closeSidebarMobile();
 },
 setupVirtualKeyboard() {
 document.addEventListener('focusin', e => {
-if (State.data.config.dispositivo === 'computador' &&
-e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') &&
+if (e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="date"]):not([type="time"]):not([type="file"]):not([type="color"]), textarea') &&
 !e.target.readOnly) {
 State.vkTarget = e.target;
 VirtualKeyboard.show();
@@ -1488,10 +1487,12 @@ UI.scrollParaElemento(e.target);
 document.addEventListener('focusout', e => {
 if (e.target.matches('input, textarea')) {
 setTimeout(() => {
-if (!document.activeElement || (!document.activeElement.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea'))) {
+const active = document.activeElement;
+const isVk = active && active.closest && active.closest('.virtual-keyboard');
+if (!active || (!active.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') && !isVk)) {
 VirtualKeyboard.hide();
 }
-}, 200);
+}, 150);
 }
 });
 document.addEventListener('click', e => {
@@ -1527,7 +1528,6 @@ UI.scrollParaElemento(State.vkTarget);
 });
 }
 };
-
 const Navigation = {
 navigate(page) {
 State.currentPage = page;
@@ -1550,7 +1550,6 @@ if (page === 'config') Config.loadUI();
 UI.closeSidebarMobile();
 }
 };
-
 const Apontamento = {
 init() {
 this.renderLista();
@@ -1718,7 +1717,6 @@ document.getElementById('apontInput').focus();
 }
 }
 };
-
 const Auth = {
 login(role) {
 if (role === 'admin') {
@@ -1869,7 +1867,6 @@ Dashboard.render();
 Charts.render();
 }
 };
-
 async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -1986,7 +1983,6 @@ Historico.renderGeral();
 Historico.renderPostos();
 Charts.render();
 }
-
 const Config = {
 loadUI() {
 document.getElementById('cfgDevice').value = State.data.config.dispositivo || 'tablet';
@@ -2069,7 +2065,6 @@ el.className = 'password-strength strength-strong';
 }
 }
 };
-
 const Dashboard = {
 switchTab(tab, el) {
 document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
@@ -2219,7 +2214,6 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 }
 };
-
 const Admin = {
 async abrirCamera() {
 const cameraSection = document.getElementById('cameraSection');
@@ -2507,7 +2501,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
 const Posto = {
 render() {
 if (!State.currentPosto) return;
@@ -2714,7 +2707,6 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 }
 };
-
 const Conclusao = {
 solicitar(id) {
 const p = State.data.projetos.find(x => x.id === id);
@@ -2949,7 +2941,6 @@ if (!p) return;
 await this.moverParaProximoProcesso(p, turno);
 }
 };
-
 const Historico = {
 switchTab(tab, el) {
 document.querySelectorAll('.historico-tab').forEach(t => t.classList.remove('active'));
@@ -3120,7 +3111,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
 const Turno = {
 confirmarFimSemana(turno) {
 State.data.turnosPorPosto[State.currentPosto] = turno;
@@ -3137,7 +3127,6 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaModalAberto = false;
 }
 };
-
 const VirtualKeyboard = {
 show() {
 const vk = document.getElementById('virtualKeyboard');
@@ -3154,7 +3143,6 @@ State.vkActive = false;
 State.vkTarget = null;
 }
 };
-
 const Charts = {
 render() {
 if (typeof Chart === 'undefined') return;
@@ -3319,7 +3307,6 @@ ticks: { callback: v => v + '%' }
 });
 }
 };
-
 const Export = {
 csv() {
 const data = State.data.projetos;
@@ -3387,14 +3374,16 @@ UI.showToast('success', 'Exportado', 'CSV de concluídos gerado');
 downloadCSV(filename, headers, rows) {
 const escapeCSV = v => {
 const s = String(v ?? '');
-if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+if (s.includes(',') || s.includes('"') || s.includes('
+')) {
 return '"' + s.replace(/"/g, '""') + '"';
 }
 return s;
 };
 const csvContent = [headers.map(escapeCSV).join(','),
 ...rows.map(r => r.map(escapeCSV).join(','))
-].join('\n');
+].join('
+');
 const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
 const url = URL.createObjectURL(blob);
 const link = document.createElement('a');
@@ -3427,7 +3416,6 @@ URL.revokeObjectURL(url);
 UI.showToast('success', 'Backup gerado', 'Arquivo de backup baixado');
 }
 };
-
 const App = {
 async init() {
 try {
