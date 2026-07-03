@@ -1476,13 +1476,26 @@ UI.closeSidebarMobile();
 });
 },
 setupVirtualKeyboard() {
+// CORREÇÃO: O teclado virtual agora é ativado corretamente em modo computador
 document.addEventListener('focusin', e => {
 if (State.data.config.dispositivo === 'computador' &&
 e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') &&
 !e.target.readOnly) {
 State.vkTarget = e.target;
-if (!State.vkActive) VirtualKeyboard.show();
+// Força a exibição do teclado virtual
+VirtualKeyboard.show();
 UI.scrollParaElemento(e.target);
+}
+});
+// CORREÇÃO: Fechar teclado virtual ao clicar fora dos campos
+document.addEventListener('focusout', e => {
+if (e.target.matches('input, textarea')) {
+// Pequeno delay para permitir clique em botões do teclado
+setTimeout(() => {
+if (!document.activeElement || (!document.activeElement.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea'))) {
+VirtualKeyboard.hide();
+}
+}, 200);
 }
 });
 document.addEventListener('click', e => {
