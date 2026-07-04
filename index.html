@@ -121,9 +121,10 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .form-actions { grid-column:span 2; display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
 .table-wrapper { overflow-x:auto; border-radius:8px; margin-top:15px; -webkit-overflow-scrolling:touch; }
 .table-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
-.search-box { position:relative; flex:1; max-width:300px; min-width:140px; }
-.search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; }
-.search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; }
+.search-box { position:relative; flex:1; max-width:300px; min-width:140px; z-index:20; }
+.search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; position:relative; z-index:25; }
+.search-box input:focus { border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); outline:none; }
+.search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; z-index:21; }
 .table { width:100%; border-collapse:collapse; min-width:600px; }
 .table thead th { background:var(--weg-blue); color:white; padding:10px 8px; text-align:center; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
 .table tbody tr { transition:var(--transition); }
@@ -430,8 +431,6 @@ input, select, textarea { position:relative; z-index:5; }
 .toast-container { pointer-events:none; }
 .toast { pointer-events:auto; }
 .sidebar { pointer-events:auto; }
-.password-toggle { pointer-events:auto; }
-.search-box i { pointer-events:none !important; }
 </style>
 </head>
 <body>
@@ -627,7 +626,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Admin.renderTable()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span>
@@ -663,7 +662,7 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Posto.renderTable()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span>
@@ -748,7 +747,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderGeral()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span>
@@ -768,7 +767,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostos()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span>
 <span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span>
@@ -784,14 +783,13 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </div>
-</div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostoAtual()" data-vk></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." data-vk></div>
 <div class="filter-bar">
 <span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span>
 <span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span>
@@ -1035,7 +1033,7 @@ APONTAMENTOS_SYNC_INTERVAL: 20000
 };
 const FLUXO_PROCESSOS = { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null };
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v40',
+STORAGE_KEY: 'weg_fluxo_produtivo_v41',
 SENHA_PADRAO: '16101961',
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
 TURNO_COOLDOWN: 2 * 60 * 60 * 1000
@@ -1172,8 +1170,7 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta(texto) {
-let clean = texto.replace(/\r/g, '').replace(/
-/g, ' ').replace(/\s+/g, ' ').trim();
+let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 const result = { pep: null, diagrama: null };
 const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-–—\s]+)/i);
 if (pepLabelMatch) {
@@ -1184,8 +1181,7 @@ if (!result.pep) {
 const generic = clean.match(/\b(\d{3})\s*[-–—]\s*(\d{7})\s*[-–—]\s*(\d{3})\b/);
 if (generic) { result.pep = generic[1] + '-' + generic[2] + '-' + generic[3]; }
 }
-const lines = texto.split(/\r?
-/);
+const lines = texto.split(/\r?\n/);
 for (let line of lines) {
 const upper = line.toUpperCase();
 if (upper.includes('DIAGR') || upper.includes('ORD')) {
@@ -1476,12 +1472,18 @@ UI.closeSidebarMobile();
 });
 },
 setupVirtualKeyboard() {
+// CORREÇÃO: Teclado virtual funciona em TODOS os inputs com data-vk, incluindo buscas
 document.addEventListener('focusin', e => {
-if (e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="date"]):not([type="time"]):not([type="file"]):not([type="color"]), textarea') &&
-!e.target.readOnly) {
-State.vkTarget = e.target;
+const target = e.target;
+if (!target) return;
+const isInput = target.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="date"]):not([type="time"]):not([type="file"]):not([type="color"]), textarea');
+const hasVkAttr = target.hasAttribute && target.hasAttribute('data-vk');
+const isComputerMode = State.data.config.dispositivo === 'computador';
+// Ativa em modo computador OU se o input tem data-vk
+if (isInput && !target.readOnly && (isComputerMode || hasVkAttr)) {
+State.vkTarget = target;
 VirtualKeyboard.show();
-UI.scrollParaElemento(e.target);
+UI.scrollParaElemento(target);
 }
 });
 document.addEventListener('focusout', e => {
@@ -1489,10 +1491,11 @@ if (e.target.matches('input, textarea')) {
 setTimeout(() => {
 const active = document.activeElement;
 const isVk = active && active.closest && active.closest('.virtual-keyboard');
-if (!active || (!active.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea') && !isVk)) {
+const isInput = active && active.matches && active.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="number"]), textarea');
+if (!active || (!isInput && !isVk)) {
 VirtualKeyboard.hide();
 }
-}, 150);
+}, 200);
 }
 });
 document.addEventListener('click', e => {
@@ -1506,25 +1509,30 @@ if (!State.vkTarget) {
 UI.showToast('warning', 'Teclado virtual', 'Clique em um campo de texto primeiro');
 return;
 }
+const target = State.vkTarget;
 if (action === 'backspace') {
-const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
-const end = State.vkTarget.selectionEnd ?? start;
-State.vkTarget.value = State.vkTarget.value.slice(0, start - 1) + State.vkTarget.value.slice(end);
-State.vkTarget.setSelectionRange(Math.max(0, start - 1), Math.max(0, start - 1));
+const start = target.selectionStart !== null ? target.selectionStart : target.value.length;
+const end = target.selectionEnd !== null ? target.selectionEnd : start;
+target.value = target.value.slice(0, start - 1) + target.value.slice(end);
+const newPos = Math.max(0, start - 1);
+try { target.setSelectionRange(newPos, newPos); } catch(err) {}
 } else if (action === 'clear') {
-State.vkTarget.value = '';
+target.value = '';
 } else if (action === 'close') {
 VirtualKeyboard.hide();
 return;
 } else if (k !== undefined) {
-const start = State.vkTarget.selectionStart ?? State.vkTarget.value.length;
-const end = State.vkTarget.selectionEnd ?? start;
-State.vkTarget.value = State.vkTarget.value.slice(0, start) + k + State.vkTarget.value.slice(end);
-State.vkTarget.setSelectionRange(start + 1, start + 1);
+const start = target.selectionStart !== null ? target.selectionStart : target.value.length;
+const end = target.selectionEnd !== null ? target.selectionEnd : start;
+target.value = target.value.slice(0, start) + k + target.value.slice(end);
+const newPos = start + 1;
+try { target.setSelectionRange(newPos, newPos); } catch(err) {}
 }
-State.vkTarget.dispatchEvent(new Event('input', { bubbles: true }));
-State.vkTarget.focus();
-UI.scrollParaElemento(State.vkTarget);
+// CORREÇÃO CRÍTICA: Dispara eventos corretamente para oninput funcionar
+target.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+target.dispatchEvent(new Event('change', { bubbles: true }));
+target.focus();
+UI.scrollParaElemento(target);
 });
 }
 };
@@ -2060,7 +2068,7 @@ el.className = 'password-strength strength-weak';
 el.textContent = '🟡 Senha média';
 el.className = 'password-strength strength-medium';
 } else {
-el.textContent = ' Senha forte';
+el.textContent = '🟢 Senha forte';
 el.className = 'password-strength strength-strong';
 }
 }
@@ -2383,7 +2391,7 @@ renderTable() {
 const tbody = document.getElementById('admTableBody');
 if (!tbody) return;
 const searchEl = document.getElementById('admSearch');
-const search = (searchEl ? searchEl.value : '').toLowerCase();
+const search = (searchEl ? searchEl.value : '').toLowerCase().trim();
 let data = [...State.data.projetos];
 if (State.admFilter !== 'all') data = data.filter(p => p.processo === State.admFilter);
 if (search) {
@@ -2391,12 +2399,14 @@ data = data.filter(p =>
 (p.pep || '').toLowerCase().includes(search) ||
 (p.diagrama || '').toLowerCase().includes(search) ||
 (p.placa || '').toLowerCase().includes(search) ||
-(p.descricao || '').toLowerCase().includes(search)
+(p.descricao || '').toLowerCase().includes(search) ||
+(p.status || '').toLowerCase().includes(search) ||
+(p.prioridade || '').toLowerCase().includes(search)
 );
 }
 data = Utils.ordenarPorPrioridade(data);
 if (data.length === 0) {
-tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>Cadastre um novo projeto.</p></div></td></tr>';
+tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Cadastre um novo projeto.') + '</p></div></td></tr>';
 return;
 }
 tbody.innerHTML = data.map(p => {
@@ -2516,6 +2526,12 @@ clearInterval(State.timerInterval);
 State.timerInterval = null;
 }
 State.timerInterval = setInterval(() => this.atualizarTemposEmTempoReal(), 1000);
+// CORREÇÃO: Adiciona listener de busca no input
+const searchInput = document.getElementById('postoSearch');
+if (searchInput && !searchInput.dataset.listenerAdded) {
+searchInput.addEventListener('input', () => this.renderTable());
+searchInput.dataset.listenerAdded = 'true';
+}
 },
 aplicarTurnoAutomatico() {
 if (!State.currentPosto) return;
@@ -2556,7 +2572,7 @@ renderTable() {
 const tbody = document.getElementById('postoTableBody');
 if (!tbody) return;
 const searchEl = document.getElementById('postoSearch');
-const search = (searchEl ? searchEl.value : '').toLowerCase();
+const search = (searchEl ? searchEl.value : '').toLowerCase().trim();
 let data = State.data.projetos.filter(p => p.processo === State.currentPosto && p.status !== 'Concluído');
 if (State.postoFilter !== 'all') data = data.filter(p => p.status === State.postoFilter);
 if (search) {
@@ -2564,7 +2580,8 @@ data = data.filter(p =>
 (p.pep || '').toLowerCase().includes(search) ||
 (p.diagrama || '').toLowerCase().includes(search) ||
 (p.placa || '').toLowerCase().includes(search) ||
-(p.descricao || '').toLowerCase().includes(search)
+(p.descricao || '').toLowerCase().includes(search) ||
+(p.status || '').toLowerCase().includes(search)
 );
 }
 data = Utils.ordenarPorPrioridade(data);
@@ -2576,7 +2593,7 @@ hoje.setHours(0, 0, 0, 0);
 const concluidosHoje = State.data.historicoPostos.filter(p => p.processo === State.currentPosto && Utils.isHoje(p.dataHoraConclusao)).length;
 document.getElementById('posto-concluidos').textContent = concluidosHoje;
 if (data.length === 0) {
-tbody.innerHTML = '<tr><td colspan="' + (State.currentPosto === 'Pintura' ? '9' : '10') + '"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>Não há projetos para ' + State.currentPosto + '.</p></div></td></tr>';
+tbody.innerHTML = '<tr><td colspan="' + (State.currentPosto === 'Pintura' ? '9' : '10') + '"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Não há projetos para ' + State.currentPosto + '.') + '</p></div></td></tr>';
 this.atualizarCabecalho();
 return;
 }
@@ -2593,14 +2610,14 @@ if (p.volumesTotal && p.volumesTotal > 0) {
 if (p.volumesProcessados > 0 && p.volumesProcessados < p.volumesTotal) {
 const restantes = p.volumesTotal - p.volumesProcessados;
 const porcentagem = (p.volumesProcessados / p.volumesTotal) * 100;
-volumesDisplay = `<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">${p.volumesProcessados}</span><span class="volumes-divider">/</span><span class="volumes-total">${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ${porcentagem}%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>${restantes} restante${restantes !== 1 ? 's' : ''}</span></div></div>`;
+volumesDisplay = '<div class="volumes-container"><div class="volumes-main"><span class="volumes-processed">' + p.volumesProcessados + '</span><span class="volumes-divider">/</span><span class="volumes-total">' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill" style="width: ' + porcentagem + '%"></div></div><div class="volumes-remaining"><i class="fa-solid fa-hourglass-half"></i><span>' + restantes + ' restante' + (restantes !== 1 ? 's' : '') + '</span></div></div>';
 } else if (p.volumesProcessados >= p.volumesTotal) {
-volumesDisplay = `<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>${p.volumesTotal}/${p.volumesTotal}</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>`;
+volumesDisplay = '<div class="volumes-container"><div class="volumes-main complete"><i class="fa-solid fa-check-circle"></i><span>' + p.volumesTotal + '/' + p.volumesTotal + '</span></div><div class="volumes-progress-bar"><div class="volumes-progress-fill complete" style="width: 100%"></div></div></div>';
 } else {
-volumesDisplay = `<div class="volumes-container"><span class="volumes-total-only">${p.volumesTotal} volume${p.volumesTotal !== 1 ? 's' : ''}</span></div>`;
+volumesDisplay = '<div class="volumes-container"><span class="volumes-total-only">' + p.volumesTotal + ' volume' + (p.volumesTotal !== 1 ? 's' : '') + '</span></div>';
 }
 } else {
-volumesDisplay = `<span class="volumes-simple">${p.volumes || '-'}</span>`;
+volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>';
 }
 } else {
 volumesDisplay = '-';
@@ -2608,25 +2625,25 @@ volumesDisplay = '-';
 let tempoDisplay = '-';
 const inicio = Number(p.dataHoraInicio);
 if (p.status === 'Em Processo' && inicio > 0) {
-tempoDisplay = `<span class="tempo-real ativo" id="tempo-${p.id}">Calculando...</span>`;
+tempoDisplay = '<span class="tempo-real ativo" id="tempo-' + p.id + '">Calculando...</span>';
 } else if (p.dataHoraInicio && p.dataHoraFim) {
-tempoDisplay = `<span class="tempo-real">${Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio)}</span>`;
+tempoDisplay = '<span class="tempo-real">' + Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio) + '</span>';
 }
-let statusDisplay = `<span class="status ${statusClass}">${p.status || ''}</span>`;
+let statusDisplay = '<span class="status ' + statusClass + '">' + (p.status || '') + '</span>';
 if (State.currentPosto === 'Pintura' && p.status === 'Parcial' && p.observacaoPintura) {
-statusDisplay += `<div class="obs-pintura"><i class="fa-solid fa-circle-info"></i>${p.observacaoPintura}</div>`;
+statusDisplay += '<div class="obs-pintura"><i class="fa-solid fa-circle-info"></i>' + p.observacaoPintura + '</div>';
 }
 let botoesAcao = '';
 if (p.status === 'Aguardando' || p.status === 'Parcial') {
-botoesAcao = `<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso('${p.id}')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`;
+botoesAcao = '<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
 } else if (p.status === 'Em Processo') {
-botoesAcao = `<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso('${p.id}')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar('${p.id}')"><i class="fa-solid fa-circle-check"></i></button>`;
+botoesAcao = '<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
 }
-const descricaoDisplay = p.descricao ? `<small style="color:var(--text-light);display:block;">${p.descricao}</small>` : '';
+const descricaoDisplay = p.descricao ? '<small style="color:var(--text-light);display:block;">' + p.descricao + '</small>' : '';
 if (State.currentPosto === 'Pintura') {
-html += `<tr><td style="text-align:center;">${p.pep || '-'}</td><td style="text-align:center;"><strong>${p.diagrama || ''}</strong></td><td style="text-align:center;">${p.placa || '-'}</td><td style="text-align:center;">${descricaoDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade || ''}</span></td><td style="text-align:center;"><span class="turno-badge">${p.turno || '-'}</span></td><td style="text-align:center;">${tempoDisplay}</td><td style="text-align:center;">${statusDisplay}</td><td style="text-align:center;"><div class="action-main">${botoesAcao}</div></td></tr>`;
+html += '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + descricaoDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + (p.prioridade || '') + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;">' + tempoDisplay + '</td><td style="text-align:center;">' + statusDisplay + '</td><td style="text-align:center;"><div class="action-main">' + botoesAcao + '</div></td></tr>';
 } else {
-html += `<tr><td style="text-align:center;">${p.pep || '-'}</td><td style="text-align:center;"><strong>${p.diagrama || ''}</strong></td><td style="text-align:center;">${p.placa || '-'}</td><td style="text-align:center;">${descricaoDisplay}</td><td style="text-align:center;">${volumesDisplay}</td><td style="text-align:center;"><span style="color:${prioColor};font-weight:600;">${p.prioridade || ''}</span></td><td style="text-align:center;"><span class="turno-badge">${p.turno || '-'}</span></td><td style="text-align:center;">${tempoDisplay}</td><td style="text-align:center;">${statusDisplay}</td><td style="text-align:center;"><div class="action-main">${botoesAcao}</div></td></tr>`;
+html += '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + descricaoDisplay + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + (p.prioridade || '') + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;">' + tempoDisplay + '</td><td style="text-align:center;">' + statusDisplay + '</td><td style="text-align:center;"><div class="action-main">' + botoesAcao + '</div></td></tr>';
 }
 });
 tbody.innerHTML = html;
@@ -2637,30 +2654,9 @@ atualizarCabecalho() {
 const head = document.getElementById('postoTableHead');
 if (!head) return;
 if (State.currentPosto === 'Pintura') {
-head.innerHTML = `<tr>
-<th>PEP</th>
-<th>Diagrama</th>
-<th>Placa</th>
-<th>Descrição</th>
-<th>Prioridade</th>
-<th>Turno</th>
-<th>Tempo</th>
-<th>Status</th>
-<th>Ações</th>
-</tr>`;
+head.innerHTML = '<tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Descrição</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr>';
 } else {
-head.innerHTML = `<tr>
-<th>PEP</th>
-<th>Diagrama</th>
-<th>Placa</th>
-<th>Descrição</th>
-<th>Volumes</th>
-<th>Prioridade</th>
-<th>Turno</th>
-<th>Tempo</th>
-<th>Status</th>
-<th>Ações</th>
-</tr>`;
+head.innerHTML = '<tr><th>PEP</th><th>Diagrama</th><th>Placa</th><th>Descrição</th><th>Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr>';
 }
 },
 atualizarTemposEmTempoReal() {
@@ -2976,7 +2972,7 @@ renderGeral() {
 const tbody = document.getElementById('histTableBody');
 if (!tbody) return;
 const searchEl = document.getElementById('histSearch');
-const search = (searchEl ? searchEl.value : '').toLowerCase();
+const search = (searchEl ? searchEl.value : '').toLowerCase().trim();
 let data = [...State.data.historico];
 if (State.histFilter !== 'all') data = data.filter(p => p.processo === State.histFilter);
 if (search) {
@@ -2992,7 +2988,7 @@ data = data.filter(p => p.processo === State.currentPosto);
 }
 data.sort((a, b) => (b.concluidoEm || 0) - (a.concluidoEm || 0));
 if (data.length === 0) {
-tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3></div></td></tr>';
+tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div></td></tr>';
 return;
 }
 tbody.innerHTML = data.map(p => {
@@ -3007,7 +3003,7 @@ renderPostos() {
 const tbody = document.getElementById('histPostoTableBody');
 if (!tbody) return;
 const searchEl = document.getElementById('histPostoSearch');
-const search = (searchEl ? searchEl.value : '').toLowerCase();
+const search = (searchEl ? searchEl.value : '').toLowerCase().trim();
 let data = [...State.data.historicoPostos];
 if (State.histPostoFilter !== 'all') data = data.filter(p => p.processo === State.histPostoFilter);
 if (search) {
@@ -3022,7 +3018,7 @@ data = data.filter(p => p.processo === State.currentPosto);
 }
 data.sort((a, b) => (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0));
 if (data.length === 0) {
-tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3></div></td></tr>';
+tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div></td></tr>';
 return;
 }
 const postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
@@ -3038,7 +3034,7 @@ renderPostoAtual() {
 const tbody = document.getElementById('historicoPostoTableBody');
 if (!tbody) return;
 const searchEl = document.getElementById('historicoPostoSearch');
-const search = (searchEl ? searchEl.value : '').toLowerCase();
+const search = (searchEl ? searchEl.value : '').toLowerCase().trim();
 document.getElementById('historicoPostoNome').textContent = State.currentPosto;
 document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
 let data = State.data.historicoPostos.filter(p => p.processo === State.currentPosto);
@@ -3052,7 +3048,7 @@ data = data.filter(p =>
 }
 data.sort((a, b) => (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0));
 if (data.length === 0) {
-tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3></div></td></tr>';
+tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div></td></tr>';
 return;
 }
 tbody.innerHTML = data.map(p => {
@@ -3374,16 +3370,14 @@ UI.showToast('success', 'Exportado', 'CSV de concluídos gerado');
 downloadCSV(filename, headers, rows) {
 const escapeCSV = v => {
 const s = String(v ?? '');
-if (s.includes(',') || s.includes('"') || s.includes('
-')) {
+if (s.includes(',') || s.includes('"') || s.includes('\n')) {
 return '"' + s.replace(/"/g, '""') + '"';
 }
 return s;
 };
 const csvContent = [headers.map(escapeCSV).join(','),
 ...rows.map(r => r.map(escapeCSV).join(','))
-].join('
-');
+].join('\n');
 const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
 const url = URL.createObjectURL(blob);
 const link = document.createElement('a');
