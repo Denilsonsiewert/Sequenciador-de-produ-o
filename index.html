@@ -546,7 +546,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-list"></i> Projetos Cadastrados</h2><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div></div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Admin.renderTable()"></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span></div>
 </div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="admTableBody"></tbody></table></div>
@@ -564,7 +564,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><label style="font-size:12px;font-weight:600;">Turno:</label><select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:12px;min-height:36px;"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Posto.renderTable()"></div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span><span class="filter-chip" data-filter="Parcial" onclick="Posto.setFilter('Parcial',this)">Parcial</span></div>
 </div>
 <div class="table-wrapper"><table class="table" id="postoTable"><thead id="postoTableHead"><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th class="vol-col">Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div>
@@ -589,13 +589,13 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div id="historicoGeralSection">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderGeral()"></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div>
 </div>
 <div id="historicoPostosSection" style="display:none;">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostos()"></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div>
 </div>
@@ -603,7 +603,7 @@ input, select, textarea { position:relative; z-index:5; }
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." oninput="Historico.renderPostoAtual()"></div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
@@ -677,7 +677,8 @@ const State = {
     isOnline: navigator.onLine, apiAvailable: true,
     cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: null,
     apontamentoLista: [], apontamentoEnviadasHoje: 0, apontamentosSyncInterval: null,
-    syncIntervalIds: []
+    syncIntervalIds: [],
+    searchTimers: {} // para debounce das buscas
 };
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
@@ -765,6 +766,11 @@ const Utils = {
             }
         }
         return result;
+    },
+    // Debounce genérico
+    debounce(fn, delay, key) {
+        if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
+        State.searchTimers[key] = setTimeout(fn, delay);
     }
 };
 
@@ -2973,7 +2979,7 @@ const Export = {
 };
 
 /* ============================================================
-   INICIALIZAÇÃO
+   INICIALIZAÇÃO - COM DEBOUNCE PARA BUSCAS
    ============================================================ */
 (function() {
     try {
@@ -2984,6 +2990,27 @@ const Export = {
         UI.setupVirtualKeyboard();
         setInterval(UI.updateDate, 1000);
         UI.updateDate();
+
+        // --- DEBOUNCE PARA OS CAMPOS DE BUSCA ---
+        function setupSearchDebounce(inputId, callback, delay) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            let timer = null;
+            input.addEventListener('input', function() {
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(function() {
+                    callback();
+                    timer = null;
+                }, delay || 350);
+            });
+        }
+
+        setupSearchDebounce('admSearch', function() { Admin.renderTable(); }, 350);
+        setupSearchDebounce('postoSearch', function() { Posto.renderTable(); }, 350);
+        setupSearchDebounce('histSearch', function() { Historico.renderGeral(); }, 350);
+        setupSearchDebounce('histPostoSearch', function() { Historico.renderPostos(); }, 350);
+        setupSearchDebounce('historicoPostoSearch', function() { Historico.renderPostoAtual(); }, 350);
+
         const savedRole = localStorage.getItem('weg_logged_in_role');
         if (typeof API !== 'undefined' && State.apiAvailable) {
             API.on('project:synced', function(proj) {
