@@ -735,6 +735,7 @@ const Utils = {
         };
     },
     fromApiFormat(apiProj) {
+        if (!apiProj) return null;
         return {
             id: apiProj.ID, pep: apiProj.PEP, diagrama: apiProj.Diagrama, placa: apiProj.Placa,
             descricao: apiProj.Descricao, volumesTotal: apiProj.VolumesTotal, volumesProcessados: apiProj.VolumesProcessados,
@@ -746,6 +747,7 @@ const Utils = {
         };
     },
     extrairDadosEtiqueta(texto) {
+        if (!texto || typeof texto !== 'string') return { pep: null, diagrama: null };
         let clean = texto.replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
         const result = { pep: null, diagrama: null };
         const pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-\s]+)/i);
@@ -767,7 +769,6 @@ const Utils = {
         }
         return result;
     },
-    // Debounce genérico
     debounce(fn, delay, key) {
         if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
         State.searchTimers[key] = setTimeout(fn, delay);
@@ -884,7 +885,7 @@ const Storage = {
             else if (acao === 'config') result = await API.updateConfig(dados.key, dados.value);
             else if (acao === 'salvarApontamento') result = await API.salvarApontamento(dados);
             if (result && result.success) {
-                this.salvarLocal();
+                try { this.salvarLocal(); } catch (e) { console.warn('Falha ao salvar local:', e); }
                 lastSyncTimestamp = Date.now();
                 localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
                 return { success: true, offline: false };
@@ -923,45 +924,49 @@ const UI = {
         }, 350);
     },
     openModal: function(id) {
-        document.getElementById(id).classList.add('active');
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.add('active');
         if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = true;
     },
     closeModal: function(id) {
-        document.getElementById(id).classList.remove('active');
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.remove('active');
         if (id === 'modalTurnoFimSemana') State.turnoFimSemanaModalAberto = false;
     },
     toggleSidebarMobile: function() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
+        if (!sidebar) return;
         const isOpen = sidebar.classList.contains('open');
         if (isOpen) {
             sidebar.classList.remove('open');
-            overlay.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
             document.body.style.overflow = '';
         } else {
             sidebar.classList.add('open');
-            overlay.classList.add('active');
+            if (overlay) overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
     },
     closeSidebarMobile: function() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
-        if (sidebar.classList.contains('open')) {
+        if (sidebar && sidebar.classList.contains('open')) {
             sidebar.classList.remove('open');
-            overlay.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
     },
     togglePwdVisibility: function(inputId, btn) {
         const input = document.getElementById(inputId);
+        if (!input) return;
         const icon = btn.querySelector('i');
         if (input.type === 'password') {
             input.type = 'text';
-            icon.className = 'fa-solid fa-eye-slash';
+            if (icon) icon.className = 'fa-solid fa-eye-slash';
         } else {
             input.type = 'password';
-            icon.className = 'fa-solid fa-eye';
+            if (icon) icon.className = 'fa-solid fa-eye';
         }
         input.focus();
     },
@@ -977,24 +982,27 @@ const UI = {
             'historico-posto': State.currentPosto ? 'Histórico - ' + State.currentPosto : 'Histórico do Posto',
             'config': 'Configurações'
         };
-        titleEl.textContent = titles[page] || 'WEG';
-        if ((page === 'posto' || page === 'historico-posto') && State.currentPosto) {
-            badgeEl.textContent = State.currentPosto;
-            badgeEl.style.display = 'inline-block';
-        } else {
-            badgeEl.style.display = 'none';
+        if (titleEl) titleEl.textContent = titles[page] || 'WEG';
+        if (badgeEl) {
+            if ((page === 'posto' || page === 'historico-posto') && State.currentPosto) {
+                badgeEl.textContent = State.currentPosto;
+                badgeEl.style.display = 'inline-block';
+            } else {
+                badgeEl.style.display = 'none';
+            }
         }
     },
     showToast: function(type, title, message) {
-        const icons = { success: 'check-circle', error: 'circle-xmark', warning: 'triangle-exclamation', info: 'circle-info' };
         const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const icons = { success: 'check-circle', error: 'circle-xmark', warning: 'triangle-exclamation', info: 'circle-info' };
         const toast = document.createElement('div');
         toast.className = 'toast ' + type;
         toast.innerHTML = '<i class="fa-solid fa-' + icons[type] + '"></i><div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>';
         container.appendChild(toast);
         setTimeout(function() {
             toast.style.animation = 'slideIn .3s ease reverse';
-            setTimeout(function() { toast.remove(); }, 300);
+            setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
         }, 3500);
     },
     updateDate: function() {
@@ -1009,6 +1017,7 @@ const UI = {
     },
     buildMenu: function() {
         const menu = document.getElementById('mainMenu');
+        if (!menu) return;
         let html = '';
         if (State.currentUser === 'admin') {
             html = '<a data-page="dashboard" class="' + (State.currentPage === 'dashboard' ? 'active' : '') + '" data-tooltip="Dashboard"><i class="fa-solid fa-chart-line"></i></a>' +
@@ -1050,7 +1059,7 @@ const UI = {
         document.addEventListener('click', function(e) {
             const sb = document.getElementById('sidebar');
             const toggle = document.getElementById('menuToggle');
-            if (window.innerWidth <= 1023 && sb.classList.contains('open') && !sb.contains(e.target) && !toggle.contains(e.target)) {
+            if (window.innerWidth <= 1023 && sb && sb.classList.contains('open') && !sb.contains(e.target) && toggle && !toggle.contains(e.target)) {
                 UI.closeSidebarMobile();
             }
         });
@@ -1252,10 +1261,10 @@ const Apontamento = {
         count.textContent = '(' + State.apontamentoLista.length + ')';
         if (State.apontamentoLista.length === 0) {
             list.innerHTML = '<div class="apontamento-empty"><i class="fa-solid fa-barcode"></i><h3>Nenhuma ordem bipada</h3><p>Bipe a primeira ordem para começar</p></div>';
-            btnLimpar.style.display = 'none';
+            if (btnLimpar) btnLimpar.style.display = 'none';
             return;
         }
-        btnLimpar.style.display = 'inline-flex';
+        if (btnLimpar) btnLimpar.style.display = 'inline-flex';
         list.innerHTML = State.apontamentoLista.map(function(item, idx) {
             return '<div class="apontamento-item">' +
                 '<span class="item-num">' + (idx + 1) + '</span>' +
@@ -1468,9 +1477,11 @@ async function syncDataCompleto() {
     try {
         var projs = await apiRequest('sync', { since: 0 }, 'GET');
         if (projs.success && projs.data) {
-            State.data.projetos = projs.data.map(Utils.fromApiFormat);
+            State.data.projetos = projs.data.map(Utils.fromApiFormat).filter(Boolean);
             lastSyncTimestamp = projs.timestamp || Date.now();
             localStorage.setItem('weg_last_sync_ts', lastSyncTimestamp.toString());
+        } else {
+            State.data.projetos = [];
         }
         try {
             var hist = await apiRequest('syncHistorico', { since: 0 }, 'GET');
@@ -1485,8 +1496,10 @@ async function syncDataCompleto() {
                         observacaoPintura: h.ObservacaoPintura, concluidoEm: h.ConcluidoEm
                     };
                 });
+            } else {
+                State.data.historico = [];
             }
-        } catch(e2) { console.warn('syncHistorico falhou:', e2); }
+        } catch(e2) { console.warn('syncHistorico falhou:', e2); State.data.historico = []; }
         try {
             var histPostos = await apiRequest('syncHistoricoPostos', { since: 0 }, 'GET');
             if (histPostos.success && histPostos.data) {
@@ -1498,8 +1511,10 @@ async function syncDataCompleto() {
                         dataHoraConclusao: h.DataHoraConclusao
                     };
                 });
+            } else {
+                State.data.historicoPostos = [];
             }
-        } catch(e3) { console.warn('syncHistoricoPostos falhou:', e3); }
+        } catch(e3) { console.warn('syncHistoricoPostos falhou:', e3); State.data.historicoPostos = []; }
         const syncInd = document.getElementById('syncIndicator');
         const syncSt = document.getElementById('syncStatus');
         if (syncInd) syncInd.className = 'sync-indicator';
@@ -1529,6 +1544,7 @@ async function syncDataIncremental() {
             } else {
                 result.data.forEach(function(remoteProj) {
                     const projLocal = Utils.fromApiFormat(remoteProj);
+                    if (!projLocal) return;
                     const index = State.data.projetos.findIndex(function(p) { return p.id === projLocal.id; });
                     if (index === -1) {
                         State.data.projetos.push(projLocal);
@@ -3015,6 +3031,7 @@ const Export = {
         if (typeof API !== 'undefined' && State.apiAvailable) {
             API.on('project:synced', function(proj) {
                 const projLocal = Utils.fromApiFormat(proj);
+                if (!projLocal) return;
                 const index = State.data.projetos.findIndex(function(p) { return p.id === projLocal.id; });
                 if (index === -1) {
                     State.data.projetos.push(projLocal);
@@ -3031,6 +3048,7 @@ const Export = {
             });
             API.on('project:created', function(proj) {
                 const projLocal = Utils.fromApiFormat(proj);
+                if (!projLocal) return;
                 if (!State.data.projetos.find(function(p) { return p.id === projLocal.id; })) {
                     State.data.projetos.push(projLocal);
                     Storage.salvarLocal();
@@ -3040,6 +3058,7 @@ const Export = {
             });
             API.on('project:updated', function(proj) {
                 const projLocal = Utils.fromApiFormat(proj);
+                if (!projLocal) return;
                 const index = State.data.projetos.findIndex(function(p) { return p.id === projLocal.id; });
                 if (index !== -1) {
                     State.data.projetos[index] = Object.assign({}, State.data.projetos[index], projLocal);
