@@ -123,7 +123,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .form-actions { grid-column:span 2; display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
 .table-wrapper { overflow-x:auto; border-radius:8px; margin-top:15px; -webkit-overflow-scrolling:touch; }
 .table-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
-/* NOVO: Search box com seletor de campo */
 .search-box-combo { display:flex; gap:6px; flex:1; max-width:420px; min-width:240px; z-index:20; align-items:stretch; }
 .search-field-select { padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--weg-blue); font-size:12px; font-weight:600; cursor:pointer !important; min-height:40px; min-width:110px; flex-shrink:0; transition:var(--transition); }
 .search-field-select:focus { outline:none; border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); }
@@ -132,6 +131,9 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; position:relative; z-index:25; }
 .search-box input:focus { border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); outline:none; }
 .search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; z-index:21; }
+/* NOVO: Indicador visual de extração automática */
+.search-box.extracted input { border-color:var(--success); background:rgba(0,166,81,.05); }
+.search-box.extracted i { color:var(--success); }
 .table { width:100%; border-collapse:collapse; min-width:600px; }
 .table thead th { background:var(--weg-blue); color:white; padding:10px 8px; text-align:center; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
 .table tbody tr { transition:var(--transition); }
@@ -563,7 +565,7 @@ input, select, textarea { position:relative; z-index:5; }
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+<div class="search-box" id="admSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span></div>
 </div>
@@ -591,7 +593,7 @@ input, select, textarea { position:relative; z-index:5; }
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+<div class="search-box" id="postoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
 </div>
 <button class="btn btn-success btn-sm" id="btnAddPosto" onclick="Posto.abrirCadastroManual()" style="display:none;white-space:nowrap;"><i class="fa-solid fa-plus"></i> Adicionar Projeto</button>
 </div>
@@ -628,7 +630,7 @@ input, select, textarea { position:relative; z-index:5; }
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+<div class="search-box" id="histSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div>
 </div>
@@ -644,7 +646,7 @@ input, select, textarea { position:relative; z-index:5; }
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+<div class="search-box" id="histPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div>
 </div>
@@ -662,7 +664,7 @@ input, select, textarea { position:relative; z-index:5; }
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+<div class="search-box" id="historicoPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div>
 </div>
@@ -909,6 +911,79 @@ if (num) { result.diagrama = num[1]; break; }
 }
 return result;
 },
+/* NOVA FUNÇÃO: Detecta se o texto bipeado é uma etiqueta completa e extrai o diagrama */
+ehEtiquetaCompleta: function(texto) {
+if (!texto) return false;
+var clean = String(texto).replace(/\s+/g, ' ').trim();
+var parts = clean.split(' ');
+// Uma etiqueta completa tem múltiplos blocos numéricos (pelo menos 4)
+var blocosNumericos = parts.filter(function(p) { return /^\d+$/.test(p); });
+if (blocosNumericos.length < 4) return false;
+// Verifica se há pelo menos um bloco de 11 dígitos começando com "95"
+var temBloco95 = blocosNumericos.some(function(p) {
+return /^\d{11}$/.test(p) && p.indexOf('95') === 0;
+});
+if (temBloco95) return true;
+// Ou verifica padrão 95XXXXXXXXX concatenado
+if (/95\d{9}/.test(clean)) return true;
+return false;
+},
+/* NOVA FUNÇÃO: Extrai diagrama de uma etiqueta completa bipeada */
+extrairDiagramaDaEtiqueta: function(texto) {
+if (!texto) return null;
+var clean = String(texto).replace(/\s+/g, ' ').trim();
+var parts = clean.split(' ');
+// 1. Procura bloco de 11 dígitos começando com "95" (padrão da etiqueta)
+for (var i = 0; i < parts.length; i++) {
+var part = parts[i];
+if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
+return part.substring(2); // Remove os 2 primeiros dígitos "95"
+}
+}
+// 2. Procura padrão "95XXXXXXXXX" no texto inteiro
+var match95 = clean.match(/95(\d{9})/);
+if (match95) return match95[1];
+// 3. Fallback: qualquer bloco isolado de 9 dígitos
+for (var j = 0; j < parts.length; j++) {
+var p = parts[j];
+if (/^\d{9}$/.test(p)) return p;
+}
+return null;
+},
+/* NOVA FUNÇÃO: Processa texto bipeado no campo de busca - se for etiqueta, extrai o diagrama */
+processarBuscaComExtracao: function(inputElement, boxElement) {
+var texto = inputElement.value;
+if (!texto) {
+if (boxElement) boxElement.classList.remove('extracted');
+return texto;
+}
+// Se o texto é uma etiqueta completa, extrai o diagrama
+if (this.ehEtiquetaCompleta(texto)) {
+var diagrama = this.extrairDiagramaDaEtiqueta(texto);
+if (diagrama && diagrama !== texto.trim()) {
+inputElement.value = diagrama;
+if (boxElement) {
+boxElement.classList.add('extracted');
+setTimeout(function() { boxElement.classList.remove('extracted'); }, 3000);
+}
+try {
+var ctx = new (window.AudioContext || window.webkitAudioContext)();
+var osc = ctx.createOscillator();
+var gain = ctx.createGain();
+osc.connect(gain);
+gain.connect(ctx.destination);
+osc.frequency.value = 1200;
+gain.gain.value = 0.08;
+osc.start();
+setTimeout(function() { osc.stop(); }, 80);
+} catch (e) {}
+return diagrama;
+}
+} else {
+if (boxElement) boxElement.classList.remove('extracted');
+}
+return texto;
+},
 extrairDiagramaCodigoBarras: function(texto) {
 if (!texto) return null;
 var clean = String(texto).replace(/\s+/g, ' ').trim();
@@ -933,7 +1008,6 @@ normalizarDiagrama: function(valor) {
 if (valor == null) return '';
 return String(valor).trim().toLowerCase().replace(/\s+/g, '');
 },
-/* NOVO: Filtro por campo específico */
 filtrarPorCampo: function(item, search, campo) {
 if (!search) return true;
 var s = search.toLowerCase();
@@ -1105,10 +1179,7 @@ if (container) {
 var containerRect = container.getBoundingClientRect();
 var elementoDentroModal = elemento.offsetTop;
 var posicaoAlvo = elementoDentroModal - (viewportHeight - espacoNecessario - containerRect.top);
-container.scrollTo({
-top: Math.max(0, posicaoAlvo),
-behavior: 'smooth'
-});
+container.scrollTo({ top: Math.max(0, posicaoAlvo), behavior: 'smooth' });
 } else {
 var targetPosition = elementRect.top + window.scrollY - (viewportHeight - espacoNecessario - elementRect.height);
 window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
@@ -3337,23 +3408,31 @@ UI.setupVirtualKeyboard();
 setupVisibilityDetection();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
-function setupSearchDebounce(inputId, callback, delay) {
+/* NOVO: Setup de busca com extração automática de etiqueta */
+function setupSearchComExtracao(inputId, boxId, callback, delay) {
 var input = document.getElementById(inputId);
+var box = document.getElementById(boxId);
 if (!input) return;
 var timer = null;
 input.addEventListener('input', function() {
 if (timer) clearTimeout(timer);
 timer = setTimeout(function() {
+// NOVO: Processa o texto bipeado - se for etiqueta, extrai o diagrama
+var textoExtraido = Utils.processarBuscaComExtracao(input, box);
+if (textoExtraido !== input.value) {
+// A extração ocorreu - mostra feedback
+UI.showToast('success', 'Etiqueta detectada', 'Diagrama extraído: ' + textoExtraido);
+}
 callback();
 timer = null;
 }, delay || 350);
 });
 }
-setupSearchDebounce('admSearch', function() { Admin.renderTable(); }, 350);
-setupSearchDebounce('postoSearch', function() { Posto.renderTable(); }, 350);
-setupSearchDebounce('histSearch', function() { Historico.renderGeral(); }, 350);
-setupSearchDebounce('histPostoSearch', function() { Historico.renderPostos(); }, 350);
-setupSearchDebounce('historicoPostoSearch', function() { Historico.renderPostoAtual(); }, 350);
+setupSearchComExtracao('admSearch', 'admSearchBox', function() { Admin.renderTable(); }, 350);
+setupSearchComExtracao('postoSearch', 'postoSearchBox', function() { Posto.renderTable(); }, 350);
+setupSearchComExtracao('histSearch', 'histSearchBox', function() { Historico.renderGeral(); }, 350);
+setupSearchComExtracao('histPostoSearch', 'histPostoSearchBox', function() { Historico.renderPostos(); }, 350);
+setupSearchComExtracao('historicoPostoSearch', 'historicoPostoSearchBox', function() { Historico.renderPostoAtual(); }, 350);
 var savedRole = localStorage.getItem('weg_logged_in_role');
 if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', function(proj) {
