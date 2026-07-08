@@ -123,17 +123,10 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .form-actions { grid-column:span 2; display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
 .table-wrapper { overflow-x:auto; border-radius:8px; margin-top:15px; -webkit-overflow-scrolling:touch; }
 .table-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
-.search-box-combo { display:flex; gap:6px; flex:1; max-width:420px; min-width:240px; z-index:20; align-items:stretch; }
-.search-field-select { padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--weg-blue); font-size:12px; font-weight:600; cursor:pointer !important; min-height:40px; min-width:110px; flex-shrink:0; transition:var(--transition); }
-.search-field-select:focus { outline:none; border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); }
-.search-field-select:hover { border-color:var(--weg-blue); background:var(--weg-light); }
-.search-box { position:relative; flex:1; min-width:140px; z-index:20; }
+.search-box { position:relative; flex:1; max-width:300px; min-width:140px; z-index:20; }
 .search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; position:relative; z-index:25; }
 .search-box input:focus { border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); outline:none; }
 .search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; z-index:21; }
-/* NOVO: Indicador visual de extração automática */
-.search-box.extracted input { border-color:var(--success); background:rgba(0,166,81,.05); }
-.search-box.extracted i { color:var(--success); }
 .table { width:100%; border-collapse:collapse; min-width:600px; }
 .table thead th { background:var(--weg-blue); color:white; padding:10px 8px; text-align:center; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
 .table tbody tr { transition:var(--transition); }
@@ -167,6 +160,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .volumes-simple { color:var(--text-light); font-size:12px; text-align:center; }
 .tempo-real { background:var(--weg-light); color:var(--weg-blue); padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; font-family:'Courier New', monospace; display:inline-block; }
 .tempo-real.ativo { background:var(--success); color:white; animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.7; } }
 .action-main { display:flex; gap:6px; align-items:center; justify-content:center; flex-wrap:wrap; }
 .icon-action-lg { background:var(--bg); border:2px solid var(--border); cursor:pointer !important; padding:8px 12px; border-radius:8px; color:var(--text); transition:var(--transition); font-size:18px; min-width:48px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,.08); flex:0 0 auto; position:relative; touch-action:manipulation; }
 .icon-action-lg:hover { box-shadow:0 4px 8px rgba(0,0,0,.12); transform:translateY(-1px); }
@@ -342,7 +336,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .turno-comparison { flex-direction:column; gap:6px; }
 .turno-stat { padding:8px; }
 .turno-stat .turno-value { font-size:18px; }
-.search-box-combo { max-width:100%; min-width:100%; }
 }
 @media (max-width:767px) {
 :root { --header-height:70px; --sidebar-width:60px; }
@@ -412,8 +405,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 #cardSeguranca .form-actions .btn { padding:10px 18px; font-size:13px; }
 .apontamento-input-card .input-row { flex-direction:column; }
 .apontamento-input-card .input-row .btn { width:100%; margin-bottom:8px; }
-.search-box-combo { min-width:100%; }
-.search-field-select { min-width:100px; font-size:11px; }
 }
 @media (max-width:400px) {
 .kpi-grid { grid-template-columns:1fr 1fr; gap:6px; }
@@ -557,16 +548,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-list"></i> Projetos Cadastrados</h2><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div></div>
 <div class="table-toolbar">
-<div class="search-box-combo">
-<select class="search-field-select" id="admSearchField" onchange="Admin.renderTable()">
-<option value="all">🔍 Todos os campos</option>
-<option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
-<option value="placa">🪪 Placa</option>
-<option value="descricao">📝 Descrição</option>
-</select>
-<div class="search-box" id="admSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
-</div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span></div>
 </div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="admTableBody"></tbody></table></div>
@@ -584,19 +566,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><label style="font-size:12px;font-weight:600;">Turno:</label><select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:12px;min-height:36px;"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
 </div>
 <div class="table-toolbar">
-<div style="display:flex;gap:8px;align-items:stretch;flex:1;min-width:0;flex-wrap:wrap;">
-<div class="search-box-combo" style="flex:1;min-width:240px;">
-<select class="search-field-select" id="postoSearchField" onchange="Posto.renderTable()">
-<option value="all">🔍 Todos os campos</option>
-<option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
-<option value="placa">🪪 Placa</option>
-<option value="descricao">📝 Descrição</option>
-</select>
-<div class="search-box" id="postoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
-</div>
-<button class="btn btn-success btn-sm" id="btnAddPosto" onclick="Posto.abrirCadastroManual()" style="display:none;white-space:nowrap;"><i class="fa-solid fa-plus"></i> Adicionar Projeto</button>
-</div>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span><span class="filter-chip" data-filter="Parcial" onclick="Posto.setFilter('Parcial',this)">Parcial</span></div>
 </div>
 <div class="table-wrapper"><table class="table" id="postoTable"><thead id="postoTableHead"><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th class="vol-col">Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div>
@@ -621,53 +591,22 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div id="historicoGeralSection">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar">
-<div class="search-box-combo">
-<select class="search-field-select" id="histSearchField" onchange="Historico.renderGeral()">
-<option value="all">🔍 Todos os campos</option>
-<option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
-<option value="placa">🪪 Placa</option>
-<option value="descricao">📝 Descrição</option>
-</select>
-<div class="search-box" id="histSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
-</div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div>
-</div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div>
 </div>
 <div id="historicoPostosSection" style="display:none;">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar">
-<div class="search-box-combo">
-<select class="search-field-select" id="histPostoSearchField" onchange="Historico.renderPostos()">
-<option value="all">🔍 Todos os campos</option>
-<option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
-<option value="placa">🪪 Placa</option>
-</select>
-<div class="search-box" id="histPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
-</div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div>
-</div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div>
 </div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar">
-<div class="search-box-combo">
-<select class="search-field-select" id="historicoPostoSearchField" onchange="Historico.renderPostoAtual()">
-<option value="all">🔍 Todos os campos</option>
-<option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
-<option value="placa">🪪 Placa</option>
-</select>
-<div class="search-box" id="historicoPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
-</div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div>
-</div>
+<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-config">
@@ -699,73 +638,6 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:500px;padding:25px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid"><div class="form-group"><label>PEP</label><input type="text" id="edit-pep"></div><div class="form-group"><label>Diagrama/Ordem</label><input type="text" id="edit-diagrama"></div><div class="form-group"><label>Placa</label><input type="text" id="edit-placa"></div><div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao"></div><div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div><div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes"></div><div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div><div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div><div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2"></textarea></div><div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div></div></form></div></div>
 <div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Projeto <strong id="concluirCodigo"></strong></p><div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="margin-top:10px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div><div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="text" id="concluirVolumesProcessados" inputmode="numeric" pattern="[0-9]*" min="1" required placeholder="Ex: 5"></div><div style="margin-top:8px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div></div><div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div class="form-group" style="margin-top:10px;"><label>Status de Conclusão <span class="req">*</span></label><select id="concluirStatusPintura"><option value="Concluído">Concluído (avança para Conferência)</option><option value="Parcial">Parcial (permanece na Pintura)</option></select></div><div class="form-group" style="margin-top:10px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso">Peças em reprocesso</option><option value="Gancherias pendentes">Gancherias pendentes</option></select></div></div><div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
-<!-- MODAL: Cadastro Manual no Posto -->
-<div class="modal-overlay" id="modalCadastroPosto">
-<div class="modal" style="max-width:650px;">
-<div class="modal-head">
-<h3><i class="fa-solid fa-barcode" style="color:var(--weg-blue);"></i> Cadastrar Projeto Manual</h3>
-<button class="modal-close" onclick="Posto.fecharCadastroManual()">×</button>
-</div>
-<div class="alert alert-info" style="margin-bottom:15px;">
-<i class="fa-solid fa-barcode"></i>
-<div>
-<strong>Leitor de Código de Barras</strong>
-<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipe.</div>
-</div>
-</div>
-<form onsubmit="return Posto.cadastrarProjetoManual(event)">
-<div class="form-grid">
-<div class="form-group">
-<label>Tipo do Código <span class="req">*</span></label>
-<select id="cpo-tipo" required onchange="Posto.atualizarLabelCodigo()">
-<option value="Diagrama">Diagrama</option>
-<option value="Ordem">Ordem de Produção</option>
-</select>
-</div>
-<div class="form-group">
-<label id="cpo-label-codigo">Código de Barras (Diagrama) <span class="req">*</span></label>
-<input type="text" id="cpo-codigo" required placeholder="Bipe ou digite o código..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();Posto.processarCodigoBarras();}">
-</div>
-<div class="form-group">
-<label>PEP <small style="color:var(--text-light);font-weight:400;">(opcional)</small></label>
-<input type="text" id="cpo-pep" placeholder="Ex: 170-2500343-121">
-</div>
-<div class="form-group">
-<label>Diagrama / Ordem <span class="req">*</span></label>
-<input type="text" id="cpo-diagrama" required placeholder="Preenchido automaticamente">
-</div>
-<div class="form-group">
-<label>Placa</label>
-<input type="text" id="cpo-placa" placeholder="Ex: PLACA123">
-</div>
-<div class="form-group">
-<label>Volumes</label>
-<input type="text" id="cpo-volumes" placeholder="Ex: 28">
-</div>
-<div class="form-group">
-<label>Descrição</label>
-<input type="text" id="cpo-descricao" placeholder="Ex: Ccm">
-</div>
-<div class="form-group">
-<label>Prioridade</label>
-<select id="cpo-prioridade">
-<option value="Normal">Normal</option>
-<option value="Alta">Alta</option>
-<option value="Urgente">Urgente</option>
-</select>
-</div>
-<div class="form-group full">
-<label>Observações</label>
-<textarea id="cpo-obs" rows="2" placeholder="Observações adicionais..."></textarea>
-</div>
-<div class="form-actions">
-<button type="button" class="btn btn-secondary" onclick="Posto.fecharCadastroManual()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
-<button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar</button>
-</div>
-</div>
-</form>
-</div>
-</div>
 <div class="toast-container" id="toastContainer"></div>
 <div class="virtual-keyboard" id="virtualKeyboard">
 <div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
@@ -911,121 +783,9 @@ if (num) { result.diagrama = num[1]; break; }
 }
 return result;
 },
-/* NOVA FUNÇÃO: Detecta se o texto bipeado é uma etiqueta completa e extrai o diagrama */
-ehEtiquetaCompleta: function(texto) {
-if (!texto) return false;
-var clean = String(texto).replace(/\s+/g, ' ').trim();
-var parts = clean.split(' ');
-// Uma etiqueta completa tem múltiplos blocos numéricos (pelo menos 4)
-var blocosNumericos = parts.filter(function(p) { return /^\d+$/.test(p); });
-if (blocosNumericos.length < 4) return false;
-// Verifica se há pelo menos um bloco de 11 dígitos começando com "95"
-var temBloco95 = blocosNumericos.some(function(p) {
-return /^\d{11}$/.test(p) && p.indexOf('95') === 0;
-});
-if (temBloco95) return true;
-// Ou verifica padrão 95XXXXXXXXX concatenado
-if (/95\d{9}/.test(clean)) return true;
-return false;
-},
-/* NOVA FUNÇÃO: Extrai diagrama de uma etiqueta completa bipeada */
-extrairDiagramaDaEtiqueta: function(texto) {
-if (!texto) return null;
-var clean = String(texto).replace(/\s+/g, ' ').trim();
-var parts = clean.split(' ');
-// 1. Procura bloco de 11 dígitos começando com "95" (padrão da etiqueta)
-for (var i = 0; i < parts.length; i++) {
-var part = parts[i];
-if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
-return part.substring(2); // Remove os 2 primeiros dígitos "95"
-}
-}
-// 2. Procura padrão "95XXXXXXXXX" no texto inteiro
-var match95 = clean.match(/95(\d{9})/);
-if (match95) return match95[1];
-// 3. Fallback: qualquer bloco isolado de 9 dígitos
-for (var j = 0; j < parts.length; j++) {
-var p = parts[j];
-if (/^\d{9}$/.test(p)) return p;
-}
-return null;
-},
-/* NOVA FUNÇÃO: Processa texto bipeado no campo de busca - se for etiqueta, extrai o diagrama */
-processarBuscaComExtracao: function(inputElement, boxElement) {
-var texto = inputElement.value;
-if (!texto) {
-if (boxElement) boxElement.classList.remove('extracted');
-return texto;
-}
-// Se o texto é uma etiqueta completa, extrai o diagrama
-if (this.ehEtiquetaCompleta(texto)) {
-var diagrama = this.extrairDiagramaDaEtiqueta(texto);
-if (diagrama && diagrama !== texto.trim()) {
-inputElement.value = diagrama;
-if (boxElement) {
-boxElement.classList.add('extracted');
-setTimeout(function() { boxElement.classList.remove('extracted'); }, 3000);
-}
-try {
-var ctx = new (window.AudioContext || window.webkitAudioContext)();
-var osc = ctx.createOscillator();
-var gain = ctx.createGain();
-osc.connect(gain);
-gain.connect(ctx.destination);
-osc.frequency.value = 1200;
-gain.gain.value = 0.08;
-osc.start();
-setTimeout(function() { osc.stop(); }, 80);
-} catch (e) {}
-return diagrama;
-}
-} else {
-if (boxElement) boxElement.classList.remove('extracted');
-}
-return texto;
-},
-extrairDiagramaCodigoBarras: function(texto) {
-if (!texto) return null;
-var clean = String(texto).replace(/\s+/g, ' ').trim();
-var parts = clean.split(' ');
-for (var i = 0; i < parts.length; i++) {
-var part = parts[i];
-if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
-return part.substring(2);
-}
-}
-var match95 = clean.match(/95(\d{9})/);
-if (match95) return match95[1];
-for (var j = 0; j < parts.length; j++) {
-var p = parts[j];
-if (/^\d{9}$/.test(p)) return p;
-}
-var match9 = clean.match(/\b(\d{9})\b/);
-if (match9) return match9[1];
-return null;
-},
 normalizarDiagrama: function(valor) {
 if (valor == null) return '';
 return String(valor).trim().toLowerCase().replace(/\s+/g, '');
-},
-filtrarPorCampo: function(item, search, campo) {
-if (!search) return true;
-var s = search.toLowerCase();
-if (campo === 'all') {
-return (item.pep || '').toLowerCase().indexOf(s) !== -1 ||
-(item.diagrama || '').toLowerCase().indexOf(s) !== -1 ||
-(item.placa || '').toLowerCase().indexOf(s) !== -1 ||
-(item.descricao || '').toLowerCase().indexOf(s) !== -1;
-} else if (campo === 'diagrama') {
-return (item.diagrama || '').toLowerCase().indexOf(s) !== -1;
-} else if (campo === 'pep') {
-return (item.pep || '').toLowerCase().indexOf(s) !== -1;
-} else if (campo === 'placa') {
-return (item.placa || '').toLowerCase().indexOf(s) !== -1;
-} else if (campo === 'descricao') {
-return (item.descricao || '').toLowerCase().indexOf(s) !== -1;
-}
-return true;
 },
 debounce: function(fn, delay, key) {
 if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
@@ -1320,7 +1080,6 @@ if (e.target === m) {
 if (m.id === 'modalSenhaAdmin') Auth.cancelarLoginAdmin();
 else if (m.id === 'modalConfirmarSenha') Auth.cancelarConfirmacaoSenha();
 else if (m.id === 'modalTurnoFimSemana') Turno.cancelarSelecao();
-else if (m.id === 'modalCadastroPosto') Posto.fecharCadastroManual();
 else if (m.id === 'modalLogout') UI.closeModal('modalLogout');
 else UI.closeModal(m.id);
 }
@@ -1962,7 +1721,7 @@ el.className = 'password-strength strength-weak';
 el.textContent = '🟡 Senha média';
 el.className = 'password-strength strength-medium';
 } else {
-el.textContent = '🟢 Senha forte';
+el.textContent = ' Senha forte';
 el.className = 'password-strength strength-strong';
 }
 }
@@ -2288,13 +2047,16 @@ renderTable: function() {
 var tbody = document.getElementById('admTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('admSearch');
-var fieldEl = document.getElementById('admSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
-var campo = fieldEl ? fieldEl.value : 'all';
 var data = [].concat(State.data.projetos);
 if (State.admFilter !== 'all') data = data.filter(function(p) { return p.processo === State.admFilter; });
 if (search) {
-data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
+data = data.filter(function(p) {
+return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
+(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
+(p.placa || '').toLowerCase().indexOf(search) !== -1 ||
+(p.descricao || '').toLowerCase().indexOf(search) !== -1;
+});
 }
 data = Utils.ordenarPorPrioridade(data);
 if (data.length === 0) {
@@ -2415,10 +2177,6 @@ document.getElementById('postoTitulo').textContent = 'Posto - ' + State.currentP
 document.getElementById('postoBadge').textContent = State.currentPosto;
 document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
 this.aplicarTurnoAutomatico();
-var btnAdd = document.getElementById('btnAddPosto');
-if (btnAdd) {
-btnAdd.style.display = (State.currentPosto === 'Nanocerâmico') ? 'inline-flex' : 'none';
-}
 this.renderTable();
 if (State.timerInterval) {
 clearInterval(State.timerInterval);
@@ -2461,140 +2219,20 @@ document.querySelectorAll('#page-posto .filter-chip').forEach(function(c) { c.cl
 el.classList.add('active');
 this.renderTable();
 },
-abrirCadastroManual: function() {
-if (State.currentPosto !== 'Nanocerâmico') {
-UI.showToast('warning', 'Acesso restrito', 'Cadastro manual disponível apenas no posto Nanocerâmico');
-return;
-}
-document.getElementById('cpo-tipo').value = 'Diagrama';
-document.getElementById('cpo-codigo').value = '';
-document.getElementById('cpo-pep').value = '';
-document.getElementById('cpo-diagrama').value = '';
-document.getElementById('cpo-placa').value = '';
-document.getElementById('cpo-volumes').value = '';
-document.getElementById('cpo-descricao').value = '';
-document.getElementById('cpo-prioridade').value = 'Normal';
-document.getElementById('cpo-obs').value = '';
-this.atualizarLabelCodigo();
-UI.openModal('modalCadastroPosto');
-setTimeout(function() {
-var codigoInput = document.getElementById('cpo-codigo');
-if (codigoInput) {
-codigoInput.focus();
-UI.scrollParaElemento(codigoInput);
-}
-}, 350);
-},
-fecharCadastroManual: function() {
-UI.closeModal('modalCadastroPosto');
-},
-atualizarLabelCodigo: function() {
-var tipo = document.getElementById('cpo-tipo').value;
-var label = document.getElementById('cpo-label-codigo');
-if (label) {
-label.innerHTML = 'Código de Barras (' + tipo + ') <span class="req">*</span>';
-}
-},
-processarCodigoBarras: function() {
-var codigo = document.getElementById('cpo-codigo').value.trim();
-if (!codigo) {
-UI.showToast('warning', 'Atenção', 'Digite ou bipe o código de barras');
-return;
-}
-var diagrama = Utils.extrairDiagramaCodigoBarras(codigo);
-if (diagrama) {
-document.getElementById('cpo-diagrama').value = diagrama;
-UI.showToast('success', 'Código processado', 'Diagrama/Ordem extraído: ' + diagrama);
-var pepInput = document.getElementById('cpo-pep');
-if (pepInput) {
-pepInput.focus();
-UI.scrollParaElemento(pepInput);
-}
-} else {
-UI.showToast('warning', 'Código não reconhecido', 'Preencha o Diagrama/Ordem manualmente');
-var diagramaInput = document.getElementById('cpo-diagrama');
-if (diagramaInput) {
-diagramaInput.focus();
-UI.scrollParaElemento(diagramaInput);
-}
-}
-},
-cadastrarProjetoManual: async function(e) {
-e.preventDefault();
-var pep = document.getElementById('cpo-pep').value.trim();
-var diagrama = document.getElementById('cpo-diagrama').value.trim();
-var placa = document.getElementById('cpo-placa').value.trim();
-var volumes = document.getElementById('cpo-volumes').value.trim();
-var descricao = document.getElementById('cpo-descricao').value.trim();
-var prioridade = document.getElementById('cpo-prioridade').value;
-var obs = document.getElementById('cpo-obs').value.trim();
-if (!diagrama) {
-UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
-document.getElementById('cpo-diagrama').focus();
-return false;
-}
-var diagramaNormalizado = Utils.normalizarDiagrama(diagrama);
-var existeDiagrama = State.data.projetos.some(function(p) {
-var d = Utils.normalizarDiagrama(p.diagrama);
-return d && d === diagramaNormalizado;
-});
-if (existeDiagrama) {
-UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
-return false;
-}
-var volumesTotal = null;
-if (volumes) {
-var match = volumes.match(/\d+/);
-if (match) volumesTotal = parseInt(match[0]);
-}
-var obsFinal = '[Manual]';
-if (obs && obs.trim()) {
-obsFinal += ' ' + obs.trim();
-}
-var novo = {
-id: Utils.genId(),
-pep: pep || null,
-diagrama: diagrama,
-placa: placa || null,
-descricao: descricao,
-volumes: volumes || '1 unidade',
-volumesTotal: volumesTotal,
-volumesProcessados: 0,
-processo: 'Nanocerâmico',
-prioridade: prioridade,
-status: 'Aguardando',
-turno: State.data.turnosPorPosto['Nanocerâmico'] || '1º Turno',
-obs: obsFinal,
-criadoEm: Date.now(),
-atualizadoEm: Date.now()
-};
-State.data.projetos.push(novo);
-this.renderTable();
-if (State.currentUser === 'admin') Admin.renderTable();
-UI.closeModal('modalCadastroPosto');
-UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
-try {
-await Storage.salvarApi('create', novo);
-} catch (error) {
-console.error('Erro ao cadastrar manualmente:', error);
-State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
-this.renderTable();
-if (State.currentUser === 'admin') Admin.renderTable();
-UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique sua conexão');
-}
-return false;
-},
 renderTable: function() {
 var tbody = document.getElementById('postoTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('postoSearch');
-var fieldEl = document.getElementById('postoSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
-var campo = fieldEl ? fieldEl.value : 'all';
 var data = State.data.projetos.filter(function(p) { return p.processo === State.currentPosto && p.status !== 'Concluído'; });
 if (State.postoFilter !== 'all') data = data.filter(function(p) { return p.status === State.postoFilter; });
 if (search) {
-data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
+data = data.filter(function(p) {
+return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
+(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
+(p.placa || '').toLowerCase().indexOf(search) !== -1 ||
+(p.descricao || '').toLowerCase().indexOf(search) !== -1;
+});
 }
 data = Utils.ordenarPorPrioridade(data);
 var todosPosto = State.data.projetos.filter(function(p) { return p.processo === State.currentPosto; });
@@ -2970,13 +2608,16 @@ renderGeral: function() {
 var tbody = document.getElementById('histTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('histSearch');
-var fieldEl = document.getElementById('histSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
-var campo = fieldEl ? fieldEl.value : 'all';
 var data = [].concat(State.data.historico);
 if (State.histFilter !== 'all') data = data.filter(function(p) { return p.processo === State.histFilter; });
 if (search) {
-data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
+data = data.filter(function(p) {
+return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
+(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
+(p.placa || '').toLowerCase().indexOf(search) !== -1 ||
+(p.descricao || '').toLowerCase().indexOf(search) !== -1;
+});
 }
 if (State.currentUser !== 'admin' && State.currentPosto) {
 data = data.filter(function(p) { return p.processo === State.currentPosto; });
@@ -2998,13 +2639,15 @@ renderPostos: function() {
 var tbody = document.getElementById('histPostoTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('histPostoSearch');
-var fieldEl = document.getElementById('histPostoSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
-var campo = fieldEl ? fieldEl.value : 'all';
 var data = [].concat(State.data.historicoPostos);
 if (State.histPostoFilter !== 'all') data = data.filter(function(p) { return p.processo === State.histPostoFilter; });
 if (search) {
-data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
+data = data.filter(function(p) {
+return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
+(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
+(p.placa || '').toLowerCase().indexOf(search) !== -1;
+});
 }
 if (State.currentUser !== 'admin' && State.currentPosto) {
 data = data.filter(function(p) { return p.processo === State.currentPosto; });
@@ -3027,15 +2670,17 @@ renderPostoAtual: function() {
 var tbody = document.getElementById('historicoPostoTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('historicoPostoSearch');
-var fieldEl = document.getElementById('historicoPostoSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
-var campo = fieldEl ? fieldEl.value : 'all';
 document.getElementById('historicoPostoNome').textContent = State.currentPosto;
 document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
 var data = State.data.historicoPostos.filter(function(p) { return p.processo === State.currentPosto; });
 if (State.historicoPostoFilter !== 'all') data = data.filter(function(p) { return p.turno === State.historicoPostoFilter; });
 if (search) {
-data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
+data = data.filter(function(p) {
+return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
+(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
+(p.placa || '').toLowerCase().indexOf(search) !== -1;
+});
 }
 data.sort(function(a, b) { return (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0); });
 if (data.length === 0) {
@@ -3408,31 +3053,23 @@ UI.setupVirtualKeyboard();
 setupVisibilityDetection();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
-/* NOVO: Setup de busca com extração automática de etiqueta */
-function setupSearchComExtracao(inputId, boxId, callback, delay) {
+function setupSearchDebounce(inputId, callback, delay) {
 var input = document.getElementById(inputId);
-var box = document.getElementById(boxId);
 if (!input) return;
 var timer = null;
 input.addEventListener('input', function() {
 if (timer) clearTimeout(timer);
 timer = setTimeout(function() {
-// NOVO: Processa o texto bipeado - se for etiqueta, extrai o diagrama
-var textoExtraido = Utils.processarBuscaComExtracao(input, box);
-if (textoExtraido !== input.value) {
-// A extração ocorreu - mostra feedback
-UI.showToast('success', 'Etiqueta detectada', 'Diagrama extraído: ' + textoExtraido);
-}
 callback();
 timer = null;
 }, delay || 350);
 });
 }
-setupSearchComExtracao('admSearch', 'admSearchBox', function() { Admin.renderTable(); }, 350);
-setupSearchComExtracao('postoSearch', 'postoSearchBox', function() { Posto.renderTable(); }, 350);
-setupSearchComExtracao('histSearch', 'histSearchBox', function() { Historico.renderGeral(); }, 350);
-setupSearchComExtracao('histPostoSearch', 'histPostoSearchBox', function() { Historico.renderPostos(); }, 350);
-setupSearchComExtracao('historicoPostoSearch', 'historicoPostoSearchBox', function() { Historico.renderPostoAtual(); }, 350);
+setupSearchDebounce('admSearch', function() { Admin.renderTable(); }, 350);
+setupSearchDebounce('postoSearch', function() { Posto.renderTable(); }, 350);
+setupSearchDebounce('histSearch', function() { Historico.renderGeral(); }, 350);
+setupSearchDebounce('histPostoSearch', function() { Historico.renderPostos(); }, 350);
+setupSearchDebounce('historicoPostoSearch', function() { Historico.renderPostoAtual(); }, 350);
 var savedRole = localStorage.getItem('weg_logged_in_role');
 if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', function(proj) {
