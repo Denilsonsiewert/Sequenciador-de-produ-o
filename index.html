@@ -315,6 +315,12 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .apontamento-success i { font-size:48px; margin-bottom:10px; }
 .apontamento-success h3 { font-size:20px; margin-bottom:6px; }
 .apontamento-success p { opacity:.9; font-size:13px; }
+.cadastro-posto-banner { background:linear-gradient(135deg, var(--weg-blue), var(--weg-dark)); color:white; padding:16px 20px; border-radius:var(--radius); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; box-shadow:var(--shadow); }
+.cadastro-posto-banner .banner-text { display:flex; align-items:center; gap:12px; flex:1; min-width:200px; }
+.cadastro-posto-banner .banner-text i { font-size:28px; opacity:.9; }
+.cadastro-posto-banner .banner-text strong { display:block; font-size:15px; margin-bottom:2px; }
+.cadastro-posto-banner .banner-text small { opacity:.85; font-size:11px; }
+.cadastro-posto-banner .btn { flex-shrink:0; }
 @media (max-width:1023px) {
 .menu-toggle { display:inline-flex !important; }
 .sidebar { position:fixed !important; left:0 !important; top:var(--header-height) !important; height:calc(100vh - var(--header-height)) !important; z-index:99 !important; box-shadow:var(--shadow-lg); transform:translateX(-100%) !important; width:var(--sidebar-width) !important; border-right:none; transition:transform 0.3s cubic-bezier(.4,0,.2,1) !important; will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden; }
@@ -405,6 +411,9 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 #cardSeguranca .form-actions .btn { padding:10px 18px; font-size:13px; }
 .apontamento-input-card .input-row { flex-direction:column; }
 .apontamento-input-card .input-row .btn { width:100%; margin-bottom:8px; }
+.cadastro-posto-banner { padding:12px 14px; }
+.cadastro-posto-banner .banner-text i { font-size:22px; }
+.cadastro-posto-banner .banner-text strong { font-size:13px; }
 }
 @media (max-width:400px) {
 .kpi-grid { grid-template-columns:1fr 1fr; gap:6px; }
@@ -566,7 +575,10 @@ input, select, textarea { position:relative; z-index:5; }
 <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><label style="font-size:12px;font-weight:600;">Turno:</label><select id="postoTurno" onchange="Posto.salvarTurno()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:12px;min-height:36px;"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div>
 </div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<div style="display:flex;gap:8px;align-items:stretch;flex:1;min-width:0;flex-wrap:wrap;">
+<div class="search-box" style="flex:1;min-width:140px;"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<button class="btn btn-success btn-sm" id="btnAddPosto" onclick="Posto.abrirCadastroManual()" style="display:none;white-space:nowrap;"><i class="fa-solid fa-plus"></i> Adicionar Projeto</button>
+</div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span><span class="filter-chip" data-filter="Parcial" onclick="Posto.setFilter('Parcial',this)">Parcial</span></div>
 </div>
 <div class="table-wrapper"><table class="table" id="postoTable"><thead id="postoTableHead"><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th class="vol-col">Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div>
@@ -638,6 +650,75 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:500px;padding:25px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid"><div class="form-group"><label>PEP</label><input type="text" id="edit-pep"></div><div class="form-group"><label>Diagrama/Ordem</label><input type="text" id="edit-diagrama"></div><div class="form-group"><label>Placa</label><input type="text" id="edit-placa"></div><div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao"></div><div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div><div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes"></div><div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div><div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div><div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2"></textarea></div><div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div></div></form></div></div>
 <div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Projeto <strong id="concluirCodigo"></strong></p><div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="margin-top:10px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div><div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="text" id="concluirVolumesProcessados" inputmode="numeric" pattern="[0-9]*" min="1" required placeholder="Ex: 5"></div><div style="margin-top:8px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div></div><div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div class="form-group" style="margin-top:10px;"><label>Status de Conclusão <span class="req">*</span></label><select id="concluirStatusPintura"><option value="Concluído">Concluído (avança para Conferência)</option><option value="Parcial">Parcial (permanece na Pintura)</option></select></div><div class="form-group" style="margin-top:10px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso">Peças em reprocesso</option><option value="Gancherias pendentes">Gancherias pendentes</option></select></div></div><div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+
+<!-- NOVO MODAL: Cadastro Manual no Posto -->
+<div class="modal-overlay" id="modalCadastroPosto">
+<div class="modal" style="max-width:650px;">
+<div class="modal-head">
+<h3><i class="fa-solid fa-barcode" style="color:var(--weg-blue);"></i> Cadastrar Projeto Manual</h3>
+<button class="modal-close" onclick="Posto.fecharCadastroManual()">×</button>
+</div>
+<div class="alert alert-info" style="margin-bottom:15px;">
+<i class="fa-solid fa-barcode"></i>
+<div>
+<strong>Leitor de Código de Barras</strong>
+<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipe.</div>
+</div>
+</div>
+<form onsubmit="return Posto.cadastrarProjetoManual(event)">
+<div class="form-grid">
+<div class="form-group">
+<label>Tipo do Código <span class="req">*</span></label>
+<select id="cpo-tipo" required onchange="Posto.atualizarLabelCodigo()">
+<option value="Diagrama">Diagrama</option>
+<option value="Ordem">Ordem de Produção</option>
+</select>
+</div>
+<div class="form-group">
+<label id="cpo-label-codigo">Código de Barras (Diagrama) <span class="req">*</span></label>
+<input type="text" id="cpo-codigo" required placeholder="Bipe ou digite o código..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();Posto.processarCodigoBarras();}">
+</div>
+<div class="form-group">
+<label>PEP <small style="color:var(--text-light);font-weight:400;">(opcional)</small></label>
+<input type="text" id="cpo-pep" placeholder="Ex: 170-2500343-121">
+</div>
+<div class="form-group">
+<label>Diagrama / Ordem <span class="req">*</span></label>
+<input type="text" id="cpo-diagrama" required placeholder="Preenchido automaticamente">
+</div>
+<div class="form-group">
+<label>Placa</label>
+<input type="text" id="cpo-placa" placeholder="Ex: PLACA123">
+</div>
+<div class="form-group">
+<label>Volumes</label>
+<input type="text" id="cpo-volumes" placeholder="Ex: 28">
+</div>
+<div class="form-group">
+<label>Descrição</label>
+<input type="text" id="cpo-descricao" placeholder="Ex: Ccm">
+</div>
+<div class="form-group">
+<label>Prioridade</label>
+<select id="cpo-prioridade">
+<option value="Normal">Normal</option>
+<option value="Alta">Alta</option>
+<option value="Urgente">Urgente</option>
+</select>
+</div>
+<div class="form-group full">
+<label>Observações</label>
+<textarea id="cpo-obs" rows="2" placeholder="Observações adicionais..."></textarea>
+</div>
+<div class="form-actions">
+<button type="button" class="btn btn-secondary" onclick="Posto.fecharCadastroManual()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+<button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Cadastrar</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 <div class="virtual-keyboard" id="virtualKeyboard">
 <div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
@@ -653,8 +734,8 @@ CONFIGURAÇÃO E ESTADO - COM SMART POLLING
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
 SECRET: "16101961",
-POLLING_INTERVAL_ACTIVE: 10000, // 10s quando aba ativa
-POLLING_INTERVAL_BACKGROUND: 60000, // 60s quando aba em background
+POLLING_INTERVAL_ACTIVE: 10000,
+POLLING_INTERVAL_BACKGROUND: 60000,
 FULL_SYNC_INTERVAL: 60000,
 APONTAMENTOS_SYNC_INTERVAL: 20000
 };
@@ -681,7 +762,7 @@ cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: n
 apontamentoLista: [], apontamentoEnviadasHoje: 0, apontamentosSyncInterval: null,
 syncIntervalIds: [],
 searchTimers: {},
-renderedRows: { admin: new Map(), posto: new Map(), historico: new Map() }, // DOM Diffing
+renderedRows: { admin: new Map(), posto: new Map(), historico: new Map() },
 pollingActive: true,
 isTabVisible: true
 };
@@ -762,7 +843,8 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta: function(texto) {
-var clean = String(texto).replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+var clean = String(texto).replace(/\r/g, '').replace(/
+/g, ' ').replace(/\s+/g, ' ').trim();
 var result = { pep: null, diagrama: null };
 var pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-\s]+)/i);
 if (pepLabelMatch) {
@@ -773,7 +855,8 @@ if (!result.pep) {
 var generic = clean.match(/\b(\d{3})\s*[-]\s*(\d{7})\s*[-]\s*(\d{3})\b/);
 if (generic) { result.pep = generic[1] + '-' + generic[2] + '-' + generic[3]; }
 }
-var lines = String(texto).split(/\r?\n/);
+var lines = String(texto).split(/\r?
+/);
 for (var i = 0; i < lines.length; i++) {
 var line = lines[i];
 var upper = line.toUpperCase();
@@ -783,6 +866,36 @@ if (num) { result.diagrama = num[1]; break; }
 }
 }
 return result;
+},
+/* NOVO: Extrai diagrama/ordem do código de barras bipado no posto */
+extrairDiagramaCodigoBarras: function(texto) {
+if (!texto) return null;
+var clean = String(texto).replace(/\s+/g, ' ').trim();
+var parts = clean.split(' ');
+
+// 1. Procurar bloco de 11 dígitos começando com "95" (com espaços)
+for (var i = 0; i < parts.length; i++) {
+var part = parts[i];
+if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
+return part.substring(2);
+}
+}
+
+// 2. Procurar padrão "95XXXXXXXXX" no texto inteiro (sem espaços)
+var match95 = clean.match(/95(\d{9})/);
+if (match95) return match95[1];
+
+// 3. Fallback: qualquer bloco de 9 dígitos isolado
+for (var j = 0; j < parts.length; j++) {
+var p = parts[j];
+if (/^\d{9}$/.test(p)) return p;
+}
+
+// 4. Último fallback: qualquer sequência de 9 dígitos no texto
+var match9 = clean.match(/\b(\d{9})\b/);
+if (match9) return match9[1];
+
+return null;
 },
 normalizarDiagrama: function(valor) {
 if (valor == null) return '';
@@ -931,31 +1044,20 @@ if (!elemento) return;
 var vkHeight = State.vkActive ? (document.getElementById('virtualKeyboard').offsetHeight || 260) : 0;
 var viewportHeight = window.innerHeight;
 var elementRect = elemento.getBoundingClientRect();
-
-// Espaço necessário acima do teclado + margem de segurança
 var espacoNecessario = vkHeight + 80;
 var inputBottom = elementRect.bottom;
 var espacoAbaixo = viewportHeight - inputBottom;
-
-// Se o campo está sendo coberto pelo teclado
 if (espacoAbaixo < espacoNecessario) {
-// Procurar o container scrollável mais próximo (modal)
 var container = elemento.closest('.modal');
-
 if (container) {
-// Scroll dentro do modal
 var containerRect = container.getBoundingClientRect();
 var elementoDentroModal = elemento.offsetTop;
-
-// Calcular posição alvo: campo deve ficar acima do teclado
 var posicaoAlvo = elementoDentroModal - (viewportHeight - espacoNecessario - containerRect.top);
-
 container.scrollTo({
 top: Math.max(0, posicaoAlvo),
 behavior: 'smooth'
 });
 } else {
-// Fallback: scroll da janela
 var targetPosition = elementRect.top + window.scrollY - (viewportHeight - espacoNecessario - elementRect.height);
 window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
 }
@@ -1095,6 +1197,7 @@ if (e.target === m) {
 if (m.id === 'modalSenhaAdmin') Auth.cancelarLoginAdmin();
 else if (m.id === 'modalConfirmarSenha') Auth.cancelarConfirmacaoSenha();
 else if (m.id === 'modalTurnoFimSemana') Turno.cancelarSelecao();
+else if (m.id === 'modalCadastroPosto') Posto.fecharCadastroManual();
 else if (m.id === 'modalLogout') UI.closeModal('modalLogout');
 else UI.closeModal(m.id);
 }
@@ -1125,7 +1228,6 @@ var notButton = target.type !== 'button' && target.type !== 'submit' && target.t
 if (isInput && notButton && !target.readOnly) {
 State.vkTarget = target;
 VirtualKeyboard.show();
-// Scroll duplo para garantir que o campo fique visível
 UI.scrollParaElemento(target);
 setTimeout(function() { UI.scrollParaElemento(target); }, 500);
 }
@@ -1185,7 +1287,6 @@ function setupVisibilityDetection() {
 document.addEventListener('visibilitychange', function() {
 State.isTabVisible = !document.hidden;
 console.log('Tab visibility:', State.isTabVisible ? 'visible' : 'hidden');
-// Reconfigurar polling baseado na visibilidade
 if (State.currentUser) {
 clearSyncIntervals();
 iniciarSyncComRetry();
@@ -2041,7 +2142,6 @@ obs: obs,
 criadoEm: Date.now(),
 atualizadoEm: Date.now()
 };
-// ATUALIZAÇÃO OTIMISTA: Adiciona ao estado local imediatamente
 State.data.projetos.push(novo);
 this.renderTable();
 UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo);
@@ -2050,7 +2150,6 @@ await Storage.salvarApi('create', novo);
 document.getElementById('formCadastro').reset();
 } catch (error) {
 console.error('Erro ao cadastrar:', error);
-// Reverte a atualização otimista
 State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
 this.renderTable();
 UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique sua conexão com a internet');
@@ -2155,7 +2254,6 @@ UI.closeModal('modalEditar');
 return false;
 }
 p.status = novoStatus;
-// ATUALIZAÇÃO OTIMISTA
 UI.closeModal('modalEditar');
 this.renderTable();
 Charts.render();
@@ -2172,7 +2270,6 @@ excluirProjeto: async function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
 if (!p) return;
 if (!confirm('Deseja realmente excluir o projeto ' + p.diagrama + '?')) return;
-// ATUALIZAÇÃO OTIMISTA
 State.data.projetos = State.data.projetos.filter(function(x) { return x.id !== id; });
 this.renderTable();
 Charts.render();
@@ -2188,7 +2285,7 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 };
 /* ============================================================
-POSTO - COM ATUALIZAÇÃO OTIMISTA E TIMER DESACOPLADO
+POSTO - COM CADASTRO MANUAL VIA LEITOR DE CÓDIGO DE BARRAS
 ============================================================ */
 const Posto = {
 render: function() {
@@ -2199,8 +2296,12 @@ document.getElementById('postoTitulo').textContent = 'Posto - ' + State.currentP
 document.getElementById('postoBadge').textContent = State.currentPosto;
 document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
 this.aplicarTurnoAutomatico();
+// Mostrar/ocultar botão de adicionar projeto (apenas para Nanocerâmico)
+var btnAdd = document.getElementById('btnAddPosto');
+if (btnAdd) {
+btnAdd.style.display = (State.currentPosto === 'Nanocerâmico') ? 'inline-flex' : 'none';
+}
 this.renderTable();
-// TIMER DESACOPLADO - Atualiza apenas os cronômetros sem re-renderizar a tabela
 if (State.timerInterval) {
 clearInterval(State.timerInterval);
 State.timerInterval = null;
@@ -2241,6 +2342,139 @@ State.postoFilter = f;
 document.querySelectorAll('#page-posto .filter-chip').forEach(function(c) { c.classList.remove('active'); });
 el.classList.add('active');
 this.renderTable();
+},
+/* NOVO: Abre modal de cadastro manual */
+abrirCadastroManual: function() {
+if (State.currentPosto !== 'Nanocerâmico') {
+UI.showToast('warning', 'Acesso restrito', 'Cadastro manual disponível apenas no posto Nanocerâmico');
+return;
+}
+document.getElementById('cpo-tipo').value = 'Diagrama';
+document.getElementById('cpo-codigo').value = '';
+document.getElementById('cpo-pep').value = '';
+document.getElementById('cpo-diagrama').value = '';
+document.getElementById('cpo-placa').value = '';
+document.getElementById('cpo-volumes').value = '';
+document.getElementById('cpo-descricao').value = '';
+document.getElementById('cpo-prioridade').value = 'Normal';
+document.getElementById('cpo-obs').value = '';
+this.atualizarLabelCodigo();
+UI.openModal('modalCadastroPosto');
+setTimeout(function() {
+var codigoInput = document.getElementById('cpo-codigo');
+if (codigoInput) {
+codigoInput.focus();
+UI.scrollParaElemento(codigoInput);
+}
+}, 350);
+},
+fecharCadastroManual: function() {
+UI.closeModal('modalCadastroPosto');
+},
+atualizarLabelCodigo: function() {
+var tipo = document.getElementById('cpo-tipo').value;
+var label = document.getElementById('cpo-label-codigo');
+if (label) {
+label.innerHTML = 'Código de Barras (' + tipo + ') <span class="req">*</span>';
+}
+},
+processarCodigoBarras: function() {
+var codigo = document.getElementById('cpo-codigo').value.trim();
+if (!codigo) {
+UI.showToast('warning', 'Atenção', 'Digite ou bipe o código de barras');
+return;
+}
+var diagrama = Utils.extrairDiagramaCodigoBarras(codigo);
+if (diagrama) {
+document.getElementById('cpo-diagrama').value = diagrama;
+UI.showToast('success', 'Código processado', 'Diagrama/Ordem extraído: ' + diagrama);
+var pepInput = document.getElementById('cpo-pep');
+if (pepInput) {
+pepInput.focus();
+UI.scrollParaElemento(pepInput);
+}
+} else {
+UI.showToast('warning', 'Código não reconhecido', 'Preencha o Diagrama/Ordem manualmente');
+var diagramaInput = document.getElementById('cpo-diagrama');
+if (diagramaInput) {
+diagramaInput.focus();
+UI.scrollParaElemento(diagramaInput);
+}
+}
+},
+cadastrarProjetoManual: async function(e) {
+e.preventDefault();
+var pep = document.getElementById('cpo-pep').value.trim();
+var diagrama = document.getElementById('cpo-diagrama').value.trim();
+var placa = document.getElementById('cpo-placa').value.trim();
+var volumes = document.getElementById('cpo-volumes').value.trim();
+var descricao = document.getElementById('cpo-descricao').value.trim();
+var prioridade = document.getElementById('cpo-prioridade').value;
+var obs = document.getElementById('cpo-obs').value.trim();
+
+if (!diagrama) {
+UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
+document.getElementById('cpo-diagrama').focus();
+return false;
+}
+
+var diagramaNormalizado = Utils.normalizarDiagrama(diagrama);
+var existeDiagrama = State.data.projetos.some(function(p) {
+var d = Utils.normalizarDiagrama(p.diagrama);
+return d && d === diagramaNormalizado;
+});
+if (existeDiagrama) {
+UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
+return false;
+}
+
+var volumesTotal = null;
+if (volumes) {
+var match = volumes.match(/\d+/);
+if (match) volumesTotal = parseInt(match[0]);
+}
+
+// NOVO: Adiciona marcação [Manual] na observação para identificação no Google Sheets
+var obsFinal = '[Manual]';
+if (obs && obs.trim()) {
+obsFinal += ' ' + obs.trim();
+}
+
+var novo = {
+id: Utils.genId(),
+pep: pep || null,
+diagrama: diagrama,
+placa: placa || null,
+descricao: descricao,
+volumes: volumes || '1 unidade',
+volumesTotal: volumesTotal,
+volumesProcessados: 0,
+processo: 'Nanocerâmico',
+prioridade: prioridade,
+status: 'Aguardando',
+turno: State.data.turnosPorPosto['Nanocerâmico'] || '1º Turno',
+obs: obsFinal,
+criadoEm: Date.now(),
+atualizadoEm: Date.now()
+};
+
+// Atualização otimista
+State.data.projetos.push(novo);
+this.renderTable();
+if (State.currentUser === 'admin') Admin.renderTable();
+UI.closeModal('modalCadastroPosto');
+UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
+
+try {
+await Storage.salvarApi('create', novo);
+} catch (error) {
+console.error('Erro ao cadastrar manualmente:', error);
+State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
+this.renderTable();
+if (State.currentUser === 'admin') Admin.renderTable();
+UI.showToast('error', 'Erro ao cadastrar', error.message || 'Verifique sua conexão');
+}
+return false;
 },
 renderTable: function() {
 var tbody = document.getElementById('postoTableBody');
@@ -2349,7 +2583,6 @@ el.classList.add('ativo');
 iniciarProcesso: async function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
 if (!p) return;
-// ATUALIZAÇÃO OTIMISTA
 p.status = 'Em Processo';
 p.dataHoraInicio = Date.now();
 p.dataHoraFim = null;
@@ -2366,7 +2599,6 @@ UI.showToast('error', 'Erro', 'Não foi possível iniciar: ' + error.message);
 pausarProcesso: async function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
 if (!p) return;
-// ATUALIZAÇÃO OTIMISTA
 p.status = 'Aguardando';
 p.atualizadoEm = Date.now();
 this.renderTable();
@@ -2390,22 +2622,15 @@ document.getElementById('concluirCodigo').textContent = p.diagrama;
 document.getElementById('concluirVolumesSection').style.display = 'none';
 document.getElementById('concluirPinturaSection').style.display = 'none';
 document.getElementById('concluirTurnoNormal').style.display = 'block';
-
 if (p.processo === 'Nanocerâmico') {
 document.getElementById('concluirVolumesSection').style.display = 'block';
 document.getElementById('concluirTurnoNormal').style.display = 'none';
-
-// CORREÇÃO: Prioriza o turno ativo do posto, depois o turno do projeto, depois fallback
 var turnoAtivo = State.data.turnosPorPosto[p.processo] || '1º Turno';
 var turnoSelecionado = turnoAtivo;
-
-// Se o projeto já tem um turno válido definido, usa ele
 if (p.turno && ['1º Turno', '2º Turno', '3º Turno'].indexOf(p.turno) !== -1) {
 turnoSelecionado = p.turno;
 }
-
 document.getElementById('concluirTurnoNano').value = turnoSelecionado;
-
 var total = p.volumesTotal || 0;
 var jaProcessados = p.volumesProcessados || 0;
 var faltam = total - jaProcessados;
@@ -2420,19 +2645,15 @@ document.getElementById('concluirVolumesProcessados').oninput = function() { Con
 } else if (p.processo === 'Pintura') {
 document.getElementById('concluirPinturaSection').style.display = 'block';
 document.getElementById('concluirTurnoNormal').style.display = 'none';
-
-// CORREÇÃO: Mesma lógica para Pintura
 var turnoAtivo = State.data.turnosPorPosto[p.processo] || '1º Turno';
 var turnoSelecionado = turnoAtivo;
 if (p.turno && ['1º Turno', '2º Turno', '3º Turno'].indexOf(p.turno) !== -1) {
 turnoSelecionado = p.turno;
 }
 document.getElementById('concluirTurnoPintura').value = turnoSelecionado;
-
 document.getElementById('concluirObservacaoPintura').value = p.observacaoPintura || '';
 document.getElementById('concluirStatusPintura').value = (p.status === 'Parcial') ? 'Parcial' : 'Concluído';
 } else {
-// CORREÇÃO: Mesma lógica para Conferência
 var turnoAtivo = State.data.turnosPorPosto[p.processo] || '1º Turno';
 var turnoSelecionado = turnoAtivo;
 if (p.turno && ['1º Turno', '2º Turno', '3º Turno'].indexOf(p.turno) !== -1) {
@@ -2440,13 +2661,11 @@ turnoSelecionado = p.turno;
 }
 document.getElementById('concluirTurno').value = turnoSelecionado;
 }
-
 UI.openModal('modalConcluir');
 setTimeout(function() {
 if (p.processo === 'Nanocerâmico') {
 var inputVolumes = document.getElementById('concluirVolumesProcessados');
 inputVolumes.focus();
-// Força o scroll após o modal abrir
 UI.scrollParaElemento(inputVolumes);
 } else if (p.processo === 'Pintura') {
 var selectStatus = document.getElementById('concluirStatusPintura');
@@ -2491,7 +2710,6 @@ await this.moverParaProximoProcesso(p, turno);
 p.status = 'Parcial';
 p.turno = turno;
 p.atualizadoEm = Date.now();
-// ATUALIZAÇÃO OTIMISTA
 Posto.renderTable();
 Admin.renderTable();
 UI.showToast('info', 'Conclusão parcial', volumesProcessados + ' volumes processados. Faltam ' + (p.volumesTotal - p.volumesProcessados) + '.');
@@ -2510,7 +2728,6 @@ await this.moverParaProximoProcesso(p, turno);
 p.status = 'Parcial';
 p.dataHoraFim = null;
 p.tempoReal = null;
-// ATUALIZAÇÃO OTIMISTA
 Posto.renderTable();
 Admin.renderTable();
 UI.showToast('info', 'Parcial', 'Projeto ' + p.diagrama + ' permanece na Pintura. Motivo: ' + (observacao || 'Não informado') + '.');
@@ -2541,7 +2758,6 @@ p.volumesProcessados = 0;
 p.dataHoraInicio = null;
 p.observacaoPintura = null;
 p.atualizadoEm = Date.now();
-// ATUALIZAÇÃO OTIMISTA
 Posto.renderTable();
 Admin.renderTable();
 var nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
@@ -2565,7 +2781,6 @@ Prioridade: p.prioridade, Turno: turno || p.turno || '1º Turno', Obs: p.obs,
 CriadoEm: p.criadoEm, DataHoraInicio: p.dataHoraInicio, DataHoraFim: Date.now(),
 TempoReal: tempoReal, ObservacaoPintura: p.observacaoPintura, ConcluidoEm: Date.now()
 };
-// ATUALIZAÇÃO OTIMISTA
 State.data.historico.unshift({
 id: concluido.ID, projetoId: concluido.ProjetoID, pep: concluido.PEP,
 diagrama: concluido.Diagrama, placa: concluido.Placa, descricao: concluido.Descricao,
@@ -2594,7 +2809,6 @@ ID: 'hp_' + Date.now(), ProjetoID: p.id, PEP: p.pep, Diagrama: p.diagrama,
 Placa: p.placa, Processo: p.processo, Turno: turno, TempoReal: tempoReal,
 Observacao: p.observacaoPintura || null, DataHoraConclusao: Date.now()
 };
-// ATUALIZAÇÃO OTIMISTA
 State.data.historicoPostos.unshift({
 id: registro.ID, projetoId: registro.ProjetoID, pep: registro.PEP,
 diagrama: registro.Diagrama, placa: registro.Placa, processo: registro.Processo,
@@ -2748,7 +2962,6 @@ descricao: p.descricao, volumesTotal: p.volumesTotal, volumesProcessados: 0,
 processo: p.processo, prioridade: p.prioridade, status: 'Aguardando',
 turno: p.turno || '1º Turno', obs: p.obs, criadoEm: Date.now(), atualizadoEm: Date.now()
 };
-// ATUALIZAÇÃO OTIMISTA
 State.data.projetos.push(novoProjeto);
 State.data.historico.splice(idx, 1);
 this.renderGeral();
@@ -2766,7 +2979,6 @@ UI.showToast('error', 'Erro', 'Não foi possível reativar: ' + error.message);
 excluir: async function(id) {
 if (!confirm('Excluir permanentemente este registro?')) return;
 var p = State.data.historico.find(function(x) { return x.id === id; });
-// ATUALIZAÇÃO OTIMISTA
 State.data.historico = State.data.historico.filter(function(x) { return x.id !== id; });
 this.renderGeral();
 Charts.render();
@@ -2806,7 +3018,6 @@ var vk = document.getElementById('virtualKeyboard');
 vk.classList.add('active');
 State.vkActive = true;
 if (State.vkTarget) {
-// Scroll duplo: imediato e após animação do teclado
 UI.scrollParaElemento(State.vkTarget);
 setTimeout(function() {
 UI.scrollParaElemento(State.vkTarget);
@@ -3048,12 +3259,14 @@ UI.showToast('success', 'Exportado', 'CSV de concluídos gerado');
 downloadCSV: function(filename, headers, rows) {
 var escapeCSV = function(v) {
 var s = String(v !== null && v !== undefined ? v : '');
-if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('
+') !== -1) {
 return '"' + s.replace(/"/g, '""') + '"';
 }
 return s;
 };
-var csvContent = [headers.map(escapeCSV).join(',')].concat(rows.map(function(r) { return r.map(escapeCSV).join(','); })).join('\n');
+var csvContent = [headers.map(escapeCSV).join(',')].concat(rows.map(function(r) { return r.map(escapeCSV).join(','); })).join('
+');
 var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
 var url = URL.createObjectURL(blob);
 var link = document.createElement('a');
@@ -3096,7 +3309,7 @@ UI.aplicarEstadoCursor();
 UI.setupModalClickHandlers();
 UI.setupSidebarClickHandler();
 UI.setupVirtualKeyboard();
-setupVisibilityDetection(); // NOVO: Detecta visibilidade da aba
+setupVisibilityDetection();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
 function setupSearchDebounce(inputId, callback, delay) {
