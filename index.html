@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>WEG - Centro de Fluxo Produtivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -131,7 +133,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; position:relative; z-index:25; }
 .search-box input:focus { border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); outline:none; }
 .search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; z-index:21; }
-/* NOVO: Indicador visual de extração automática */
 .search-box.extracted input { border-color:var(--success); background:rgba(0,166,81,.05); }
 .search-box.extracted i { color:var(--success); }
 .table { width:100%; border-collapse:collapse; min-width:600px; }
@@ -182,145 +183,26 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .icon-action:hover { background:var(--weg-light); color:var(--weg-blue); }
 .icon-action.delete:hover { background:rgba(211,47,47,.1); color:var(--danger); }
 .icon-action.success:hover { background:rgba(0,166,81,.1); color:var(--success); }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:10001; backdrop-filter:blur(4px); padding:20px; }
-.modal-overlay.active { display:flex; animation:fadeIn .3s ease; }
-.modal { background:var(--card); border-radius:var(--radius); padding:25px; max-width:650px; width:100%; max-height:calc(100vh - 120px); overflow-y:auto; box-shadow:var(--shadow-lg); animation:slideUp .3s ease; position:relative; z-index:10002; }
-@keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-.modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:12px; border-bottom:1px solid var(--border); }
-.modal-head h3 { color:var(--text); font-size:18px; display:flex; align-items:center; gap:8px; }
-.modal-close { background:none; border:none; font-size:24px; cursor:pointer !important; color:var(--text-light); transition:var(--transition); width:40px; height:40px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; padding:0; touch-action:manipulation; }
-.modal-close:hover { background:var(--bg); color:var(--danger); }
-.modal-logout { max-width:450px; text-align:center; }
-.modal-logout .modal-body { padding:20px 0; }
-.modal-logout .logout-icon { width:70px; height:70px; background:var(--weg-light); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px; color:var(--weg-blue); }
-.modal-logout h3 { color:var(--text); font-size:20px; margin-bottom:8px; }
-.modal-logout p { color:var(--text-light); font-size:14px; margin-bottom:20px; }
-.modal-logout .modal-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.modal-logout .btn { min-width:120px; justify-content:center; }
-.camera-container { position:relative; width:100%; max-width:500px; margin:15px auto; border-radius:12px; overflow:hidden; background:#000; aspect-ratio:4/3; display:none; }
-.camera-container.active { display:block; }
-.camera-container video { width:100%; height:100%; object-fit:cover; display:block; }
-.camera-container canvas { display:none; }
-.camera-overlay { position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; border:3px solid var(--weg-blue); border-radius:12px; }
-.scan-line { position:absolute; top:50%; left:10%; right:10%; height:2px; background:linear-gradient(90deg, transparent, var(--success), transparent); animation:scan 2s ease-in-out infinite; box-shadow:0 0 10px var(--success); }
-@keyframes scan { 0%,100% { transform:translateY(-50px); } 50% { transform:translateY(50px); } }
-.camera-controls { display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
-.camera-status { text-align:center; padding:8px; margin-top:8px; border-radius:8px; font-size:12px; font-weight:600; }
-.camera-status.scanning { background:var(--weg-light); color:var(--weg-blue); }
-.camera-status.success { background:rgba(0,166,81,.1); color:var(--success); }
-.camera-status.error { background:rgba(211,47,47,.1); color:var(--danger); }
-.virtual-keyboard { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 -8px 40px rgba(0,0,0,.25); z-index:10500; display:none; max-width:400px; width:95%; touch-action:manipulation; }
-.virtual-keyboard.active { display:block; animation:slideUp .3s ease; }
-.vk-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border); }
-.vk-header i { color:var(--weg-blue); font-size:15px; }
-.vk-header span { font-size:13px; color:var(--text); font-weight:600; }
-.vk-row { display:flex; gap:8px; margin-bottom:8px; justify-content:center; }
-.vk-key { background:var(--bg); border:1px solid var(--border); border-radius:10px; min-width:60px; height:50px; font-size:18px; font-weight:600; color:var(--text); cursor:pointer !important; transition:all .15s ease; display:inline-flex; align-items:center; justify-content:center; padding:0; user-select:none; flex:1; max-width:75px; box-shadow:0 2px 4px rgba(0,0,0,.05); position:relative; touch-action:manipulation; }
-.vk-key:hover { background:var(--weg-light); border-color:var(--weg-blue); }
-.vk-key:active { background:var(--weg-blue); color:white; }
-.vk-key.wide { min-width:80px; font-size:15px; max-width:100px; flex:2; }
-.vk-key.action { background:var(--weg-blue); color:white; border-color:var(--weg-blue); }
-.vk-key.action:hover { background:var(--weg-dark); border-color:var(--weg-dark); }
-.vk-key.action.danger { background:var(--danger); border-color:var(--danger); }
-.vk-key.action.danger:hover { background:#b71c1c; border-color:#b71c1c; }
-.vk-key.action.success { background:var(--success); border-color:var(--success); }
-.vk-key.action.success:hover { background:#008a40; border-color:#008a40; }
-.vk-key.action.clear { background:var(--info); border-color:var(--info); }
-.vk-key.action.clear:hover { background:#1976D2; border-color:#1976D2; }
-.toast-container { position:fixed; top:100px; right:20px; z-index:9700; display:flex; flex-direction:column; gap:8px; pointer-events:none; max-width:90%; }
-.toast { background:var(--card); border-left:4px solid var(--info); padding:10px 14px; border-radius:8px; box-shadow:var(--shadow-lg); min-width:250px; display:flex; align-items:center; gap:10px; animation:slideIn .3s ease; pointer-events:auto; }
-@keyframes slideIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
-.toast.success { border-left-color:var(--success); }
-.toast.success i { color:var(--success); }
-.toast.error { border-left-color:var(--danger); }
-.toast.error i { color:var(--danger); }
-.toast.warning { border-left-color:var(--warning); }
-.toast.warning i { color:var(--warning); }
-.toast i { font-size:16px; }
-.toast-content { flex:1; }
-.toast-title { font-weight:600; font-size:12px; }
-.toast-message { font-size:11px; color:var(--text-light); margin-top:1px; }
-.filter-bar { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
-.filter-chip { background:var(--bg); border:1px solid var(--border); padding:5px 12px; border-radius:16px; font-size:11px; cursor:pointer !important; transition:var(--transition); display:inline-flex; align-items:center; justify-content:center; gap:4px; touch-action:manipulation; min-height:32px; }
-.filter-chip:hover, .filter-chip.active { background:var(--weg-blue); color:white; border-color:var(--weg-blue); }
-.empty-state { text-align:center; padding:40px 20px; color:var(--text-light); }
-.empty-state i { font-size:48px; color:var(--border); margin-bottom:12px; }
-.empty-state h3 { font-size:16px; margin-bottom:6px; color:var(--text); }
-.password-wrapper { position:relative; width:100%; display:flex; align-items:stretch; }
-.password-wrapper input { width:100%; padding-right:48px !important; }
-.password-toggle { position:absolute; right:6px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:var(--text-light); cursor:pointer !important; font-size:16px; padding:0; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; transition:var(--transition); touch-action:manipulation; z-index:20; flex-shrink:0; }
-.password-toggle:hover { background:var(--bg); color:var(--weg-blue); }
-.password-toggle:active { background:var(--weg-light); }
-.password-strength { margin-top:4px; font-size:11px; font-weight:600; }
-.strength-weak { color:var(--danger); }
-.strength-medium { color:var(--warning); }
-.strength-strong { color:var(--success); }
-.alert { padding:10px 14px; border-radius:8px; font-size:12px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.alert-danger { background:rgba(211,47,47,.1); color:var(--danger); border-left:4px solid var(--danger); }
-.alert-info { background:var(--weg-light); color:var(--weg-blue); border-left:4px solid var(--weg-blue); }
-.alert-warning { background:rgba(255,176,0,.12); color:#a87400; border-left:4px solid var(--warning); }
-.charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-top:20px; }
-.chart-container { position:relative; height:280px; }
-.dashboard-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:15px; margin-top:20px; }
-.stat-card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); text-align:center; border-top:4px solid var(--weg-blue); }
-.stat-card h4 { color:var(--text-light); font-size:11px; text-transform:uppercase; margin-bottom:8px; }
-.stat-card .stat-value { font-size:24px; font-weight:bold; color:var(--weg-blue); margin-bottom:4px; }
-.stat-card .stat-label { font-size:10px; color:var(--text-light); }
-.comparison-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px; margin-top:20px; }
-.comparison-card { background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); }
-.comparison-card h3 { color:var(--text); font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.comparison-card h3 i { color:var(--weg-blue); }
-.turno-comparison { display:flex; justify-content:space-around; margin-top:12px; gap:8px; }
-.turno-stat { text-align:center; padding:12px; background:var(--bg); border-radius:8px; flex:1; }
-.turno-stat .turno-name { font-size:11px; color:var(--text-light); margin-bottom:6px; font-weight:600; }
-.turno-stat .turno-value { font-size:20px; font-weight:bold; color:var(--weg-blue); }
-.turno-stat .turno-label { font-size:10px; color:var(--text-light); margin-top:4px; }
-.dashboard-tabs, .historico-tabs { display:flex; gap:6px; margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:0; flex-wrap:wrap; }
-.dashboard-tab, .historico-tab { padding:10px 16px; background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer !important; font-size:13px; font-weight:600; color:var(--text-light); transition:var(--transition); display:inline-flex; align-items:center; gap:6px; margin-bottom:-2px; touch-action:manipulation; min-height:44px; }
-.dashboard-tab:hover, .historico-tab:hover { color:var(--weg-blue); }
-.dashboard-tab.active, .historico-tab.active { color:var(--weg-blue); border-bottom-color:var(--weg-blue); }
-#cardSeguranca { min-height:auto !important; padding:25px !important; }
-#cardSeguranca h2 { font-size:20px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border); }
-#cardSeguranca .form-grid { gap:20px; margin-top:20px; }
-#cardSeguranca .form-group label { font-size:13px; margin-bottom:8px; }
-#cardSeguranca .form-group input { padding:12px 48px 12px 12px !important; font-size:14px; }
-#cardSeguranca .form-actions { margin-top:20px; gap:12px; }
-#cardSeguranca .form-actions .btn { padding:12px 24px; font-size:14px; }
-.apontamento-container { max-width:900px; margin:0 auto; }
-.apontamento-header { background:linear-gradient(135deg, var(--weg-blue), var(--weg-dark)); color:white; padding:24px; border-radius:var(--radius); margin-bottom:20px; box-shadow:var(--shadow-lg); }
-.apontamento-header h2 { font-size:22px; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
-.apontamento-header p { opacity:.9; font-size:13px; }
-.apontamento-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-top:16px; }
-.apontamento-stat { background:rgba(255,255,255,.15); backdrop-filter:blur(10px); padding:12px; border-radius:10px; text-align:center; }
-.apontamento-stat .stat-num { font-size:24px; font-weight:bold; display:block; }
-.apontamento-stat .stat-label { font-size:11px; opacity:.9; }
-.apontamento-input-card { background:var(--card); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); margin-bottom:20px; border:2px dashed var(--border); transition:var(--transition); }
-.apontamento-input-card.focused { border-color:var(--weg-blue); box-shadow:0 0 0 4px rgba(0,91,172,.15); }
-.apontamento-input-card .input-row { display:flex; gap:10px; align-items:stretch; }
-.apontamento-input-card .input-row input { flex:1; font-size:18px; font-weight:600; padding:14px 16px; border:2px solid var(--border); border-radius:10px; text-align:center; letter-spacing:1px; min-height:56px; }
-.apontamento-input-card .input-row input:focus { outline:none; border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); }
-.apontamento-hint { margin-top:10px; font-size:12px; color:var(--text-light); display:flex; align-items:center; gap:6px; }
-.apontamento-hint i { color:var(--weg-blue); }
-.apontamento-list-card { background:var(--card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); margin-bottom:20px; }
-.apontamento-list-card .list-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:12px; border-bottom:1px solid var(--border); }
-.apontamento-list-card .list-header h3 { font-size:16px; display:flex; align-items:center; gap:8px; }
-.apontamento-list-card .list-header h3 i { color:var(--weg-blue); }
-.apontamento-list { max-height:400px; overflow-y:auto; }
-.apontamento-item { display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:8px; transition:var(--transition); animation:slideIn .3s ease; border-left:4px solid var(--weg-blue); }
-.apontamento-item:hover { background:var(--weg-light); transform:translateX(4px); }
-.apontamento-item .item-num { width:36px; height:36px; background:var(--weg-blue); color:white; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; flex-shrink:0; }
-.apontamento-item .item-code { flex:1; font-weight:600; font-size:15px; font-family:'Courier New', monospace; color:var(--text); }
-.apontamento-item .item-time { font-size:11px; color:var(--text-light); }
-.apontamento-item .item-remove { background:transparent; border:none; color:var(--danger); cursor:pointer !important; width:36px; height:36px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; transition:var(--transition); font-size:14px; }
-.apontamento-item .item-remove:hover { background:rgba(211,47,47,.1); }
-.apontamento-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
-.apontamento-actions .btn { min-width:180px; }
-.apontamento-empty { text-align:center; padding:40px 20px; color:var(--text-light); }
-.apontamento-empty i { font-size:48px; color:var(--border); margin-bottom:12px; display:block; }
-.apontamento-success { background:linear-gradient(135deg, var(--success), #008a40); color:white; padding:20px; border-radius:var(--radius); text-align:center; animation:slideUp .3s ease; margin-bottom:20px; }
-.apontamento-success i { font-size:48px; margin-bottom:10px; }
-.apontamento-success h3 { font-size:20px; margin-bottom:6px; }
-.apontamento-success p { opacity:.9; font-size:13px; }
+/* NOVO: Cards mobile (aparecem em telas pequenas) */
+.mobile-cards { display:none; flex-direction:column; gap:10px; margin-top:15px; }
+.mobile-card { background:var(--card); border-radius:10px; padding:14px; box-shadow:var(--shadow); border-left:4px solid var(--weg-blue); position:relative; }
+.mobile-card.priority-urgente { border-left-color:var(--danger); }
+.mobile-card.priority-alta { border-left-color:var(--warning); }
+.mobile-card.status-emprocesso { border-left-color:var(--info); }
+.mobile-card.status-aguardando { border-left-color:var(--warning); }
+.mobile-card.status-concluido { border-left-color:var(--success); }
+.mobile-card.status-parcial { border-left-color:#9C27B0; }
+.mobile-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px; }
+.mobile-card-title { font-size:15px; font-weight:700; color:var(--weg-blue); font-family:'Courier New', monospace; word-break:break-all; }
+.mobile-card-badges { display:flex; gap:4px; flex-wrap:wrap; }
+.mobile-card-body { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; margin-bottom:10px; }
+.mobile-card-field { display:flex; flex-direction:column; gap:2px; }
+.mobile-card-field-label { color:var(--text-light); font-size:10px; text-transform:uppercase; font-weight:600; letter-spacing:.3px; }
+.mobile-card-field-value { color:var(--text); font-weight:500; word-break:break-word; }
+.mobile-card-field.full { grid-column:span 2; }
+.mobile-card-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:10px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.mobile-card-actions { display:flex; gap:6px; flex:1; justify-content:flex-end; }
+.mobile-card .status { font-size:9px; padding:2px 8px; }
 @media (max-width:1023px) {
 .menu-toggle { display:inline-flex !important; }
 .sidebar { position:fixed !important; left:0 !important; top:var(--header-height) !important; height:calc(100vh - var(--header-height)) !important; z-index:99 !important; box-shadow:var(--shadow-lg); transform:translateX(-100%) !important; width:var(--sidebar-width) !important; border-right:none; transition:transform 0.3s cubic-bezier(.4,0,.2,1) !important; will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden; }
@@ -366,13 +248,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .card h2 { font-size:14px; }
 .table-toolbar { flex-direction:column; align-items:stretch; gap:8px; }
 .search-box { max-width:100%; }
-.table td { font-size:12px; padding:6px 4px; }
-.table thead th { font-size:10px; padding:6px 4px; }
-.table { min-width:500px; }
-.volumes-container { min-width:60px; }
-.volumes-main { font-size:11px; }
-.volumes-processed { font-size:12px; }
-.volumes-remaining { font-size:9px; }
 .icon-action-lg { min-width:40px; min-height:38px; padding:6px 10px; font-size:15px; }
 .icon-action { width:34px; height:34px; min-width:34px; padding:6px 8px; font-size:14px; }
 .row-actions { gap:4px; }
@@ -415,6 +290,17 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .search-box-combo { min-width:100%; }
 .search-field-select { min-width:100px; font-size:11px; }
 }
+/* NOVO: Mobile portrait - transforma tabelas em cards */
+@media (max-width:600px) and (orientation:portrait) {
+.table-wrapper { display:none; }
+.mobile-cards { display:flex; }
+.kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+.kpi { padding:10px 12px; }
+.kpi-value { font-size:20px; }
+.kpi h3 { font-size:9px; }
+.kpi-icon { width:28px; height:28px; font-size:12px; }
+.dashboard-stats { grid-template-columns:1fr; gap:8px; }
+}
 @media (max-width:400px) {
 .kpi-grid { grid-template-columns:1fr 1fr; gap:6px; }
 .kpi { padding:10px 8px; }
@@ -427,6 +313,10 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .vk-key { min-width:38px; height:38px; font-size:13px; max-width:50px; }
 .vk-key.wide { min-width:50px; font-size:12px; max-width:70px; }
 .vk-row { gap:4px; margin-bottom:4px; }
+.mobile-card { padding:12px; }
+.mobile-card-title { font-size:14px; }
+.mobile-card-body { grid-template-columns:1fr; gap:6px; }
+.mobile-card-field.full { grid-column:span 1; }
 }
 @media (hover:none) and (pointer:coarse) {
 * { transform:none !important; }
@@ -570,6 +460,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span></div>
 </div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="admTableBody"></tbody></table></div>
+<div class="mobile-cards" id="admMobileCards"></div>
 </div>
 </section>
 <section class="page" id="page-posto">
@@ -600,6 +491,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span><span class="filter-chip" data-filter="Parcial" onclick="Posto.setFilter('Parcial',this)">Parcial</span></div>
 </div>
 <div class="table-wrapper"><table class="table" id="postoTable"><thead id="postoTableHead"><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th class="vol-col">Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div>
+<div class="mobile-cards" id="postoMobileCards"></div>
 </div>
 </section>
 <section class="page" id="page-apontamento">
@@ -634,7 +526,9 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div>
 </div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div>
+<div class="mobile-cards" id="histMobileCards"></div>
+</div>
 </div>
 <div id="historicoPostosSection" style="display:none;">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
@@ -650,7 +544,9 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div>
 </div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div>
+<div class="mobile-cards" id="histPostoMobileCards"></div>
+</div>
 </div>
 </section>
 <section class="page" id="page-historico-posto">
@@ -668,7 +564,9 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div>
 </div>
-<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
+<div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div>
+<div class="mobile-cards" id="historicoPostoMobileCards"></div>
+</div>
 </section>
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
@@ -699,7 +597,6 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:500px;padding:25px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid"><div class="form-group"><label>PEP</label><input type="text" id="edit-pep"></div><div class="form-group"><label>Diagrama/Ordem</label><input type="text" id="edit-diagrama"></div><div class="form-group"><label>Placa</label><input type="text" id="edit-placa"></div><div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao"></div><div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div><div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes"></div><div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div><div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div><div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2"></textarea></div><div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div></div></form></div></div>
 <div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Projeto <strong id="concluirCodigo"></strong></p><div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="margin-top:10px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div><div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="text" id="concluirVolumesProcessados" inputmode="numeric" pattern="[0-9]*" min="1" required placeholder="Ex: 5"></div><div style="margin-top:8px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div></div><div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div class="form-group" style="margin-top:10px;"><label>Status de Conclusão <span class="req">*</span></label><select id="concluirStatusPintura"><option value="Concluído">Concluído (avança para Conferência)</option><option value="Parcial">Parcial (permanece na Pintura)</option></select></div><div class="form-group" style="margin-top:10px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso">Peças em reprocesso</option><option value="Gancherias pendentes">Gancherias pendentes</option></select></div></div><div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
-<!-- MODAL: Cadastro Manual no Posto -->
 <div class="modal-overlay" id="modalCadastroPosto">
 <div class="modal" style="max-width:650px;">
 <div class="modal-head">
@@ -911,53 +808,43 @@ if (num) { result.diagrama = num[1]; break; }
 }
 return result;
 },
-/* NOVA FUNÇÃO: Detecta se o texto bipeado é uma etiqueta completa e extrai o diagrama */
 ehEtiquetaCompleta: function(texto) {
 if (!texto) return false;
 var clean = String(texto).replace(/\s+/g, ' ').trim();
 var parts = clean.split(' ');
-// Uma etiqueta completa tem múltiplos blocos numéricos (pelo menos 4)
 var blocosNumericos = parts.filter(function(p) { return /^\d+$/.test(p); });
 if (blocosNumericos.length < 4) return false;
-// Verifica se há pelo menos um bloco de 11 dígitos começando com "95"
 var temBloco95 = blocosNumericos.some(function(p) {
 return /^\d{11}$/.test(p) && p.indexOf('95') === 0;
 });
 if (temBloco95) return true;
-// Ou verifica padrão 95XXXXXXXXX concatenado
 if (/95\d{9}/.test(clean)) return true;
 return false;
 },
-/* NOVA FUNÇÃO: Extrai diagrama de uma etiqueta completa bipeada */
 extrairDiagramaDaEtiqueta: function(texto) {
 if (!texto) return null;
 var clean = String(texto).replace(/\s+/g, ' ').trim();
 var parts = clean.split(' ');
-// 1. Procura bloco de 11 dígitos começando com "95" (padrão da etiqueta)
 for (var i = 0; i < parts.length; i++) {
 var part = parts[i];
 if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
-return part.substring(2); // Remove os 2 primeiros dígitos "95"
+return part.substring(2);
 }
 }
-// 2. Procura padrão "95XXXXXXXXX" no texto inteiro
 var match95 = clean.match(/95(\d{9})/);
 if (match95) return match95[1];
-// 3. Fallback: qualquer bloco isolado de 9 dígitos
 for (var j = 0; j < parts.length; j++) {
 var p = parts[j];
 if (/^\d{9}$/.test(p)) return p;
 }
 return null;
 },
-/* NOVA FUNÇÃO: Processa texto bipeado no campo de busca - se for etiqueta, extrai o diagrama */
 processarBuscaComExtracao: function(inputElement, boxElement) {
 var texto = inputElement.value;
 if (!texto) {
 if (boxElement) boxElement.classList.remove('extracted');
 return texto;
 }
-// Se o texto é uma etiqueta completa, extrai o diagrama
 if (this.ehEtiquetaCompleta(texto)) {
 var diagrama = this.extrairDiagramaDaEtiqueta(texto);
 if (diagrama && diagrama !== texto.trim()) {
@@ -1026,6 +913,112 @@ return (item.placa || '').toLowerCase().indexOf(s) !== -1;
 return (item.descricao || '').toLowerCase().indexOf(s) !== -1;
 }
 return true;
+},
+/* NOVO: Detecta se é mobile portrait */
+isMobilePortrait: function() {
+return window.innerWidth <= 600 && window.matchMedia('(orientation: portrait)').matches;
+},
+/* NOVO: Renderiza card mobile para projeto */
+renderMobileCardProjeto: function(p, tipoTela) {
+var statusClass = p.status === 'Em Processo' ? 'emprocesso' :
+p.status === 'Aguardando' ? 'aguardando' :
+p.status === 'Parcial' ? 'parcial' : 'aguardando';
+var prioClass = p.prioridade === 'Urgente' ? 'priority-urgente' :
+p.prioridade === 'Alta' ? 'priority-alta' : '';
+var prioColor = p.prioridade === 'Urgente' ? 'var(--danger)' :
+p.prioridade === 'Alta' ? 'var(--warning)' : 'var(--text-light)';
+var volumesDisplay = '-';
+if (tipoTela !== 'pintura' && p.volumesTotal && p.volumesTotal > 0) {
+volumesDisplay = p.volumesProcessados + ' / ' + p.volumesTotal;
+if (p.volumesProcessados >= p.volumesTotal) volumesDisplay += ' ✓';
+} else if (p.volumes) {
+volumesDisplay = p.volumes;
+}
+var tempoDisplay = '-';
+var inicio = Number(p.dataHoraInicio);
+if (p.status === 'Em Processo' && inicio > 0) {
+tempoDisplay = '<span class="tempo-real ativo" id="tempo-' + p.id + '">00:00:00</span>';
+} else if (p.dataHoraInicio && p.dataHoraFim) {
+tempoDisplay = '<span class="tempo-real">' + Utils.formatarTempo(p.dataHoraFim - p.dataHoraInicio) + '</span>';
+}
+var botoesAcao = '';
+if (tipoTela === 'posto') {
+if (p.status === 'Aguardando' || p.status === 'Parcial') {
+botoesAcao = '<button class="icon-action-lg warning" title="Iniciar" onclick="Posto.iniciarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-play"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
+} else if (p.status === 'Em Processo') {
+botoesAcao = '<button class="icon-action-lg info" title="Pausar" onclick="Posto.pausarProcesso(\'' + p.id + '\')"><i class="fa-solid fa-pause"></i></button><button class="icon-action-lg success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-circle-check"></i></button>';
+}
+} else if (tipoTela === 'admin') {
+botoesAcao = '<button class="icon-action" title="Editar" onclick="Admin.abrirEdicao(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>';
+}
+var statusDisplay = '<span class="status ' + statusClass + '">' + (p.status || '') + '</span>';
+if (tipoTela === 'pintura' && p.status === 'Parcial' && p.observacaoPintura) {
+statusDisplay += ' <small style="color:#7B1FA2;font-size:10px;">' + p.observacaoPintura + '</small>';
+}
+var campos = '';
+if (p.pep) campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">PEP</span><span class="mobile-card-field-value">' + p.pep + '</span></div>';
+if (p.placa) campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Placa</span><span class="mobile-card-field-value">' + p.placa + '</span></div>';
+if (p.descricao) campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Descrição</span><span class="mobile-card-field-value">' + p.descricao + '</span></div>';
+if (tipoTela !== 'pintura') {
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Volumes</span><span class="mobile-card-field-value">' + volumesDisplay + '</span></div>';
+}
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Prioridade</span><span class="mobile-card-field-value" style="color:' + prioColor + ';font-weight:600;">' + (p.prioridade || '') + '</span></div>';
+if (tipoTela === 'posto' || tipoTela === 'admin') {
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Turno</span><span class="mobile-card-field-value"><span class="turno-badge">' + (p.turno || '-') + '</span></span></div>';
+}
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Tempo</span><span class="mobile-card-field-value">' + tempoDisplay + '</span></div>';
+return '<div class="mobile-card status-' + statusClass + ' ' + prioClass + '">' +
+'<div class="mobile-card-header">' +
+'<div class="mobile-card-title">' + (p.diagrama || '') + '</div>' +
+'<div class="mobile-card-badges">' + statusDisplay + '</div>' +
+'</div>' +
+'<div class="mobile-card-body">' + campos + '</div>' +
+(botoesAcao ? '<div class="mobile-card-footer"><div class="mobile-card-actions">' + botoesAcao + '</div></div>' : '') +
+'</div>';
+},
+/* NOVO: Renderiza card mobile para histórico */
+renderMobileCardHistorico: function(p, tipoTela) {
+var tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
+var dtInicio = p.dataHoraInicio ? new Date(p.dataHoraInicio).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+var dtFim = p.dataHoraFim ? new Date(p.dataHoraFim).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+var dataConclusao = p.dataHoraConclusao ? new Date(p.dataHoraConclusao).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+var campos = '';
+if (p.pep) campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">PEP</span><span class="mobile-card-field-value">' + p.pep + '</span></div>';
+if (p.placa) campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Placa</span><span class="mobile-card-field-value">' + p.placa + '</span></div>';
+if (p.descricao) campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Descrição</span><span class="mobile-card-field-value">' + p.descricao + '</span></div>';
+if (tipoTela === 'geral') {
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Processo</span><span class="mobile-card-field-value">' + (p.processo || '') + '</span></div>';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Turno</span><span class="mobile-card-field-value"><span class="turno-badge">' + (p.turno || '-') + '</span></span></div>';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Tempo</span><span class="mobile-card-field-value" style="color:var(--weg-blue);font-weight:700;">' + tempoStr + '</span></div>';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Início</span><span class="mobile-card-field-value">' + dtInicio + '</span></div>';
+campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Término</span><span class="mobile-card-field-value">' + dtFim + '</span></div>';
+} else if (tipoTela === 'postos') {
+var postoClass = p.processo === 'Nanocerâmico' ? 'posto-nano' : p.processo === 'Pintura' ? 'posto-pintura' : 'posto-conferencia';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Posto</span><span class="mobile-card-field-value"><span class="posto-badge ' + postoClass + '">' + (p.processo || '') + '</span></span></div>';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Turno</span><span class="mobile-card-field-value"><span class="turno-badge">' + (p.turno || '-') + '</span></span></div>';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Tempo</span><span class="mobile-card-field-value" style="color:var(--weg-blue);font-weight:700;">' + tempoStr + '</span></div>';
+campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Data/Hora</span><span class="mobile-card-field-value">' + dataConclusao + '</span></div>';
+if (p.observacao) campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Observação</span><span class="mobile-card-field-value">' + p.observacao + '</span></div>';
+} else if (tipoTela === 'postoAtual') {
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Turno</span><span class="mobile-card-field-value"><span class="turno-badge">' + (p.turno || '-') + '</span></span></div>';
+campos += '<div class="mobile-card-field"><span class="mobile-card-field-label">Tempo</span><span class="mobile-card-field-value" style="color:var(--weg-blue);font-weight:700;">' + tempoStr + '</span></div>';
+campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Data/Hora</span><span class="mobile-card-field-value">' + dataConclusao + '</span></div>';
+if (p.observacao) campos += '<div class="mobile-card-field full"><span class="mobile-card-field-label">Observação</span><span class="mobile-card-field-value">' + p.observacao + '</span></div>';
+}
+var acoes = '';
+if (tipoTela === 'geral' && State.currentUser === 'admin') {
+acoes = '<div class="mobile-card-footer"><div class="mobile-card-actions">' +
+'<button class="icon-action" title="Reativar" onclick="Historico.reativar(\'' + p.id + '\')"><i class="fa-solid fa-rotate-left"></i></button>' +
+'<button class="icon-action delete" title="Excluir" onclick="Historico.excluir(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' +
+'</div></div>';
+}
+return '<div class="mobile-card">' +
+'<div class="mobile-card-header">' +
+'<div class="mobile-card-title">' + (p.diagrama || '') + '</div>' +
+'</div>' +
+'<div class="mobile-card-body">' + campos + '</div>' +
+acoes +
+'</div>';
 },
 debounce: function(fn, delay, key) {
 if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
@@ -2286,6 +2279,7 @@ this.renderTable();
 },
 renderTable: function() {
 var tbody = document.getElementById('admTableBody');
+var mobileCards = document.getElementById('admMobileCards');
 if (!tbody) return;
 var searchEl = document.getElementById('admSearch');
 var fieldEl = document.getElementById('admSearchField');
@@ -2298,7 +2292,9 @@ data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo);
 }
 data = Utils.ordenarPorPrioridade(data);
 if (data.length === 0) {
-tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Cadastre um novo projeto.') + '</p></div></td></tr>';
+var emptyHtml = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Cadastre um novo projeto.') + '</p></div></td></tr>';
+tbody.innerHTML = emptyHtml;
+if (mobileCards) mobileCards.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>Nenhum projeto encontrado</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Cadastre um novo projeto.') + '</p></div>';
 return;
 }
 tbody.innerHTML = data.map(function(p) {
@@ -2324,6 +2320,12 @@ volumesDisplay = '<span class="volumes-simple">' + (p.volumes || '-') + '</span>
 var descricaoDisplay = p.descricao ? '<small style="color:var(--text-light);display:block;">' + p.descricao + '</small>' : '';
 return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;">' + descricaoDisplay + '</td><td style="text-align:center;">' + (p.processo || '') + '</td><td style="text-align:center;">' + volumesDisplay + '</td><td style="text-align:center;"><span style="color:' + prioColor + ';font-weight:600;">' + (p.prioridade || '') + '</span></td><td style="text-align:center;"><span class="status ' + statusClass + '">' + (p.status || '') + '</span></td><td style="text-align:center;"><div class="row-actions"><button class="icon-action" title="Editar" onclick="Admin.abrirEdicao(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button><button class="icon-action success" title="Concluir" onclick="Conclusao.solicitar(\'' + p.id + '\')"><i class="fa-solid fa-check"></i></button><button class="icon-action delete" title="Excluir" onclick="Admin.excluirProjeto(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
 }).join('');
+// NOVO: Renderiza cards mobile
+if (mobileCards) {
+mobileCards.innerHTML = data.map(function(p) {
+return Utils.renderMobileCardProjeto(p, 'admin');
+}).join('');
+}
 },
 abrirEdicao: function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
@@ -2586,6 +2588,7 @@ return false;
 },
 renderTable: function() {
 var tbody = document.getElementById('postoTableBody');
+var mobileCards = document.getElementById('postoMobileCards');
 if (!tbody) return;
 var searchEl = document.getElementById('postoSearch');
 var fieldEl = document.getElementById('postoSearchField');
@@ -2606,6 +2609,7 @@ var concluidosHoje = State.data.historicoPostos.filter(function(p) { return p.pr
 document.getElementById('posto-concluidos').textContent = concluidosHoje;
 if (data.length === 0) {
 tbody.innerHTML = '<tr><td colspan="' + (State.currentPosto === 'Pintura' ? '9' : '10') + '"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Não há projetos para ' + State.currentPosto + '.') + '</p></div></td></tr>';
+if (mobileCards) mobileCards.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>Nenhum projeto pendente</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Não há projetos para ' + State.currentPosto + '.') + '</p></div>';
 this.atualizarCabecalho();
 return;
 }
@@ -2660,6 +2664,13 @@ html += '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style
 });
 tbody.innerHTML = html;
 this.atualizarCabecalho();
+// NOVO: Renderiza cards mobile
+if (mobileCards) {
+var tipoTela = State.currentPosto === 'Pintura' ? 'pintura' : 'posto';
+mobileCards.innerHTML = data.map(function(p) {
+return Utils.renderMobileCardProjeto(p, tipoTela);
+}).join('');
+}
 setTimeout(function() { Posto.atualizarTemposEmTempoReal(); }, 100);
 },
 atualizarCabecalho: function() {
@@ -2968,6 +2979,7 @@ this.renderPostoAtual();
 },
 renderGeral: function() {
 var tbody = document.getElementById('histTableBody');
+var mobileCards = document.getElementById('histMobileCards');
 if (!tbody) return;
 var searchEl = document.getElementById('histSearch');
 var fieldEl = document.getElementById('histSearchField');
@@ -2984,6 +2996,7 @@ data = data.filter(function(p) { return p.processo === State.currentPosto; });
 data.sort(function(a, b) { return (b.concluidoEm || 0) - (a.concluidoEm || 0); });
 if (data.length === 0) {
 tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div></td></tr>';
+if (mobileCards) mobileCards.innerHTML = '<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h3>Histórico vazio</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div>';
 return;
 }
 tbody.innerHTML = data.map(function(p) {
@@ -2993,9 +3006,15 @@ var tempoStr = p.tempoReal ? Utils.formatarTempo(p.tempoReal) : '-';
 var descricaoDisplay = p.descricao ? '<small style="color:var(--text-light);display:block;">' + p.descricao + '</small>' : '';
 return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + descricaoDisplay + '</td><td style="text-align:center;">' + (p.processo || '') + '</td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dtInicio + '</td><td style="text-align:center;">' + dtFim + '</td><td style="text-align:center;"><div class="row-actions">' + (State.currentUser === 'admin' ? '<button class="icon-action" title="Reativar" onclick="Historico.reativar(\'' + p.id + '\')"><i class="fa-solid fa-rotate-left"></i></button>' : '') + (State.currentUser === 'admin' ? '<button class="icon-action delete" title="Excluir" onclick="Historico.excluir(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</div></td></tr>';
 }).join('');
+if (mobileCards) {
+mobileCards.innerHTML = data.map(function(p) {
+return Utils.renderMobileCardHistorico(p, 'geral');
+}).join('');
+}
 },
 renderPostos: function() {
 var tbody = document.getElementById('histPostoTableBody');
+var mobileCards = document.getElementById('histPostoMobileCards');
 if (!tbody) return;
 var searchEl = document.getElementById('histPostoSearch');
 var fieldEl = document.getElementById('histPostoSearchField');
@@ -3012,6 +3031,7 @@ data = data.filter(function(p) { return p.processo === State.currentPosto; });
 data.sort(function(a, b) { return (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0); });
 if (data.length === 0) {
 tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div></td></tr>';
+if (mobileCards) mobileCards.innerHTML = '<div class="empty-state"><i class="fa-solid fa-route"></i><h3>Nenhum registro</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div>';
 return;
 }
 var postoClassMap = { 'Nanocerâmico': 'posto-nano', 'Pintura': 'posto-pintura', 'Conferência': 'posto-conferencia' };
@@ -3022,9 +3042,15 @@ var postoClass = postoClassMap[p.processo] || '';
 var obs = p.observacao ? '<small style="color:var(--text-light);">' + p.observacao + '</small>' : '-';
 return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;"><span class="posto-badge ' + postoClass + '">' + (p.processo || '') + '</span></td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dataConclusao + '</td><td style="text-align:center;">' + obs + '</td></tr>';
 }).join('');
+if (mobileCards) {
+mobileCards.innerHTML = data.map(function(p) {
+return Utils.renderMobileCardHistorico(p, 'postos');
+}).join('');
+}
 },
 renderPostoAtual: function() {
 var tbody = document.getElementById('historicoPostoTableBody');
+var mobileCards = document.getElementById('historicoPostoMobileCards');
 if (!tbody) return;
 var searchEl = document.getElementById('historicoPostoSearch');
 var fieldEl = document.getElementById('historicoPostoSearchField');
@@ -3040,6 +3066,7 @@ data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo);
 data.sort(function(a, b) { return (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0); });
 if (data.length === 0) {
 tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div></td></tr>';
+if (mobileCards) mobileCards.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-check"></i><h3>Nenhum projeto concluído</h3><p>' + (search ? 'Nenhum resultado para "' + search + '"' : 'Nenhum registro encontrado.') + '</p></div>';
 return;
 }
 tbody.innerHTML = data.map(function(p) {
@@ -3048,6 +3075,11 @@ var dataConclusao = new Date(p.dataHoraConclusao).toLocaleString('pt-BR', { day:
 var obs = p.observacao ? '<small style="color:var(--text-light);">' + p.observacao + '</small>' : '-';
 return '<tr><td style="text-align:center;">' + (p.pep || '-') + '</td><td style="text-align:center;"><strong>' + (p.diagrama || '') + '</strong></td><td style="text-align:center;">' + (p.placa || '-') + '</td><td style="text-align:center;"><span class="turno-badge">' + (p.turno || '-') + '</span></td><td style="text-align:center;"><strong style="color:var(--weg-blue);">' + tempoStr + '</strong></td><td style="text-align:center;">' + dataConclusao + '</td><td style="text-align:center;">' + obs + '</td></tr>';
 }).join('');
+if (mobileCards) {
+mobileCards.innerHTML = data.map(function(p) {
+return Utils.renderMobileCardHistorico(p, 'postoAtual');
+}).join('');
+}
 },
 reativar: async function(id) {
 var idx = State.data.historico.findIndex(function(x) { return x.id === id; });
@@ -3408,7 +3440,6 @@ UI.setupVirtualKeyboard();
 setupVisibilityDetection();
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
-/* NOVO: Setup de busca com extração automática de etiqueta */
 function setupSearchComExtracao(inputId, boxId, callback, delay) {
 var input = document.getElementById(inputId);
 var box = document.getElementById(boxId);
@@ -3417,10 +3448,8 @@ var timer = null;
 input.addEventListener('input', function() {
 if (timer) clearTimeout(timer);
 timer = setTimeout(function() {
-// NOVO: Processa o texto bipeado - se for etiqueta, extrai o diagrama
 var textoExtraido = Utils.processarBuscaComExtracao(input, box);
 if (textoExtraido !== input.value) {
-// A extração ocorreu - mostra feedback
 UI.showToast('success', 'Etiqueta detectada', 'Diagrama extraído: ' + textoExtraido);
 }
 callback();
@@ -3494,6 +3523,18 @@ window.addEventListener('offline', function() {
 State.isOnline = false;
 State.apiAvailable = false;
 UI.showToast('warning', 'Offline', 'Sem conexão com a internet');
+});
+// NOVO: Re-renderiza em mobile quando mudar orientação
+window.addEventListener('resize', function() {
+if (State.currentUser === 'admin') Admin.renderTable();
+if (State.currentPosto) {
+Posto.renderTable();
+if (State.currentPage === 'historico-posto') Historico.renderPostoAtual();
+}
+if (State.currentPage === 'historico') {
+Historico.renderGeral();
+Historico.renderPostos();
+}
 });
 } catch (e) {
 console.error("Erro crítico na inicialização:", e);
