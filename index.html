@@ -123,7 +123,12 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .form-actions { grid-column:span 2; display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
 .table-wrapper { overflow-x:auto; border-radius:8px; margin-top:15px; -webkit-overflow-scrolling:touch; }
 .table-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
-.search-box { position:relative; flex:1; max-width:300px; min-width:140px; z-index:20; }
+/* NOVO: Search box com seletor de campo */
+.search-box-combo { display:flex; gap:6px; flex:1; max-width:420px; min-width:240px; z-index:20; align-items:stretch; }
+.search-field-select { padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--weg-blue); font-size:12px; font-weight:600; cursor:pointer !important; min-height:40px; min-width:110px; flex-shrink:0; transition:var(--transition); }
+.search-field-select:focus { outline:none; border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); }
+.search-field-select:hover { border-color:var(--weg-blue); background:var(--weg-light); }
+.search-box { position:relative; flex:1; min-width:140px; z-index:20; }
 .search-box input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px; cursor:text !important; touch-action:manipulation; min-height:40px; position:relative; z-index:25; }
 .search-box input:focus { border-color:var(--weg-blue); box-shadow:0 0 0 3px rgba(0,91,172,.15); outline:none; }
 .search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-light); pointer-events:none !important; font-size:14px; z-index:21; }
@@ -160,7 +165,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .volumes-simple { color:var(--text-light); font-size:12px; text-align:center; }
 .tempo-real { background:var(--weg-light); color:var(--weg-blue); padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; font-family:'Courier New', monospace; display:inline-block; }
 .tempo-real.ativo { background:var(--success); color:white; animation:pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.7; } }
 .action-main { display:flex; gap:6px; align-items:center; justify-content:center; flex-wrap:wrap; }
 .icon-action-lg { background:var(--bg); border:2px solid var(--border); cursor:pointer !important; padding:8px 12px; border-radius:8px; color:var(--text); transition:var(--transition); font-size:18px; min-width:48px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,.08); flex:0 0 auto; position:relative; touch-action:manipulation; }
 .icon-action-lg:hover { box-shadow:0 4px 8px rgba(0,0,0,.12); transform:translateY(-1px); }
@@ -315,12 +319,6 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .apontamento-success i { font-size:48px; margin-bottom:10px; }
 .apontamento-success h3 { font-size:20px; margin-bottom:6px; }
 .apontamento-success p { opacity:.9; font-size:13px; }
-.cadastro-posto-banner { background:linear-gradient(135deg, var(--weg-blue), var(--weg-dark)); color:white; padding:16px 20px; border-radius:var(--radius); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; box-shadow:var(--shadow); }
-.cadastro-posto-banner .banner-text { display:flex; align-items:center; gap:12px; flex:1; min-width:200px; }
-.cadastro-posto-banner .banner-text i { font-size:28px; opacity:.9; }
-.cadastro-posto-banner .banner-text strong { display:block; font-size:15px; margin-bottom:2px; }
-.cadastro-posto-banner .banner-text small { opacity:.85; font-size:11px; }
-.cadastro-posto-banner .btn { flex-shrink:0; }
 @media (max-width:1023px) {
 .menu-toggle { display:inline-flex !important; }
 .sidebar { position:fixed !important; left:0 !important; top:var(--header-height) !important; height:calc(100vh - var(--header-height)) !important; z-index:99 !important; box-shadow:var(--shadow-lg); transform:translateX(-100%) !important; width:var(--sidebar-width) !important; border-right:none; transition:transform 0.3s cubic-bezier(.4,0,.2,1) !important; will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden; }
@@ -342,6 +340,7 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 .turno-comparison { flex-direction:column; gap:6px; }
 .turno-stat { padding:8px; }
 .turno-stat .turno-value { font-size:18px; }
+.search-box-combo { max-width:100%; min-width:100%; }
 }
 @media (max-width:767px) {
 :root { --header-height:70px; --sidebar-width:60px; }
@@ -411,9 +410,8 @@ button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > 
 #cardSeguranca .form-actions .btn { padding:10px 18px; font-size:13px; }
 .apontamento-input-card .input-row { flex-direction:column; }
 .apontamento-input-card .input-row .btn { width:100%; margin-bottom:8px; }
-.cadastro-posto-banner { padding:12px 14px; }
-.cadastro-posto-banner .banner-text i { font-size:22px; }
-.cadastro-posto-banner .banner-text strong { font-size:13px; }
+.search-box-combo { min-width:100%; }
+.search-field-select { min-width:100px; font-size:11px; }
 }
 @media (max-width:400px) {
 .kpi-grid { grid-template-columns:1fr 1fr; gap:6px; }
@@ -557,7 +555,16 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="card">
 <div class="card-head"><h2><i class="fa-solid fa-list"></i> Projetos Cadastrados</h2><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-secondary" onclick="Export.csv()"><i class="fa-solid fa-download"></i> Exportar</button></div></div>
 <div class="table-toolbar">
-<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<div class="search-box-combo">
+<select class="search-field-select" id="admSearchField" onchange="Admin.renderTable()">
+<option value="all">🔍 Todos os campos</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
+<option value="pep">🏷️ PEP</option>
+<option value="placa">🪪 Placa</option>
+<option value="descricao">📝 Descrição</option>
+</select>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+</div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Admin.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Admin.setFilter('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Admin.setFilter('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Admin.setFilter('Conferência',this)">Conferência</span></div>
 </div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="admTableBody"></tbody></table></div>
@@ -576,7 +583,16 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div class="table-toolbar">
 <div style="display:flex;gap:8px;align-items:stretch;flex:1;min-width:0;flex-wrap:wrap;">
-<div class="search-box" style="flex:1;min-width:140px;"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
+<div class="search-box-combo" style="flex:1;min-width:240px;">
+<select class="search-field-select" id="postoSearchField" onchange="Posto.renderTable()">
+<option value="all">🔍 Todos os campos</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
+<option value="pep">🏷️ PEP</option>
+<option value="placa">🪪 Placa</option>
+<option value="descricao">📝 Descrição</option>
+</select>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+</div>
 <button class="btn btn-success btn-sm" id="btnAddPosto" onclick="Posto.abrirCadastroManual()" style="display:none;white-space:nowrap;"><i class="fa-solid fa-plus"></i> Adicionar Projeto</button>
 </div>
 <div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Posto.setFilter('all',this)">Todos</span><span class="filter-chip" data-filter="Aguardando" onclick="Posto.setFilter('Aguardando',this)">Aguardando</span><span class="filter-chip" data-filter="Em Processo" onclick="Posto.setFilter('Em Processo',this)">Em Processo</span><span class="filter-chip" data-filter="Parcial" onclick="Posto.setFilter('Parcial',this)">Parcial</span></div>
@@ -603,22 +619,53 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div id="historicoGeralSection">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-archive"></i> Projetos Finalizados</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div></div>
+<div class="table-toolbar">
+<div class="search-box-combo">
+<select class="search-field-select" id="histSearchField" onchange="Historico.renderGeral()">
+<option value="all">🔍 Todos os campos</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
+<option value="pep">🏷️ PEP</option>
+<option value="placa">🪪 Placa</option>
+<option value="descricao">📝 Descrição</option>
+</select>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+</div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterGeral('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterGeral('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterGeral('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterGeral('Conferência',this)">Conferência</span></div>
+</div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Descrição</th><th>Processo</th><th>Turno</th><th>Tempo</th><th>Início</th><th>Término</th><th>Ações</th></tr></thead><tbody id="histTableBody"></tbody></table></div></div>
 </div>
 <div id="historicoPostosSection" style="display:none;">
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-route"></i> Histórico de Passagens por Posto</h2><button class="btn btn-sm btn-secondary" onclick="Export.historicoPostosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div></div>
+<div class="table-toolbar">
+<div class="search-box-combo">
+<select class="search-field-select" id="histPostoSearchField" onchange="Historico.renderPostos()">
+<option value="all">🔍 Todos os campos</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
+<option value="pep">🏷️ PEP</option>
+<option value="placa">🪪 Placa</option>
+</select>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+</div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostos('all',this)">Todos</span><span class="filter-chip" data-filter="Nanocerâmico" onclick="Historico.setFilterPostos('Nanocerâmico',this)">Nanocerâmico</span><span class="filter-chip" data-filter="Pintura" onclick="Historico.setFilterPostos('Pintura',this)">Pintura</span><span class="filter-chip" data-filter="Conferência" onclick="Historico.setFilterPostos('Conferência',this)">Conferência</span></div>
+</div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div>
 </div>
 </section>
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
-<div class="table-toolbar"><div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar por PEP, Diagrama, Placa..." autocomplete="off"></div>
-<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div></div>
+<div class="table-toolbar">
+<div class="search-box-combo">
+<select class="search-field-select" id="historicoPostoSearchField" onchange="Historico.renderPostoAtual()">
+<option value="all">🔍 Todos os campos</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
+<option value="pep">🏷️ PEP</option>
+<option value="placa">🪪 Placa</option>
+</select>
+<div class="search-box"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Digite para buscar..." autocomplete="off"></div>
+</div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all" onclick="Historico.setFilterPostoAtual('all',this)">Todos</span><span class="filter-chip" data-filter="1º Turno" onclick="Historico.setFilterPostoAtual('1º Turno',this)">1º Turno</span><span class="filter-chip" data-filter="2º Turno" onclick="Historico.setFilterPostoAtual('2º Turno',this)">2º Turno</span><span class="filter-chip" data-filter="3º Turno" onclick="Historico.setFilterPostoAtual('3º Turno',this)">3º Turno</span></div>
+</div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-config">
@@ -650,8 +697,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:500px;padding:25px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid"><div class="form-group"><label>PEP</label><input type="text" id="edit-pep"></div><div class="form-group"><label>Diagrama/Ordem</label><input type="text" id="edit-diagrama"></div><div class="form-group"><label>Placa</label><input type="text" id="edit-placa"></div><div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao"></div><div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div><div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes"></div><div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div><div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div><div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2"></textarea></div><div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div></div></form></div></div>
 <div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Projeto <strong id="concluirCodigo"></strong></p><div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="margin-top:10px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div><div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="text" id="concluirVolumesProcessados" inputmode="numeric" pattern="[0-9]*" min="1" required placeholder="Ex: 5"></div><div style="margin-top:8px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div></div><div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div class="form-group" style="margin-top:10px;"><label>Status de Conclusão <span class="req">*</span></label><select id="concluirStatusPintura"><option value="Concluído">Concluído (avança para Conferência)</option><option value="Parcial">Parcial (permanece na Pintura)</option></select></div><div class="form-group" style="margin-top:10px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso">Peças em reprocesso</option><option value="Gancherias pendentes">Gancherias pendentes</option></select></div></div><div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
-
-<!-- NOVO MODAL: Cadastro Manual no Posto -->
+<!-- MODAL: Cadastro Manual no Posto -->
 <div class="modal-overlay" id="modalCadastroPosto">
 <div class="modal" style="max-width:650px;">
 <div class="modal-head">
@@ -718,7 +764,6 @@ input, select, textarea { position:relative; z-index:5; }
 </form>
 </div>
 </div>
-
 <div class="toast-container" id="toastContainer"></div>
 <div class="virtual-keyboard" id="virtualKeyboard">
 <div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
@@ -729,7 +774,7 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <script>
 /* ============================================================
-CONFIGURAÇÃO E ESTADO - COM SMART POLLING
+CONFIGURAÇÃO E ESTADO
 ============================================================ */
 const API_CONFIG = {
 URL: "https://script.google.com/macros/s/AKfycbyi5Y_G68bnQ1SOOpE6IkbRQueRmyDEUv2RhvCHQbFAdxCG8rfNs0CqCYA319eDgD9J/exec",
@@ -762,7 +807,6 @@ cameraStream: null, scanInterval: null, lastPepFound: null, lastDiagramaFound: n
 apontamentoLista: [], apontamentoEnviadasHoje: 0, apontamentosSyncInterval: null,
 syncIntervalIds: [],
 searchTimers: {},
-renderedRows: { admin: new Map(), posto: new Map(), historico: new Map() },
 pollingActive: true,
 isTabVisible: true
 };
@@ -843,8 +887,7 @@ observacaoPintura: apiProj.ObservacaoPintura || null
 };
 },
 extrairDadosEtiqueta: function(texto) {
-var clean = String(texto).replace(/\r/g, '').replace(/
-/g, ' ').replace(/\s+/g, ' ').trim();
+var clean = String(texto).replace(/\r/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 var result = { pep: null, diagrama: null };
 var pepLabelMatch = clean.match(/PEP\s*[:;]\s*([\d\-\s]+)/i);
 if (pepLabelMatch) {
@@ -855,8 +898,7 @@ if (!result.pep) {
 var generic = clean.match(/\b(\d{3})\s*[-]\s*(\d{7})\s*[-]\s*(\d{3})\b/);
 if (generic) { result.pep = generic[1] + '-' + generic[2] + '-' + generic[3]; }
 }
-var lines = String(texto).split(/\r?
-/);
+var lines = String(texto).split(/\r?\n/);
 for (var i = 0; i < lines.length; i++) {
 var line = lines[i];
 var upper = line.toUpperCase();
@@ -867,39 +909,49 @@ if (num) { result.diagrama = num[1]; break; }
 }
 return result;
 },
-/* NOVO: Extrai diagrama/ordem do código de barras bipado no posto */
 extrairDiagramaCodigoBarras: function(texto) {
 if (!texto) return null;
 var clean = String(texto).replace(/\s+/g, ' ').trim();
 var parts = clean.split(' ');
-
-// 1. Procurar bloco de 11 dígitos começando com "95" (com espaços)
 for (var i = 0; i < parts.length; i++) {
 var part = parts[i];
 if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
 return part.substring(2);
 }
 }
-
-// 2. Procurar padrão "95XXXXXXXXX" no texto inteiro (sem espaços)
 var match95 = clean.match(/95(\d{9})/);
 if (match95) return match95[1];
-
-// 3. Fallback: qualquer bloco de 9 dígitos isolado
 for (var j = 0; j < parts.length; j++) {
 var p = parts[j];
 if (/^\d{9}$/.test(p)) return p;
 }
-
-// 4. Último fallback: qualquer sequência de 9 dígitos no texto
 var match9 = clean.match(/\b(\d{9})\b/);
 if (match9) return match9[1];
-
 return null;
 },
 normalizarDiagrama: function(valor) {
 if (valor == null) return '';
 return String(valor).trim().toLowerCase().replace(/\s+/g, '');
+},
+/* NOVO: Filtro por campo específico */
+filtrarPorCampo: function(item, search, campo) {
+if (!search) return true;
+var s = search.toLowerCase();
+if (campo === 'all') {
+return (item.pep || '').toLowerCase().indexOf(s) !== -1 ||
+(item.diagrama || '').toLowerCase().indexOf(s) !== -1 ||
+(item.placa || '').toLowerCase().indexOf(s) !== -1 ||
+(item.descricao || '').toLowerCase().indexOf(s) !== -1;
+} else if (campo === 'diagrama') {
+return (item.diagrama || '').toLowerCase().indexOf(s) !== -1;
+} else if (campo === 'pep') {
+return (item.pep || '').toLowerCase().indexOf(s) !== -1;
+} else if (campo === 'placa') {
+return (item.placa || '').toLowerCase().indexOf(s) !== -1;
+} else if (campo === 'descricao') {
+return (item.descricao || '').toLowerCase().indexOf(s) !== -1;
+}
+return true;
 },
 debounce: function(fn, delay, key) {
 if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
@@ -1028,7 +1080,7 @@ throw error;
 }
 };
 /* ============================================================
-UI - COM INDICADOR DE SYNC MELHORADO
+UI
 ============================================================ */
 const UI = {
 aplicarEstadoCursor: function() {
@@ -1281,12 +1333,11 @@ UI.scrollParaElemento(target);
 }
 };
 /* ============================================================
-SMART POLLING - DETECÇÃO DE VISIBILIDADE
+SMART POLLING
 ============================================================ */
 function setupVisibilityDetection() {
 document.addEventListener('visibilitychange', function() {
 State.isTabVisible = !document.hidden;
-console.log('Tab visibility:', State.isTabVisible ? 'visible' : 'hidden');
 if (State.currentUser) {
 clearSyncIntervals();
 iniciarSyncComRetry();
@@ -1627,7 +1678,7 @@ Charts.render();
 }
 };
 /* ============================================================
-SYNC - COM INDICADOR VISUAL
+SYNC
 ============================================================ */
 function clearSyncIntervals() {
 State.syncIntervalIds.forEach(function(id) { clearInterval(id); });
@@ -1992,7 +2043,7 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 };
 /* ============================================================
-ADMIN - COM ATUALIZAÇÃO OTIMISTA
+ADMIN
 ============================================================ */
 const Admin = {
 abrirCamera: async function() {
@@ -2166,16 +2217,13 @@ renderTable: function() {
 var tbody = document.getElementById('admTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('admSearch');
+var fieldEl = document.getElementById('admSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+var campo = fieldEl ? fieldEl.value : 'all';
 var data = [].concat(State.data.projetos);
 if (State.admFilter !== 'all') data = data.filter(function(p) { return p.processo === State.admFilter; });
 if (search) {
-data = data.filter(function(p) {
-return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
-(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
-(p.placa || '').toLowerCase().indexOf(search) !== -1 ||
-(p.descricao || '').toLowerCase().indexOf(search) !== -1;
-});
+data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
 }
 data = Utils.ordenarPorPrioridade(data);
 if (data.length === 0) {
@@ -2285,7 +2333,7 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 };
 /* ============================================================
-POSTO - COM CADASTRO MANUAL VIA LEITOR DE CÓDIGO DE BARRAS
+POSTO
 ============================================================ */
 const Posto = {
 render: function() {
@@ -2296,7 +2344,6 @@ document.getElementById('postoTitulo').textContent = 'Posto - ' + State.currentP
 document.getElementById('postoBadge').textContent = State.currentPosto;
 document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
 this.aplicarTurnoAutomatico();
-// Mostrar/ocultar botão de adicionar projeto (apenas para Nanocerâmico)
 var btnAdd = document.getElementById('btnAddPosto');
 if (btnAdd) {
 btnAdd.style.display = (State.currentPosto === 'Nanocerâmico') ? 'inline-flex' : 'none';
@@ -2343,7 +2390,6 @@ document.querySelectorAll('#page-posto .filter-chip').forEach(function(c) { c.cl
 el.classList.add('active');
 this.renderTable();
 },
-/* NOVO: Abre modal de cadastro manual */
 abrirCadastroManual: function() {
 if (State.currentPosto !== 'Nanocerâmico') {
 UI.showToast('warning', 'Acesso restrito', 'Cadastro manual disponível apenas no posto Nanocerâmico');
@@ -2411,13 +2457,11 @@ var volumes = document.getElementById('cpo-volumes').value.trim();
 var descricao = document.getElementById('cpo-descricao').value.trim();
 var prioridade = document.getElementById('cpo-prioridade').value;
 var obs = document.getElementById('cpo-obs').value.trim();
-
 if (!diagrama) {
 UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
 document.getElementById('cpo-diagrama').focus();
 return false;
 }
-
 var diagramaNormalizado = Utils.normalizarDiagrama(diagrama);
 var existeDiagrama = State.data.projetos.some(function(p) {
 var d = Utils.normalizarDiagrama(p.diagrama);
@@ -2427,19 +2471,15 @@ if (existeDiagrama) {
 UI.showToast('warning', 'Diagrama duplicado', 'Já existe um projeto com este Diagrama/Ordem: ' + diagrama);
 return false;
 }
-
 var volumesTotal = null;
 if (volumes) {
 var match = volumes.match(/\d+/);
 if (match) volumesTotal = parseInt(match[0]);
 }
-
-// NOVO: Adiciona marcação [Manual] na observação para identificação no Google Sheets
 var obsFinal = '[Manual]';
 if (obs && obs.trim()) {
 obsFinal += ' ' + obs.trim();
 }
-
 var novo = {
 id: Utils.genId(),
 pep: pep || null,
@@ -2457,14 +2497,11 @@ obs: obsFinal,
 criadoEm: Date.now(),
 atualizadoEm: Date.now()
 };
-
-// Atualização otimista
 State.data.projetos.push(novo);
 this.renderTable();
 if (State.currentUser === 'admin') Admin.renderTable();
 UI.closeModal('modalCadastroPosto');
 UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
-
 try {
 await Storage.salvarApi('create', novo);
 } catch (error) {
@@ -2480,16 +2517,13 @@ renderTable: function() {
 var tbody = document.getElementById('postoTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('postoSearch');
+var fieldEl = document.getElementById('postoSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+var campo = fieldEl ? fieldEl.value : 'all';
 var data = State.data.projetos.filter(function(p) { return p.processo === State.currentPosto && p.status !== 'Concluído'; });
 if (State.postoFilter !== 'all') data = data.filter(function(p) { return p.status === State.postoFilter; });
 if (search) {
-data = data.filter(function(p) {
-return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
-(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
-(p.placa || '').toLowerCase().indexOf(search) !== -1 ||
-(p.descricao || '').toLowerCase().indexOf(search) !== -1;
-});
+data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
 }
 data = Utils.ordenarPorPrioridade(data);
 var todosPosto = State.data.projetos.filter(function(p) { return p.processo === State.currentPosto; });
@@ -2611,7 +2645,7 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 };
 /* ============================================================
-CONCLUSAO - COM ATUALIZAÇÃO OTIMISTA
+CONCLUSAO
 ============================================================ */
 const Conclusao = {
 solicitar: function(id) {
@@ -2865,16 +2899,13 @@ renderGeral: function() {
 var tbody = document.getElementById('histTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('histSearch');
+var fieldEl = document.getElementById('histSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+var campo = fieldEl ? fieldEl.value : 'all';
 var data = [].concat(State.data.historico);
 if (State.histFilter !== 'all') data = data.filter(function(p) { return p.processo === State.histFilter; });
 if (search) {
-data = data.filter(function(p) {
-return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
-(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
-(p.placa || '').toLowerCase().indexOf(search) !== -1 ||
-(p.descricao || '').toLowerCase().indexOf(search) !== -1;
-});
+data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
 }
 if (State.currentUser !== 'admin' && State.currentPosto) {
 data = data.filter(function(p) { return p.processo === State.currentPosto; });
@@ -2896,15 +2927,13 @@ renderPostos: function() {
 var tbody = document.getElementById('histPostoTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('histPostoSearch');
+var fieldEl = document.getElementById('histPostoSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+var campo = fieldEl ? fieldEl.value : 'all';
 var data = [].concat(State.data.historicoPostos);
 if (State.histPostoFilter !== 'all') data = data.filter(function(p) { return p.processo === State.histPostoFilter; });
 if (search) {
-data = data.filter(function(p) {
-return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
-(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
-(p.placa || '').toLowerCase().indexOf(search) !== -1;
-});
+data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
 }
 if (State.currentUser !== 'admin' && State.currentPosto) {
 data = data.filter(function(p) { return p.processo === State.currentPosto; });
@@ -2927,17 +2956,15 @@ renderPostoAtual: function() {
 var tbody = document.getElementById('historicoPostoTableBody');
 if (!tbody) return;
 var searchEl = document.getElementById('historicoPostoSearch');
+var fieldEl = document.getElementById('historicoPostoSearchField');
 var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+var campo = fieldEl ? fieldEl.value : 'all';
 document.getElementById('historicoPostoNome').textContent = State.currentPosto;
 document.getElementById('historicoPostoBadge').textContent = State.currentPosto;
 var data = State.data.historicoPostos.filter(function(p) { return p.processo === State.currentPosto; });
 if (State.historicoPostoFilter !== 'all') data = data.filter(function(p) { return p.turno === State.historicoPostoFilter; });
 if (search) {
-data = data.filter(function(p) {
-return (p.pep || '').toLowerCase().indexOf(search) !== -1 ||
-(p.diagrama || '').toLowerCase().indexOf(search) !== -1 ||
-(p.placa || '').toLowerCase().indexOf(search) !== -1;
-});
+data = data.filter(function(p) { return Utils.filtrarPorCampo(p, search, campo); });
 }
 data.sort(function(a, b) { return (b.dataHoraConclusao || 0) - (a.dataHoraConclusao || 0); });
 if (data.length === 0) {
@@ -3259,14 +3286,12 @@ UI.showToast('success', 'Exportado', 'CSV de concluídos gerado');
 downloadCSV: function(filename, headers, rows) {
 var escapeCSV = function(v) {
 var s = String(v !== null && v !== undefined ? v : '');
-if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('
-') !== -1) {
+if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
 return '"' + s.replace(/"/g, '""') + '"';
 }
 return s;
 };
-var csvContent = [headers.map(escapeCSV).join(',')].concat(rows.map(function(r) { return r.map(escapeCSV).join(','); })).join('
-');
+var csvContent = [headers.map(escapeCSV).join(',')].concat(rows.map(function(r) { return r.map(escapeCSV).join(','); })).join('\n');
 var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
 var url = URL.createObjectURL(blob);
 var link = document.createElement('a');
@@ -3300,7 +3325,7 @@ UI.showToast('success', 'Backup gerado', 'Arquivo de backup baixado');
 }
 };
 /* ============================================================
-INICIALIZAÇÃO - COM SMART POLLING
+INICIALIZAÇÃO
 ============================================================ */
 (function() {
 try {
