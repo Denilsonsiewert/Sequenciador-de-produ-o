@@ -688,7 +688,6 @@ isTabVisible: true
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
-
 /* ============================================================
 UTILITÁRIOS
 ============================================================ */
@@ -794,7 +793,6 @@ if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
 State.searchTimers[key] = setTimeout(fn, delay);
 }
 };
-
 /* ============================================================
 API
 ============================================================ */
@@ -861,7 +859,6 @@ async function clearAllData() { return await apiRequest('clearAll', {}); }
 async function salvarApontamento(data) { return await apiRequest('salvarApontamento', { data: data }); }
 async function buscarApontamentos(desde) { return await apiRequest('buscarApontamentos', { desde: desde }, 'GET'); }
 window.API = { createProject: createProject, updateProject: updateProject, deleteProject: deleteProject, createHistorico: createHistorico, createHistoricoPosto: createHistoricoPosto, deleteHistorico: deleteHistorico, updateConfig: updateConfig, clearAllData: clearAllData, salvarApontamento: salvarApontamento, buscarApontamentos: buscarApontamentos, on: on, off: off };
-
 /* ============================================================
 STORAGE
 ============================================================ */
@@ -917,7 +914,6 @@ throw error;
 }
 }
 };
-
 /* ============================================================
 UI - COM INDICADOR DE SYNC MELHORADO
 ============================================================ */
@@ -933,15 +929,38 @@ scrollParaElemento: function(elemento) {
 setTimeout(function() {
 if (!elemento) return;
 var vkHeight = State.vkActive ? (document.getElementById('virtualKeyboard').offsetHeight || 260) : 0;
-var elementRect = elemento.getBoundingClientRect();
 var viewportHeight = window.innerHeight;
+var elementRect = elemento.getBoundingClientRect();
+
+// Espaço necessário acima do teclado + margem de segurança
+var espacoNecessario = vkHeight + 80;
 var inputBottom = elementRect.bottom;
-var spaceBelow = viewportHeight - inputBottom;
-if (spaceBelow < vkHeight + 60) {
-var targetPosition = elementRect.top + window.scrollY - (viewportHeight - vkHeight - elementRect.height - 40);
+var espacoAbaixo = viewportHeight - inputBottom;
+
+// Se o campo está sendo coberto pelo teclado
+if (espacoAbaixo < espacoNecessario) {
+// Procurar o container scrollável mais próximo (modal)
+var container = elemento.closest('.modal');
+
+if (container) {
+// Scroll dentro do modal
+var containerRect = container.getBoundingClientRect();
+var elementoDentroModal = elemento.offsetTop;
+
+// Calcular posição alvo: campo deve ficar acima do teclado
+var posicaoAlvo = elementoDentroModal - (viewportHeight - espacoNecessario - containerRect.top);
+
+container.scrollTo({
+top: Math.max(0, posicaoAlvo),
+behavior: 'smooth'
+});
+} else {
+// Fallback: scroll da janela
+var targetPosition = elementRect.top + window.scrollY - (viewportHeight - espacoNecessario - elementRect.height);
 window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
 }
-}, 350);
+}
+}, 400);
 },
 openModal: function(id) {
 document.getElementById(id).classList.add('active');
@@ -1032,7 +1051,6 @@ setSyncStatus: function(status) {
 var indicator = document.getElementById('syncIndicator');
 var statusEl = document.getElementById('syncStatus');
 if (!indicator) return;
-
 if (status === 'syncing') {
 indicator.className = 'sync-indicator syncing';
 statusEl.textContent = 'Sincronizando...';
@@ -1107,7 +1125,9 @@ var notButton = target.type !== 'button' && target.type !== 'submit' && target.t
 if (isInput && notButton && !target.readOnly) {
 State.vkTarget = target;
 VirtualKeyboard.show();
+// Scroll duplo para garantir que o campo fique visível
 UI.scrollParaElemento(target);
+setTimeout(function() { UI.scrollParaElemento(target); }, 500);
 }
 });
 document.addEventListener('focusout', function(e) {
@@ -1158,7 +1178,6 @@ UI.scrollParaElemento(target);
 });
 }
 };
-
 /* ============================================================
 SMART POLLING - DETECÇÃO DE VISIBILIDADE
 ============================================================ */
@@ -1166,7 +1185,6 @@ function setupVisibilityDetection() {
 document.addEventListener('visibilitychange', function() {
 State.isTabVisible = !document.hidden;
 console.log('Tab visibility:', State.isTabVisible ? 'visible' : 'hidden');
-
 // Reconfigurar polling baseado na visibilidade
 if (State.currentUser) {
 clearSyncIntervals();
@@ -1174,11 +1192,9 @@ iniciarSyncComRetry();
 }
 });
 }
-
 function getCurrentPollingInterval() {
 return State.isTabVisible ? API_CONFIG.POLLING_INTERVAL_ACTIVE : API_CONFIG.POLLING_INTERVAL_BACKGROUND;
 }
-
 /* ============================================================
 NAVIGATION
 ============================================================ */
@@ -1204,7 +1220,6 @@ if (page === 'config') Config.loadUI();
 UI.closeSidebarMobile();
 }
 };
-
 /* ============================================================
 APONTAMENTO
 ============================================================ */
@@ -1371,7 +1386,6 @@ document.getElementById('apontInput').focus();
 }
 }
 };
-
 /* ============================================================
 AUTH
 ============================================================ */
@@ -1511,7 +1525,6 @@ Dashboard.render();
 Charts.render();
 }
 };
-
 /* ============================================================
 SYNC - COM INDICADOR VISUAL
 ============================================================ */
@@ -1645,7 +1658,6 @@ setTimeout(tentarSync, 5000);
 };
 tentarSync();
 }
-
 /* ============================================================
 CONFIG
 ============================================================ */
@@ -1732,7 +1744,6 @@ el.className = 'password-strength strength-strong';
 }
 }
 };
-
 /* ============================================================
 DASHBOARD
 ============================================================ */
@@ -1879,7 +1890,6 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 }
 };
-
 /* ============================================================
 ADMIN - COM ATUALIZAÇÃO OTIMISTA
 ============================================================ */
@@ -2031,12 +2041,10 @@ obs: obs,
 criadoEm: Date.now(),
 atualizadoEm: Date.now()
 };
-
 // ATUALIZAÇÃO OTIMISTA: Adiciona ao estado local imediatamente
 State.data.projetos.push(novo);
 this.renderTable();
 UI.showToast('success', 'Cadastrado', 'Projeto ' + diagrama + ' cadastrado em ' + processo);
-
 try {
 await Storage.salvarApi('create', novo);
 document.getElementById('formCadastro').reset();
@@ -2147,14 +2155,12 @@ UI.closeModal('modalEditar');
 return false;
 }
 p.status = novoStatus;
-
 // ATUALIZAÇÃO OTIMISTA
 UI.closeModal('modalEditar');
 this.renderTable();
 Charts.render();
 if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Atualizado', 'Projeto ' + p.diagrama + ' atualizado na nuvem');
-
 try {
 await Storage.salvarApi('update', p);
 } catch (error) {
@@ -2166,14 +2172,12 @@ excluirProjeto: async function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
 if (!p) return;
 if (!confirm('Deseja realmente excluir o projeto ' + p.diagrama + '?')) return;
-
 // ATUALIZAÇÃO OTIMISTA
 State.data.projetos = State.data.projetos.filter(function(x) { return x.id !== id; });
 this.renderTable();
 Charts.render();
 if (State.currentPosto) Posto.render();
 UI.showToast('success', 'Excluído', 'Projeto ' + p.diagrama + ' removido da nuvem');
-
 try {
 await Storage.salvarApi('delete', { id: id });
 } catch (error) {
@@ -2183,7 +2187,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
 /* ============================================================
 POSTO - COM ATUALIZAÇÃO OTIMISTA E TIMER DESACOPLADO
 ============================================================ */
@@ -2197,7 +2200,6 @@ document.getElementById('postoBadge').textContent = State.currentPosto;
 document.getElementById('postoTurno').value = State.data.turnosPorPosto[State.currentPosto] || '1º Turno';
 this.aplicarTurnoAutomatico();
 this.renderTable();
-
 // TIMER DESACOPLADO - Atualiza apenas os cronômetros sem re-renderizar a tabela
 if (State.timerInterval) {
 clearInterval(State.timerInterval);
@@ -2347,7 +2349,6 @@ el.classList.add('ativo');
 iniciarProcesso: async function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
 if (!p) return;
-
 // ATUALIZAÇÃO OTIMISTA
 p.status = 'Em Processo';
 p.dataHoraInicio = Date.now();
@@ -2356,7 +2357,6 @@ p.tempoReal = null;
 p.atualizadoEm = Date.now();
 this.renderTable();
 UI.showToast('success', 'Processo iniciado', p.diagrama + ' iniciado às ' + new Date().toLocaleTimeString('pt-BR'));
-
 try {
 await Storage.salvarApi('update', p);
 } catch (error) {
@@ -2366,13 +2366,11 @@ UI.showToast('error', 'Erro', 'Não foi possível iniciar: ' + error.message);
 pausarProcesso: async function(id) {
 var p = State.data.projetos.find(function(x) { return x.id === id; });
 if (!p) return;
-
 // ATUALIZAÇÃO OTIMISTA
 p.status = 'Aguardando';
 p.atualizadoEm = Date.now();
 this.renderTable();
 UI.showToast('info', 'Processo pausado', p.diagrama + ' pausado');
-
 try {
 await Storage.salvarApi('update', p);
 } catch (error) {
@@ -2380,7 +2378,6 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 }
 };
-
 /* ============================================================
 CONCLUSAO - COM ATUALIZAÇÃO OTIMISTA
 ============================================================ */
@@ -2393,10 +2390,22 @@ document.getElementById('concluirCodigo').textContent = p.diagrama;
 document.getElementById('concluirVolumesSection').style.display = 'none';
 document.getElementById('concluirPinturaSection').style.display = 'none';
 document.getElementById('concluirTurnoNormal').style.display = 'block';
+
 if (p.processo === 'Nanocerâmico') {
 document.getElementById('concluirVolumesSection').style.display = 'block';
 document.getElementById('concluirTurnoNormal').style.display = 'none';
-document.getElementById('concluirTurnoNano').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
+
+// CORREÇÃO: Prioriza o turno ativo do posto, depois o turno do projeto, depois fallback
+var turnoAtivo = State.data.turnosPorPosto[p.processo] || '1º Turno';
+var turnoSelecionado = turnoAtivo;
+
+// Se o projeto já tem um turno válido definido, usa ele
+if (p.turno && ['1º Turno', '2º Turno', '3º Turno'].indexOf(p.turno) !== -1) {
+turnoSelecionado = p.turno;
+}
+
+document.getElementById('concluirTurnoNano').value = turnoSelecionado;
+
 var total = p.volumesTotal || 0;
 var jaProcessados = p.volumesProcessados || 0;
 var faltam = total - jaProcessados;
@@ -2411,20 +2420,39 @@ document.getElementById('concluirVolumesProcessados').oninput = function() { Con
 } else if (p.processo === 'Pintura') {
 document.getElementById('concluirPinturaSection').style.display = 'block';
 document.getElementById('concluirTurnoNormal').style.display = 'none';
-document.getElementById('concluirTurnoPintura').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
+
+// CORREÇÃO: Mesma lógica para Pintura
+var turnoAtivo = State.data.turnosPorPosto[p.processo] || '1º Turno';
+var turnoSelecionado = turnoAtivo;
+if (p.turno && ['1º Turno', '2º Turno', '3º Turno'].indexOf(p.turno) !== -1) {
+turnoSelecionado = p.turno;
+}
+document.getElementById('concluirTurnoPintura').value = turnoSelecionado;
+
 document.getElementById('concluirObservacaoPintura').value = p.observacaoPintura || '';
 document.getElementById('concluirStatusPintura').value = (p.status === 'Parcial') ? 'Parcial' : 'Concluído';
 } else {
-document.getElementById('concluirTurno').value = p.turno || State.data.turnosPorPosto[p.processo] || '1º Turno';
+// CORREÇÃO: Mesma lógica para Conferência
+var turnoAtivo = State.data.turnosPorPosto[p.processo] || '1º Turno';
+var turnoSelecionado = turnoAtivo;
+if (p.turno && ['1º Turno', '2º Turno', '3º Turno'].indexOf(p.turno) !== -1) {
+turnoSelecionado = p.turno;
 }
+document.getElementById('concluirTurno').value = turnoSelecionado;
+}
+
 UI.openModal('modalConcluir');
 setTimeout(function() {
 if (p.processo === 'Nanocerâmico') {
-document.getElementById('concluirVolumesProcessados').focus();
+var inputVolumes = document.getElementById('concluirVolumesProcessados');
+inputVolumes.focus();
+// Força o scroll após o modal abrir
+UI.scrollParaElemento(inputVolumes);
 } else if (p.processo === 'Pintura') {
-document.getElementById('concluirStatusPintura').focus();
+var selectStatus = document.getElementById('concluirStatusPintura');
+selectStatus.focus();
 }
-}, 100);
+}, 350);
 },
 atualizarVolumesRestantes: function() {
 var p = State.data.projetos.find(function(x) { return x.id === State.projetoParaConcluir; });
@@ -2463,12 +2491,10 @@ await this.moverParaProximoProcesso(p, turno);
 p.status = 'Parcial';
 p.turno = turno;
 p.atualizadoEm = Date.now();
-
 // ATUALIZAÇÃO OTIMISTA
 Posto.renderTable();
 Admin.renderTable();
 UI.showToast('info', 'Conclusão parcial', volumesProcessados + ' volumes processados. Faltam ' + (p.volumesTotal - p.volumesProcessados) + '.');
-
 await Storage.salvarApi('update', p);
 }
 } else if (p.processo === 'Pintura') {
@@ -2484,12 +2510,10 @@ await this.moverParaProximoProcesso(p, turno);
 p.status = 'Parcial';
 p.dataHoraFim = null;
 p.tempoReal = null;
-
 // ATUALIZAÇÃO OTIMISTA
 Posto.renderTable();
 Admin.renderTable();
 UI.showToast('info', 'Parcial', 'Projeto ' + p.diagrama + ' permanece na Pintura. Motivo: ' + (observacao || 'Não informado') + '.');
-
 await Storage.salvarApi('update', p);
 }
 } else {
@@ -2517,13 +2541,11 @@ p.volumesProcessados = 0;
 p.dataHoraInicio = null;
 p.observacaoPintura = null;
 p.atualizadoEm = Date.now();
-
 // ATUALIZAÇÃO OTIMISTA
 Posto.renderTable();
 Admin.renderTable();
 var nomeProximoPosto = proximoProcesso === 'Pintura' ? 'Pintura' : 'Conferência';
 UI.showToast('success', 'Fluxo atualizado', p.diagrama + ' processado no ' + turno + ' e movido para ' + nomeProximoPosto);
-
 await Storage.salvarApi('update', p);
 } else {
 await this.finalizarProjeto(p, turno);
@@ -2543,7 +2565,6 @@ Prioridade: p.prioridade, Turno: turno || p.turno || '1º Turno', Obs: p.obs,
 CriadoEm: p.criadoEm, DataHoraInicio: p.dataHoraInicio, DataHoraFim: Date.now(),
 TempoReal: tempoReal, ObservacaoPintura: p.observacaoPintura, ConcluidoEm: Date.now()
 };
-
 // ATUALIZAÇÃO OTIMISTA
 State.data.historico.unshift({
 id: concluido.ID, projetoId: concluido.ProjetoID, pep: concluido.PEP,
@@ -2555,13 +2576,11 @@ dataHoraFim: concluido.DataHoraFim, tempoReal: concluido.TempoReal,
 observacaoPintura: concluido.ObservacaoPintura, concluidoEm: concluido.ConcluidoEm
 });
 State.data.projetos = State.data.projetos.filter(function(x) { return x.id !== p.id; });
-
 Admin.renderTable();
 Posto.renderTable();
 Historico.renderGeral();
 Charts.render();
 UI.showToast('success', 'Concluído', p.diagrama + ' finalizado. Tempo: ' + Utils.formatarTempo(tempoReal));
-
 try {
 await API.createHistorico(concluido);
 await Storage.salvarApi('delete', { id: p.id });
@@ -2575,7 +2594,6 @@ ID: 'hp_' + Date.now(), ProjetoID: p.id, PEP: p.pep, Diagrama: p.diagrama,
 Placa: p.placa, Processo: p.processo, Turno: turno, TempoReal: tempoReal,
 Observacao: p.observacaoPintura || null, DataHoraConclusao: Date.now()
 };
-
 // ATUALIZAÇÃO OTIMISTA
 State.data.historicoPostos.unshift({
 id: registro.ID, projetoId: registro.ProjetoID, pep: registro.PEP,
@@ -2583,7 +2601,6 @@ diagrama: registro.Diagrama, placa: registro.Placa, processo: registro.Processo,
 turno: registro.Turno, tempoReal: registro.TempoReal, observacao: registro.Observacao,
 dataHoraConclusao: registro.DataHoraConclusao
 });
-
 try {
 await API.createHistoricoPosto(registro);
 } catch (error) {
@@ -2596,7 +2613,6 @@ if (!p) return;
 await this.moverParaProximoProcesso(p, turno);
 }
 };
-
 /* ============================================================
 HISTORICO
 ============================================================ */
@@ -2732,7 +2748,6 @@ descricao: p.descricao, volumesTotal: p.volumesTotal, volumesProcessados: 0,
 processo: p.processo, prioridade: p.prioridade, status: 'Aguardando',
 turno: p.turno || '1º Turno', obs: p.obs, criadoEm: Date.now(), atualizadoEm: Date.now()
 };
-
 // ATUALIZAÇÃO OTIMISTA
 State.data.projetos.push(novoProjeto);
 State.data.historico.splice(idx, 1);
@@ -2741,7 +2756,6 @@ Admin.renderTable();
 Posto.render();
 Charts.render();
 UI.showToast('success', 'Reativado', novoProjeto.diagrama + ' voltou para processamento');
-
 try {
 await Storage.salvarApi('deleteHistorico', { id: id });
 await Storage.salvarApi('create', novoProjeto);
@@ -2752,13 +2766,11 @@ UI.showToast('error', 'Erro', 'Não foi possível reativar: ' + error.message);
 excluir: async function(id) {
 if (!confirm('Excluir permanentemente este registro?')) return;
 var p = State.data.historico.find(function(x) { return x.id === id; });
-
 // ATUALIZAÇÃO OTIMISTA
 State.data.historico = State.data.historico.filter(function(x) { return x.id !== id; });
 this.renderGeral();
 Charts.render();
 UI.showToast('success', 'Excluído', 'Registro removido da nuvem');
-
 try {
 await Storage.salvarApi('deleteHistorico', { id: id });
 } catch (error) {
@@ -2766,7 +2778,6 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
-
 /* ============================================================
 TURNO
 ============================================================ */
@@ -2786,7 +2797,6 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaModalAberto = false;
 }
 };
-
 /* ============================================================
 VIRTUAL KEYBOARD
 ============================================================ */
@@ -2796,7 +2806,11 @@ var vk = document.getElementById('virtualKeyboard');
 vk.classList.add('active');
 State.vkActive = true;
 if (State.vkTarget) {
+// Scroll duplo: imediato e após animação do teclado
 UI.scrollParaElemento(State.vkTarget);
+setTimeout(function() {
+UI.scrollParaElemento(State.vkTarget);
+}, 450);
 }
 },
 hide: function() {
@@ -2806,7 +2820,6 @@ State.vkActive = false;
 State.vkTarget = null;
 }
 };
-
 /* ============================================================
 CHARTS
 ============================================================ */
@@ -2965,7 +2978,6 @@ ticks: { callback: function(v) { return v + '%'; } }
 });
 }
 };
-
 /* ============================================================
 EXPORT
 ============================================================ */
@@ -3074,7 +3086,6 @@ URL.revokeObjectURL(url);
 UI.showToast('success', 'Backup gerado', 'Arquivo de backup baixado');
 }
 };
-
 /* ============================================================
 INICIALIZAÇÃO - COM SMART POLLING
 ============================================================ */
@@ -3088,7 +3099,6 @@ UI.setupVirtualKeyboard();
 setupVisibilityDetection(); // NOVO: Detecta visibilidade da aba
 setInterval(UI.updateDate, 1000);
 UI.updateDate();
-
 function setupSearchDebounce(inputId, callback, delay) {
 var input = document.getElementById(inputId);
 if (!input) return;
@@ -3106,7 +3116,6 @@ setupSearchDebounce('postoSearch', function() { Posto.renderTable(); }, 350);
 setupSearchDebounce('histSearch', function() { Historico.renderGeral(); }, 350);
 setupSearchDebounce('histPostoSearch', function() { Historico.renderPostos(); }, 350);
 setupSearchDebounce('historicoPostoSearch', function() { Historico.renderPostoAtual(); }, 350);
-
 var savedRole = localStorage.getItem('weg_logged_in_role');
 if (typeof API !== 'undefined' && State.apiAvailable) {
 API.on('project:synced', function(proj) {
