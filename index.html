@@ -1373,7 +1373,7 @@ UI.showToast('success', 'Apontamento realizado', totalEnviado + ' ordem(ns) envi
 var container = document.querySelector('.apontamento-container');
 var successDiv = document.createElement('div');
 successDiv.className = 'apontamento-success';
-successDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i><h3>Apontamento Realizado!</h3><p>' + totalEnviado + ' ordem(ns) enviada(s) para o Google Sheets</p>';
+successDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i><h3>Apontamento Realizado!</h3><p>' + totalEnviado + ' ordem(ns) enviada(s) </p>';
 container.insertBefore(successDiv, container.firstChild);
 setTimeout(function() { successDiv.remove(); }, 3000);
 } catch (error) {
@@ -1645,7 +1645,7 @@ clearSyncIntervals();
 var tentarSync = async function() {
 try {
 await syncDataCompleto();
-UI.showToast('success', 'Sincronizado', 'Dados carregados do Google Sheets');
+UI.showToast('success', 'Sincronizado', '');
 var pollingInterval = getCurrentPollingInterval();
 var id1 = setInterval(syncDataIncremental, pollingInterval);
 var id2 = setInterval(syncDataCompleto, API_CONFIG.FULL_SYNC_INTERVAL);
