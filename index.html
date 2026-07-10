@@ -560,9 +560,9 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="admSearchField" onchange="Admin.renderTable()">
-<option value="all">🔍 Todos os campos</option>
+<option value="all"> Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
@@ -627,7 +627,7 @@ input, select, textarea { position:relative; z-index:5; }
 <select class="search-field-select" id="histSearchField" onchange="Historico.renderGeral()">
 <option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
@@ -642,9 +642,9 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="histPostoSearchField" onchange="Historico.renderPostos()">
-<option value="all">🔍 Todos os campos</option>
+<option value="all"> Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="histPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -662,7 +662,7 @@ input, select, textarea { position:relative; z-index:5; }
 <select class="search-field-select" id="historicoPostoSearchField" onchange="Historico.renderPostoAtual()">
 <option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="historicoPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -710,7 +710,7 @@ input, select, textarea { position:relative; z-index:5; }
 <i class="fa-solid fa-barcode"></i>
 <div>
 <strong>Leitor de Código de Barras</strong>
-<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipar.<br><strong>📌 Importante:</strong> Se selecionar "Ordem de Produção", o código será automaticamente adicionado à fila de Apontamentos.</div>
+<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipar.<br><strong> Importante:</strong> Se selecionar "Ordem de Produção", ao concluir a tarefa ela será automaticamente enviada para a aba Apontamentos com a marcação "Involucro" na coluna K.</div>
 </div>
 </div>
 <form onsubmit="return Posto.cadastrarProjetoManual(event)">
@@ -994,6 +994,7 @@ extrairOrdemProducaoCodigoBarras: function(texto) {
 if (!texto) return null;
 var clean = String(texto).replace(/\s+/g, ' ').trim();
 var parts = clean.split(' ');
+// Procura por código começando com 95 e extraindo 10 dígitos (95 + 10 = 12 dígitos)
 for (var i = 0; i < parts.length; i++) {
 var part = parts[i];
 if (/^\d{12}$/.test(part) && part.indexOf('95') === 0) {
@@ -1573,7 +1574,8 @@ turno: turnoAtual,
 operador: State.currentUser,
 posto: State.currentPosto,
 dataEnvio: new Date().toISOString(),
-total: State.apontamentoLista.length
+total: State.apontamentoLista.length,
+involucro: ''
 };
 await API.salvarApontamento(dataEnvio);
 var totalEnviado = State.apontamentoLista.length;
@@ -2462,7 +2464,11 @@ atualizarLabelCodigo: function() {
 var tipo = document.getElementById('cpo-tipo').value;
 var label = document.getElementById('cpo-label-codigo');
 if (label) {
-label.innerHTML = 'Código de Barras (' + tipo + ') <span class="req">*</span>';
+if (tipo === 'Ordem') {
+label.innerHTML = 'Código de Barras (Ordem de Produção) <span class="req">*</span>';
+} else {
+label.innerHTML = 'Código de Barras (Diagrama) <span class="req">*</span>';
+}
 }
 },
 processarCodigoBarras: function() {
@@ -2557,19 +2563,6 @@ UI.closeModal('modalCadastroPosto');
 UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
 try {
 await Storage.salvarApi('create', novo);
-if (tipo === 'Ordem' && State.currentPosto === 'Nanocerâmico') {
-var existeNaLista = State.apontamentoLista.find(function(o) { return o.codigo === diagrama; });
-if (!existeNaLista) {
-State.apontamentoLista.push({
-codigo: diagrama,
-timestamp: Date.now(),
-hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-});
-Apontamento.renderLista();
-Apontamento.atualizarStats();
-UI.showToast('info', 'Ordem adicionada ao Apontamento', diagrama + ' foi automaticamente adicionada à fila de apontamento. Vá até a aba Apontamento e clique em "Apontar" para enviar ao VBA.');
-}
-}
 } catch (error) {
 console.error('Erro ao cadastrar manualmente:', error);
 State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
@@ -2841,6 +2834,24 @@ UI.openModal('modalConcluir');
 }
 State.projetoParaConcluir = null;
 },
+enviarParaApontamento: async function(p, turno) {
+try {
+var dataEnvio = {
+ordens: [p.diagrama],
+turno: turno,
+operador: State.currentUser,
+posto: 'Nanocerâmico',
+dataEnvio: new Date().toISOString(),
+total: 1,
+involucro: (p.tipoCodigo === 'Ordem') ? 'Involucro' : ''
+};
+await API.salvarApontamento(dataEnvio);
+UI.showToast('success', 'Apontamento automático', p.diagrama + ' enviado para a aba Apontamentos' + (p.tipoCodigo === 'Ordem' ? ' com marcação "Involucro"' : ''));
+} catch (error) {
+console.error('Erro ao enviar para apontamento:', error);
+UI.showToast('warning', 'Atenção', 'Ordem concluída mas não foi enviada para Apontamentos: ' + error.message);
+}
+},
 moverParaProximoProcesso: async function(p, turno) {
 var proximoProcesso = FLUXO_PROCESSOS[p.processo];
 var tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
@@ -2867,6 +2878,9 @@ await this.finalizarProjeto(p, turno);
 finalizarProjeto: async function(p, turno) {
 var tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
 await this.registrarHistoricoPosto(p, turno, tempoReal);
+if (p.tipoCodigo === 'Ordem') {
+await this.enviarParaApontamento(p, turno);
+}
 p.dataHoraFim = Date.now();
 p.tempoReal = tempoReal;
 p.concluidoEm = Date.now();
