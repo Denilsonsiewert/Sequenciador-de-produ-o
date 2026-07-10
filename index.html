@@ -29,10 +29,10 @@
 --transition: all .25s ease;
 }
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color:transparent; }
-body { background:var(--bg); color:var(--text); transition:var(--transition); cursor:default !important; overflow-x:hidden; }
+body { background:var(--bg); color:var(--text); transition:var(--transition); cursor:default !important; touch-action:manipulation; overflow-x:hidden; }
 body.hide-cursor, body.hide-cursor *, body.hide-cursor button, body.hide-cursor a, body.hide-cursor input, body.hide-cursor select, body.hide-cursor textarea { cursor:none !important; }
 button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .historico-tab, .dashboard-tab, .password-toggle, .modal-close, .vk-key {
-position:relative; display:inline-flex; align-items:center; justify-content:center; cursor:pointer !important; user-select:none; -webkit-tap-highlight-color:transparent; touch-action:manipulation; min-height:44px; min-width:44px;
+position:relative; display:inline-flex; align-items:center; justify-content:center; cursor:pointer !important; user-select:none; -webkit-tap-highlight-color:transparent; z-index:10; touch-action:manipulation; min-height:44px; min-width:44px;
 }
 button > i, a > i, .btn > i, .icon-action > i, .icon-action-lg > i, .role-btn > i, .menu a > i, .filter-chip > i, .historico-tab > i, .dashboard-tab > i, .password-toggle > i, .modal-close > i, .vk-key > i { pointer-events:none; position:relative; z-index:11; }
 ::-webkit-scrollbar { width:8px; height:8px; }
@@ -435,6 +435,7 @@ button, a, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip
 button:hover, .btn:hover, .role-btn:hover, .menu a:hover, .vk-key:hover, .filter-chip:hover, .icon-action:hover, .icon-action-lg:hover { opacity:0.85; }
 button:active, .btn:active, .role-btn:active, .menu a:active, .vk-key:active, .filter-chip:active, .icon-action:active, .icon-action-lg:active { opacity:0.7; }
 }
+button, .btn, .icon-action, .icon-action-lg, .role-btn, .menu a, .filter-chip, .vk-key, .password-toggle, .modal-close, .dashboard-tab, .historico-tab { position:relative; z-index:10; pointer-events:auto; }
 .card, .kpi, .table-wrapper, .comparison-card, .stat-card { overflow:visible; }
 input, select, textarea { position:relative; z-index:5; }
 .modal-overlay { z-index:10001; }
@@ -559,7 +560,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="admSearchField" onchange="Admin.renderTable()">
-<option value="all"> Todos os campos</option>
+<option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
@@ -587,7 +588,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div style="display:flex;gap:8px;align-items:stretch;flex:1;min-width:0;flex-wrap:wrap;">
 <div class="search-box-combo" style="flex:1;min-width:240px;">
 <select class="search-field-select" id="postoSearchField" onchange="Posto.renderTable()">
-<option value="all"> Todos os campos</option>
+<option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
@@ -624,9 +625,9 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="histSearchField" onchange="Historico.renderGeral()">
-<option value="all">🔍 Todos os campos</option>
+<option value="all"> Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
@@ -641,9 +642,9 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="histPostoSearchField" onchange="Historico.renderPostos()">
-<option value="all">🔍 Todos os campos</option>
+<option value="all"> Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="histPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -661,7 +662,7 @@ input, select, textarea { position:relative; z-index:5; }
 <select class="search-field-select" id="historicoPostoSearchField" onchange="Historico.renderPostoAtual()">
 <option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="historicoPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -993,12 +994,12 @@ var clean = String(texto).replace(/\s+/g, ' ').trim();
 var parts = clean.split(' ');
 for (var i = 0; i < parts.length; i++) {
 var part = parts[i];
-if (/^\d{11}$/.test(part) && part.indexOf('95') === 0) {
-return part;
+if (/^\d{12}$/.test(part) && part.indexOf('95') === 0) {
+return part.substring(2);
 }
 }
-var match95 = clean.match(/95(\d{9})/);
-if (match95) return '95' + match95[1];
+var match95 = clean.match(/95(\d{10})/);
+if (match95) return match95[1];
 for (var j = 0; j < parts.length; j++) {
 var p = parts[j];
 if (/^\d{10}$/.test(p)) return p;
@@ -2502,7 +2503,6 @@ var volumes = document.getElementById('cpo-volumes').value.trim();
 var descricao = document.getElementById('cpo-descricao').value.trim();
 var prioridade = document.getElementById('cpo-prioridade').value;
 var obs = document.getElementById('cpo-obs').value.trim();
-var tipo = document.getElementById('cpo-tipo').value;
 if (!diagrama) {
 UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
 document.getElementById('cpo-diagrama').focus();
@@ -2541,8 +2541,7 @@ status: 'Aguardando',
 turno: State.data.turnosPorPosto['Nanocerâmico'] || '1º Turno',
 obs: obsFinal,
 criadoEm: Date.now(),
-atualizadoEm: Date.now(),
-tipoCodigo: tipo
+atualizadoEm: Date.now()
 };
 State.data.projetos.push(novo);
 this.renderTable();
@@ -2551,16 +2550,6 @@ UI.closeModal('modalCadastroPosto');
 UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
 try {
 await Storage.salvarApi('create', novo);
-if (tipo === 'Ordem' && State.currentPosto === 'Nanocerâmico') {
-State.apontamentoLista.push({
-codigo: diagrama,
-timestamp: Date.now(),
-hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-});
-Apontamento.renderLista();
-Apontamento.atualizarStats();
-UI.showToast('info', 'Ordem adicionada ao apontamento', diagrama + ' foi automaticamente adicionada à fila de apontamento');
-}
 } catch (error) {
 console.error('Erro ao cadastrar manualmente:', error);
 State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
