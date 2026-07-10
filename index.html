@@ -625,9 +625,9 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="histSearchField" onchange="Historico.renderGeral()">
-<option value="all"> Todos os campos</option>
+<option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">️ PEP</option>
+<option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
@@ -642,9 +642,9 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="histPostoSearchField" onchange="Historico.renderPostos()">
-<option value="all"> Todos os campos</option>
+<option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">️ PEP</option>
+<option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="histPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="histPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -662,7 +662,7 @@ input, select, textarea { position:relative; z-index:5; }
 <select class="search-field-select" id="historicoPostoSearchField" onchange="Historico.renderPostoAtual()">
 <option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">️ PEP</option>
+<option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="historicoPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -710,7 +710,7 @@ input, select, textarea { position:relative; z-index:5; }
 <i class="fa-solid fa-barcode"></i>
 <div>
 <strong>Leitor de Código de Barras</strong>
-<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipe.</div>
+<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipar.<br><strong>📌 Importante:</strong> Se selecionar "Ordem de Produção", o código será automaticamente adicionado à fila de Apontamentos.</div>
 </div>
 </div>
 <form onsubmit="return Posto.cadastrarProjetoManual(event)">
@@ -718,8 +718,8 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="form-group">
 <label>Tipo do Código <span class="req">*</span></label>
 <select id="cpo-tipo" required onchange="Posto.atualizarLabelCodigo()">
-<option value="Diagrama">Diagrama</option>
-<option value="Ordem">Ordem de Produção</option>
+<option value="Diagrama">Diagrama (9 dígitos)</option>
+<option value="Ordem">Ordem de Produção (10 dígitos)</option>
 </select>
 </div>
 <div class="form-group">
@@ -856,7 +856,8 @@ Processo: projeto.processo, Prioridade: projeto.prioridade, Status: projeto.stat
 Obs: projeto.obs, CriadoEm: projeto.criadoEm, AtualizadoEm: projeto.atualizadoEm || Date.now(),
 DataHoraInicio: projeto.dataHoraInicio || null, DataHoraFim: projeto.dataHoraFim || null,
 TempoReal: projeto.tempoReal || null, ConcluidoEm: projeto.concluidoEm || null,
-ObservacaoPintura: projeto.observacaoPintura || null
+ObservacaoPintura: projeto.observacaoPintura || null,
+TipoCodigo: projeto.tipoCodigo || null
 };
 },
 fromApiFormat: function(apiProj) {
@@ -879,7 +880,8 @@ dataHoraInicio: apiProj.DataHoraInicio ? Number(apiProj.DataHoraInicio) : null,
 dataHoraFim: apiProj.DataHoraFim ? Number(apiProj.DataHoraFim) : null,
 tempoReal: apiProj.TempoReal ? Number(apiProj.TempoReal) : null,
 concluidoEm: apiProj.ConcluidoEm ? Number(apiProj.ConcluidoEm) : null,
-observacaoPintura: apiProj.ObservacaoPintura || null
+observacaoPintura: apiProj.ObservacaoPintura || null,
+tipoCodigo: apiProj.TipoCodigo || null
 };
 },
 extrairDadosEtiqueta: function(texto) {
@@ -2503,6 +2505,7 @@ var volumes = document.getElementById('cpo-volumes').value.trim();
 var descricao = document.getElementById('cpo-descricao').value.trim();
 var prioridade = document.getElementById('cpo-prioridade').value;
 var obs = document.getElementById('cpo-obs').value.trim();
+var tipo = document.getElementById('cpo-tipo').value;
 if (!diagrama) {
 UI.showToast('error', 'Erro', 'O campo Diagrama/Ordem é obrigatório');
 document.getElementById('cpo-diagrama').focus();
@@ -2523,6 +2526,9 @@ var match = volumes.match(/\d+/);
 if (match) volumesTotal = parseInt(match[0]);
 }
 var obsFinal = '[Manual]';
+if (tipo === 'Ordem') {
+obsFinal = '[Manual - Ordem de Produção]';
+}
 if (obs && obs.trim()) {
 obsFinal += ' ' + obs.trim();
 }
@@ -2541,7 +2547,8 @@ status: 'Aguardando',
 turno: State.data.turnosPorPosto['Nanocerâmico'] || '1º Turno',
 obs: obsFinal,
 criadoEm: Date.now(),
-atualizadoEm: Date.now()
+atualizadoEm: Date.now(),
+tipoCodigo: tipo
 };
 State.data.projetos.push(novo);
 this.renderTable();
@@ -2550,6 +2557,19 @@ UI.closeModal('modalCadastroPosto');
 UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
 try {
 await Storage.salvarApi('create', novo);
+if (tipo === 'Ordem' && State.currentPosto === 'Nanocerâmico') {
+var existeNaLista = State.apontamentoLista.find(function(o) { return o.codigo === diagrama; });
+if (!existeNaLista) {
+State.apontamentoLista.push({
+codigo: diagrama,
+timestamp: Date.now(),
+hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+});
+Apontamento.renderLista();
+Apontamento.atualizarStats();
+UI.showToast('info', 'Ordem adicionada ao Apontamento', diagrama + ' foi automaticamente adicionada à fila de apontamento. Vá até a aba Apontamento e clique em "Apontar" para enviar ao VBA.');
+}
+}
 } catch (error) {
 console.error('Erro ao cadastrar manualmente:', error);
 State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
