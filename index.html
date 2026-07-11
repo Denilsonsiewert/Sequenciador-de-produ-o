@@ -446,6 +446,7 @@ input, select, textarea { position:relative; z-index:5; }
 </style>
 </head>
 <body>
+<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
 <div class="logo-big"><i class="fa-solid fa-industry"></i></div>
@@ -459,6 +460,8 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </div>
+
+<!-- APP -->
 <div id="app" style="display:none;">
 <header class="header">
 <div class="header-left">
@@ -482,6 +485,8 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="UI.closeSidebarMobile()"></div>
 <aside class="sidebar" id="sidebar"><nav class="menu" id="mainMenu"></nav></aside>
 <main class="content" id="mainContent">
+
+<!-- DASHBOARD -->
 <section class="page" id="page-dashboard">
 <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Dashboard de Produção <span class="process-badge">Visão Geral</span></h1>
 <div class="dashboard-tabs">
@@ -534,6 +539,8 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 </div>
 </section>
+
+<!-- ADMIN -->
 <section class="page" id="page-admin">
 <h1 class="page-title"><i class="fa-solid fa-user-shield"></i> Administração <span class="process-badge">Coordenação</span></h1>
 <div class="card">
@@ -560,11 +567,11 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="admSearchField" onchange="Admin.renderTable()">
-<option value="all">🔍 Todos os campos</option>
-<option value="diagrama"> Diagrama/Ordem</option>
+<option value="all"> Todos os campos</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
-<option value="descricao"> Descrição</option>
+<option value="descricao">📝 Descrição</option>
 </select>
 <div class="search-box" id="admSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="admSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
 </div>
@@ -573,6 +580,8 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th>Processo</th><th>Volumes</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="admTableBody"></tbody></table></div>
 </div>
 </section>
+
+<!-- POSTO -->
 <section class="page" id="page-posto">
 <h1 class="page-title"><i class="fa-solid fa-industry" id="postoIcon"></i> <span id="postoTitulo">Posto</span> <span class="process-badge" id="postoBadge"></span></h1>
 <div class="kpi-grid">
@@ -591,7 +600,7 @@ input, select, textarea { position:relative; z-index:5; }
 <option value="all">🔍 Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
 <option value="pep">🏷️ PEP</option>
-<option value="placa">🪪 Placa</option>
+<option value="placa"> Placa</option>
 <option value="descricao">📝 Descrição</option>
 </select>
 <div class="search-box" id="postoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="postoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -603,6 +612,8 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-wrapper"><table class="table" id="postoTable"><thead id="postoTableHead"><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Descrição</th><th class="vol-col">Volumes</th><th>Prioridade</th><th>Turno</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="postoTableBody"></tbody></table></div>
 </div>
 </section>
+
+<!-- APONTAMENTO -->
 <section class="page" id="page-apontamento">
 <div class="apontamento-container">
 <div class="apontamento-header"><h2><i class="fa-solid fa-barcode"></i> Apontamento de Ordens</h2><p>Bipe as ordens e clique em <strong>Apontar</strong>.</p>
@@ -614,6 +625,8 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="apontamento-list-card"><div class="list-header"><h3><i class="fa-solid fa-list-check"></i> Ordens na Fila <span id="apontCount" style="color:var(--weg-blue);">(0)</span></h3><button class="btn btn-sm btn-danger" onclick="Apontamento.limparLista()" id="btnLimparLista" style="display:none;"><i class="fa-solid fa-trash"></i> Limpar Tudo</button></div><div class="apontamento-list" id="apontList"><div class="apontamento-empty"><i class="fa-solid fa-barcode"></i><h3>Nenhuma ordem bipada</h3><p>Bipe a primeira ordem para começar</p></div></div></div>
 </div>
 </section>
+
+<!-- HISTORICO -->
 <section class="page" id="page-historico">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h1>
 <div class="historico-tabs">
@@ -626,7 +639,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="search-box-combo">
 <select class="search-field-select" id="histSearchField" onchange="Historico.renderGeral()">
 <option value="all">🔍 Todos os campos</option>
-<option value="diagrama">📋 Diagrama/Ordem</option>
+<option value="diagrama"> Diagrama/Ordem</option>
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 <option value="descricao"> Descrição</option>
@@ -643,7 +656,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="search-box-combo">
 <select class="search-field-select" id="histPostoSearchField" onchange="Historico.renderPostos()">
 <option value="all">🔍 Todos os campos</option>
-<option value="diagrama"> Diagrama/Ordem</option>
+<option value="diagrama">📋 Diagrama/Ordem</option>
 <option value="pep">🏷️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
@@ -654,15 +667,17 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Posto</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="histPostoTableBody"></tbody></table></div></div>
 </div>
 </section>
+
+<!-- HISTORICO POSTO -->
 <section class="page" id="page-historico-posto">
 <h1 class="page-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico do Posto <span class="process-badge" id="historicoPostoBadge"></span></h1>
 <div class="card"><div class="card-head"><h2><i class="fa-solid fa-circle-check"></i> Projetos Concluídos no <span id="historicoPostoNome"></span></h2><button class="btn btn-sm btn-secondary" onclick="Export.postoConcluidosCSV()"><i class="fa-solid fa-download"></i> Exportar</button></div>
 <div class="table-toolbar">
 <div class="search-box-combo">
 <select class="search-field-select" id="historicoPostoSearchField" onchange="Historico.renderPostoAtual()">
-<option value="all">🔍 Todos os campos</option>
+<option value="all"> Todos os campos</option>
 <option value="diagrama">📋 Diagrama/Ordem</option>
-<option value="pep">🏷️ PEP</option>
+<option value="pep">️ PEP</option>
 <option value="placa">🪪 Placa</option>
 </select>
 <div class="search-box" id="historicoPostoSearchBox"><i class="fa-solid fa-search"></i><input type="text" id="historicoPostoSearch" placeholder="Buscar ou bipe a etiqueta..." autocomplete="off"></div>
@@ -671,6 +686,8 @@ input, select, textarea { position:relative; z-index:5; }
 </div>
 <div class="table-wrapper"><table class="table"><thead><tr><th>PEP</th><th>Diagrama/Ordem</th><th>Placa</th><th>Turno</th><th>Tempo</th><th>Data/Hora</th><th>Observação</th></tr></thead><tbody id="historicoPostoTableBody"></tbody></table></div></div>
 </section>
+
+<!-- CONFIG -->
 <section class="page" id="page-config">
 <h1 class="page-title"><i class="fa-solid fa-gear"></i> Configurações</h1>
 <div class="card" id="cardSeguranca" style="display:none;">
@@ -691,15 +708,24 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="alert alert-warning"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Atenção:</strong> "Limpar Tudo" apaga TODOS os dados na nuvem.</div></div>
 <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;"><button class="btn btn-secondary" onclick="Export.backup()"><i class="fa-solid fa-download"></i> Backup Local</button><button class="btn btn-danger" onclick="Auth.solicitarLimpeza()"><i class="fa-solid fa-trash"></i> Limpar Nuvem</button></div></div>
 </section>
+
 </main>
 </div>
 </div>
+
+<!-- MODAIS -->
 <div class="modal-overlay" id="modalLogout"><div class="modal modal-logout"><div class="modal-body"><div class="logout-icon"><i class="fa-solid fa-right-from-bracket"></i></div><h3>Deseja realmente sair?</h3><p>Você voltará para a tela de seleção de perfis.</p><div class="modal-actions"><button class="btn btn-secondary btn-lg" onclick="UI.closeModal('modalLogout')"><i class="fa-solid fa-xmark"></i> Cancelar</button><button class="btn btn-danger btn-lg" onclick="Auth.efetivarLogout()"><i class="fa-solid fa-check"></i> Sim, Sair</button></div></div></div></div>
+
 <div class="modal-overlay" id="modalTurnoFimSemana"><div class="modal" style="max-width:420px;"><div class="modal-head"><h3><i class="fa-solid fa-calendar-week" style="color:var(--warning);"></i> Seleção de Turno</h3><button class="modal-close" onclick="UI.closeModal('modalTurnoFimSemana')">×</button></div><div class="alert alert-warning"><i class="fa-solid fa-circle-info"></i><div>Hoje é <strong>final de semana</strong>. Qual turno?<br><small style="color:var(--text-light);margin-top:4px;display:block;">⏰ Pergunta a cada 2h.</small></div></div><div style="display:flex;flex-direction:column;gap:8px;"><button class="btn" onclick="Turno.confirmarFimSemana('1º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 1º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('2º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 2º Turno</button><button class="btn" onclick="Turno.confirmarFimSemana('3º Turno')" style="justify-content:flex-start;"><i class="fa-solid fa-clock" style="margin-right:10px;"></i> 3º Turno</button></div></div></div>
+
 <div class="modal-overlay" id="modalSenhaAdmin"><div class="modal" style="max-width:500px;padding:25px;"><div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--weg-blue);"></i> Acesso Restrito</h3><button class="modal-close" onclick="Auth.cancelarLoginAdmin()">×</button></div><div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div>Digite a senha de administrador.</div></div><div id="senhaAdminErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div id="senhaAdminErroMsg">Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputSenhaAdmin" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarLoginAdmin();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputSenhaAdmin',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarLoginAdmin()">Cancelar</button><button class="btn btn-success" onclick="Auth.confirmarLoginAdmin()"><i class="fa-solid fa-unlock"></i> Entrar</button></div></div></div>
+
 <div class="modal-overlay" id="modalConfirmarSenha"><div class="modal" style="max-width:500px;padding:25px;"><div class="modal-head"><h3><i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i> <span id="modalConfirmarTitulo">Confirmação</span></h3><button class="modal-close" onclick="Auth.cancelarConfirmacaoSenha()">×</button></div><div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i><div id="modalConfirmarAviso">Digite a senha.</div></div><div id="confirmarSenhaErro" class="alert alert-danger" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i><div>Senha incorreta.</div></div><div class="form-group" style="margin-bottom:15px;"><label>Senha <span class="req">*</span></label><div class="password-wrapper"><input type="password" id="inputConfirmarSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter'){event.preventDefault();Auth.confirmarAcaoSenha();}"><button type="button" class="password-toggle" onclick="UI.togglePwdVisibility('inputConfirmarSenha',this)"><i class="fa-solid fa-eye"></i></button></div></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="Auth.cancelarConfirmacaoSenha()">Cancelar</button><button class="btn btn-danger" onclick="Auth.confirmarAcaoSenha()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+
 <div class="modal-overlay" id="modalEditar"><div class="modal"><div class="modal-head"><h3><i class="fa-solid fa-pen" style="color:var(--weg-blue);"></i> Editar Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalEditar')">×</button></div><form onsubmit="return Admin.salvarEdicao(event)"><input type="hidden" id="edit-id"><div class="form-grid"><div class="form-group"><label>PEP</label><input type="text" id="edit-pep"></div><div class="form-group"><label>Diagrama/Ordem</label><input type="text" id="edit-diagrama"></div><div class="form-group"><label>Placa</label><input type="text" id="edit-placa"></div><div class="form-group"><label>Descrição</label><input type="text" id="edit-descricao"></div><div class="form-group"><label>Processo</label><select id="edit-processo" onchange="Admin.toggleVolumesEdicao()"><option value="Nanocerâmico">Nanocerâmico</option><option value="Pintura">Pintura</option><option value="Conferência">Conferência</option></select></div><div class="form-group" id="group-edit-volumes"><label>Volumes</label><input type="text" id="edit-volumes"></div><div class="form-group"><label>Prioridade</label><select id="edit-prioridade"><option value="Normal">Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div><div class="form-group"><label>Status</label><select id="edit-status"><option value="Aguardando">Aguardando</option><option value="Em Processo">Em Processo</option></select></div><div class="form-group full"><label>Observações</label><textarea id="edit-obs" rows="2"></textarea></div><div class="form-actions"><button type="button" class="btn btn-secondary" onclick="UI.closeModal('modalEditar')">Cancelar</button><button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Salvar</button></div></div></form></div></div>
+
 <div class="modal-overlay" id="modalConcluir"><div class="modal" style="max-width:500px;"><div class="modal-head"><h3><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> Concluir Projeto</h3><button class="modal-close" onclick="UI.closeModal('modalConcluir')">×</button></div><p style="margin-bottom:15px;">Projeto <strong id="concluirCodigo"></strong></p><div id="concluirVolumesSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoNano"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="margin-top:10px;">Total: <strong id="concluirTotalVolumes" style="color:var(--weg-blue);">0</strong> | Processados: <strong id="concluirJaProcessados" style="color:var(--success);">0</strong> | Faltam: <strong id="concluirFaltam" style="color:var(--warning);">0</strong></div><div class="form-group" style="margin-top:10px;"><label>Processar agora <span class="req">*</span></label><input type="text" id="concluirVolumesProcessados" inputmode="numeric" pattern="[0-9]*" min="1" required placeholder="Ex: 5"></div><div style="margin-top:8px;">Restará: <strong id="concluirVolumesRestantes" style="color:var(--warning);">0</strong></div></div><div id="concluirPinturaSection" style="display:none; margin:15px 0; padding:15px; background:var(--bg); border-radius:8px;"><div class="form-group"><label>Turno <span class="req">*</span></label><select id="concluirTurnoPintura"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div class="form-group" style="margin-top:10px;"><label>Status de Conclusão <span class="req">*</span></label><select id="concluirStatusPintura"><option value="Concluído">Concluído (avança para Conferência)</option><option value="Parcial">Parcial (permanece na Pintura)</option></select></div><div class="form-group" style="margin-top:10px;"><label>Observação</label><select id="concluirObservacaoPintura"><option value="">Nenhuma</option><option value="Peças em reprocesso">Peças em reprocesso</option><option value="Gancherias pendentes">Gancherias pendentes</option></select></div></div><div class="form-group" id="concluirTurnoNormal" style="margin-bottom:15px;"><label>Turno</label><select id="concluirTurno"><option value="1º Turno">1º Turno</option><option value="2º Turno">2º Turno</option><option value="3º Turno">3º Turno</option></select></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-secondary" onclick="UI.closeModal('modalConcluir')">Cancelar</button><button class="btn btn-success" onclick="Conclusao.confirmar()"><i class="fa-solid fa-check"></i> Confirmar</button></div></div></div>
+
 <div class="modal-overlay" id="modalCadastroPosto">
 <div class="modal" style="max-width:650px;">
 <div class="modal-head">
@@ -710,7 +736,7 @@ input, select, textarea { position:relative; z-index:5; }
 <i class="fa-solid fa-barcode"></i>
 <div>
 <strong>Leitor de Código de Barras</strong>
-<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipe.<br><strong>📌 Importante:</strong> Se selecionar "Ordem de Produção", ao apontar, ela será enviada para a aba Apontamentos com "Involucro" na coluna K.</div>
+<div style="font-size:11px;margin-top:2px;opacity:.85;">Bipe o código da etiqueta ou digite manualmente. O sistema extrairá o Diagrama/Ordem automaticamente. Selecione o tipo do código antes de bipe.<br><strong> Importante:</strong> Ao selecionar "Ordem de Produção", ao concluir o Nanocerâmico, ela será enviada automaticamente para a aba Apontamentos com a marcação "Involucro" na coluna K.</div>
 </div>
 </div>
 <form onsubmit="return Posto.cadastrarProjetoManual(event)">
@@ -718,8 +744,8 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="form-group">
 <label>Tipo do Código <span class="req">*</span></label>
 <select id="cpo-tipo" required onchange="Posto.atualizarLabelCodigo()">
-<option value="Diagrama">Diagrama</option>
-<option value="Ordem">Ordem de Produção</option>
+<option value="Diagrama">Diagrama (9 dígitos)</option>
+<option value="Ordem">Ordem de Produção (10 dígitos)</option>
 </select>
 </div>
 <div class="form-group">
@@ -766,7 +792,9 @@ input, select, textarea { position:relative; z-index:5; }
 </form>
 </div>
 </div>
+
 <div class="toast-container" id="toastContainer"></div>
+
 <div class="virtual-keyboard" id="virtualKeyboard">
 <div class="vk-header"><i class="fa-solid fa-keyboard"></i><span>Teclado Numérico</span></div>
 <div class="vk-row"><button class="vk-key" data-key="7">7</button><button class="vk-key" data-key="8">8</button><button class="vk-key" data-key="9">9</button><button class="vk-key action danger" data-action="backspace"><i class="fa-solid fa-delete-left"></i></button></div>
@@ -774,6 +802,7 @@ input, select, textarea { position:relative; z-index:5; }
 <div class="vk-row"><button class="vk-key" data-key="1">1</button><button class="vk-key" data-key="2">2</button><button class="vk-key" data-key="3">3</button><button class="vk-key action danger" data-action="close"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="vk-row"><button class="vk-key wide" data-key="0" style="flex:2;max-width:180px;">0</button><button class="vk-key" data-key=".">.</button><button class="vk-key" data-key="-">-</button></div>
 </div>
+
 <script>
 /* ============================================================
 CONFIGURAÇÃO E ESTADO
@@ -788,7 +817,7 @@ APONTAMENTOS_SYNC_INTERVAL: 20000
 };
 const FLUXO_PROCESSOS = { 'Nanocerâmico': 'Pintura', 'Pintura': 'Conferência', 'Conferência': null };
 const CONFIG = {
-STORAGE_KEY: 'weg_fluxo_produtivo_v44',
+STORAGE_KEY: 'weg_fluxo_produtivo_v45',
 SENHA_PADRAO: '16101961',
 PRIORIDADE_ORDEM: { 'Urgente': 0, 'Alta': 1, 'Normal': 2 },
 TURNO_COOLDOWN: 2 * 60 * 60 * 1000
@@ -815,6 +844,7 @@ isTabVisible: true
 let lastSyncTimestamp = 0;
 let syncInProgress = false;
 const eventListeners = {};
+
 /* ============================================================
 UTILITÁRIOS
 ============================================================ */
@@ -862,7 +892,8 @@ Processo: projeto.processo, Prioridade: projeto.prioridade, Status: projeto.stat
 Obs: projeto.obs, CriadoEm: projeto.criadoEm, AtualizadoEm: projeto.atualizadoEm || Date.now(),
 DataHoraInicio: projeto.dataHoraInicio || null, DataHoraFim: projeto.dataHoraFim || null,
 TempoReal: projeto.tempoReal || null, ConcluidoEm: projeto.concluidoEm || null,
-ObservacaoPintura: projeto.observacaoPintura || null
+ObservacaoPintura: projeto.observacaoPintura || null,
+TipoCodigo: projeto.tipoCodigo || null
 };
 },
 fromApiFormat: function(apiProj) {
@@ -885,7 +916,8 @@ dataHoraInicio: apiProj.DataHoraInicio ? Number(apiProj.DataHoraInicio) : null,
 dataHoraFim: apiProj.DataHoraFim ? Number(apiProj.DataHoraFim) : null,
 tempoReal: apiProj.TempoReal ? Number(apiProj.TempoReal) : null,
 concluidoEm: apiProj.ConcluidoEm ? Number(apiProj.ConcluidoEm) : null,
-observacaoPintura: apiProj.ObservacaoPintura || null
+observacaoPintura: apiProj.ObservacaoPintura || null,
+tipoCodigo: apiProj.TipoCodigo || null
 };
 },
 extrairDadosEtiqueta: function(texto) {
@@ -1042,6 +1074,7 @@ if (State.searchTimers[key]) clearTimeout(State.searchTimers[key]);
 State.searchTimers[key] = setTimeout(fn, delay);
 }
 };
+
 /* ============================================================
 API
 ============================================================ */
@@ -1108,6 +1141,7 @@ async function clearAllData() { return await apiRequest('clearAll', {}); }
 async function salvarApontamento(data) { return await apiRequest('salvarApontamento', { data: data }); }
 async function buscarApontamentos(desde) { return await apiRequest('buscarApontamentos', { desde: desde }, 'GET'); }
 window.API = { createProject: createProject, updateProject: updateProject, deleteProject: deleteProject, createHistorico: createHistorico, createHistoricoPosto: createHistoricoPosto, deleteHistorico: deleteHistorico, updateConfig: updateConfig, clearAllData: clearAllData, salvarApontamento: salvarApontamento, buscarApontamentos: buscarApontamentos, on: on, off: off };
+
 /* ============================================================
 STORAGE
 ============================================================ */
@@ -1163,6 +1197,7 @@ throw error;
 }
 }
 };
+
 /* ============================================================
 UI
 ============================================================ */
@@ -1413,9 +1448,7 @@ UI.scrollParaElemento(target);
 });
 }
 };
-/* ============================================================
-SMART POLLING
-============================================================ */
+
 function setupVisibilityDetection() {
 document.addEventListener('visibilitychange', function() {
 State.isTabVisible = !document.hidden;
@@ -1428,6 +1461,7 @@ iniciarSyncComRetry();
 function getCurrentPollingInterval() {
 return State.isTabVisible ? API_CONFIG.POLLING_INTERVAL_ACTIVE : API_CONFIG.POLLING_INTERVAL_BACKGROUND;
 }
+
 /* ============================================================
 NAVIGATION
 ============================================================ */
@@ -1453,6 +1487,7 @@ if (page === 'config') Config.loadUI();
 UI.closeSidebarMobile();
 }
 };
+
 /* ============================================================
 APONTAMENTO
 ============================================================ */
@@ -1589,9 +1624,8 @@ btnApontar.disabled = true;
 btnApontar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
 try {
 var turnoAtual = Utils.detectarTurnoAutomatico();
-// ✅ ALTERAÇÃO 2: Envia objetos completos (com codigo e tipo) ao invés de só strings
 var dataEnvio = {
-ordens: State.apontamentoLista,
+ordens: State.apontamentoLista.map(function(o) { return o.codigo; }),
 turno: turnoAtual,
 operador: State.currentUser,
 posto: State.currentPosto,
@@ -1620,6 +1654,7 @@ document.getElementById('apontInput').focus();
 }
 }
 };
+
 /* ============================================================
 AUTH
 ============================================================ */
@@ -1759,13 +1794,12 @@ Dashboard.render();
 Charts.render();
 }
 };
-/* ============================================================
-SYNC
-============================================================ */
+
 function clearSyncIntervals() {
 State.syncIntervalIds.forEach(function(id) { clearInterval(id); });
 State.syncIntervalIds = [];
 }
+
 async function syncDataCompleto() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -1830,6 +1864,7 @@ throw error;
 syncInProgress = false;
 }
 }
+
 async function syncDataIncremental() {
 if (syncInProgress) return;
 syncInProgress = true;
@@ -1866,6 +1901,7 @@ UI.setSyncStatus('disconnected');
 syncInProgress = false;
 }
 }
+
 function updateUI() {
 if (State.currentUser === 'admin') Admin.renderTable();
 if (State.currentPosto) Posto.render();
@@ -1874,6 +1910,7 @@ Historico.renderGeral();
 Historico.renderPostos();
 Charts.render();
 }
+
 function iniciarSyncComRetry() {
 clearSyncIntervals();
 var tentarSync = async function() {
@@ -1892,6 +1929,7 @@ setTimeout(tentarSync, 5000);
 };
 tentarSync();
 }
+
 /* ============================================================
 CONFIG
 ============================================================ */
@@ -1967,10 +2005,10 @@ if (/[A-Z]/.test(senha) && /[a-z]/.test(senha)) score++;
 if (/\d/.test(senha)) score++;
 if (/[^A-Za-z0-9]/.test(senha)) score++;
 if (score <= 2) {
-el.textContent = ' Senha fraca';
+el.textContent = '🔴 Senha fraca';
 el.className = 'password-strength strength-weak';
 } else if (score <= 3) {
-el.textContent = ' Senha média';
+el.textContent = '🟡 Senha média';
 el.className = 'password-strength strength-medium';
 } else {
 el.textContent = '🟢 Senha forte';
@@ -1978,6 +2016,7 @@ el.className = 'password-strength strength-strong';
 }
 }
 };
+
 /* ============================================================
 DASHBOARD
 ============================================================ */
@@ -2124,6 +2163,7 @@ document.getElementById('posto-ultimo-data').textContent = '-';
 }
 }
 };
+
 /* ============================================================
 ADMIN
 ============================================================ */
@@ -2414,6 +2454,7 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
+
 /* ============================================================
 POSTO
 ============================================================ */
@@ -2503,7 +2544,11 @@ atualizarLabelCodigo: function() {
 var tipo = document.getElementById('cpo-tipo').value;
 var label = document.getElementById('cpo-label-codigo');
 if (label) {
-label.innerHTML = 'Código de Barras (' + tipo + ') <span class="req">*</span>';
+if (tipo === 'Ordem') {
+label.innerHTML = 'Código de Barras (Ordem de Produção) <span class="req">*</span>';
+} else {
+label.innerHTML = 'Código de Barras (Diagrama) <span class="req">*</span>';
+}
 }
 },
 processarCodigoBarras: function() {
@@ -2598,21 +2643,6 @@ UI.closeModal('modalCadastroPosto');
 UI.showToast('success', 'Cadastrado manualmente', 'Projeto ' + diagrama + ' cadastrado com sucesso');
 try {
 await Storage.salvarApi('create', novo);
-// ✅ ALTERAÇÃO 1: Se for Ordem de Produção, adiciona na fila de apontamentos com o campo tipo
-if (tipo === 'Ordem' && State.currentPosto === 'Nanocerâmico') {
-var existeNaLista = State.apontamentoLista.find(function(o) { return o.codigo === diagrama; });
-if (!existeNaLista) {
-State.apontamentoLista.push({
-codigo: diagrama,
-tipo: 'Ordem',
-timestamp: Date.now(),
-hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-});
-Apontamento.renderLista();
-Apontamento.atualizarStats();
-UI.showToast('info', 'Ordem adicionada ao Apontamento', diagrama + ' foi automaticamente adicionada à fila de apontamento. Vá até a aba Apontamento e clique em "Apontar" para enviar ao VBA.');
-}
-}
 } catch (error) {
 console.error('Erro ao cadastrar manualmente:', error);
 State.data.projetos = State.data.projetos.filter(function(p) { return p.id !== novo.id; });
@@ -2753,8 +2783,9 @@ UI.showToast('error', 'Erro', 'Não foi possível pausar: ' + error.message);
 }
 }
 };
+
 /* ============================================================
-CONCLUSAO
+CONCLUSAO - COM ENVIO AUTOMÁTICO PARA APONTAMENTOS
 ============================================================ */
 const Conclusao = {
 solicitar: function(id) {
@@ -2887,10 +2918,32 @@ UI.openModal('modalConcluir');
 }
 State.projetoParaConcluir = null;
 },
+enviarParaApontamento: async function(p, turno) {
+try {
+var dataEnvio = {
+ordens: [p.diagrama],
+turno: turno,
+operador: State.currentUser,
+posto: 'Nanocerâmico',
+dataEnvio: new Date().toISOString(),
+total: 1,
+involucro: (p.tipoCodigo === 'Ordem') ? 'Involucro' : ''
+};
+await API.salvarApontamento(dataEnvio);
+UI.showToast('success', 'Apontamento automático', p.diagrama + ' enviado para a aba Apontamentos' + (p.tipoCodigo === 'Ordem' ? ' com marcação "Involucro"' : ''));
+} catch (error) {
+console.error('Erro ao enviar para apontamento:', error);
+UI.showToast('warning', 'Atenção', 'Projeto concluído mas não foi enviado para Apontamentos: ' + error.message);
+}
+},
 moverParaProximoProcesso: async function(p, turno) {
 var proximoProcesso = FLUXO_PROCESSOS[p.processo];
 var tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
 await this.registrarHistoricoPosto(p, turno, tempoReal);
+// SE FOR ORDEM DE PRODUÇÃO, ENVIA AUTOMATICAMENTE PARA APONTAMENTOS COM "INVOLUCRO"
+if (p.tipoCodigo === 'Ordem' && p.processo === 'Nanocerâmico') {
+await this.enviarParaApontamento(p, turno);
+}
 if (proximoProcesso) {
 p.processo = proximoProcesso;
 p.status = 'Aguardando';
@@ -2913,6 +2966,10 @@ await this.finalizarProjeto(p, turno);
 finalizarProjeto: async function(p, turno) {
 var tempoReal = Date.now() - (p.dataHoraInicio || p.criadoEm);
 await this.registrarHistoricoPosto(p, turno, tempoReal);
+// SE FOR ORDEM DE PRODUÇÃO, ENVIA AUTOMATICAMENTE PARA APONTAMENTOS COM "INVOLUCRO"
+if (p.tipoCodigo === 'Ordem') {
+await this.enviarParaApontamento(p, turno);
+}
 p.dataHoraFim = Date.now();
 p.tempoReal = tempoReal;
 p.concluidoEm = Date.now();
@@ -2970,6 +3027,7 @@ if (!p) return;
 await this.moverParaProximoProcesso(p, turno);
 }
 };
+
 /* ============================================================
 HISTORICO
 ============================================================ */
@@ -3126,6 +3184,7 @@ UI.showToast('error', 'Erro', 'Não foi possível excluir da nuvem: ' + error.me
 }
 }
 };
+
 /* ============================================================
 TURNO
 ============================================================ */
@@ -3145,6 +3204,7 @@ UI.closeModal('modalTurnoFimSemana');
 State.turnoFimSemanaModalAberto = false;
 }
 };
+
 /* ============================================================
 VIRTUAL KEYBOARD
 ============================================================ */
@@ -3167,6 +3227,7 @@ State.vkActive = false;
 State.vkTarget = null;
 }
 };
+
 /* ============================================================
 CHARTS
 ============================================================ */
@@ -3325,6 +3386,7 @@ ticks: { callback: function(v) { return v + '%'; } }
 });
 }
 };
+
 /* ============================================================
 EXPORT
 ============================================================ */
@@ -3433,6 +3495,7 @@ URL.revokeObjectURL(url);
 UI.showToast('success', 'Backup gerado', 'Arquivo de backup baixado');
 }
 };
+
 /* ============================================================
 INICIALIZAÇÃO
 ============================================================ */
